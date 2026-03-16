@@ -446,7 +446,7 @@ std::shared_ptr<MeshResourceData> MeshInfoFactory::CreateSpriteQuadInfo(Renderer
 		{ VEC3(w,    h,    0.0f),  VEC2(1.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, -1.0f)}, // 右下
 	};
 
-	*meshData = CreateMesh(pDevice, vertices, g_SpriteQuadVertexNum, g_QuadIndices, g_SpriteQuadIndexNum);
+	*meshData = CreateMesh(pDevice, vertices, g_SpriteQuadVertexNum, g_QuadIndices, g_SpriteQuadIndexNum, true);
 
 	// マテリアル情報設定
 	meshData->pMaterials;

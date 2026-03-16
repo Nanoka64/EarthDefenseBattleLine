@@ -45,6 +45,7 @@ struct MeshResourceData
 	UINT NumIndex;										// インデックス数
 	std::weak_ptr<Material> pMaterials;					// マテリアル（基本一つだけ）
 	UINT NumMaterial;
+	bool IsDynamic;										// 動的メッシュか（バッファの切り替え）
 
 	MeshResourceData() :
 		pVertexBuffer(nullptr),
@@ -53,7 +54,8 @@ struct MeshResourceData
 		pIndexBuffer(nullptr),
 		NumIndex(0),
 		pMaterials(),
-		NumMaterial(0)
+		NumMaterial(0),
+		IsDynamic(false)
 	{};
 };
 
@@ -64,21 +66,28 @@ public:
 	~MeshInfoFactory();
 
 	template<typename TVertex>
-	static MeshResourceData CreateMesh(ID3D11Device* pDevice,TVertex* pVertices, const UINT vNum,const WORD* pIndices, UINT iNum)
+	static MeshResourceData CreateMesh(ID3D11Device* pDevice,TVertex* pVertices, const UINT vNum,const WORD* pIndices, UINT iNum, bool isDynamic = false)
 	{
 		MeshResourceData meshData = {};
 		meshData.VertexStride = sizeof(TVertex); // ここで型のサイズを固定値にする
 		meshData.NumVertex = vNum;
 		meshData.NumIndex = iNum;
+		meshData.IsDynamic = isDynamic;
 
 		/////////////////////////////////////////////////////////////////////
 		// 頂点バッファの作成
 		/////////////////////////////////////////////////////////////////////
 		D3D11_BUFFER_DESC bd{};
-		bd.Usage = D3D11_USAGE_DEFAULT;						// 標準設定
+		if (isDynamic) {
+			bd.Usage = D3D11_USAGE_DYNAMIC;					// 動的バッファ
+			bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;		// CPU書き込み
+		}
+		else {
+			bd.Usage = D3D11_USAGE_DEFAULT;					// 標準設定
+			bd.CPUAccessFlags = 0;							// CPUから書き込みしない
+		}
 		bd.ByteWidth = meshData.VertexStride * vNum;		// バッファのサイズ
 		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;			// 頂点バッファとして使う
-		bd.CPUAccessFlags = 0;								// CPUから書き込みしない
 
 		// 頂点バッファのデータ初期化構造体
 		D3D11_SUBRESOURCE_DATA initData{};
