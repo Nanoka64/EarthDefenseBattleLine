@@ -6,6 +6,7 @@
 //
 // \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 #pragma once
+#include "ConstantBuffers_H.hlsli"
 SamplerState g_sSampler : register(s0);
 Texture2D g_tTexture : register(t0); // ディフューズ
 

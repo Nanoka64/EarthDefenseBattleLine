@@ -35,6 +35,7 @@ private:
 	float m_Width;
 	float m_Height;
 
+	VECTOR4::VEC4 m_Color;		// 頂点カラー
 	VECTOR2::VEC2 m_UVOffset;	// uvオフセット
 
 	SHADER_TYPE m_ShaderType;	// 使用するシェーダの種類
@@ -63,6 +64,9 @@ public:
 	void set_Height(float h);
 	float get_Width()const;
 	float get_Height()const;
+
+	void set_Color(const VECTOR4::VEC4 &_col) { m_Color = _col; }
+	VECTOR4::VEC4 get_Color()const { return m_Color; }
 
 	// ブレンドモードの設定
 	void set_BlendMode(const BLEND_MODE _blend) { m_BlendMode = _blend; }

@@ -1,6 +1,8 @@
 #pragma once
 #include "IComponent.h"
 
+class SpriteRenderer;
+
 // ***************************************************************************************
 // ---------------------------------------------------------------------------------------
 /* --- @:Button Class --- */
@@ -8,12 +10,13 @@
 //  ★継承：IComponent ★
 //
 // 【?】Unity風のボタン
+//		とりあえず、見た目の変化は無しでクリック処理のみ
 //		
 // ***************************************************************************************
 class Button : public IComponent
 {
 private:
-	enum class STATE { NORMAL, HIGH_LIGHTED, PRESSED, DISABLED, NUM };	// 通常/ハイライト/クリック中/無効中
+	enum class STATE { NORMAL, HIGH_LIGHTED, PRESSED, SELECTED, DISABLED, NUM };	// 通常/ハイライト/押されている/選択された/無効中
 	enum class TRANSITION { COLOR, SPRITE };							// 遷移オプション 
 
 	VECTOR4::VEC4 m_StateColor[UINT_CAST(STATE::NUM)];	// それぞれのステートごとのカラー
@@ -23,6 +26,7 @@ private:
 	bool m_IsInteractable;				// 入力を受け付けるかどうか
 	std::string m_Text;					// テキスト
 	std::weak_ptr<RectTransform> m_pMyTransform;	// 自分のトランスフォーム
+	std::weak_ptr<SpriteRenderer> m_pSprite;		// スプライト
 
 public:
 	Button(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
@@ -31,6 +35,18 @@ public:
 	void Start(RendererEngine &renderer) override;		// 初期化
 	void Update(RendererEngine &renderer) override;		// 更新処理
 	void Draw(RendererEngine &renderer)override;		// 描画処理
+
+	/// <summary>
+	/// ボタン用のスプライト設定
+	/// </summary>
+	/// <param name="_pComp"></param>
+	void set_Sprite(const std::shared_ptr<SpriteRenderer> &_pComp) { m_pSprite = _pComp; }
+
+	/// <summary>
+	/// 現在の状態を取得
+	/// </summary>
+	/// <returns></returns>
+	STATE get_State()const { return m_CrntState; }	
 
 	/// <summary>
 	/// クリックされた際の処理を登録

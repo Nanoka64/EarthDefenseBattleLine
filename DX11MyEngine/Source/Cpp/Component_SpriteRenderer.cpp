@@ -26,7 +26,8 @@ m_VSUserExpandCBNum(0),
 m_PSUserExpandCBNum(0),
 m_UVOffset(VECTOR2::VEC2()),
 m_BlendMode(BLEND_MODE::ALPHA),
-m_pCBSpritDataSet(nullptr)
+m_pCBSpritDataSet(nullptr),
+m_Color(VEC4(1.0f))
 {
     this->set_Tag("SpriteRenderer");
 }
@@ -80,7 +81,7 @@ void SpriteRenderer::Draw(RendererEngine &renderer)
 	Master::m_pShaderManager->DeviceToSetShader(m_ShaderType);
 	
 	// 頂点情報の更新
-	//VertexUpdate(renderer);
+	VertexUpdate(renderer);
 
 	auto transform = m_pOwner.lock()->get_RectTransform().lock();
 	transform->UpdateUILocalMatrix();
@@ -167,6 +168,40 @@ void SpriteRenderer::Draw(RendererEngine &renderer)
 
 
 	Master::m_pBlendManager->DeviceToSetBlendState(BLEND_MODE::NONE);
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:SpriteRenderer Class 
+//*【?】頂点情報の更新
+//* 引数：なし
+//* 返値：void
+//*----------------------------------------------------------------------------------------
+void SpriteRenderer::VertexUpdate(RendererEngine& renderer)
+{
+	auto pContext = renderer.get_DeviceContext();
+
+	if (m_pMeshData->IsDynamic)
+	{
+		float hw = m_Width;
+		float hh = m_Height;
+		VEC3 centerPos = m_pOwner.lock()->get_RectTransform().lock()->get_VEC3ToPos();
+
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		pContext->Map(m_pMeshData->pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);	// バッファにアクセス
+
+		// 頂点ポインタとしてキャストして取得
+		VERTEX_Static *pV = reinterpret_cast<VERTEX_Static *>(mappedResource.pData);
+
+		// 頂点情報の書き換え
+		pV[0] = { VEC3(0.0f, 0.0f, 0.0f),  VEC2(0.0f, 0.0f), m_Color, VEC3(0.0f, 0.0f, -1.0f) };
+		pV[1] = { VEC3(1.0f, 0.0f, 0.0f),  VEC2(1.0f, 0.0f), m_Color, VEC3(0.0f, 0.0f, -1.0f) };
+		pV[2] = { VEC3(0.0f, 1.0f, 0.0f),  VEC2(0.0f, 1.0f), m_Color, VEC3(0.0f, 0.0f, -1.0f) };
+		pV[3] = { VEC3(1.0f, 1.0f, 0.0f),  VEC2(1.0f, 1.0f), m_Color, VEC3(0.0f, 0.0f, -1.0f) };
+
+		pContext->Unmap(m_pMeshData->pVertexBuffer, 0);												// アクセス終了
+	}
+
+	//pContext->UpdateSubresource(m_pMeshData->pVertexBuffer, 0, nullptr, vertices, 0, 0);
 }
 
 
@@ -272,37 +307,6 @@ bool SpriteRenderer::Setup(const CreateSpriteInfo& info)
 	return true;
 }
 
-
-//*---------------------------------------------------------------------------------------
-//* @:SpriteRenderer Class 
-//*【?】頂点情報の更新
-//* 引数：なし
-//* 返値：void
-//*----------------------------------------------------------------------------------------
-void SpriteRenderer::VertexUpdate(RendererEngine& renderer)
-{
-	auto pContext = renderer.get_DeviceContext();
-
-	float hw = m_Width;
-	float hh = m_Height;
-	VEC3 centerPos = m_pOwner.lock()->get_RectTransform().lock()->get_VEC3ToPos();
-
-	VERTEX_Static vertices[4];
-
-	vertices[0].pos = VEC3(centerPos.x - hw, centerPos.y + hh,  0.0f);
-	vertices[1].pos = VEC3(centerPos.x + hw, centerPos.y + hh,  0.0f);
-	vertices[2].pos = VEC3(centerPos.x - hw, centerPos.y - hh,  0.0f);
-	vertices[3].pos = VEC3(centerPos.x + hw, centerPos.y - hh,  0.0f);	
-	vertices[0].uv = VEC2(0.0f, 0.0f);
-	vertices[1].uv = VEC2(1.0f, 0.0f);
-	vertices[2].uv = VEC2(0.0f, 1.0f);
-	vertices[3].uv = VEC2(1.0f, 1.0f);
-	vertices[0].color = VEC4(1.0f, 1.0f,1.0f,1.0f);
-	vertices[1].color = VEC4(1.0f, 1.0f,1.0f,1.0f);
-	vertices[2].color = VEC4(1.0f, 1.0f,1.0f,1.0f);
-	vertices[3].color = VEC4(1.0f, 1.0f,1.0f,1.0f);
-	pContext->UpdateSubresource(m_pMeshData->pVertexBuffer, 0, nullptr, vertices, 0, 0);
-}
 
 // ----------------------------------------------------------------------------------------------------------------------
 //       * IPolyResource Class - 定数バッファの作成- *

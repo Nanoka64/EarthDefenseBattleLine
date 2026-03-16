@@ -4,6 +4,7 @@
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
 #include "Component_SpriteRenderer.h"
+#include "Component_Button.h"
 #include "Component_SkinnedMeshAnimator.h"
 #include "Component_PlayerController.h"
 #include "Component_BoxCollider.h"
@@ -322,6 +323,28 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         {
             sprite.ObjTag = "TitleDescription01_Sp" + std::to_string(i + 1);
             //auto obj = MeshFactory::CreateSprite(sprite);
+        }
+    }
+
+    /* ボタンテスト用 */
+    {
+        CreateSpriteInfo sprite;
+        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Line.png");
+        sprite.ObjTag = "Button";
+        sprite.pRenderer = m_pRenderer;
+        sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+        sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
+        sprite.Width = 500.0f;
+        sprite.Height = 200.0f;
+        sprite.IsActive = true;
+        sprite.IsTransparent = true;
+        auto obj = MeshFactory::CreateSprite(sprite);
+        if (obj) {
+            obj->get_RectTransform().lock()->set_RectPosition(VEC2(960.0f, 500.0f));
+
+            auto button = obj->add_Component<Button>();
+            button->set_Sprite(obj->get_Component<SpriteRenderer>());
+            button->set_Text("Button");
         }
     }
 

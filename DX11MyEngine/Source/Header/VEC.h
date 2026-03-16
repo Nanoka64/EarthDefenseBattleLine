@@ -173,6 +173,7 @@ namespace VECTOR4
 
 		VEC4() : x(0.f), y(0.f), z(0.f), w(0.f) {};
 		VEC4(float _x, float _y, float _z, float _w) :x(_x), y(_y), z(_z), w(_w) {};
+		VEC4(float _scl) :x(_scl), y(_scl), z(_scl), w(_scl) {};
 		VEC4(const DirectX::XMFLOAT4& v) :x(v.x), y(v.y), z(v.z), w(v.w) {};    // XMFLOAT4ÇéÛÇØéÊÇÈç€ÇÃïœä∑
 		template<size_t N>
 		
