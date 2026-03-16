@@ -606,6 +606,9 @@
     <ClCompile Include="Source\Cpp\Component_TrailRenderer.cpp">
       <Filter>ソース ファイル\BaseComponent\Mesh\Effect</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Cpp\ObjectFactory.cpp">
+      <Filter>ソース ファイル\Obj</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Header\SHADER.h">
@@ -1006,6 +1009,9 @@
     </ClInclude>
     <ClInclude Include="Source\Header\Component_TrailRenderer.h">
       <Filter>ソース ファイル\BaseComponent\Mesh\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ObjectFactory.h">
+      <Filter>ソース ファイル\Obj</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

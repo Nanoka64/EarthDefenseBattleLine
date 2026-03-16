@@ -9,7 +9,7 @@
 enum class UTILITY_MESH_TYPE
 {
 	NONE = 0,
-	CUBU,
+	CUBE,
 	QUAD,
 	SPHERE,
 	PLANE,

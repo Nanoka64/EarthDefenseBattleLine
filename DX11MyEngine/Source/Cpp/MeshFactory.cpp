@@ -210,7 +210,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateSkybox(const CreateSkyboxIn
     auto skyRenderer = pObj->add_Component<SkyRenderer>();
 
     // リソースのセットアップ                                  ↓キューブにする
-    if (!meshResource->Setup(*info.pRenderer, info.ShaderType, UTILITY_MESH_TYPE::CUBU, info.MaterialData->pMaterialData, info.MatNum, false))return {};
+    if (!meshResource->Setup(*info.pRenderer, info.ShaderType, UTILITY_MESH_TYPE::CUBE, info.MaterialData->pMaterialData, info.MatNum, false))return {};
 
     // Rendererにリソースを設定
     skyRenderer->set_MeshResource(meshResource);
@@ -241,7 +241,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateDecal(const CreateDecalInfo
     auto decalRenderer = pObj->add_Component<DecalRenderer>();
 
     // リソースのセットアップ                                  ↓キューブにする
-    if (!meshResource->Setup(*info.pRenderer, info.ShaderType, UTILITY_MESH_TYPE::CUBU, info.MaterialData->pMaterialData, info.MatNum, false))return {};
+    if (!meshResource->Setup(*info.pRenderer, info.ShaderType, UTILITY_MESH_TYPE::CUBE, info.MaterialData->pMaterialData, info.MatNum, false))return {};
 
     // Rendererにリソースを設定
     decalRenderer->set_MeshResource(meshResource);

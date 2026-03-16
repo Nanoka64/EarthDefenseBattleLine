@@ -275,6 +275,7 @@
     <ClInclude Include="Source\Header\MeshFactory.h" />
     <ClInclude Include="Source\Header\Component_PointLight.h" />
     <ClInclude Include="Source\Header\DX_RenderTarget.h" />
+    <ClInclude Include="Source\Header\ObjectFactory.h" />
     <ClInclude Include="Source\Header\ObjectPool.h" />
     <ClInclude Include="Source\Header\ObjectSelect.h" />
     <ClInclude Include="Source\Header\RenderPipeline.h" />
@@ -439,6 +440,7 @@
     <ClCompile Include="Source\Cpp\MeshFactory.cpp" />
     <ClCompile Include="Source\Cpp\Component_PointLight.cpp" />
     <ClCompile Include="Source\Cpp\DX_RenderTarget.cpp" />
+    <ClCompile Include="Source\Cpp\ObjectFactory.cpp" />
     <ClCompile Include="Source\Cpp\ObjectPool.cpp" />
     <ClCompile Include="Source\Cpp\ObjectSelect.cpp" />
     <ClCompile Include="Source\Cpp\RenderPipeline.cpp" />

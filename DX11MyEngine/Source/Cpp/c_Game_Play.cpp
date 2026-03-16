@@ -85,6 +85,7 @@ int c_Game_Play::Update(SceneManager *pOwner)
             B2Transform->SlerpLookAt(playerPos, 0.5f);
         }
     }
+
     return c_GAME::c_GAME_PLAY;
 }
 

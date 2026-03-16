@@ -426,7 +426,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
         CreateUtilityMeshInfo mesh;
         mesh.pRenderer = m_pRenderer;
-        mesh.Type = UTILITY_MESH_TYPE::CUBU;
+        mesh.Type = UTILITY_MESH_TYPE::CUBE;
         mesh.MatNum = 1;
         mesh.MaterialData = matInfo;
         mesh.IsActive = true;

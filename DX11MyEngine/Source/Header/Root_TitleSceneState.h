@@ -15,7 +15,10 @@ private:
 	bool m_IsLoad;	// ƒ[ƒhŠ®—¹‚µ‚Ä‚¢‚é‚©
 	
 	std::shared_ptr<class SpriteRenderer> m_pBackSprite;
+	std::shared_ptr<class SpriteRenderer> m_pBackSprite2;
+	std::shared_ptr<class RectTransform> m_pBackSprite2_Rect;
 	VECTOR2::VEC2 m_UVScroll;
+	VECTOR2::VEC2 m_UVScroll2;
 public:
 	void OnEnter(SceneManager* pOwner) override;
 	void OnExit(SceneManager* pOwner)override;

@@ -10,6 +10,9 @@
 
 using namespace SceneStateEnums;
 using namespace Tool::UV;
+using namespace VECTOR2;
+using namespace VECTOR3;
+using namespace VECTOR4;
 
 
 //*---------------------------------------------------------------------------------------
@@ -25,6 +28,8 @@ void Root_TitleSceneState::OnEnter(SceneManager* pOwner)
 
 	// タイトル用のスプライトをオフに
 	auto obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp");
+	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp2");
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleLogo_Sp");
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
@@ -51,6 +56,8 @@ void Root_TitleSceneState::OnExit(SceneManager* pOwner)
 
 	// タイトル用のスプライトをオフに
 	auto obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp");
+	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp2");
 	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleLogo_Sp");
 	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
@@ -119,22 +126,41 @@ void Root_TitleSceneState::Draw(SceneManager* pOwner)
 {
 	if (m_CrntChildStateID == -1)return;
 
+	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
+
 	//Master::m_pDirectWriteManager->DrawString("☆タイトルです",VECTOR2::VEC2(940, 540));
+
 
 	// スプライト取得
 	if (!m_pBackSprite)
 	{
 		auto obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp");
-		if (obj)
+		auto obj2 = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp2");
+
+		if (obj && obj2)
 		{
 			m_pBackSprite = obj->get_Component<SpriteRenderer>();
+			m_pBackSprite2 = obj2->get_Component<SpriteRenderer>();
+			m_pBackSprite2_Rect = obj2->get_RectTransform().lock();
 		}
 	}
 	else
 	{
-		// 背景のUVスクロール
-		m_UVScroll.x += 0.001f;;
+		// 最奥背景（緑のやつ）のグリッドスプライトの挙動
+		m_UVScroll.x += 0.001f;				// UVスクロール（左に動かす）
 		m_pBackSprite->set_UVOffset(m_UVScroll);
+
+
+		// 背景のグリッドスプライトの挙動
+		m_UVScroll2.x -= 0.001f;				// UVスクロール 最奥背景とは反対（右方向）に動かす 
+		m_pBackSprite2->set_UVOffset(m_UVScroll2);
+		float sin_factor = cosf(m_UVScroll.x * 30.0f);
+		VEC2 rectPos = VEC2(0.0f, -400.0f);		// 基準の位置
+		float wave_fctor = ((sin_factor * 0.3f) * 2.0f) - 1.0f;	// 波をゆっくり（x0.3）にした後、-1.0～1.0に変換する
+		rectPos.y += wave_fctor * 20.0f;		// 揺らす
+
+		m_pBackSprite2_Rect->set_RectPosition(rectPos);
+		m_pBackSprite2->set_Color(VEC4(sin_factor, sin_factor, sin_factor, 0.3f));	// αは最大0.3まで
 	}
 
 	// 子ステートの描画
