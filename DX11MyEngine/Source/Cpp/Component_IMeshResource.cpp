@@ -163,7 +163,7 @@ bool IMeshResource::Setup(RendererEngine& renderer, SHADER_TYPE shaderType, UTIL
 	case UTILITY_MESH_TYPE::NONE:
 		return false;
 		break;
-	case UTILITY_MESH_TYPE::CUBU:
+	case UTILITY_MESH_TYPE::CUBE:
 		m_pMeshData = MeshInfoFactory::CreateCubeInfo(renderer,materials, materialNum,isNormalMap);
 		break;
 	case UTILITY_MESH_TYPE::QUAD:

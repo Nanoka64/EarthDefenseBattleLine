@@ -95,7 +95,7 @@ void EnemyController::Start(RendererEngine& renderer)
 
 			CreateDecalInfo decal;
 			decal.pRenderer = &renderer;
-			decal.Type = UTILITY_MESH_TYPE::CUBU;
+			decal.Type = UTILITY_MESH_TYPE::CUBE;
 			decal.MatNum = 1;
 			decal.MaterialData = matInfo;
 			decal.IsActive = false;
@@ -150,7 +150,7 @@ void EnemyController::Start(RendererEngine& renderer)
 
 			CreateDecalInfo decal;
 			decal.pRenderer = &renderer;
-			decal.Type = UTILITY_MESH_TYPE::CUBU;
+			decal.Type = UTILITY_MESH_TYPE::CUBE;
 			decal.MatNum = 1;
 			decal.MaterialData = matInfo;
 			decal.IsActive = false;

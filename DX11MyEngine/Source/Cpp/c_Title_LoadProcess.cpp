@@ -229,7 +229,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
 
         CreateUtilityMeshInfo mesh;
         mesh.pRenderer = m_pRenderer;
-        mesh.Type = UTILITY_MESH_TYPE::CUBU;
+        mesh.Type = UTILITY_MESH_TYPE::CUBE;
         mesh.ObjTag = "DirLight";
         mesh.MatNum = 1;
         mesh.MaterialData = matInfo;
@@ -250,7 +250,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         obj->get_Transform().lock()->set_RotateToDeg(VEC3(15.0f, 150.0f, 0.0f));
     }
 
-    /* タイトル画面背景用スプライト */
+    /* タイトル画面背景用スプライト1 */
     {
         CreateSpriteInfo sprite;
         sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/TitleBack.png");
@@ -260,6 +260,23 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
         sprite.Width = m_pRenderer->get_ScreenWidth();
         sprite.Height = m_pRenderer->get_ScreenHeight();
+        sprite.IsActive = true;
+        sprite.IsTransparent = true;
+        auto obj = MeshFactory::CreateSprite(sprite);
+        if (obj) {
+            obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
+        }
+    }
+    /* タイトル画面背景用スプライト2 */
+    {
+        CreateSpriteInfo sprite;
+        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/2221833.png");
+        sprite.ObjTag = "TitleBack_Sp2";
+        sprite.pRenderer = m_pRenderer;
+        sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+        sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
+        sprite.Width = 2000.0f;
+        sprite.Height = 2300.0f;
         sprite.IsActive = true;
         sprite.IsTransparent = true;
         auto obj = MeshFactory::CreateSprite(sprite);
@@ -329,7 +346,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
     /* ボタンテスト用 */
     {
         CreateSpriteInfo sprite;
-        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Line.png");
+        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Logo.png");
         sprite.ObjTag = "Button";
         sprite.pRenderer = m_pRenderer;
         sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;

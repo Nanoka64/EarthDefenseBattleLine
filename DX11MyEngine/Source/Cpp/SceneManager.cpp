@@ -424,7 +424,7 @@ bool SceneManager::Init(RendererEngine &renderer)
 
         //    CreateUtilityMeshInfo mesh;
         //    mesh.pRenderer = &renderer;
-        //    mesh.Type = UTILITY_MESH_TYPE::CUBU;
+        //    mesh.Type = UTILITY_MESH_TYPE::CUBE;
         //    mesh.MatNum = 1;
         //    mesh.MaterialData = matInfo;
         //    mesh.IsActive = true;
