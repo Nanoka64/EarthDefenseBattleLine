@@ -192,11 +192,11 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         //pPlayerObj->get_Transform().lock()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
 
         // 軌跡
-        auto trail = pPlayerObj->add_Component<TrailRenderer>();
-        trail->set_MinVertexDistance(4.0f);
-        trail->set_Width(5.0f);
-        trail->set_EmissivePower(2.0f);
-        trail->set_Color(VEC4(1.0f, 1.0f, 1.0f, 1.0f));
+        //auto trail = pPlayerObj->add_Component<TrailRenderer>();
+        //trail->set_MinVertexDistance(4.0f);
+        //trail->set_Width(5.0f);
+        //trail->set_EmissivePower(2.0f);
+        //trail->set_Color(VEC4(1.0f, 1.0f, 1.0f, 1.0f));
 
         // コライダーの追加
         auto collider = pPlayerObj->add_Component<BoxCollider>();
@@ -283,6 +283,13 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         if (obj) {
             obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
         }
+
+        // もう一つ作る
+        sprite.ObjTag = "TitleBack_Sp3";
+        obj = MeshFactory::CreateSprite(sprite);
+        if (obj) {
+            obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
+        }
     }
     
     /* タイトルロゴ用スプライト */
@@ -345,24 +352,24 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
 
     /* ボタンテスト用 */
     {
-        CreateSpriteInfo sprite;
-        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Logo.png");
-        sprite.ObjTag = "Button";
-        sprite.pRenderer = m_pRenderer;
-        sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-        sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-        sprite.Width = 500.0f;
-        sprite.Height = 200.0f;
-        sprite.IsActive = true;
-        sprite.IsTransparent = true;
-        auto obj = MeshFactory::CreateSprite(sprite);
-        if (obj) {
-            obj->get_RectTransform().lock()->set_RectPosition(VEC2(960.0f, 500.0f));
+        //CreateSpriteInfo sprite;
+        //sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Logo.png");
+        //sprite.ObjTag = "Button";
+        //sprite.pRenderer = m_pRenderer;
+        //sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+        //sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
+        //sprite.Width = 500.0f;
+        //sprite.Height = 200.0f;
+        //sprite.IsActive = true;
+        //sprite.IsTransparent = true;
+        //auto obj = MeshFactory::CreateSprite(sprite);
+        //if (obj) {
+        //    obj->get_RectTransform().lock()->set_RectPosition(VEC2(960.0f, 500.0f));
 
-            auto button = obj->add_Component<Button>();
-            button->set_Sprite(obj->get_Component<SpriteRenderer>());
-            button->set_Text("Button");
-        }
+        //    auto button = obj->add_Component<Button>();
+        //    button->set_Sprite(obj->get_Component<SpriteRenderer>());
+        //    button->set_Text("Button");
+        //}
     }
 
 
