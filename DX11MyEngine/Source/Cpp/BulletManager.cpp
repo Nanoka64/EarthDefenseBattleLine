@@ -436,14 +436,14 @@ void BulletManager::Update(RendererEngine &renderer)
         }
     }
 
-    if (m_pExplosionBulletLightPool)
-    {
-        Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"a弾プールの確認"), 0);
-        Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"aプール最大数：%d"), m_pExplosionBulletLightPool->get_MaxNum());
-        Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"aプールの現在の生成数：%d"), m_pExplosionBulletLightPool->get_CrntCreateNum());
-        Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"a使用しているオブジェクト数：%d"), m_ExtractedExplosionLightArray.size());
-        Master::m_pDebugger->EndDebugWindow();
-    }
+    //if (m_pExplosionBulletLightPool)
+    //{
+    //    Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"爆発弾ライトプールの確認"), 0);
+    //    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"aプール最大数：%d"), m_pExplosionBulletLightPool->get_MaxNum());
+    //    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"aプールの現在の生成数：%d"), m_pExplosionBulletLightPool->get_CrntCreateNum());
+    //    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"a使用しているオブジェクト数：%d"), m_ExtractedExplosionLightArray.size());
+    //    Master::m_pDebugger->EndDebugWindow();
+    //}
 
     //////////////////////////////////////////////////////////////////////////////////////////
     //						デバッグ用

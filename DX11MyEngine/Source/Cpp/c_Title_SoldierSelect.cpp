@@ -27,10 +27,10 @@ static const VECTOR2::VEC2 g_ItemPosArray[UINT_CAST(SOLDIER_TYPE::NUM)] =
 /// </summary>
 static constexpr const char* g_SoldierNames[UINT_CAST(SOLDIER_TYPE::NUM)] =
 {
-	"レンジャー",
-	"ウイングダイバー",
-	"エアレイダー",
-	"フェンサー",
+	"陸戦歩兵",
+	"...",
+	"...",
+	"...",
 };
 
 /// <summary>
@@ -212,4 +212,6 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 	}
 
 	Master::m_pDirectWriteManager->DrawString("☆兵科選択", VECTOR2::VEC2(40.0f, 500.0f), "White_40_STD");
+	Master::m_pDirectWriteManager->DrawString("まだ選択できません", VECTOR2::VEC2(600.0f, 500.0f), "White_50_STD");
+
 }
