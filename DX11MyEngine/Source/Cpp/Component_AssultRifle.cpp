@@ -99,7 +99,7 @@ void AssultRifle::Update(RendererEngine &renderer)
     Master::m_pDebugger->EndDebugWindow();
 
     // 発射レートの切り替え
-    m_FireRate = m_IsExplosionBullet ? 5 : 5;
+    m_FireRate = m_IsExplosionBullet ? 20 : 5;
 
     // 右クリックでズーム
     renderer.get_CameraComponent()->set_Fov(90.0f);
@@ -148,7 +148,7 @@ void AssultRifle::Update(RendererEngine &renderer)
 
         // フラッシュ
         m_pFlashPointLight.lock()->set_Range(30.0f);
-        m_pFlashPointLight.lock()->set_Intensity(1.5f);
+        m_pFlashPointLight.lock()->set_Intensity(5.5f);
         m_pFlashPointLight.lock()->set_LightColor(VEC3(1.0f, 1.0f, 1.0f));
 	}
 }
