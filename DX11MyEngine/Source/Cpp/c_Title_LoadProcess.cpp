@@ -247,7 +247,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
 
         obj->get_Transform().lock()->set_Pos(VEC3(0.0f, 1000.0f, -1000.0f));
         obj->get_Transform().lock()->set_Scale(VEC3(30.0, 30.0, 80.0));
-        obj->get_Transform().lock()->set_RotateToDeg(VEC3(50.0f, 150.0f, 0.0f));
+        obj->get_Transform().lock()->set_RotateToDeg(VEC3(15.0f, 150.0f, 0.0f));
     }
 
     /* タイトル画面背景用スプライト1 */
