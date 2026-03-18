@@ -18,7 +18,9 @@ TrailRenderer::TrailRenderer(std::weak_ptr<GameObject> pOwner, int updateRank)
 	m_Width(10.0f),
 	m_CrntTrailPos(VEC3()),
 	m_pCBMaterialDataSet(nullptr),
-	m_IsView(true),
+	//m_IsView(true),
+	m_IsPosRand(false),
+	m_PosRandVec(VEC3()),
 	m_EmissivePower(1.0f),
 	m_Color(VEC4(1.0f, 1.0f, 1.0f,1.0f))
 {
@@ -87,6 +89,13 @@ void TrailRenderer::Update(RendererEngine &renderer)
 		TrailInfo trail;
 		trail._time = m_DrawTime;
 		trail._pos = m_CrntTrailPos;// åªç›à íuÇí«â¡
+
+		if (m_IsPosRand)
+		{
+			trail._pos.x += Tool::RandRange(-m_PosRandVec.x, m_PosRandVec.x);
+			trail._pos.y += Tool::RandRange(-m_PosRandVec.y, m_PosRandVec.y);
+			trail._pos.z += Tool::RandRange(-m_PosRandVec.z, m_PosRandVec.z);
+		}
 
 		// í«â¡
 		m_TrailInfoList.push_back(trail);

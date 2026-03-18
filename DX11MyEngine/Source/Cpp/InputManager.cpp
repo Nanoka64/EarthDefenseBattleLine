@@ -342,6 +342,7 @@ void InputManager::InitDefaultKeyConfig()
     m_GameConfigMap[GAME_CONFIG::WEAPON_ZOOM]._key    = DIK_G;                     // ズーム
     m_GameConfigMap[GAME_CONFIG::WEAPON_ZOOM]._mouse  = MOUSE_BUTTON_STATE::RIGHT; // ズーム マウス
 
+    m_GameConfigMap[GAME_CONFIG::DECITION]._key       = DIK_RETURN;                 // 決定
     m_GameConfigMap[GAME_CONFIG::PAUSE]._key          = DIK_ESCAPE;                 // ポーズ画面
 
     // キー状態初期化

@@ -352,26 +352,29 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
 
     /* ボタンテスト用 */
     {
-        //CreateSpriteInfo sprite;
-        //sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Logo.png");
-        //sprite.ObjTag = "Button";
-        //sprite.pRenderer = m_pRenderer;
-        //sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-        //sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-        //sprite.Width = 500.0f;
-        //sprite.Height = 200.0f;
-        //sprite.IsActive = true;
-        //sprite.IsTransparent = true;
-        //auto obj = MeshFactory::CreateSprite(sprite);
-        //if (obj) {
-        //    obj->get_RectTransform().lock()->set_RectPosition(VEC2(960.0f, 500.0f));
+        CreateSpriteInfo sprite;
+        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Line.png");
+        sprite.pRenderer = m_pRenderer;
+        sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+        sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
+        sprite.Width = 500.0f;
+        sprite.Height = 200.0f;
+        sprite.IsActive = true;
+        sprite.IsTransparent = true;
+        // 項目分生成
+        for (int i = 0; i < 4; i++)
+        {
+            sprite.ObjTag = "MenuItem_Button_" + std::to_string(i + 1);
+            auto obj = MeshFactory::CreateSprite(sprite);
+            obj->get_RectTransform().lock()->set_RectPosition(VEC2(960.0f, 500.0f));
 
-        //    auto button = obj->add_Component<Button>();
-        //    button->set_Sprite(obj->get_Component<SpriteRenderer>());
-        //    button->set_Text("Button");
-        //}
+            // ボタンコンポーネントの追加
+            auto button = obj->add_Component<Button>();
+            button->set_Sprite(obj->get_Component<SpriteRenderer>());
+            button->set_Text("ボタン");
+            button->set_TextOffsetPos(VEC2(100.0f, 0.0f));
+        }
     }
-
 
     m_IsMatLoad = true;
 }

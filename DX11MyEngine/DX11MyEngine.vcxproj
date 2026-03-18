@@ -325,6 +325,7 @@
     <ClInclude Include="Source\Header\TimeManager.h" />
     <ClInclude Include="Source\Header\TragetManager.h" />
     <ClInclude Include="Source\Header\TRIANGLE.h" />
+    <ClInclude Include="Source\Header\UIManager.h" />
     <ClInclude Include="Source\Header\VEC.h" />
     <ClInclude Include="Source\Header\VERTEX.h" />
     <ClInclude Include="Source\Header\VertexBuffer.h" />
@@ -592,6 +593,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\Cpp\UIManager.cpp" />
     <ClCompile Include="Source\Cpp\VertexBuffer.cpp" />
     <ClCompile Include="Source\Cpp\VertexShader.cpp" />
     <ClCompile Include="Source\Cpp\WinMain.cpp">

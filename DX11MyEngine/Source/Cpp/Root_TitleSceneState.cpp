@@ -31,15 +31,17 @@ void Root_TitleSceneState::OnEnter(SceneManager* pOwner)
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp2");
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp3");
+	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleLogo_Sp");
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItemBack_Sp1");
+	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_1");
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItemBack_Sp2");
+	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_2");
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItemBack_Sp3");
+	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_3");
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItemBack_Sp4");
+	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_4");
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 }
 
@@ -59,15 +61,17 @@ void Root_TitleSceneState::OnExit(SceneManager* pOwner)
 	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp2");
 	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp3");
+	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleLogo_Sp");
 	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItemBack_Sp1");
+	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_1");
 	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItemBack_Sp2");
+	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_2");
 	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItemBack_Sp3");
+	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_3");
 	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItemBack_Sp4");
+	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_4");
 	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 
 	// ****************************************************

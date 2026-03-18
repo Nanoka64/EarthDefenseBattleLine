@@ -609,6 +609,9 @@
     <ClCompile Include="Source\Cpp\ObjectFactory.cpp">
       <Filter>ソース ファイル\Obj</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Cpp\UIManager.cpp">
+      <Filter>ソース ファイル\Game\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Header\SHADER.h">
@@ -1012,6 +1015,9 @@
     </ClInclude>
     <ClInclude Include="Source\Header\ObjectFactory.h">
       <Filter>ソース ファイル\Obj</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\UIManager.h">
+      <Filter>ソース ファイル\Game\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

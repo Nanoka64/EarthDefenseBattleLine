@@ -63,7 +63,8 @@ enum class GAME_CONFIG
     WEAPON_ZOOM,    // ズーム
 
     
-    PAUSE,   // ポーズ画面
+    DECITION, // 決定
+    PAUSE,    // ポーズ画面
 
     NUM,
 };

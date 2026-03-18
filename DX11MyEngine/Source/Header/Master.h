@@ -14,6 +14,7 @@
 #include "TimeManager.h"
 #include "BulletManager.h"
 #include "DataManager.h"
+#include "UIManager.h"
 
 class Master
 {
@@ -32,4 +33,5 @@ public:
 	static SoundManager			* m_pSoundManager;		// サウンド管理
 	static TimeManager			* m_pTimeManager;		// 時間管理
 	static DataManager			* m_pDataManager;		// データ管理
+	static UIManager			* m_pUIManager;			// UI管理
 };

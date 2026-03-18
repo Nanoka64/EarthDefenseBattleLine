@@ -3,6 +3,7 @@
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
 #include "Component_SpriteRenderer.h"
+#include "Component_Button.h"
 #include "GameObject.h"
 #include "MeshFactory.h"
 #include "InputFactory.h"
@@ -48,19 +49,29 @@ void c_Title_MainMenu::OnEnter(SceneManager* pOwner)
 	// ****************************************************
 	Master::m_pSoundManager->PlayBGM(BGM_ID::BGM_TITLE_01);
 
+	m_NextState = c_TITLE_MAIN_MENU;
+
 	// すでに初期化済みなら項目背景画像のみアクティブにして返す
 	if (m_IsInit)
 	{
 		// 背景画像をアクティブに
 		for (int i = 0; i < static_cast<int>(TITLEMENU_ITEM::NUM); i++)
 		{
-			auto obj = m_pMenuItemBackSpriteTransform[i]->get_OwnerObj();
+			auto obj = m_pMenuItem_RectTransform[i].lock()->get_OwnerObj();
 			if (obj.expired())
 			{
 				assert(false);
 				continue;
 			}
 			obj.lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
+			auto button = m_pButtons[i].lock();
+
+			// ボタンにテキスト設定
+			button->set_Text(g_TitleMenuItemNames[i]);
+
+			// 処理設定
+			button->OnClickFunc([this, i]() {m_NextState = m_MenuItemInfoArray[i]._nextState; });
 		}
 
 		return;
@@ -69,25 +80,36 @@ void c_Title_MainMenu::OnEnter(SceneManager* pOwner)
 	m_PrevHoveredMenuItem = TITLEMENU_ITEM::EXIT;
 
 
+	// 遷移先シーンの設定
+	m_MenuItemInfoArray[0]._nextState = c_TITLE::c_TITLE_MISSION_SELECT;
+	m_MenuItemInfoArray[1]._nextState = c_TITLE::c_TITLE_SOLDIER_SELECT;
+	m_MenuItemInfoArray[2]._nextState = c_TITLE::c_TITLE_CONFIG;
+	m_MenuItemInfoArray[3]._nextState = c_TITLE::c_GO_EXIT;
+
+
 	// アクティブにしてトランスフォームを取得
 	for (int i = 0; i < static_cast<int>(TITLEMENU_ITEM::NUM); i++)
 	{
-		auto obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItemBack_Sp" + std::to_string(i + 1));
+		auto obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_" + std::to_string(i + 1));
 		if (obj)
 		{
 			obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-			m_pMenuItemBackSpriteTransform[i] = obj->get_RectTransform().lock();
+			m_pMenuItem_RectTransform[i] = obj->get_RectTransform();
+
+			// ボタンコンポーネント
+			auto button = obj->get_Component<Button>();
+			button->set_Text(g_TitleMenuItemNames[i]);
+
+			// シーンを遷移させる処理
+			button->OnClickFunc([this, i]() {m_NextState = m_MenuItemInfoArray[i]._nextState; });	
+
+			m_pButtons[i] = button;
 		}
 
 		m_MenuItemInfoArray[i]._pos = g_MenuItemPosArray[i];
 		m_MenuItemInfoArray[i]._name = g_TitleMenuItemNames[i];
 		m_MenuItemInfoArray[i]._type = static_cast<TITLEMENU_ITEM>(i);
 	}
-	
-	m_MenuItemInfoArray[0]._nextState = c_TITLE::c_TITLE_MISSION_SELECT;
-	m_MenuItemInfoArray[1]._nextState = c_TITLE::c_TITLE_SOLDIER_SELECT;
-	m_MenuItemInfoArray[2]._nextState = c_TITLE::c_TITLE_CONFIG;
-	m_MenuItemInfoArray[3]._nextState = c_TITLE::c_GO_EXIT;
 
 	m_IsInit = true;
 }
@@ -104,7 +126,7 @@ void c_Title_MainMenu::OnExit(SceneManager* pOwner)
 	// オブジェクトを非アクティブに
 	for (int i = 0; i < static_cast<int>(TITLEMENU_ITEM::NUM); i++)
 	{
-		auto obj = m_pMenuItemBackSpriteTransform[i]->get_OwnerObj();
+		auto obj = m_pMenuItem_RectTransform[i].lock()->get_OwnerObj();
 		if (obj.expired())
 		{
 			assert(false);
@@ -125,34 +147,34 @@ int c_Title_MainMenu::Update(SceneManager* pOwner)
 {
 	POINT mousePos = Master::m_pInputManager->GetMousePos();	// マウス座標
 
-	m_NextState = c_TITLE_MAIN_MENU;
+	//m_NextState = c_TITLE_MAIN_MENU;
 
-	for (auto& item : m_MenuItemInfoArray)
+	int i = 0;
+	for (auto &button : m_pButtons)
 	{
-		// 項目の位置
-		VEC2 menuItemPos = item._pos;
+		Button::STATE state = button.lock()->get_State();
+		
+		m_MenuItemInfoArray[i]._isHovered = false;
 
-		// 衝突判定情報
-		CollInData2D_AABB colData;
-		colData._min = menuItemPos;
-		colData._max = menuItemPos;
-		colData._max += g_MenuItemSize;	// サイズ反映
-
-		// マウスと項目の判定
-		if (Master::m_pCollisionManager->HitCheck2D_BoxVsPoint(colData, VEC2(mousePos.x, mousePos.y)))
+		switch (state)
 		{
-			item._isHovered = true;	// マウスが乗ってる
-
-			// 左クリックで選択
-			if (GetMouseClickDown(MOUSE_BUTTON_STATE::LEFT))
-			{
-				m_NextState = item._nextState;
-			}
+		case Button::STATE::NORMAL:
+			break;
+		case Button::STATE::HIGH_LIGHTED:
+			m_MenuItemInfoArray[i]._isHovered = true;	// マウスが乗ってる
+			break;
+		case Button::STATE::PRESSED:
+			m_MenuItemInfoArray[i]._isHovered = true;	// マウスが乗ってる
+			break;
+		case Button::STATE::SELECTED:
+			break;
+		case Button::STATE::DISABLED:
+			break;
+		default:
+			break;
 		}
-		else
-		{
-			item._isHovered = false;
-		}
+		
+		i++;
 	}
 
     return m_NextState;
@@ -193,13 +215,8 @@ void c_Title_MainMenu::Draw(SceneManager* pOwner)
 			m_PrevHoveredMenuItem = item._type;	// なんの項目に乗ったか保持
 		}
 		
-		// TODO:UI用もソートされてしまっているため描画順が崩れる
-		// なので一旦オフセットのほうに位置を入れる
-		m_pMenuItemBackSpriteTransform[static_cast<int>(item._type)]->set_RectPosition(VEC2(spritePos.x, spritePos.y));
-		m_pMenuItemBackSpriteTransform[static_cast<int>(item._type)]->set_Size(450.0f, 100.0f);
-
-		// 文字表示
-		Master::m_pDirectWriteManager->DrawString(item._name, menuItemPos, "White_40_STD");
+		m_pMenuItem_RectTransform[static_cast<int>(item._type)].lock()->set_RectPosition(VEC2(spritePos.x, spritePos.y));
+		m_pMenuItem_RectTransform[static_cast<int>(item._type)].lock()->set_Size(450.0f, 100.0f);
 	}
 
 	Master::m_pDirectWriteManager->DrawString("☆メインメニュー", VECTOR2::VEC2(40.0f, 500.0f), "White_40_STD");

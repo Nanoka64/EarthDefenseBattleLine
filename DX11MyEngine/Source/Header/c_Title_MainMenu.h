@@ -53,12 +53,14 @@ private:
 
 	MenuItemInfo m_MenuItemInfoArray[static_cast<int>(TITLEMENU_ITEM::NUM)];
 
+	std::weak_ptr<class Button> m_pButtons[static_cast<int>(TITLEMENU_ITEM::NUM)];	// ボタン用
+
 	TITLEMENU_ITEM m_PrevHoveredMenuItem;	// 前にマウスが乗っていた項目（SE用）
 	bool m_IsInit;	// 既に初期化済みか
 
 
 	//static const VECTOR2::VEC2 m_MenuItemPosArray[static_cast<int>(TITLEMENU_ITEM::NUM)];
-	std::shared_ptr<class RectTransform> m_pMenuItemBackSpriteTransform[static_cast<int>(TITLEMENU_ITEM::NUM)];
+	std::weak_ptr<class RectTransform> m_pMenuItem_RectTransform[static_cast<int>(TITLEMENU_ITEM::NUM)];
 
 
 public:

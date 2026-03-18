@@ -15,18 +15,22 @@ class SpriteRenderer;
 // ***************************************************************************************
 class Button : public IComponent
 {
-private:
+public:
 	enum class STATE { NORMAL, HIGH_LIGHTED, PRESSED, SELECTED, DISABLED, NUM };	// 通常/ハイライト/押されている/選択された/無効中
 	enum class TRANSITION { COLOR, SPRITE };							// 遷移オプション 
 
+private:
+
 	VECTOR4::VEC4 m_StateColor[UINT_CAST(STATE::NUM)];	// それぞれのステートごとのカラー
 	STATE m_CrntState;					// 現在の状態
+	STATE m_InputValidationState;		// 入力判定とするステート
 	float m_FadeDuration;				// ステート間の色の遷移時間
 	std::function<void()> m_OnClick;	// クリックされた際の処理
 	bool m_IsInteractable;				// 入力を受け付けるかどうか
 	std::string m_Text;					// テキスト
 	std::weak_ptr<RectTransform> m_pMyTransform;	// 自分のトランスフォーム
 	std::weak_ptr<SpriteRenderer> m_pSprite;		// スプライト
+	VECTOR2::VEC2 m_TextOffsetPos;		// テキストの位置補正用
 
 public:
 	Button(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
@@ -52,7 +56,11 @@ public:
 	/// クリックされた際の処理を登録
 	/// </summary>
 	/// <param name="_onClick">クリックされた際の処理が記述してある関数</param>
-	void OnClickFunc(const std::function<void()> &_onClick) { m_OnClick = _onClick; };
+	/// <param name="_inputValidationState">処理を実行するタイミングのステート</param>
+	void OnClickFunc(const std::function<void()> &_onClick, STATE _inputValidationState = STATE::PRESSED) {
+		m_OnClick = _onClick; 
+		m_InputValidationState= _inputValidationState;
+	};
 
 	/// <summary>
 	/// 有効状態の設定
@@ -89,5 +97,17 @@ public:
 	/// </summary>
 	/// <returns>表示する文字</returns>
 	std::string get_Text()const { return m_Text; }
+
+	/// <summary>
+	/// テキストの位置補正値の設定
+	/// </summary>
+	/// <param name="_v">補正値</param>
+	void set_TextOffsetPos(const VECTOR2::VEC2 &_v) { m_TextOffsetPos = _v; }
+
+	/// <summary>
+	/// テキストの位置補正値の取得
+	/// </summary>
+	/// <returns>補正値</returns>
+	VECTOR2::VEC2 get_TextOffsetPos()const { return m_TextOffsetPos; };
 };
 

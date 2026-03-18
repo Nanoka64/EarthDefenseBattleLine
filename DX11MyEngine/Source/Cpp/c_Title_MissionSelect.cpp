@@ -3,6 +3,7 @@
 #include "Root_TitleSceneState.h"
 #include "GameObjectManager.h"
 #include "ResourceManager.h"
+#include "Component_Button.h"
 #include "InputFactory.h"
 #include "SceneStateEnums.h"
 #include "GameObject.h"
@@ -36,19 +37,30 @@ using namespace SceneStateEnums;
 //*----------------------------------------------------------------------------------------
 void c_Title_MissionSelect::OnEnter(SceneManager *pOwner)
 {
+	m_NextState = c_TITLE_MISSION_SELECT;
+
 	// すでに初期化済みなら返す
 	if (m_IsInit)
 	{
 		// 背景画像をアクティブに
 		for (int i = 0; i < MISSION_NUM; i++)
 		{
-			auto obj = m_pMenuItemBackSpriteTransform[i]->get_OwnerObj();
+			auto obj = m_pMenuItem_RectTransform[i]->get_OwnerObj();
 			if (obj.expired())
 			{
 				assert(false);
 				continue;
 			}
 			obj.lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
+			auto button = m_pButtons[i].lock();
+
+			// ボタンにテキスト設定
+			button->set_Text(g_MissionNames[i]);
+
+			// 処理設定
+			button->OnClickFunc([this, i]() {m_NextState = c_TITLE::c_GO_GAME_SCENE; });
+
 		}
 		return;
 	}
@@ -58,11 +70,20 @@ void c_Title_MissionSelect::OnEnter(SceneManager *pOwner)
 	// アクティブにしてトランスフォームを取得
 	for (int i = 0; i < MISSION_NUM; i++)
 	{
-		auto obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItemBack_Sp" + std::to_string(i + 1));
+		auto obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_" + std::to_string(i + 1));
 		if (obj)
 		{
 			obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-			m_pMenuItemBackSpriteTransform[i] = obj->get_RectTransform().lock();
+			m_pMenuItem_RectTransform[i] = obj->get_RectTransform().lock();
+
+			// ボタンコンポーネント
+			auto button = obj->get_Component<Button>();
+			button->set_Text(g_MissionNames[i]);
+
+			// シーンを遷移させる処理
+			button->OnClickFunc([this, i]() {m_NextState = c_TITLE::c_GO_GAME_SCENE; });
+
+			m_pButtons[i] = button;
 		}
 
 		m_MissionItems[i]._pos = g_MissionItemPosArray[i];
@@ -83,7 +104,7 @@ void c_Title_MissionSelect::OnExit(SceneManager *pOwner)
 	// オブジェクトを非アクティブに
 	for (int i = 0; i < MISSION_NUM; i++)
 	{
-		auto obj = m_pMenuItemBackSpriteTransform[i]->get_OwnerObj();
+		auto obj = m_pMenuItem_RectTransform[i]->get_OwnerObj();
 		if (obj.expired())
 		{
 			assert(false);
@@ -91,8 +112,6 @@ void c_Title_MissionSelect::OnExit(SceneManager *pOwner)
 		}
 		obj.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	}
-
-
 }
 
 
@@ -109,43 +128,35 @@ int c_Title_MissionSelect::Update(SceneManager *pOwner)
 	{
 		return c_TITLE::c_TITLE_MAIN_MENU;
 	}	
-	
-	// 左クリックでゲームへ移行
-	if (GetMouseClickDown(MOUSE_BUTTON_STATE::LEFT))
+
+	//m_NextState = c_TITLE_MISSION_SELECT;
+
+	int i = 0;
+	for (auto &button : m_pButtons)
 	{
-		return c_TITLE::c_GO_GAME_SCENE;
-	}
+		Button::STATE state = button.lock()->get_State();;
 
-	POINT mousePos = Master::m_pInputManager->GetMousePos();	// マウス座標
+		m_MissionItems[i]._isHovered = false;
 
-	m_NextState = c_TITLE_MISSION_SELECT;
-
-	for (auto& item : m_MissionItems)
-	{
-		// 項目の位置
-		VEC2 menuItemPos = item._pos;
-
-		// 衝突判定情報
-		CollInData2D_AABB colData;
-		colData._min = menuItemPos;
-		colData._max = menuItemPos;
-		colData._max += g_MissionItemSize;	// サイズ反映
-
-		// マウスと項目の判定
-		if (Master::m_pCollisionManager->HitCheck2D_BoxVsPoint(colData, VEC2(mousePos.x, mousePos.y)))
+		switch (state)
 		{
-			item._isHovered = true;	// マウスが乗ってる
+		case Button::STATE::NORMAL:
+			break;
+		case Button::STATE::HIGH_LIGHTED:
+			m_MissionItems[i]._isHovered = true;	// マウスが乗ってる
+			break;
+		case Button::STATE::PRESSED:
+			m_MissionItems[i]._isHovered = true;	// マウスが乗ってる
+			break;
+		case Button::STATE::SELECTED:
+			break;
+		case Button::STATE::DISABLED:
+			break;
+		default:
+			break;
+		}
 
-			// 左クリックで選択
-			if (GetMouseClickDown(MOUSE_BUTTON_STATE::LEFT))
-			{
-				//m_NextState = item._nextState;
-			}
-		}
-		else
-		{
-			item._isHovered = false;
-		}
+		i++;
 	}
 
 	return m_NextState;
@@ -190,13 +201,11 @@ void c_Title_MissionSelect::Draw(SceneManager *pOwner)
 			spritePos.x += 50.0f;
 		}
 
-		// TODO:UI用もソートされてしまっているため描画順が崩れる
-		// なので一旦オフセットのほうに位置を入れる
-		m_pMenuItemBackSpriteTransform[0]->set_RectPosition(VEC2(spritePos.x, spritePos.y));
-		m_pMenuItemBackSpriteTransform[0]->set_Size(500.0f, 100.0f);
+		m_pMenuItem_RectTransform[0]->set_RectPosition(VEC2(spritePos.x, spritePos.y));
+		m_pMenuItem_RectTransform[0]->set_Size(500.0f, 100.0f);
 
 		// 文字表示
-		Master::m_pDirectWriteManager->DrawString(item._name, menuItemPos, "White_40_STD");
+		//Master::m_pDirectWriteManager->DrawString(item._name, menuItemPos, "White_40_STD");
 	}
 
 

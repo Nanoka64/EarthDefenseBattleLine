@@ -32,6 +32,7 @@ EffectManager           *Master::m_pEffectManager       = nullptr;   // エフェク
 SoundManager            *Master::m_pSoundManager        = nullptr;   // サウンド管理
 TimeManager             *Master::m_pTimeManager         = nullptr;   // 時間管理
 DataManager             *Master::m_pDataManager         = nullptr;   // データ管理
+UIManager               *Master::m_pUIManager           = nullptr;   // UI管理
 
 
 //*---------------------------------------------------------------------------------------
@@ -95,7 +96,8 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
     Master::m_pEffectManager        = new EffectManager();          // エフェクト管理
     Master::m_pSoundManager         = new SoundManager();           // サウンド管理
     Master::m_pTimeManager          = new TimeManager();            // 時間管理
-    Master::m_pDataManager          = new DataManager();            //データ管理
+    Master::m_pDataManager          = new DataManager();            // データ管理
+    Master::m_pUIManager            = new UIManager();              // UI管理
 
     // *************************************************************************************************
     /**  ウインドウの初期化 **/
@@ -252,6 +254,14 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
     /**  タイムマネージャの初期化 **/
     // *************************************************************************************************
     if (!Master::m_pTimeManager->Init())
+    {
+        assert(false);
+        return false;
+    }
+    // *************************************************************************************************
+    /**  UIマネージャの初期化 **/
+    // *************************************************************************************************
+    if (!Master::m_pUIManager->Init())
     {
         assert(false);
         return false;

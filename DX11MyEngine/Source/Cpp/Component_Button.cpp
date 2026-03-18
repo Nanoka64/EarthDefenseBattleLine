@@ -18,9 +18,11 @@ Button::Button(std::weak_ptr<GameObject> pOwner, int updateRank)
 	: IComponent(pOwner, updateRank),
 	m_StateColor(VEC4()),
 	m_CrntState(STATE::NORMAL),
+	m_InputValidationState(STATE::PRESSED),
 	m_FadeDuration(0.1f),
 	m_IsInteractable(true),
-	m_Text("Button")
+	m_Text("Button"),
+	m_TextOffsetPos(VEC2())
 {
 	this->set_Tag("Button");
 }
@@ -53,7 +55,7 @@ void Button::Start(RendererEngine &renderer)
 
 
 	m_StateColor[UINT_CAST(STATE::NORMAL)]		 = VEC4(1.0f, 1.0f, 1.0f, 1.0f);	// 通常
-	m_StateColor[UINT_CAST(STATE::HIGH_LIGHTED)] = VEC4(0.7f, 0.7f, 0.7f, 1.0f);	// ハイライト
+	m_StateColor[UINT_CAST(STATE::HIGH_LIGHTED)] = VEC4(0.6f, 0.6f, 0.6f, 1.0f);	// ハイライト
 	m_StateColor[UINT_CAST(STATE::PRESSED)]		 = VEC4(0.4f, 0.4f, 0.4f, 1.0f);	// 押されている
 	m_StateColor[UINT_CAST(STATE::SELECTED)]	 = VEC4(1.0f, 1.0f, 1.0f, 1.0f);	// 選択された
 	m_StateColor[UINT_CAST(STATE::DISABLED)]	 = VEC4(0.1f, 0.1f, 0.1f, 1.0f);	// 無効
@@ -91,22 +93,27 @@ void Button::Update(RendererEngine &renderer)
 	{
 		m_CrntState = STATE::HIGH_LIGHTED;	// ハイライト状態
 
-		// 左クリックで選択
-		if (GetMouseClick(MOUSE_BUTTON_STATE::LEFT))
+		// 左クリックまたは、決定キーで選択
+		if (GetMouseClick(MOUSE_BUTTON_STATE::LEFT) || GetInput(GAME_CONFIG::DECITION))
 		{
 			m_CrntState = STATE::PRESSED;	// 押されている状態
 			
 			// キーが離されたら入力判定
-			if (GetMouseClickUp(MOUSE_BUTTON_STATE::LEFT))
+			if (GetMouseClickUp(MOUSE_BUTTON_STATE::LEFT) || GetInputUp(GAME_CONFIG::DECITION))
 			{
 				m_CrntState = STATE::SELECTED;	// 選択された状態
-
-				// クリック処理実行
-				if (m_OnClick)
-				{
-					m_OnClick();
-				}
 			}
+		}
+	}
+
+
+	// 入力処理を行うステートと一致すれば実行
+	if (m_InputValidationState == m_CrntState)
+	{
+		// クリック処理実行
+		if (m_OnClick)
+		{
+			m_OnClick();
 		}
 	}
 }
@@ -123,7 +130,7 @@ void Button::Draw(RendererEngine &renderer)
 {
 	auto transform = m_pMyTransform.lock();
 	VEC2 pos = transform->get_RectPosition();
-	Master::m_pDirectWriteManager->DrawString(m_Text, pos, "White_40_STD");
+	Master::m_pDirectWriteManager->DrawString(m_Text, pos + m_TextOffsetPos, "White_40_STD");
 
 	if (!m_pSprite.expired())
 	{

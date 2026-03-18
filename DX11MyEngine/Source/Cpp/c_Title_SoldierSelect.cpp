@@ -4,6 +4,7 @@
 #include "GameObjectManager.h"
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
+#include "Component_Button.h"
 #include "InputFactory.h"
 #include "GameObject.h"
 
@@ -49,19 +50,29 @@ using namespace SceneStateEnums;
 //*----------------------------------------------------------------------------------------
 void c_Title_SoldierSelect::OnEnter(SceneManager *pOwner)
 {
+	m_NextState = c_TITLE_SOLDIER_SELECT;
+
 	// すでに初期化済みなら返す
 	if (m_IsInit)
 	{
 		// 背景画像をアクティブに
 		for (int i = 0; i < UINT_CAST(SOLDIER_TYPE::NUM); i++)
 		{
-			auto obj = m_pMenuItemBackSpriteTransform[i]->get_OwnerObj();
+			auto obj = m_pMenuItem_RectTransform[i]->get_OwnerObj();
 			if (obj.expired())
 			{
 				assert(false);
 				continue;
 			}
 			obj.lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
+			auto button = m_pButtons[i].lock();
+
+			// ボタンにテキスト設定
+			button->set_Text(g_SoldierNames[i]);
+
+			// 処理設定
+			button->OnClickFunc([this, i]() {});
 		}
 		return;
 	}
@@ -71,11 +82,20 @@ void c_Title_SoldierSelect::OnEnter(SceneManager *pOwner)
 	// アクティブにしてトランスフォームを取得
 	for (int i = 0; i < UINT_CAST(SOLDIER_TYPE::NUM); i++)
 	{
-		auto obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItemBack_Sp" + std::to_string(i + 1));
+		auto obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_" + std::to_string(i + 1));
 		if (obj)
 		{
 			obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-			m_pMenuItemBackSpriteTransform[i] = obj->get_RectTransform().lock();
+			m_pMenuItem_RectTransform[i] = obj->get_RectTransform().lock();
+
+			// ボタンコンポーネント
+			auto button = obj->get_Component<Button>();
+			button->set_Text(g_SoldierNames[i]);
+
+			// シーンを遷移させる処理
+			button->OnClickFunc([this, i]() {});
+
+			m_pButtons[i] = button;
 		}
 
 		m_Items[i]._pos = g_ItemPosArray[i];
@@ -96,7 +116,7 @@ void c_Title_SoldierSelect::OnExit(SceneManager *pOwner)
 	// オブジェクトを非アクティブに
 	for (int i = 0; i < UINT_CAST(SOLDIER_TYPE::NUM); i++)
 	{
-		auto obj = m_pMenuItemBackSpriteTransform[i]->get_OwnerObj();
+		auto obj = m_pMenuItem_RectTransform[i]->get_OwnerObj();
 		if (obj.expired())
 		{
 			assert(false);
@@ -104,7 +124,6 @@ void c_Title_SoldierSelect::OnExit(SceneManager *pOwner)
 		}
 		obj.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	}
-
 }
 
 
@@ -126,36 +145,35 @@ int c_Title_SoldierSelect::Update(SceneManager *pOwner)
 
 	m_NextState = c_TITLE_SOLDIER_SELECT;
 
-	for (auto& item : m_Items)
+	int i = 0;
+	for (auto &button : m_pButtons)
 	{
-		// 項目の位置
-		VEC2 menuItemPos = item._pos;
+		Button::STATE state = button.lock()->get_State();;
 
-		// 衝突判定情報
-		CollInData2D_AABB colData;
-		colData._min = menuItemPos;
-		colData._max = menuItemPos;
-		colData._max += g_ItemSize;	// サイズ反映
+		m_Items[i]._isHovered = false;
 
-		// マウスと項目の判定
-		if (Master::m_pCollisionManager->HitCheck2D_BoxVsPoint(colData, VEC2(mousePos.x, mousePos.y)))
+		switch (state)
 		{
-			item._isHovered = true;	// マウスが乗ってる
+		case Button::STATE::NORMAL:
+			break;
+		case Button::STATE::HIGH_LIGHTED:
+			m_Items[i]._isHovered = true;	// マウスが乗ってる
+			break;
+		case Button::STATE::PRESSED:
+			m_Items[i]._isHovered = true;	// マウスが乗ってる
+			break;
+		case Button::STATE::SELECTED:
+			break;
+		case Button::STATE::DISABLED:
+			break;
+		default:
+			break;
+		}
 
-			// 左クリックで選択
-			if (GetMouseClickDown(MOUSE_BUTTON_STATE::LEFT))
-			{
-				//m_NextState = item._nextState;
-			}
-		}
-		else
-		{
-			item._isHovered = false;
-		}
+		i++;
 	}
 
-	//return m_NextState;
-
+	return m_NextState;
 	return c_TITLE::c_TITLE_SOLDIER_SELECT;
 }
 
@@ -200,13 +218,11 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 		}
 
 
-		// TODO:UI用もソートされてしまっているため描画順が崩れる
-		// なので一旦オフセットのほうに位置を入れる
-		m_pMenuItemBackSpriteTransform[counter]->set_RectPosition(VEC2(spritePos.x, spritePos.y));
-		m_pMenuItemBackSpriteTransform[counter]->set_Size(500.0f, 100.0f);
+		m_pMenuItem_RectTransform[counter]->set_RectPosition(VEC2(spritePos.x, spritePos.y));
+		m_pMenuItem_RectTransform[counter]->set_Size(500.0f, 100.0f);
 
 		// 文字表示
-		Master::m_pDirectWriteManager->DrawString(item._name, menuItemPos, "White_40_STD");
+		//Master::m_pDirectWriteManager->DrawString(item._name, menuItemPos, "White_40_STD");
 
 		counter++;
 	}
