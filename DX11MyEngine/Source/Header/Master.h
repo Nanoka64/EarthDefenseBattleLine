@@ -14,8 +14,19 @@
 #include "TimeManager.h"
 #include "BulletManager.h"
 #include "DataManager.h"
+#include "BulletManager.h"
 #include "UIManager.h"
 
+// ***************************************************************************************
+// ---------------------------------------------------------------------------------------
+/* --- @:Master Class --- */
+//
+// 【?】シングルトンクラスをまとめたもの
+//		
+//		基本的に初期化、更新などはDXAppクラスで行っている。
+//		UIManagerとBulletManagerはそれぞれ、タイトルロードシーン、ゲームロードシーンで行っている。
+//
+// ***************************************************************************************
 class Master
 {
 public:
@@ -29,9 +40,10 @@ public:
 	static EditorManager		* m_pEditorManager;		// エディタ管理
 	static InputManager			* m_pInputManager;		// 入力管理
 	static CollisionManager		* m_pCollisionManager;	// 衝突管理
-	static EffectManager		* m_pEffectManager;		// エフェクト管理
 	static SoundManager			* m_pSoundManager;		// サウンド管理
+	static EffectManager		* m_pEffectManager;		// エフェクト管理
 	static TimeManager			* m_pTimeManager;		// 時間管理
 	static DataManager			* m_pDataManager;		// データ管理
+	static BulletManager		* m_pBulletManager;		// 弾管理
 	static UIManager			* m_pUIManager;			// UI管理
 };

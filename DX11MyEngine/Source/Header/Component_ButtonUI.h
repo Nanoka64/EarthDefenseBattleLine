@@ -1,5 +1,6 @@
 #pragma once
 #include "IComponent.h"
+#include "ConstantUIData.h"
 
 class SpriteRenderer;
 
@@ -13,17 +14,16 @@ class SpriteRenderer;
 //		とりあえず、見た目の変化は無しでクリック処理のみ
 //		
 // ***************************************************************************************
-class Button : public IComponent
+class ButtonUI : public IComponent
 {
 public:
-	enum class STATE { NORMAL, HIGH_LIGHTED, PRESSED, SELECTED, DISABLED, NUM };	// 通常/ハイライト/押されている/選択された/無効中
-	enum class TRANSITION { COLOR, SPRITE };							// 遷移オプション 
+
 
 private:
 
-	VECTOR4::VEC4 m_StateColor[UINT_CAST(STATE::NUM)];	// それぞれのステートごとのカラー
-	STATE m_CrntState;					// 現在の状態
-	STATE m_InputValidationState;		// 入力判定とするステート
+	VECTOR4::VEC4 m_StateColor[UINT_CAST(UIData::STATE::NUM)];	// それぞれのステートごとのカラー
+	UIData::STATE m_CrntState;					// 現在の状態
+	UIData::STATE m_InputValidationState;		// 入力判定とするステート
 	float m_FadeDuration;				// ステート間の色の遷移時間
 	std::function<void()> m_OnClick;	// クリックされた際の処理
 	bool m_IsInteractable;				// 入力を受け付けるかどうか
@@ -33,8 +33,8 @@ private:
 	VECTOR2::VEC2 m_TextOffsetPos;		// テキストの位置補正用
 
 public:
-	Button(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
-	~Button();
+	ButtonUI(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
+	~ButtonUI();
 
 	void Start(RendererEngine &renderer) override;		// 初期化
 	void Update(RendererEngine &renderer) override;		// 更新処理
@@ -50,14 +50,14 @@ public:
 	/// 現在の状態を取得
 	/// </summary>
 	/// <returns></returns>
-	STATE get_State()const { return m_CrntState; }	
+	UIData::STATE get_State()const { return m_CrntState; }
 
 	/// <summary>
 	/// クリックされた際の処理を登録
 	/// </summary>
 	/// <param name="_onClick">クリックされた際の処理が記述してある関数</param>
 	/// <param name="_inputValidationState">処理を実行するタイミングのステート</param>
-	void OnClickFunc(const std::function<void()> &_onClick, STATE _inputValidationState = STATE::PRESSED) {
+	void OnClickFunc(const std::function<void()> &_onClick, UIData::STATE _inputValidationState = UIData::STATE::PRESSED) {
 		m_OnClick = _onClick; 
 		m_InputValidationState= _inputValidationState;
 	};

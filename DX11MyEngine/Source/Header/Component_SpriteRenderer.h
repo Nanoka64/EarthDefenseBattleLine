@@ -32,9 +32,6 @@ private:
 	CB_SPRITE_SET *m_pCBSpritDataSet;			// 定数バッファ(スプライト情報)
 	std::map<int , std::weak_ptr<class Texture>> m_pTextureMap;	// スロット番号とtexture
 
-	float m_Width;
-	float m_Height;
-
 	VECTOR4::VEC4 m_Color;		// 頂点カラー
 	VECTOR2::VEC2 m_UVOffset;	// uvオフセット
 
@@ -60,17 +57,20 @@ public:
 	void set_UVOffset(const VECTOR2::VEC2& _uv) { m_UVOffset = _uv; };	// UVオフセット値の設定
 	VECTOR2::VEC2 get_UVOffset()const { return m_UVOffset; }			// UVオフセット値の取得
 
-	void set_Width(float w);
-	void set_Height(float h);
-	float get_Width()const;
-	float get_Height()const;
-
 	void set_Color(const VECTOR4::VEC4 &_col) { m_Color = _col; }
 	VECTOR4::VEC4 get_Color()const { return m_Color; }
 
 	// ブレンドモードの設定
 	void set_BlendMode(const BLEND_MODE _blend) { m_BlendMode = _blend; }
 	BLEND_MODE get_BlendMode()const { return m_BlendMode; }
+
+	/// <summary>
+	/// テクスチャの設定
+	/// </summary>
+	/// <param name="_texture">テクスチャの弱参照ポインタ</param>
+	/// <param name="_slot">テクスチャの設定スロット</param>
+	void set_Texture(std::weak_ptr<class Texture> _texture, int _slot) { m_pTextureMap[_slot] = _texture; };
+
 
 	/// <summary>
 	/// 初期化時に設定したユーザー拡張用頂点定数バッファをGPUにセットする
@@ -89,12 +89,17 @@ public:
 	/// <param name="_pSrn">データ</param>
 	void setToGPU_ExtendUserPS_CBuffer(RendererEngine& renderer, int arrayNumber,void* _pSrn);
 
+	/// <summary>
+	/// テクスチャデータのクリア
+	/// </summary>
+	void clear_Texture() { m_pTextureMap.clear(); }
+
 private:
 
 	/// <summary>
 	/// 頂点情報の更新
 	/// </summary>
-	void VertexUpdate(RendererEngine &renderer);
+	void VertexUpdate(RendererEngine &renderer, const VECTOR2::VEC2 &_size);
 
 	/// <summary>
 	/// 定数バッファの作成

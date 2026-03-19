@@ -4,7 +4,7 @@
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
 #include "Component_SpriteRenderer.h"
-#include "Component_Button.h"
+#include "Component_ButtonUI.h"
 #include "Component_SkinnedMeshAnimator.h"
 #include "Component_PlayerController.h"
 #include "Component_BoxCollider.h"
@@ -100,10 +100,19 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         return;
     }
 
+    // *************************************************************************************************
+    /**  UI管理の初期化 **/
+    // *************************************************************************************************
+    if (!Master::m_pUIManager->Init(*m_pRenderer))
+    {
+        MessageBox(NULL, "UI管理クラスの初期化に失敗しました", "GameLoad", MB_OK);
+        assert(false);
+    }
 
     // CSVからマテリアルデータの読み込み
     if (!Master::m_pResourceManager->ImportCSV_AllMaterialData("Resource/Excel_Param/MaterialParam.csv"))
     {
+        MessageBox(NULL, "CSVの読み込みに失敗", "GameLoad", MB_OK);
         assert(false);
     }
 
@@ -369,7 +378,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
             obj->get_RectTransform().lock()->set_RectPosition(VEC2(960.0f, 500.0f));
 
             // ボタンコンポーネントの追加
-            auto button = obj->add_Component<Button>();
+            auto button = obj->add_Component<ButtonUI>();
             button->set_Sprite(obj->get_Component<SpriteRenderer>());
             button->set_Text("ボタン");
             button->set_TextOffsetPos(VEC2(100.0f, 0.0f));

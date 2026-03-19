@@ -16,8 +16,6 @@ using namespace Tool::UV;
 //* 引数：2.更新レイヤー
 //*----------------------------------------------------------------------------------------
 SpriteRenderer::SpriteRenderer(std::weak_ptr<GameObject> pOwner, int updateRank) : IComponent(pOwner, updateRank),
-m_Width(0.0f),
-m_Height(0.0f),
 m_pCBTransformSet(nullptr),
 m_ShaderType(SHADER_TYPE::NONE),
 m_pVSUserExpandCBuffers(nullptr),
@@ -80,11 +78,15 @@ void SpriteRenderer::Draw(RendererEngine &renderer)
     // シェーダセット ==========================
 	Master::m_pShaderManager->DeviceToSetShader(m_ShaderType);
 	
-	// 頂点情報の更新
-	VertexUpdate(renderer);
-
+	// トランスフォームの取得
 	auto transform = m_pOwner.lock()->get_RectTransform().lock();
 	transform->UpdateUILocalMatrix();
+
+	VEC2 size = transform->get_SizeDelta();
+
+	// 頂点情報の更新
+	VertexUpdate(renderer, size);
+
 	
 	// ワールド変換行列の作成 ====================================================
 	XMMATRIX world = transform->get_WorldMtx();
@@ -176,14 +178,14 @@ void SpriteRenderer::Draw(RendererEngine &renderer)
 //* 引数：なし
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-void SpriteRenderer::VertexUpdate(RendererEngine& renderer)
+void SpriteRenderer::VertexUpdate(RendererEngine& renderer, const VECTOR2::VEC2 &_size)
 {
 	auto pContext = renderer.get_DeviceContext();
 
 	if (m_pMeshData->IsDynamic)
 	{
-		float hw = m_Width;
-		float hh = m_Height;
+		float hw = _size.x;
+		float hh = _size.y;
 		VEC3 centerPos = m_pOwner.lock()->get_RectTransform().lock()->get_VEC3ToPos();
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -226,8 +228,6 @@ bool SpriteRenderer::Setup(const CreateSpriteInfo& info)
 	m_VSUserExpandCBNum = info.VSConstBufferNum;
 	m_PSUserExpandCBNum = info.PSConstBufferNum;
 	
-
-
 	// 頂点シェーダー用ユーザー拡張用定数バッファ情報のセットアップ
 	if (m_VSUserExpandCBNum > 0)
 	{
@@ -256,29 +256,23 @@ bool SpriteRenderer::Setup(const CreateSpriteInfo& info)
 		}
 	}
 
-	// ベースになるメッシュは1x1の大きさで作る
-	m_Width = 1.0f;
-	m_Height = 1.0f;
-
 	// クアッド生成
+	// ※ ベースになるメッシュは1x1の大きさで作る
 	switch (info.Type)
 	{
 	case SPRITE_USAGE_TYPE::NORMAL:
-		m_pMeshData = MeshInfoFactory::CreateSpriteQuadInfo(*info.pRenderer,m_Width, m_Height);
+		m_pMeshData = MeshInfoFactory::CreateSpriteQuadInfo(*info.pRenderer,1.0f, 1.0f);
 		break;
 	case SPRITE_USAGE_TYPE::RENDER_TARGET:
-		m_pMeshData = MeshInfoFactory::CreateRTSpriteInfo(*info.pRenderer, m_Width, m_Height);
+		m_pMeshData = MeshInfoFactory::CreateRTSpriteInfo(*info.pRenderer, 1.0f, 1.0f);
 		break;
 	default:
 		break;
 	}
 
 
-	m_Width = info.Width;
-	m_Height = info.Height;
-
 	auto transform = m_pOwner.lock()->get_RectTransform().lock();
-	transform->set_Size(m_Width, m_Height);
+	transform->set_Size(info.Width, info.Height);
 	//transform->set_Scale(m_Width, m_Height, 1.0f);
 	//transform->set_Pos(0, 0, 0);
 	//transform->set_RotateToRad(0, 0, 0);
@@ -407,52 +401,6 @@ bool SpriteRenderer::CreateUserExpandCBuffer(RendererEngine& renderer, CB_USER_E
 
 //*---------------------------------------------------------------------------------------
 //* @:SpriteRenderer Class 
-//*【?】スプライトの横幅セット
-//* 引数：横幅
-//* 返値：void
-//*----------------------------------------------------------------------------------------
-void SpriteRenderer::set_Width(float w)
-{
-	m_Width = w;
-}
-
-//*---------------------------------------------------------------------------------------
-//* @:SpriteRenderer Class 
-//*【?】スプライトの縦幅セット
-//* 引数：縦幅
-//* 返値：void
-//*----------------------------------------------------------------------------------------
-void SpriteRenderer::set_Height(float h)
-{
-	m_Height = h;
-}
-
-
-//*---------------------------------------------------------------------------------------
-//* @:SpriteRenderer Class 
-//*【?】スプライトの縦幅ゲット
-//* 引数：なし
-//* 返値：横幅
-//*----------------------------------------------------------------------------------------
-float SpriteRenderer::get_Width()const
-{
-	return m_Width;
-}
-
-
-//*---------------------------------------------------------------------------------------
-//* @:SpriteRenderer Class 
-//*【?】スプライトの縦幅ゲット
-//* 引数：なし
-//* 返値：縦幅
-//*----------------------------------------------------------------------------------------
-float SpriteRenderer::get_Height()const
-{
-	return m_Height;
-}
-
-//*---------------------------------------------------------------------------------------
-//* @:SpriteRenderer Class 
 //*【?】初期化時に設定したユーザー拡張用頂点定数バッファをGPUにセットする
 //*		あくまで臨時の初期化時のデータ更新用なので全く違うものを入れないでね
 //* 引数：1.描画エンジン
@@ -508,3 +456,4 @@ void SpriteRenderer::setToGPU_ExtendUserPS_CBuffer(RendererEngine& renderer, int
 	// アクセス終了
 	pContext->Unmap(m_pPSUserExpandCBuffers[arrayNumber].pBuff, 0);
 }
+

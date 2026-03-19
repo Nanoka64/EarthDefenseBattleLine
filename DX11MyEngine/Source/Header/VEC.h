@@ -106,12 +106,19 @@ namespace VECTOR3
 			return VEC3(tmp);
 		}
 
-		// ‘S‚Ä‚Ì—v‘f‚ðˆê‚Å‰Šú‰»
+		// ‘S‚Ä‚Ì—v‘f‚ð1‚Å‰Šú‰»
 		void AllOne()
 		{
 			this->x = 1.0f;
 			this->y = 1.0f;
 			this->z = 1.0f;
+		};
+		// ‘S‚Ä‚Ì—v‘f‚ð0‚Å‰Šú‰»
+		void AllZero()
+		{
+			this->x = 0.0f;
+			this->y = 0.0f;
+			this->z = 0.0f;
 		};
 
 		// ’·‚³
@@ -212,6 +219,15 @@ namespace VECTOR4
 			this->y = 1.0f;
 			this->z = 1.0f;
 			this->w = 1.0f;
+		};
+
+		// ‘S‚Ä‚Ì—v‘f‚ð0‚Å‰Šú‰»
+		void AllZero()
+		{
+			this->x = 0.0f;
+			this->y = 0.0f;
+			this->z = 0.0f;
+			this->w = 0.0f;
 		};
 
 
@@ -319,6 +335,13 @@ namespace VECTOR2
 		{
 			this->x = 1.0f;
 			this->y = 1.0f;
+		}
+
+		// ‘S‚Ä‚Ì—v‘f‚ð0‚Å‰Šú‰»
+		void AllZero()
+		{
+			this->x = 0.0f;
+			this->y = 0.0f;
 		}
 
 		// ’·‚³

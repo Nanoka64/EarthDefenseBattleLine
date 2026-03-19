@@ -48,7 +48,7 @@ private:
 	bool m_IsInit;	// 既に初期化済みか
 	
 	std::shared_ptr<class RectTransform> m_pMenuItem_RectTransform[MISSION_NUM];
-	std::weak_ptr<class Button> m_pButtons[static_cast<int>(MISSION_NUM)];	// ボタン用
+	std::weak_ptr<class ButtonUI> m_pButtons[static_cast<int>(MISSION_NUM)];	// ボタン用
 
 public:
 	void OnEnter(SceneManager *pOwner) override;

@@ -95,7 +95,7 @@ void AssultRifle::Update(RendererEngine &renderer)
 
     Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"弾の切り替え"));
     Master::m_pDebugger->DG_CheckBox(Tool::U8ToChar(u8"爆発弾"), &m_IsExplosionBullet);
-    Master::m_pDebugger->DG_SliderFloat(Tool::U8ToChar(u8"爆発範囲"), 1, &m_ExplosionSize, 1.0f, 100.0f);
+    Master::m_pDebugger->DG_SliderFloat(Tool::U8ToChar(u8"爆発範囲"), 1, &m_ExplosionSize, 1.0f, 200.0f);
     Master::m_pDebugger->EndDebugWindow();
 
     // 発射レートの切り替え
@@ -131,11 +131,11 @@ void AssultRifle::Update(RendererEngine &renderer)
         if (m_IsExplosionBullet)
         {
             ExplosionBulletData param;
-            param._range = 2000.0f;
-            param._speed = 300.0f;
+            param._range = 1500.0f;
+            param._speed = 1000.0f;
             param._explosionRadius = m_ExplosionSize;
             param._explosionEffectHandleTag = "Explosion_01";
-            GameManager::get_BulletManager()->Shot(renderer, bulletTransform, param);
+            Master::m_pBulletManager->Shot(renderer, bulletTransform, param);
         }
         else
         {
@@ -143,7 +143,7 @@ void AssultRifle::Update(RendererEngine &renderer)
             NormalBulletData param;
             param._range = 800.0f;
             param._speed = 1000.0f;
-            GameManager::get_BulletManager()->Shot(renderer, bulletTransform, param);
+            Master::m_pBulletManager->Shot(renderer, bulletTransform, param);
         }
 
         // フラッシュ

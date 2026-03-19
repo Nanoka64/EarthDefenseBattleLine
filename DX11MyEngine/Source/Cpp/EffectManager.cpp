@@ -26,7 +26,7 @@ EffectManager::~EffectManager()
 //* true : ¬Œ÷
 //* false : ¸”s
 //*----------------------------------------------------------------------------------------
-bool EffectManager::Setup(RendererEngine& renderer)
+bool EffectManager::Setup(RendererEngine &renderer)
 {
     auto pDevice = renderer.get_Device();
     auto pContext = renderer.get_DeviceContext();

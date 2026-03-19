@@ -5,9 +5,6 @@
 #include "DirectWriteManager.h"
 
 
-BulletManager *GameManager::m_pBulletManager = nullptr;  // 弾管理クラス
-
-
 //*---------------------------------------------------------------------------------------
 //* @:GameManager Class 
 //*【?】コンストラクタ
@@ -47,8 +44,6 @@ bool GameManager::Init(RendererEngine& renderer)
 		return false;
 	}
 
-	// 弾管理クラスの生成
-	GameManager::m_pBulletManager = new BulletManager();
 
 	return true;
 }
@@ -66,7 +61,9 @@ void GameManager::Update(RendererEngine& renderer)
 	m_pSceneManager->Update(renderer);
 
 	// 弾の更新
-	m_pBulletManager->Update(renderer);
+	Master::m_pBulletManager->Update(renderer);
+	// UIの更新
+	Master::m_pUIManager->Update(renderer);
 
 	// シーンが終了していたら終わらせる
 	if (m_pSceneManager->get_IsSceneClose())

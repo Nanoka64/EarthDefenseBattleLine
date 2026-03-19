@@ -31,7 +31,7 @@ private:
 	SceneStateEnums::c_TITLE m_NextState = SceneStateEnums::c_TITLE::c_TITLE_MAIN_MENU;
 	bool m_IsInit;	// 既に初期化済みか
 	std::shared_ptr<class RectTransform> m_pMenuItem_RectTransform[UINT_CAST(SOLDIER_TYPE::NUM)];
-	std::weak_ptr<class Button> m_pButtons[static_cast<int>(UINT_CAST(SOLDIER_TYPE::NUM))];	// ボタン用
+	std::weak_ptr<class ButtonUI> m_pButtons[static_cast<int>(UINT_CAST(SOLDIER_TYPE::NUM))];	// ボタン用
 
 
 	/// <summary>

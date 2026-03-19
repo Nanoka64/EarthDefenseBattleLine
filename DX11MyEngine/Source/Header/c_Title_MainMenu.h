@@ -53,7 +53,7 @@ private:
 
 	MenuItemInfo m_MenuItemInfoArray[static_cast<int>(TITLEMENU_ITEM::NUM)];
 
-	std::weak_ptr<class Button> m_pButtons[static_cast<int>(TITLEMENU_ITEM::NUM)];	// ボタン用
+	std::weak_ptr<class ButtonUI> m_pButtons[static_cast<int>(TITLEMENU_ITEM::NUM)];	// ボタン用
 
 	TITLEMENU_ITEM m_PrevHoveredMenuItem;	// 前にマウスが乗っていた項目（SE用）
 	bool m_IsInit;	// 既に初期化済みか

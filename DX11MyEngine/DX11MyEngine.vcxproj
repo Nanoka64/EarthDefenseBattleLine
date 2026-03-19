@@ -205,7 +205,7 @@
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="Source\Header\Component_Button.h">
+    <ClInclude Include="Source\Header\Component_ButtonUI.h">
       <SubType>
       </SubType>
     </ClInclude>
@@ -243,6 +243,7 @@
     <ClInclude Include="Source\Header\Component_TrailRenderer.h" />
     <ClInclude Include="Source\Header\CompositeState.h" />
     <ClInclude Include="Source\Header\ConstantBulletData.h" />
+    <ClInclude Include="Source\Header\ConstantUIData.h" />
     <ClInclude Include="Source\Header\ConstantWeaponData.h" />
     <ClInclude Include="Source\Header\c_Game_LoadProcess.h" />
     <ClInclude Include="Source\Header\c_Game_Play.h" />
@@ -372,7 +373,7 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Cpp\Component_Button.cpp">
+    <ClCompile Include="Source\Cpp\Component_ButtonUI.cpp">
       <SubType>
       </SubType>
     </ClCompile>
@@ -409,6 +410,7 @@
     <ClCompile Include="Source\Cpp\Component_TimerDestruction.cpp" />
     <ClCompile Include="Source\Cpp\Component_TrailRenderer.cpp" />
     <ClCompile Include="Source\Cpp\CompositeState.cpp" />
+    <ClCompile Include="Source\Cpp\ConstantUIData.cpp" />
     <ClCompile Include="Source\Cpp\c_Game_LoadProcess.cpp" />
     <ClCompile Include="Source\Cpp\c_Game_Play.cpp" />
     <ClCompile Include="Source\Cpp\c_Result_GetItemCheck.cpp" />

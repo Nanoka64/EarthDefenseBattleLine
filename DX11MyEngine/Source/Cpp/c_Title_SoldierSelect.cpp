@@ -4,7 +4,7 @@
 #include "GameObjectManager.h"
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
-#include "Component_Button.h"
+#include "Component_ButtonUI.h"
 #include "InputFactory.h"
 #include "GameObject.h"
 
@@ -89,7 +89,7 @@ void c_Title_SoldierSelect::OnEnter(SceneManager *pOwner)
 			m_pMenuItem_RectTransform[i] = obj->get_RectTransform().lock();
 
 			// ボタンコンポーネント
-			auto button = obj->get_Component<Button>();
+			auto button = obj->get_Component<ButtonUI>();
 			button->set_Text(g_SoldierNames[i]);
 
 			// シーンを遷移させる処理
@@ -148,23 +148,23 @@ int c_Title_SoldierSelect::Update(SceneManager *pOwner)
 	int i = 0;
 	for (auto &button : m_pButtons)
 	{
-		Button::STATE state = button.lock()->get_State();;
+		UIData::STATE state = button.lock()->get_State();;
 
 		m_Items[i]._isHovered = false;
 
 		switch (state)
 		{
-		case Button::STATE::NORMAL:
+		case UIData::STATE::NORMAL:
 			break;
-		case Button::STATE::HIGH_LIGHTED:
+		case UIData::STATE::HIGH_LIGHTED:
 			m_Items[i]._isHovered = true;	// マウスが乗ってる
 			break;
-		case Button::STATE::PRESSED:
+		case UIData::STATE::PRESSED:
 			m_Items[i]._isHovered = true;	// マウスが乗ってる
 			break;
-		case Button::STATE::SELECTED:
+		case UIData::STATE::SELECTED:
 			break;
-		case Button::STATE::DISABLED:
+		case UIData::STATE::DISABLED:
 			break;
 		default:
 			break;
