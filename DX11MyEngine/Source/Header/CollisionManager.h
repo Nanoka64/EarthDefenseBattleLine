@@ -16,12 +16,21 @@ enum class COLLISION_CALC_TYPE
 };
 
 /// <summary>
-/// 3Dレイ判定
+/// 3Dレイ判定用
 /// </summary>
 struct CollInData_Ray
 {
     VECTOR3::VEC3 _point;    // 開始点 
     VECTOR3::VEC3 _dir;      // 方向
+};
+
+/// <summary>
+/// 3D線分判定用
+/// </summary>
+struct CollInData_Segment
+{
+    VECTOR3::VEC3 _start;   // 開始点 
+    VECTOR3::VEC3 _end;     // 終了点
 };
 
 /// <summary>
@@ -34,16 +43,25 @@ struct CollInData_Sphere
 };
 
 /// <summary>
-/// 3DボックスAABB判定
+/// 3DボックスAABB判定用
 /// </summary>
 struct CollInData_AABB
 {
-    VECTOR3::VEC3 _min;
+    VECTOR3::VEC3 _min; 
     VECTOR3::VEC3 _max;
 };
 
 /// <summary>
-/// 2DボックスAABB判定
+/// 3D平面判定用
+/// </summary>
+struct CollInData_Plane
+{
+    VECTOR3::VEC3 _point;   // 任意の点
+    VECTOR3::VEC3 _norm;    // 平面の法線
+};
+
+/// <summary>
+/// 2DボックスAABB判定用
 /// </summary>
 struct CollInData2D_AABB
 {
@@ -87,6 +105,10 @@ public:
     /// </summary>
     void CollisionProcess();
 
+    /// <summary>
+    /// コライダーの登録
+    /// </summary>
+    /// <param name="pCol"></param>
     void RegisterCollider(std::shared_ptr<class Collider> pCol);
 
     /// <summary>
@@ -95,31 +117,61 @@ public:
     /// <returns></returns>
     bool HitCheck(std::shared_ptr<class Collider> _colA,std::shared_ptr<class Collider> _colB, std::shared_ptr<class MyTransform> _transA,std::shared_ptr<class MyTransform> _transB, class CollisionInfo* info);
     
+    bool HitCheck2(std::shared_ptr<class Collider> _colA, std::shared_ptr<class Collider> _colB, std::shared_ptr<class MyTransform> _transA, std::shared_ptr<class MyTransform> _transB, class CollisionInfo* info);
+
     /// <summary>
     /// 範囲内のオブジェクトを取得する
     /// </summary>
     std::vector<std::shared_ptr<class Collider>> CheckSphere(const VECTOR3::VEC3& _center, float _radius, unsigned _mask);
 
-    // 3D --------------------------------------------------------
+
+    /// <summary>
+    /// レイキャスト判定
+    /// </summary>
+    /// <param name="_ray"></param>
+    /// <param name="_outHitInfo"></param>
+    /// <returns></returns>
+    bool CheckRaycast(const CollInData_Ray& _ray,int _mask, CollisionInfo& _outHitInfo);
+
+    //*****************************************************************************************
+    //						 3D 
+    //*****************************************************************************************
     // 箱と箱 物理的判定
     bool HitCheck_BoxVsBox_Physics(const CollInData_AABB &_src, const CollInData_AABB &_dst, class CollisionInfo *info);
 
     // 箱と箱
     bool HitCheck_BoxVsBox(const CollInData_AABB &_src, const CollInData_AABB &_dst);
 
-    // 球と球
-    bool HitCheck_SphereVsSphere(const CollInData_Sphere &_src, const CollInData_Sphere &_dst);
-    
-    // 箱と球
-    bool HitCheck_BoxVsSphere(const CollInData_AABB &_box, const CollInData_Sphere &_sphere);
+    // 箱と点
+    bool HitCheck_BoxVsPoint(const CollInData_AABB &box, const VECTOR3::VEC3& _p);    
     
     // 箱と線
     bool HitCheck_BoxVsRay(const CollInData_AABB &_box, const CollInData_Ray &_ray);
     
-    // 球と線
-    bool HitCheck_SphereVsRay(const CollInData_Sphere &_sphere, const CollInData_Ray &_ray);
+    // 箱と球
+    bool HitCheck_BoxVsSphere(const CollInData_AABB &_box, const CollInData_Sphere &_sphere);
 
-    // 2D --------------------------------------------------------
+    // 球と球
+    bool HitCheck_SphereVsSphere(const CollInData_Sphere &_src, const CollInData_Sphere &_dst);
+
+    //*****************************************************************************************
+    //						 レイキャスト 
+    //*****************************************************************************************
+    // 平面と線
+    bool HitCheck_PlaneVsRay(const CollInData_Plane& _plane, const CollInData_Ray& _ray, CollisionInfo& _hitInfo );
+    
+    // 箱と線
+    bool HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray, CollisionInfo& _hitInfo );
+    
+    // 球と線
+    bool HitCheck_SphereVsRay(const CollInData_Sphere& _sphere, const CollInData_Ray& _ray, CollisionInfo& _hitInfo );
+
+    // 平面と線分
+    bool HitCheck_PlaneVsSegment(const CollInData_Plane& _plane, const CollInData_Segment& _segment);
+
+    //*****************************************************************************************
+    //						 2D 
+    //*****************************************************************************************
     // 箱と点
     bool HitCheck2D_BoxVsPoint(const CollInData2D_AABB& _box, const VECTOR2::VEC2& _p);
 

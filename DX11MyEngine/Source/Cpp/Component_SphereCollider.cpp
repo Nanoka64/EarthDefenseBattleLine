@@ -69,5 +69,6 @@ void SphereCollider::Update(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void SphereCollider::Draw(RendererEngine &renderer)
 {
+    if (m_IsDrawDebugMesh == false)return;
 
 }

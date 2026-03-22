@@ -39,7 +39,12 @@ BoxCollider::~BoxCollider()
 void BoxCollider::Start(RendererEngine &renderer)
 {
     m_pBoxMesh = std::make_unique<DebugMesh>();
-    m_pBoxMesh->Setup(renderer,DEBUG_MESHS_TYPE::CUBE);
+    bool res = m_pBoxMesh->Setup(renderer,DEBUG_MESHS_TYPE::CUBE);
+    if (res == false)
+    {
+        assert(false);
+        MessageBox(NULL, "デバッグ用メッシュの生成ができませんでした", "Collider", MB_OK);
+    }
 
     m_pTransform = m_pOwner.lock()->get_Transform();
 
@@ -72,6 +77,8 @@ void BoxCollider::Update(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void BoxCollider::Draw(RendererEngine &renderer)
 {
+    if (m_IsDrawDebugMesh == false)return;
+
     auto pContext = renderer.get_DeviceContext();
     XMMATRIX localMat = XMMatrixIdentity();
 
@@ -87,7 +94,7 @@ void BoxCollider::Draw(RendererEngine &renderer)
     localMat = transform->get_ExcludingRotWorldMtx(mtxS, mtxT);
 
     // メッシュ表示
-    //m_pBoxMesh->Draw(renderer, localMat);
+    m_pBoxMesh->Draw(renderer, localMat);
 }
 
 

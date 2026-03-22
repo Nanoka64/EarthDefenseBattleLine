@@ -48,6 +48,8 @@ protected:
 	COLLISION_CATEGORY m_CategoryBits;	// 衝突判定を分けるためのカテゴリー
 	unsigned m_CollisionBitMask;		// 衝突判定を分けるためのビットマスク
 
+	bool m_IsDrawDebugMesh;				// デバッグ用メッシュを表示するか
+
 public:
 	Collider(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
 	~Collider();
@@ -75,6 +77,11 @@ public:
 	/* 静的かどうか */
 	void set_IsStatic(bool _flag) { m_IsStatic = _flag; }
 	bool get_IsStatic()const { return m_IsStatic; }
+
+	/* デバッグメッシュ表示するか */
+	void set_IsDrawDebugMesh(bool _flag) { m_IsDrawDebugMesh = _flag; }
+	bool get_IsDrawDebugMesh()const { return m_IsDrawDebugMesh; }
+
 
 	/* 衝突のカテゴリ 自身のタイプ */
 	void set_CollisionCategory(COLLISION_CATEGORY _category) { m_CategoryBits = _category; }

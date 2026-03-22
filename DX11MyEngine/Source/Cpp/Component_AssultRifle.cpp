@@ -13,6 +13,7 @@
 #include "Component_3DCamera.h"
 #include "Component_LineRenderer.h"
 #include "Component_PointLight.h"
+#include "CollisionInfo.h"
 #include "GameManager.h"
 
 using namespace GIGA_Engine;
@@ -90,7 +91,6 @@ void AssultRifle::Update(RendererEngine &renderer)
     // レーザーサイトの始点と方向
     m_pLineRendererComp.lock()->set_Dir(VEC3::FromXMVECTOR(XMVector3Normalize(forward)));
     m_pLineRendererComp.lock()->set_StartPos(pos);
-
 
 
     Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"弾の切り替え"));

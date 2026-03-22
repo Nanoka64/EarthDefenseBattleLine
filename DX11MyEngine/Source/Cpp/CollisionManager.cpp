@@ -259,7 +259,6 @@ bool CollisionManager::HitCheck(
     //=========================================================================================
     else if (colA_Type == COLLIDER_TYPE::SPHERE && colB_Type == COLLIDER_TYPE::SPHERE)
     {
-        // 一旦キャストして実装（TODO: キャストしないように実装したい）
         auto sphereA = std::static_pointer_cast<SphereCollider>(_colA);
         auto sphereB = std::static_pointer_cast<SphereCollider>(_colB);
 
@@ -321,7 +320,6 @@ bool CollisionManager::HitCheck(
     //=========================================================================================
     else if (colA_Type == COLLIDER_TYPE::BOX && colB_Type == COLLIDER_TYPE::SPHERE)
     {
-        // 一旦キャストして実装（TODO: キャストしないように実装したい）
         auto boxA = std::static_pointer_cast<BoxCollider>(_colA);
         auto sphereB = std::static_pointer_cast<SphereCollider>(_colB);
 
@@ -384,6 +382,15 @@ bool CollisionManager::HitCheck(
     return false;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//						3D判定
+// 
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 //*---------------------------------------------------------------------------------------
 //*【?】範囲内のオブジェクトを取得する
 //*
@@ -417,6 +424,79 @@ std::vector<std::shared_ptr<Collider>> CollisionManager::CheckSphere(const VECTO
     }
     return hitList;
 }
+
+//*---------------------------------------------------------------------------------------
+//*【?】レイを飛ばす
+//*
+//* [引数]
+//* &_ray : レイ情報
+//* _mask : 衝突マスク
+//* &_outHitInfo : 衝突情報返す
+//* [返値]
+//* true : 当たった
+//* false : 当たってない
+//*----------------------------------------------------------------------------------------
+bool CollisionManager::CheckRaycast(const CollInData_Ray& _ray, int _mask, CollisionInfo& _outHitInfo)
+{
+    bool isHit = false;
+
+    // 全てのコライダーのヒットフラグを一旦falseに
+    for (auto& comp : m_pCollidersList)
+    {
+        comp->set_IsHit(false);
+    }
+
+    // 判定ループ処理
+    for (int i = 0; i < m_pCollidersList.size(); i++)
+    {
+        auto& col = m_pCollidersList[i];
+        bool isStaticA = false;
+        auto trans = col->get_OwnerObj().lock()->get_Component<MyTransform>();
+        if (trans == nullptr) {
+            MessageBox(NULL, "Aトランスフォームコンポーネントがありません", "衝突判定", MB_OK);
+            continue;
+        }
+        // 衝突マスクのチェック
+        if ((col->get_CollisionBitMask() & _mask) == 0 ||
+            (_mask & UINT_CAST(col->get_CollisionCategory())) == 0)
+        {
+            continue;
+        }
+
+        COLLIDER_TYPE type = col->get_ColliderType();
+
+        switch (type)
+        {
+        case COLLIDER_TYPE::NONE:
+            break;
+        case COLLIDER_TYPE::BOX:
+        {
+            CollInData_AABB box;
+            if (HitCheck_BoxVsRay(box,_ray, _outHitInfo))
+            {
+
+            }
+        }
+            break;
+        case COLLIDER_TYPE::SPHERE:
+        {
+            CollInData_Sphere sphere;
+            if (HitCheck_SphereVsRay(sphere, _ray, _outHitInfo))
+            {
+
+            }
+        }
+            break;
+        case COLLIDER_TYPE::RAY:
+            break;
+        default:
+            break;
+        }
+
+    }
+    return isHit;
+}
+
 
 //*---------------------------------------------------------------------------------------
 //*【?】ボックスとボックスの物理的な判定
@@ -468,87 +548,38 @@ bool CollisionManager::HitCheck_BoxVsBox(const CollInData_AABB &_src, const Coll
 }
 
 //*---------------------------------------------------------------------------------------
-//*【?】2Dボックスと2D ポイントの判定
+//*【?】ボックスとポイントの判定
 //*
 //* [引数]
-//* &_box : ボックス 
-//* &_p : ポイント
+//* &_src : 箱 
+//* &_dst : 点
 //* [返値]
 //* true : 当たった
 //* false : 当たってない
 //*----------------------------------------------------------------------------------------
-bool CollisionManager::HitCheck2D_BoxVsPoint(const CollInData2D_AABB& _box, const VECTOR2::VEC2& _p)
+bool CollisionManager::HitCheck_BoxVsPoint(const CollInData_AABB& _box, const VECTOR3::VEC3& _p)
 {
     // 左側の判定
-    if (_box._max.x < _p.x) return false;
+    if (_box._max.x <= _p.x) return false;
 
     // 右側の判定
-    if (_box._min.x > _p.x) return false;
+    if (_box._min.x >= _p.x) return false;
 
     // 上側の判定
-    if (_box._max.y < _p.y) return false;
+    if (_box._max.y <= _p.y) return false;
 
     // 下側の判定
-    if (_box._min.y > _p.y) return false;
+    if (_box._min.y >= _p.y) return false;
+
+    // 奥の判定
+    if (_box._max.z <= _p.z) return false;
+
+    // 手前の判定
+    if (_box._min.z >= _p.z) return false;
 
     // 当たっている可能性しか残っていない
     return true;
 }
-
-//*---------------------------------------------------------------------------------------
-//*【?】スフィアとスフィアの判定
-//*
-//* [引数]
-//* &_src : スフィア 
-//* &_dst : スフィア
-//* [返値]
-//* true : 当たった
-//* false : 当たってない
-//*----------------------------------------------------------------------------------------
-bool CollisionManager::HitCheck_SphereVsSphere(const CollInData_Sphere &_src, const CollInData_Sphere &_dst)
-{
-    VECTOR3::VEC3 result;
-    result = _dst._pos - _src._pos;
-
-    float length = result.LengthSq();
-    float r = _src._radius + _dst._radius;
-
-    if ((r * r) > length)
-    {
-        return true;
-    }
-
-    return false;
-}
-
-//*---------------------------------------------------------------------------------------
-//*【?】ボックスとスフィアの判定
-//* 参考サイト：https://yutateno.hatenablog.jp/entry/2019/11/27/001801 
-//*           ：https://developer.mozilla.org/ja/docs/Games/Techniques/3D_collision_detection
-//*
-//* [引数]
-//* &_src : 箱 
-//* &_dst : 球
-//* [返値]
-//* true : 当たった
-//* false : 当たってない
-//*----------------------------------------------------------------------------------------
-bool CollisionManager::HitCheck_BoxVsSphere(const CollInData_AABB &_box, const CollInData_Sphere &_sphere)
-{
-    // クランプして球の中心からボックスの最も近い点を取得
-    VEC3 P;
-    P.x = std::max(_box._min.x, std::min(_sphere._pos.x, _box._max.x));
-    P.y = std::max(_box._min.y, std::min(_sphere._pos.y, _box._max.y));
-    P.z = std::max(_box._min.z, std::min(_sphere._pos.z, _box._max.z));
-
-    float distance = (P.x - _sphere._pos.x) * (P.x - _sphere._pos.x) +
-                     (P.y - _sphere._pos.y) * (P.y - _sphere._pos.y) +
-                     (P.z - _sphere._pos.z) * (P.z - _sphere._pos.z);
-
-    // 距離が球の半径より小さいなら衝突
-    return distance < _sphere._radius;
-}
-
 
 //*---------------------------------------------------------------------------------------
 //*【?】ボックスとレイの判定
@@ -560,11 +591,11 @@ bool CollisionManager::HitCheck_BoxVsSphere(const CollInData_AABB &_box, const C
 //* true : 当たった
 //* false : 当たってない
 //*----------------------------------------------------------------------------------------
-bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB &_box, const CollInData_Ray &_ray)
+bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray)
 {
     float t_Min = 0.0f;
     float t_Max = 0.0f;
-    
+
     VEC3 minV = _box._min;
     VEC3 maxV = _box._max;
     VEC3 point = _ray._point;
@@ -587,11 +618,11 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB &_box, const Coll
         // X軸での領域を決定
         float t0 = (minV.x - point.x) / dir.x;
         float t1 = (maxV.x - point.x) / dir.x;
-        if (t0 < t1){
+        if (t0 < t1) {
             tx_Min = t0;
             tx_Max = t1;
         }
-        else{
+        else {
             tx_Min = t1;
             tx_Max = t0;
         }
@@ -629,7 +660,7 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB &_box, const Coll
         else {
             ty_Min = t1;
             ty_Max = t0;
-        }    
+        }
         // Y軸領域内ですでに範囲外
         if (ty_Max < 0.0f || ty_Min > 1.0f) {
             return false;
@@ -688,10 +719,130 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB &_box, const Coll
     if (t_Max > tz_Max)t_Max = tz_Max;
 
     // 共通領域のチェック
-    if (t_Min > 1.0f || t_Max < 0.0f){
+    if (t_Min > 1.0f || t_Max < 0.0f) {
         return false;
     }
 
+    return true;
+}
+
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】ボックスとスフィアの判定
+//* 参考サイト：https://yutateno.hatenablog.jp/entry/2019/11/27/001801 
+//*           ：https://developer.mozilla.org/ja/docs/Games/Techniques/3D_collision_detection
+//*
+//* [引数]
+//* &_src : 箱 
+//* &_dst : 球
+//* [返値]
+//* true : 当たった
+//* false : 当たってない
+//*----------------------------------------------------------------------------------------
+bool CollisionManager::HitCheck_BoxVsSphere(const CollInData_AABB &_box, const CollInData_Sphere &_sphere)
+{
+    // クランプして球の中心からボックスの最も近い点を取得
+    VEC3 P;
+    P.x = std::max(_box._min.x, std::min(_sphere._pos.x, _box._max.x));
+    P.y = std::max(_box._min.y, std::min(_sphere._pos.y, _box._max.y));
+    P.z = std::max(_box._min.z, std::min(_sphere._pos.z, _box._max.z));
+
+    float distance = (P.x - _sphere._pos.x) * (P.x - _sphere._pos.x) +
+                     (P.y - _sphere._pos.y) * (P.y - _sphere._pos.y) +
+                     (P.z - _sphere._pos.z) * (P.z - _sphere._pos.z);
+
+    // 距離が球の半径より小さいなら衝突
+    return distance < _sphere._radius;
+}
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】スフィアとスフィアの判定
+//*
+//* [引数]
+//* &_src : スフィア 
+//* &_dst : スフィア
+//* [返値]
+//* true : 当たった
+//* false : 当たってない
+//*----------------------------------------------------------------------------------------
+bool CollisionManager::HitCheck_SphereVsSphere(const CollInData_Sphere& _src, const CollInData_Sphere& _dst)
+{
+    VECTOR3::VEC3 result;
+    result = _dst._pos - _src._pos;
+
+    float length = result.LengthSq();
+    float r = _src._radius + _dst._radius;
+
+    if ((r * r) > length)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】プレーンとレイの判定
+//* 参考サイト：http://www.marupeke296.com/COL_3D_No3_LineToPlane.html
+//*
+//* [引数]
+//* &_plane : 平面
+//* &_ray : 光線
+//* &_hitInfo : 衝突情報格納用
+//* [返値]
+//* true : 当たった
+//* false : 当たってない
+//*----------------------------------------------------------------------------------------
+bool CollisionManager::HitCheck_PlaneVsRay(const CollInData_Plane& _plane, const CollInData_Ray& _ray, CollisionInfo& _hitInfo)
+{
+    // レイの方向と法線の垂直関係を調べる
+    float t_Dot1 = VEC3::Dot(_plane._norm, _ray._dir);
+
+    // レイと平面が垂直（平行）に近い場合
+    if (abs(t_Dot1) <= 1e-6f) {
+        // レイの始点が平面上にあるかどうかを確認
+        VEC3 a_minus_q = _ray._point - _plane._point;
+        return abs(VEC3::Dot(a_minus_q, _plane._norm)) <= 1e-6f;
+    }
+
+    // 平面とレイを結ぶベクトル
+    VEC3 v1 = _plane._point - _ray._point;
+
+    // 垂直（0.0f）なら平面とレイが重なっている
+    float t_Dot2 = VEC3::Dot(v1, _plane._norm);
+
+    // t が0以上なら進行方向に平面が存在
+    float t = t_Dot2 / t_Dot1;
+
+    //平面の背後の場合は当たっていない
+    if (t <= 0.0f) {
+        return false;
+    }
+    
+    // 衝突点を計算して格納
+    _hitInfo.set_HitPoint(_ray._point + (_ray._dir * t));
+    _hitInfo.set_HitNormal(_plane._norm);
+
+    return true;
+}
+
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】ボックスとレイの判定
+//*
+//* [引数]
+//* &_box : AABB
+//* &_ray : 光線
+//* &_hitInfo : 衝突情報格納用
+//* [返値]
+//* true : 当たった
+//* false : 当たってない
+//*----------------------------------------------------------------------------------------
+bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray, CollisionInfo& _hitInfo)
+{
     return true;
 }
 
@@ -699,13 +850,85 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB &_box, const Coll
 //*【?】スフィアとレイの判定
 //*
 //* [引数]
-//* &_src : 球
-//* &_dst : 光線
+//* &_sphere : スフィア
+//* &_ray : 光線
+//* &_hitInfo : 衝突情報格納用
 //* [返値]
 //* true : 当たった
 //* false : 当たってない
 //*----------------------------------------------------------------------------------------
-bool CollisionManager::HitCheck_SphereVsRay(const CollInData_Sphere &_src, const CollInData_Ray &_dst)
+bool CollisionManager::HitCheck_SphereVsRay(const CollInData_Sphere& _sphere, const CollInData_Ray& _ray, CollisionInfo& _hitInfo)
 {
+    return true;
+}
+
+
+
+
+
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】プレーンと線分の判定
+//* 参考サイト：http://www.marupeke296.com/COL_3D_No3_LineToPlane.html
+//*
+//* [引数]
+//* &_plane : 平面
+//* &_segment : 線分
+//* [返値]
+//* true : 当たった
+//* false : 当たってない
+//*----------------------------------------------------------------------------------------
+bool CollisionManager::HitCheck_PlaneVsSegment(const CollInData_Plane& _plane, const CollInData_Segment& _segment)
+{
+    VEC3 v1 = _segment._start - _plane._point;  
+    VEC3 v2 = _segment._end - _plane._point;
+
+    // 鈍角になっていたらマイナスになるはずで、その場合は衝突している
+    float t_Dot1 = VEC3::Dot(v1, _plane._norm); // 始点方向と法線の内積
+    float t_Dot2 = VEC3::Dot(v2, _plane._norm); // 終点方向と法線の内積
+
+    // マイナスじゃないなら衝突してない
+    if ((t_Dot1 * t_Dot2) >= 0.0f)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//						2D判定
+// 
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//*---------------------------------------------------------------------------------------
+//*【?】2Dボックスと2D ポイントの判定
+//*
+//* [引数]
+//* &_box : ボックス 
+//* &_p : ポイント
+//* [返値]
+//* true : 当たった
+//* false : 当たってない
+//*----------------------------------------------------------------------------------------
+bool CollisionManager::HitCheck2D_BoxVsPoint(const CollInData2D_AABB& _box, const VECTOR2::VEC2& _p)
+{
+    // 左側の判定
+    if (_box._max.x < _p.x) return false;
+
+    // 右側の判定
+    if (_box._min.x > _p.x) return false;
+
+    // 上側の判定
+    if (_box._max.y < _p.y) return false;
+
+    // 下側の判定
+    if (_box._min.y > _p.y) return false;
+
+    // 当たっている可能性しか残っていない
     return true;
 }

@@ -696,6 +696,7 @@ void BoxColliderEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pObj)
     bool isEnable = pComp->get_IsEnable();
     bool isHit = pComp->get_IsHit();
     bool isStatic = pComp->get_IsStatic();
+    bool isDebug = pComp->get_IsDrawDebugMesh();
     COLLISION_JUDGMENT judgmentType = pComp->get_CollisionJudgmentType();
 
     VEC3 center = pComp->get_Center();
@@ -709,6 +710,10 @@ void BoxColliderEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pObj)
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"使用フラグ"));
         Master::m_pDebugger->DG_SameLine();
         Master::m_pDebugger->DG_CheckBox("##IsEnable", &isEnable);
+
+        Master::m_pDebugger->DG_BulletText(U8ToChar(u8"デバッグ用メッシュを表示"));
+        Master::m_pDebugger->DG_SameLine();
+        Master::m_pDebugger->DG_CheckBox("##IsDebug", &isDebug);
 
         
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"トリガー"));
@@ -760,6 +765,7 @@ void BoxColliderEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pObj)
     pComp->set_IsEnable(isEnable);
     pComp->set_IsTrigger(isTrigger);
     pComp->set_IsStatic(isStatic);
+    pComp->set_IsDrawDebugMesh(isDebug);
     pComp->set_Center(center);
     pComp->set_Size(size);
     pComp->set_CollisionJudgmentType(judgmentType);
@@ -792,6 +798,7 @@ void SphereColliderEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pOb
     bool isEnable = pComp->get_IsEnable();
     bool isHit = pComp->get_IsHit();
     bool isStatic = pComp->get_IsStatic();
+    bool isDebug = pComp->get_IsDrawDebugMesh();
 
     VEC3 center = pComp->get_Center();
     float radius = pComp->get_Radius();
@@ -805,6 +812,10 @@ void SphereColliderEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pOb
         Master::m_pDebugger->DG_SameLine();
         Master::m_pDebugger->DG_CheckBox("##IsEnable", &isEnable);
 
+
+        Master::m_pDebugger->DG_BulletText(U8ToChar(u8"デバッグ用メッシュを表示"));
+        Master::m_pDebugger->DG_SameLine();
+        Master::m_pDebugger->DG_CheckBox("##IsDebug", &isDebug);
         
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"トリガー"));
         Master::m_pDebugger->DG_SameLine();
@@ -838,6 +849,7 @@ void SphereColliderEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pOb
     pComp->set_IsEnable(isEnable);
     pComp->set_IsTrigger(isTrigger);
     pComp->set_IsStatic(isStatic);
+    pComp->set_IsDrawDebugMesh(isDebug);
     pComp->set_Center(center);
     pComp->set_Radius(radius);
 }

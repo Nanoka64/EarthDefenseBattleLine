@@ -143,13 +143,36 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     auto transform = m_pOwner.lock()->get_Transform().lock();
     VEC3 crntPos = transform->get_VEC3ToPos();
     auto moveComp = m_pOwner.lock()->get_Component<MoveLogic>();
+    float moveDistance = VEC3::Distance(crntPos, m_PrevPos);
 
     MoveParam param;
     param._moveDirection = -m_MoveDir;// ※マイナスにしているのはプレイヤーの方向がおかしいせい（後で直す）
     param._moveSpeed = m_Parameter._speed;
-    moveComp->Calculate(param);
 
-    m_PrevPos = crntPos;
+
+    // レイの生成
+    CollInData_Ray ray;
+    ray._point = crntPos;
+    ray._dir = param._moveDirection;
+    CollisionInfo hitInfo;
+
+    // レイキャスト判定
+    if (Master::m_pCollisionManager->CheckRaycast(ray,hitInfo))
+    {
+        // 前回までの移動距離で衝突しているか
+        if (VEC3::Distance(hitInfo.get_HitPoint(), crntPos) <= moveDistance)
+        {
+            transform->set_Pos(hitInfo.get_HitPoint());
+            this->OnTriggerEnter(hitInfo);
+            return;
+        }
+    }
+
+    // 前回の位置として保持
+    m_PrevPos = crntPos;        
+
+    // 移動
+    moveComp->Calculate(param); 
 
 
     // 射程距離外で削除

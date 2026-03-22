@@ -169,7 +169,7 @@ void NormalBullet::Update(RendererEngine &renderer)
     MoveParam param;
     param._moveDirection = -m_MoveDir;// ※マイナスにしているのはプレイヤーの方向がおかしいせい（後で直す）
     param._moveSpeed = m_Parameter._speed;
-    moveComp->Calculate(param);
+
 
     m_PrevPos = crntPos;
 
@@ -180,6 +180,25 @@ void NormalBullet::Update(RendererEngine &renderer)
     //// ※マイナスにしているのはプレイヤーの方向がおかしいせい（後で直す）
     //crntPos = crntPos - moveVec;
     //transform->set_Pos(crntPos);
+    CollInData_Ray ray;
+    ray._point = crntPos;
+    ray._dir = param._moveDirection;
+    CollInData_Plane pln;
+    pln._point = VEC3(0.0f, 0.0f, 0.0f);
+    pln._norm = VEC3(0.0f, 1.0f, 0.0f);
+    CollisionInfo hitInfo;
+    if (Master::m_pCollisionManager->HitCheck_PlaneVsRay(pln, ray, hitInfo))
+    {
+        if (VEC3::Distance(hitInfo.get_HitPoint(), crntPos) < 10.0f)
+        {
+            transform->set_Pos(hitInfo.get_HitPoint());
+            this->OnTriggerEnter(hitInfo);
+            return;
+        }
+    }
+    moveComp->Calculate(param);
+
+
 
     // 射程距離外で削除
     float distSq =  VEC3::DistanceSq(crntPos, m_StartPos);

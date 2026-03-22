@@ -200,6 +200,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             collider->set_Size(VEC3(5.0f, 5.0f, 5.0f));
             collider->set_Center(VEC3(0.0f, 2.0f, 0.0f));
             collider->set_IsEnable(false);  // 初期化時は使用フラグオフに
+            collider->Start(renderer);
 
             // カテゴリ
             collider->set_CollisionCategory(COLLISION_CATEGORY::PLAYER_BULLET);
@@ -330,7 +331,8 @@ bool BulletManager::Init(RendererEngine &renderer)
             collider->set_Center(VEC3(0.0f, 2.0f, 0.0f));
             collider->set_IsEnable(false);  // 初期化時は使用フラグオフに
             collider->set_IsTrigger(true);  // トリガーとして設定
-            
+            collider->Start(renderer);
+
             // カテゴリ
             collider->set_CollisionCategory(COLLISION_CATEGORY::PLAYER_BULLET);
             // 衝突マスク
