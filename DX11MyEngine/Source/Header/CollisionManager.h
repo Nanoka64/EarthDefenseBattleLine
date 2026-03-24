@@ -112,12 +112,25 @@ public:
     void RegisterCollider(std::shared_ptr<class Collider> pCol);
 
     /// <summary>
-    /// 判定を行う
+    /// 衝突判定
     /// </summary>
-    /// <returns></returns>
+    /// <param name="_colA">Aコライダー</param>
+    /// <param name="_colB">Bコライダー</param>
+    /// <param name="_transA">Aトランスフォーム</param>
+    /// <param name="_transB">Bトランスフォーム</param>
+    /// <param name="info">data格納先</param>
+    /// <returns>衝突したか</returns>
     bool HitCheck(std::shared_ptr<class Collider> _colA,std::shared_ptr<class Collider> _colB, std::shared_ptr<class MyTransform> _transA,std::shared_ptr<class MyTransform> _transB, class CollisionInfo* info);
     
-    bool HitCheck_Raycast(std::shared_ptr<class Collider> _colA, std::shared_ptr<class Collider> _colB, std::shared_ptr<class MyTransform> _transA, std::shared_ptr<class MyTransform> _transB, class CollisionInfo* info);
+    /// <summary>
+    /// レイキャスト判定
+    /// </summary>
+    /// <param name="_collider">コライダー</param>
+    /// <param name="_transform">トランスフォーム</param>
+    /// <param name="_ray">レイ情報</param>
+    /// <param name="_outHitInfo">data格納先</param>
+    /// <returns>衝突したか</returns>
+    bool HitCheck_Raycast(std::shared_ptr<class Collider> _collider,  std::shared_ptr<class MyTransform> _transform, const CollInData_Ray& _ray, float *_outDist, class CollisionInfo* _outHitInfo);
 
     /// <summary>
     /// 範囲内のオブジェクトを取得する
