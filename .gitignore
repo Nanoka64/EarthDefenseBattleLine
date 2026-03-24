@@ -197,9 +197,9 @@ PublishScripts/
 # NuGet Symbol Packages
 *.snupkg
 # The packages folder can be ignored because of Package Restore
-**/[Pp]ackages/*
+#**/[Pp]ackages/*
 # except build/, which is used as an MSBuild target.
-!**/[Pp]ackages/build/
+#!**/[Pp]ackages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/[Pp]ackages/repositories.config
 # NuGet v3's project.json files produces more ignorable files
@@ -361,3 +361,38 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Resource/CSO
+/Resource/CSO/DefefferdTest.cso
+/Resource/CSO/PS.cso
+/Resource/CSO/SimpleLightingPS.cso
+/Resource/CSO/SimplePS.cso
+/Resource/CSO/SimpleVS.cso
+/Resource/CSO/SpritePS.cso
+/Resource/CSO/SpriteVS.cso
+/Resource/CSO/VS.cso
+/RCa15216
+Resource/Texture/aerial_grass_rock_diff_4k.png
+Resource/Texture/aerial_grass_rock_nor_dx_4k.png
+Resource/Texture/coast_sand_rocks_02_diff_8k.png
+Resource/Texture/coast_sand_rocks_02_nor_dx_8k.png
+Resource/Texture/snow_02_diff_8k.png
+Resource/Texture/snow_02_nor_dx_8k.png
+Resource/Texture/Weak_1024.png
+/Resource/Model/Player/run.blend
+/Resource/Model/Player/swat_AddAnim.blend
+/Resource/Model/Player/swat_AddAnim.blend1
+/Resource/Model/Player/soldier.fbx
+/DX11MyEngine/Resource/Texture/snow_02_diff_8k.png
+/DX11MyEngine/Resource/Texture/snow_02_nor_dx_8k.png
+/DX11MyEngine/Resource/Texture/coast_sand_rocks_02_diff_8k.png
+/DX11MyEngine/Resource/Texture/coast_sand_rocks_02_nor_dx_8k.png
+/packages/AssimpCpp.5.0.1.6
+
+# --- packagesフォルダ内のライブラリを強制的にコミットに含める ---
+!DX11MyEngine/packages/
+!DX11MyEngine/packages/**/[Dd]ebug/
+!DX11MyEngine/packages/**/[Rr]elease/
+!DX11MyEngine/packages/**/*.lib
+!DX11MyEngine/packages/**/*.dll
+!DX11MyEngine/packages/**/*.targets
+!DX11MyEngine/packages/**/*.props

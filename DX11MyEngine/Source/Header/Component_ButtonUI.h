@@ -1,0 +1,113 @@
+#pragma once
+#include "IComponent.h"
+#include "ConstantUIData.h"
+
+class SpriteRenderer;
+
+// ***************************************************************************************
+// ---------------------------------------------------------------------------------------
+/* --- @:Button Class --- */
+//
+//  ★継承：IComponent ★
+//
+// 【?】Unity風のボタン
+//		とりあえず、見た目の変化は無しでクリック処理のみ
+//		
+// ***************************************************************************************
+class ButtonUI : public IComponent
+{
+public:
+
+
+private:
+
+	VECTOR4::VEC4 m_StateColor[UINT_CAST(UIData::STATE::NUM)];	// それぞれのステートごとのカラー
+	UIData::STATE m_CrntState;					// 現在の状態
+	UIData::STATE m_InputValidationState;		// 入力判定とするステート
+	float m_FadeDuration;				// ステート間の色の遷移時間
+	std::function<void()> m_OnClick;	// クリックされた際の処理
+	bool m_IsInteractable;				// 入力を受け付けるかどうか
+	std::string m_Text;					// テキスト
+	std::weak_ptr<RectTransform> m_pMyTransform;	// 自分のトランスフォーム
+	std::weak_ptr<SpriteRenderer> m_pSprite;		// スプライト
+	VECTOR2::VEC2 m_TextOffsetPos;		// テキストの位置補正用
+
+public:
+	ButtonUI(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
+	~ButtonUI();
+
+	void Start(RendererEngine &renderer) override;		// 初期化
+	void Update(RendererEngine &renderer) override;		// 更新処理
+	void Draw(RendererEngine &renderer)override;		// 描画処理
+
+	/// <summary>
+	/// ボタン用のスプライト設定
+	/// </summary>
+	/// <param name="_pComp"></param>
+	void set_Sprite(const std::shared_ptr<SpriteRenderer> &_pComp) { m_pSprite = _pComp; }
+
+	/// <summary>
+	/// 現在の状態を取得
+	/// </summary>
+	/// <returns></returns>
+	UIData::STATE get_State()const { return m_CrntState; }
+
+	/// <summary>
+	/// クリックされた際の処理を登録
+	/// </summary>
+	/// <param name="_onClick">クリックされた際の処理が記述してある関数</param>
+	/// <param name="_inputValidationState">処理を実行するタイミングのステート</param>
+	void OnClickFunc(const std::function<void()> &_onClick, UIData::STATE _inputValidationState = UIData::STATE::PRESSED) {
+		m_OnClick = _onClick; 
+		m_InputValidationState= _inputValidationState;
+	};
+
+	/// <summary>
+	/// 有効状態の設定
+	/// </summary>
+	/// <param name="_isIntertactable">フラグ</param>
+	void set_IsInteractable(bool _isIntertactable) { m_IsInteractable = _isIntertactable; }
+
+	/// <summary>
+	/// 有効状態の取得
+	/// </summary>
+	/// <returns>有効フラグ</returns>
+	bool get_IsInteractable()const { return m_IsInteractable; }
+
+	/// <summary>
+	/// ステート間の色の遷移時間設定
+	/// </summary>
+	/// <param name="_duration">遷移時間</param>
+	void set_FadeDuration(float _duration) { m_FadeDuration = _duration; }
+
+	/// <summary>
+	/// ステート間の色の遷移時間取得
+	/// </summary>
+	/// <returns>遷移時間</returns>
+	float get_FadeDuration()const { return m_FadeDuration; }
+
+	/// <summary>
+	/// ボタンに表示する文字を設定
+	/// </summary>
+	/// <param name="_text">表示する文字</param>
+	void set_Text(const std::string &_text) { m_Text = _text; }
+
+	/// <summary>
+	/// ボタンに表示する文字の取得
+	/// </summary>
+	/// <returns>表示する文字</returns>
+	std::string get_Text()const { return m_Text; }
+
+	/// <summary>
+	/// テキストの位置補正値の設定
+	/// </summary>
+	/// <param name="_v">補正値</param>
+	void set_TextOffsetPos(const VECTOR2::VEC2 &_v) { m_TextOffsetPos = _v; }
+
+	/// <summary>
+	/// テキストの位置補正値の取得
+	/// </summary>
+	/// <returns>補正値</returns>
+	VECTOR2::VEC2 get_TextOffsetPos()const { return m_TextOffsetPos; };
+};
+
