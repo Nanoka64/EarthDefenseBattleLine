@@ -382,6 +382,34 @@ bool CollisionManager::HitCheck(
     return false;
 }
 
+//*---------------------------------------------------------------------------------------
+//*【?】レイキャスト判定
+//      衝突したかどうかを確かめる
+//*     コライダーごとに処理を分ける 
+//*     参考サイト：https://qiita.com/Aqua-218/items/a432cf0410bff57202c5
+// 
+//* [引数]
+//* _colA :     コライダーA
+//* _colB :     コライダーB
+//* _transA :   トランスフォームA
+//* _transB :   トランスフォームB
+//* info :      衝突情報の保存先
+//* [返値]
+//* true : 成功
+//* false : 失敗
+//*----------------------------------------------------------------------------------------
+bool CollisionManager::HitCheck_Raycast(
+    std::shared_ptr<class Collider> _colA, 
+    std::shared_ptr<class Collider> _colB, 
+    std::shared_ptr<class MyTransform> _transA, 
+    std::shared_ptr<class MyTransform> _transB, 
+    class CollisionInfo* info
+)
+{
+
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //
@@ -431,39 +459,50 @@ std::vector<std::shared_ptr<Collider>> CollisionManager::CheckSphere(const VECTO
 //* [引数]
 //* &_ray : レイ情報
 //* _mask : 衝突マスク
-//* &_outHitInfo : 衝突情報返す
+//* &_outHitInfo : 衝突情報格納先
 //* [返値]
 //* true : 当たった
 //* false : 当たってない
 //*----------------------------------------------------------------------------------------
-bool CollisionManager::CheckRaycast(const CollInData_Ray& _ray, int _mask, CollisionInfo& _outHitInfo)
+bool CollisionManager::CheckRaycast(const CollInData_Ray& _ray, int _mask, class CollisionInfo* _outHitInfo)
 {
     bool isHit = false;
-
-    // 全てのコライダーのヒットフラグを一旦falseに
-    for (auto& comp : m_pCollidersList)
-    {
-        comp->set_IsHit(false);
-    }
+    float closestDist = FLT_MAX;
+    CollisionInfo tempHitInfo;
 
     // 判定ループ処理
     for (int i = 0; i < m_pCollidersList.size(); i++)
     {
         auto& col = m_pCollidersList[i];
-        bool isStaticA = false;
+
+        // 無効なコライダーはスキップ
+        if (col == nullptr || col->get_IsEnable() == false || col->get_OwnerObj().expired()) {
+            continue;
+        }
+
+        // 衝突マスクのチェック
+        if ((_mask & UINT_CAST(col->get_CollisionCategory())) == 0)
+        {
+            continue;
+        }
+
         auto trans = col->get_OwnerObj().lock()->get_Component<MyTransform>();
         if (trans == nullptr) {
             MessageBox(NULL, "Aトランスフォームコンポーネントがありません", "衝突判定", MB_OK);
             continue;
         }
-        // 衝突マスクのチェック
-        if ((col->get_CollisionBitMask() & _mask) == 0 ||
-            (_mask & UINT_CAST(col->get_CollisionCategory())) == 0)
-        {
-            continue;
-        }
+
+        float distance = 0.0f;
 
         COLLIDER_TYPE type = col->get_ColliderType();
+
+        // 最小距離のコライダーを調べる
+        if (distance > 0.0f && closestDist < distance)
+        {
+            closestDist = distance;
+            isHit = true;
+            *_outHitInfo = tempHitInfo;  // 衝突情報格納
+        }
 
         switch (type)
         {
@@ -492,7 +531,6 @@ bool CollisionManager::CheckRaycast(const CollInData_Ray& _ray, int _mask, Colli
         default:
             break;
         }
-
     }
     return isHit;
 }
@@ -795,7 +833,7 @@ bool CollisionManager::HitCheck_SphereVsSphere(const CollInData_Sphere& _src, co
 //* true : 当たった
 //* false : 当たってない
 //*----------------------------------------------------------------------------------------
-bool CollisionManager::HitCheck_PlaneVsRay(const CollInData_Plane& _plane, const CollInData_Ray& _ray, CollisionInfo& _hitInfo)
+bool CollisionManager::HitCheck_PlaneVsRay(const CollInData_Plane& _plane, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo)
 {
     // レイの方向と法線の垂直関係を調べる
     float t_Dot1 = VEC3::Dot(_plane._norm, _ray._dir);
@@ -822,8 +860,8 @@ bool CollisionManager::HitCheck_PlaneVsRay(const CollInData_Plane& _plane, const
     }
     
     // 衝突点を計算して格納
-    _hitInfo.set_HitPoint(_ray._point + (_ray._dir * t));
-    _hitInfo.set_HitNormal(_plane._norm);
+    _hitInfo->set_HitPoint(_ray._point + (_ray._dir * t));
+    _hitInfo->set_HitNormal(_plane._norm);
 
     return true;
 }
@@ -841,7 +879,7 @@ bool CollisionManager::HitCheck_PlaneVsRay(const CollInData_Plane& _plane, const
 //* true : 当たった
 //* false : 当たってない
 //*----------------------------------------------------------------------------------------
-bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray, CollisionInfo& _hitInfo)
+bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo)
 {
     return true;
 }
@@ -857,14 +895,10 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
 //* true : 当たった
 //* false : 当たってない
 //*----------------------------------------------------------------------------------------
-bool CollisionManager::HitCheck_SphereVsRay(const CollInData_Sphere& _sphere, const CollInData_Ray& _ray, CollisionInfo& _hitInfo)
+bool CollisionManager::HitCheck_SphereVsRay(const CollInData_Sphere& _sphere, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo)
 {
     return true;
 }
-
-
-
-
 
 
 

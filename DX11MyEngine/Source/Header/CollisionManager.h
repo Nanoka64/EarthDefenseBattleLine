@@ -117,7 +117,7 @@ public:
     /// <returns></returns>
     bool HitCheck(std::shared_ptr<class Collider> _colA,std::shared_ptr<class Collider> _colB, std::shared_ptr<class MyTransform> _transA,std::shared_ptr<class MyTransform> _transB, class CollisionInfo* info);
     
-    bool HitCheck2(std::shared_ptr<class Collider> _colA, std::shared_ptr<class Collider> _colB, std::shared_ptr<class MyTransform> _transA, std::shared_ptr<class MyTransform> _transB, class CollisionInfo* info);
+    bool HitCheck_Raycast(std::shared_ptr<class Collider> _colA, std::shared_ptr<class Collider> _colB, std::shared_ptr<class MyTransform> _transA, std::shared_ptr<class MyTransform> _transB, class CollisionInfo* info);
 
     /// <summary>
     /// 範囲内のオブジェクトを取得する
@@ -131,7 +131,7 @@ public:
     /// <param name="_ray"></param>
     /// <param name="_outHitInfo"></param>
     /// <returns></returns>
-    bool CheckRaycast(const CollInData_Ray& _ray,int _mask, CollisionInfo& _outHitInfo);
+    bool CheckRaycast(const CollInData_Ray& _ray,int _mask, class CollisionInfo* _outHitInfo);
 
     //*****************************************************************************************
     //						 3D 
@@ -158,13 +158,13 @@ public:
     //						 レイキャスト 
     //*****************************************************************************************
     // 平面と線
-    bool HitCheck_PlaneVsRay(const CollInData_Plane& _plane, const CollInData_Ray& _ray, CollisionInfo& _hitInfo );
+    bool HitCheck_PlaneVsRay(const CollInData_Plane& _plane, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo );
     
     // 箱と線
-    bool HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray, CollisionInfo& _hitInfo );
+    bool HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo );
     
     // 球と線
-    bool HitCheck_SphereVsRay(const CollInData_Sphere& _sphere, const CollInData_Ray& _ray, CollisionInfo& _hitInfo );
+    bool HitCheck_SphereVsRay(const CollInData_Sphere& _sphere, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo );
 
     // 平面と線分
     bool HitCheck_PlaneVsSegment(const CollInData_Plane& _plane, const CollInData_Segment& _segment);
