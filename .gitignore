@@ -387,3 +387,12 @@ Resource/Texture/Weak_1024.png
 /DX11MyEngine/Resource/Texture/coast_sand_rocks_02_diff_8k.png
 /DX11MyEngine/Resource/Texture/coast_sand_rocks_02_nor_dx_8k.png
 /packages/AssimpCpp.5.0.1.6
+
+# --- packagesフォルダ内のライブラリを強制的にコミットに含める ---
+!DX11MyEngine/packages/
+!DX11MyEngine/packages/**/[Dd]ebug/
+!DX11MyEngine/packages/**/[Rr]elease/
+!DX11MyEngine/packages/**/*.lib
+!DX11MyEngine/packages/**/*.dll
+!DX11MyEngine/packages/**/*.targets
+!DX11MyEngine/packages/**/*.props
