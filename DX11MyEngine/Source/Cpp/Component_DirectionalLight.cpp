@@ -18,8 +18,8 @@ using namespace VECTOR3;
 //*----------------------------------------------------------------------------------------
 DirectionalLight::DirectionalLight(std::weak_ptr<GameObject> pOwner, int updateRank) : Light(pOwner, updateRank),
 m_FocusOffsetDistance(2000.0f),
-m_OrthographicWidth(800.0f),
-m_OrthographicHeigh(800.0f),
+m_OrthographicWidth(650.0f),
+m_OrthographicHeigh(650.0f),
 m_ShadowDistance(4000.0f)
 {
 	this->set_Tag("DirectionalLight");
