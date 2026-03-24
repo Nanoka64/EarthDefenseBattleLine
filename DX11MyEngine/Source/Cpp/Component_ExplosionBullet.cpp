@@ -155,9 +155,9 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     ray._point = crntPos;
     ray._dir = param._moveDirection;
     CollisionInfo hitInfo;
-
+    int mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING);
     // レイキャスト判定
-    if (Master::m_pCollisionManager->CheckRaycast(ray,hitInfo))
+    if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
     {
         // 前回までの移動距離で衝突しているか
         if (VEC3::Distance(hitInfo.get_HitPoint(), crntPos) <= moveDistance)
