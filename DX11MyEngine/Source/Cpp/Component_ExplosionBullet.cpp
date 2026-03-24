@@ -150,23 +150,23 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     param._moveSpeed = m_Parameter._speed;
 
 
-    // レイの生成
-    CollInData_Ray ray;
-    ray._point = crntPos;
-    ray._dir = param._moveDirection;
-    CollisionInfo hitInfo;
-    int mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING);
-    // レイキャスト判定
-    if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
-    {
-        // 前回までの移動距離で衝突しているか
-        if (VEC3::Distance(hitInfo.get_HitPoint(), crntPos) <= moveDistance)
-        {
-            transform->set_Pos(hitInfo.get_HitPoint());
-            this->OnTriggerEnter(hitInfo);
-            return;
-        }
-    }
+    //// レイの生成
+    //CollInData_Ray ray;
+    //ray._point = crntPos;
+    //ray._dir = param._moveDirection;
+    //CollisionInfo hitInfo;
+    //int mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING);
+    //// レイキャスト判定
+    //if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
+    //{
+    //    // 前回までの移動距離で衝突しているか
+    //    if (VEC3::Distance(hitInfo.get_HitPoint(), crntPos) <= moveDistance)
+    //    {
+    //        transform->set_Pos(hitInfo.get_HitPoint());
+    //        this->OnTriggerEnter(hitInfo);
+    //        return;
+    //    }
+    //}
 
     // 前回の位置として保持
     m_PrevPos = crntPos;        

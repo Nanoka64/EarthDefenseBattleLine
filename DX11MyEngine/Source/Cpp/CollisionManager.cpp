@@ -175,11 +175,11 @@ void CollisionManager::CollisionProcess()
 //*     参考サイト：https://qiita.com/Aqua-218/items/a432cf0410bff57202c5
 // 
 //* [引数]
-//* _colA :     コライダーA
-//* _colB :     コライダーB
-//* _transA :   トランスフォームA
-//* _transB :   トランスフォームB
-//* info :      衝突情報の保存先
+//* _colA   : コライダーA
+//* _colB   : コライダーB
+//* _transA : トランスフォームA
+//* _transB : トランスフォームB
+//* info    : 衝突情報の保存先
 //* [返値]
 //* true : 成功
 //* false : 失敗
@@ -389,25 +389,52 @@ bool CollisionManager::HitCheck(
 //*     参考サイト：https://qiita.com/Aqua-218/items/a432cf0410bff57202c5
 // 
 //* [引数]
-//* _colA :     コライダーA
-//* _colB :     コライダーB
-//* _transA :   トランスフォームA
-//* _transB :   トランスフォームB
-//* info :      衝突情報の保存先
+//* _collider  : コライダー
+//* _transform : トランスフォーム
+//* _ray       : レイ情報
+//* _outDist   : 衝突したコライダーへの距離の保存
+//* info       : 衝突情報の保存先
 //* [返値]
 //* true : 成功
 //* false : 失敗
 //*----------------------------------------------------------------------------------------
 bool CollisionManager::HitCheck_Raycast(
-    std::shared_ptr<class Collider> _colA, 
-    std::shared_ptr<class Collider> _colB, 
-    std::shared_ptr<class MyTransform> _transA, 
-    std::shared_ptr<class MyTransform> _transB, 
-    class CollisionInfo* info
-)
+    std::shared_ptr<class Collider> _collider, 
+    std::shared_ptr<class MyTransform> _transform, 
+    const CollInData_Ray& _ray, 
+    float* _outDist,
+    class CollisionInfo* _outHitInfo)
 {
     bool isHit = false;
+    COLLIDER_TYPE type = _collider->get_ColliderType();
 
+    switch (type)
+    {
+    case COLLIDER_TYPE::NONE:
+        break;
+    case COLLIDER_TYPE::BOX:
+    {
+        CollInData_AABB box;
+        if (HitCheck_BoxVsRay(box, _ray, _outHitInfo))
+        {
+
+        }
+    }
+    break;
+    case COLLIDER_TYPE::SPHERE:
+    {
+        CollInData_Sphere sphere;
+        if (HitCheck_SphereVsRay(sphere, _ray, _outHitInfo))
+        {
+
+        }
+    }
+    break;
+    case COLLIDER_TYPE::RAY:
+        break;
+    default:
+        break;
+    }
 
     return isHit;
 }
@@ -497,42 +524,16 @@ bool CollisionManager::CheckRaycast(const CollInData_Ray& _ray, int _mask, class
 
         float distance = 0.0f;
 
-        COLLIDER_TYPE type = col->get_ColliderType();
-
-        // 最小距離のコライダーを調べる
-        if (distance > 0.0f && closestDist < distance)
+        // 衝突チェック
+        if (HitCheck_Raycast(col, trans, _ray, &distance, &tempHitInfo))
         {
-            closestDist = distance;
-            isHit = true;
-            *_outHitInfo = tempHitInfo;  // 衝突情報格納
-        }
-
-        switch (type)
-        {
-        case COLLIDER_TYPE::NONE:
-            break;
-        case COLLIDER_TYPE::BOX:
-        {
-            CollInData_AABB box;
-            if (HitCheck_BoxVsRay(box,_ray, _outHitInfo))
+            // 最小距離のコライダーを調べる
+            if (distance > 0.0f && closestDist < distance)
             {
-
+                closestDist = distance;
+                isHit = true;
+                *_outHitInfo = tempHitInfo;  // 衝突情報格納
             }
-        }
-            break;
-        case COLLIDER_TYPE::SPHERE:
-        {
-            CollInData_Sphere sphere;
-            if (HitCheck_SphereVsRay(sphere, _ray, _outHitInfo))
-            {
-
-            }
-        }
-            break;
-        case COLLIDER_TYPE::RAY:
-            break;
-        default:
-            break;
         }
     }
     return isHit;
