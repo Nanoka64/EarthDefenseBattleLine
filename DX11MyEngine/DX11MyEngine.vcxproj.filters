@@ -247,6 +247,12 @@
     <Filter Include="ソース ファイル\Game\UI">
       <UniqueIdentifier>{221714d0-c999-4922-b0df-667db4f1b54b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Game\Component\Weapon\Bullet">
+      <UniqueIdentifier>{2634a016-9b75-45f7-a1de-9b7c72740b15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Component\Weapon\Gun">
+      <UniqueIdentifier>{98fe35fe-a629-425a-8351-aaf3ad34af5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Cpp\SHADER.cpp">
@@ -576,23 +582,8 @@
     <ClCompile Include="Source\Cpp\SoundManager.cpp">
       <Filter>ソース ファイル\Tool\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Cpp\Component_AssultRifle.cpp">
-      <Filter>ソース ファイル\Game\Component\Weapon</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Cpp\Component_BulletBase.cpp">
-      <Filter>ソース ファイル\Game\Component\Weapon</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Cpp\Component_ExplosionBullet.cpp">
-      <Filter>ソース ファイル\Game\Component\Weapon</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Cpp\Component_NormalBullet.cpp">
-      <Filter>ソース ファイル\Game\Component\Weapon</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Cpp\Component_ButtonUI.cpp">
       <Filter>ソース ファイル\BaseComponent\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Cpp\Component_ExplosionLightController.cpp">
-      <Filter>ソース ファイル\Game\Component\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="Source\Cpp\KeyState.cpp">
       <Filter>ソース ファイル\Tool\KeyInput</Filter>
@@ -617,6 +608,30 @@
     </ClCompile>
     <ClCompile Include="Source\Cpp\ConstantUIData.cpp">
       <Filter>ソース ファイル\Game\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\WeaponManager.cpp">
+      <Filter>ソース ファイル\Game\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_BulletBase.cpp">
+      <Filter>ソース ファイル\Game\Component\Weapon\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_ExplosionBullet.cpp">
+      <Filter>ソース ファイル\Game\Component\Weapon\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_ExplosionLightController.cpp">
+      <Filter>ソース ファイル\Game\Component\Weapon\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_NormalBullet.cpp">
+      <Filter>ソース ファイル\Game\Component\Weapon\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_AssultRifle.cpp">
+      <Filter>ソース ファイル\Game\Component\Weapon\Gun</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_GunWeapon.cpp">
+      <Filter>ソース ファイル\Game\Component\Weapon\Gun</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_WeaponBase.cpp">
+      <Filter>ソース ファイル\Game\Component\Weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -986,23 +1001,8 @@
     <ClInclude Include="Source\Header\SoundManager.h">
       <Filter>ソース ファイル\Tool\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\Component_AssultRifle.h">
-      <Filter>ソース ファイル\Game\Component\Weapon</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\Component_BulletBase.h">
-      <Filter>ソース ファイル\Game\Component\Weapon</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\Component_ExplosionBullet.h">
-      <Filter>ソース ファイル\Game\Component\Weapon</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\Component_NormalBullet.h">
-      <Filter>ソース ファイル\Game\Component\Weapon</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Header\Component_ButtonUI.h">
       <Filter>ソース ファイル\BaseComponent\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\Component_ExplosionLightController.h">
-      <Filter>ソース ファイル\Game\Component\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\KeyState.h">
       <Filter>ソース ファイル\Tool\KeyInput</Filter>
@@ -1027,6 +1027,30 @@
     </ClInclude>
     <ClInclude Include="Source\Header\UIManager.h">
       <Filter>ソース ファイル\Game\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\WeaponManager.h">
+      <Filter>ソース ファイル\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_BulletBase.h">
+      <Filter>ソース ファイル\Game\Component\Weapon\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_ExplosionBullet.h">
+      <Filter>ソース ファイル\Game\Component\Weapon\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_ExplosionLightController.h">
+      <Filter>ソース ファイル\Game\Component\Weapon\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_NormalBullet.h">
+      <Filter>ソース ファイル\Game\Component\Weapon\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_AssultRifle.h">
+      <Filter>ソース ファイル\Game\Component\Weapon\Gun</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_GunWeapon.h">
+      <Filter>ソース ファイル\Game\Component\Weapon\Gun</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_WeaponBase.h">
+      <Filter>ソース ファイル\Game\Component\Weapon</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

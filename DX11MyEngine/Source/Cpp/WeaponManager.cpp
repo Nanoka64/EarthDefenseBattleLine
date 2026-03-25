@@ -1,0 +1,141 @@
+#include "pch.h"
+#include "WeaponManager.h"
+#include "Component_GunWeapon.h"
+#include "Component_WeaponBase.h"
+
+using namespace VECTOR3;
+using namespace VECTOR2;
+//*---------------------------------------------------------------------------------------
+//*【?】コンストラクタ
+//*----------------------------------------------------------------------------------------
+WeaponManager::WeaponManager():
+m_CrntWeaponSlotIndex(-1),
+m_MaxSlot(-1)
+{
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】デストラクタ
+//*----------------------------------------------------------------------------------------
+WeaponManager::~WeaponManager()
+{
+	m_WeaponArray.clear();
+}
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】初期化処理
+//*
+//* [引数]
+//* renderer : 描画エンジンの参照
+//*_maxSlot  : 最大スロット数
+//* 
+//* 
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+bool WeaponManager::Init(RendererEngine& renderer, int _maxSlot)
+{
+	m_MaxSlot = _maxSlot;
+	
+	// 最大数分メモリ確保
+	m_WeaponArray.reserve(m_MaxSlot);
+
+	SwitchWeapon(0);
+	return true;
+}
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】更新処理
+//*
+//* [引数]
+//* renderer : 描画エンジンの参照
+//*
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void WeaponManager::Update(RendererEngine& renderer)
+{
+	// 武器１
+	if (GetInputDown(GAME_CONFIG::WEAPON_CHANGE1))
+	{
+		SwitchWeapon(0);
+	}
+	// 武器２
+	if (GetInputDown(GAME_CONFIG::WEAPON_CHANGE2))
+	{
+		SwitchWeapon(1);
+	}
+
+	// マウスホイールで武器切り替え
+	LONG scroll = Master::m_pInputManager->GetMousePosSlopeZ();
+	if (scroll > 0)
+	{
+		NextWeapon();
+	}
+	else if (scroll < 0)
+	{
+		PrevWeapon();
+	}
+}
+
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】武器の切り替え
+//*
+//* [引数]
+//* _index : 切り替え先の武器のインデクス
+//*
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void WeaponManager::SwitchWeapon(int _index)
+{
+	if (_index < 0 || _index >= (int)m_WeaponArray.size()) return;
+
+	// 現在の武器を非表示に
+	m_WeaponArray[m_CrntWeaponSlotIndex]->get_OwnerObj().lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
+	// 新しい武器を表示
+	m_CrntWeaponSlotIndex = _index;
+	m_WeaponArray[m_CrntWeaponSlotIndex]->get_OwnerObj().lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】次の武器へ切り替え
+//*
+//* [引数] なし
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void WeaponManager::NextWeapon()
+{
+	int nextIdx = (m_CrntWeaponSlotIndex + 1) % (int)m_WeaponArray.size();
+	SwitchWeapon(nextIdx);
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】前の武器へ切り替え
+//*
+//* [引数] なし
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void WeaponManager::PrevWeapon()
+{
+	int count = (int)m_WeaponArray.size();
+	int prevIdx = (m_CrntWeaponSlotIndex - 1 + count) % count;
+	SwitchWeapon(prevIdx);
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】武器の登録
+//*
+//* [引数] 
+//* _pWeapon : 武器コンポーネントの共有ポインタ
+//* _slot : 武器をセットするスロット 
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void WeaponManager::RegisterWeapon(std::shared_ptr<class GunWeapon> _pWeapon, int _slot)
+{
+	if (_slot >= m_MaxSlot)return;
+
+	m_WeaponArray.emplace_back(_pWeapon);
+}

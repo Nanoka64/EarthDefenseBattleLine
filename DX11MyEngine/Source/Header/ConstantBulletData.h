@@ -89,5 +89,4 @@ namespace BulletData
             *this = HormingExplosionBulletData();
         }
     };
-
 };

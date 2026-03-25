@@ -84,6 +84,7 @@
 #include <algorithm>
 #include <array>
 #include <span>
+#include <variant>	// 共用体
 
 /* 定数 */
 constexpr int POINTLIGHT_MAX_NUM		= 100; // ポイントライトの最大数

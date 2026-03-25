@@ -454,6 +454,17 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             light->set_LightColor(col);
             light->set_Range(100.0f);
             light->set_Intensity(25.0f);
+
+            // コライダーの追加
+            auto collider = obj->add_Component<BoxCollider>();
+            collider->set_Size(VEC3(10, 10, 10));
+            collider->set_Center(VEC3(0, 0, 0));
+            collider->set_IsStatic(true);
+            // 衝突カテゴリ
+            collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
+
+            // コライダーの登録
+            Master::m_pCollisionManager->RegisterCollider(collider);
         }
     }
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "ConstantBulletData.h"
 
 /// <summary>
 /// 武器データをまとめた名前空間
@@ -6,10 +7,72 @@
 namespace WeaponData
 {
     /// <summary>
+    /// ベースとなる武器データ
+    /// </summary>
+    struct BaseWeaponData
+    {
+        int _level = -1;                // 武器レベル
+        std::string _name;              // 武器名
+
+        /// <summary>
+        /// リセット
+        /// </summary>
+        void Reset()
+        {
+            *this = BaseWeaponData();
+        }
+    };
+
+    /// <summary>
+    /// 銃系武器のデータ
+    /// </summary>
+    struct GunWeaponData : BaseWeaponData
+    {
+        int _bulletMaxNum = 0;          // 弾数
+        int _bulletSimultaneousNum = 1; // 弾の同時発射数
+        float _fireRate = 0.0f;         // 連射速度
+        float _reloadTime = 0.0f;       // リロード時間
+        float _accuracy = 0.0f;         // 精度
+        float _zoomLength = 0.0f;       // ズーム倍率（0.0以外の時に作動）
+        bool _isLaserSight = true;      // レーザーサイトはあるか
+
+        BulletData::BULLET_TYPE _bulletType = BulletData::BULLET_TYPE::NORMAL;  // 弾の種類
+
+        // variantは共用体（union）を使いやすくしてくれるやつ
+        using BulletParamVariant = std::variant<BulletData::NormalBulletData, BulletData::ExplosionBulletData>;
+        BulletParamVariant _bulletParam;    // 弾のパラメータ
+
+
+        /// <summary>
+        /// リセット
+        /// </summary>
+        void Reset()
+        {
+            *this = GunWeaponData();
+        }
+    };
+
+    /// <summary>
+    /// 爆発武器のデータ
+    /// </summary>
+    struct ExplosionWeaponData : GunWeaponData
+    {
+        /// <summary>
+        /// リセット
+        /// </summary>
+        void Reset()
+        {
+            *this = ExplosionWeaponData();
+        }
+    };
+
+    /// <summary>
     /// レンジャーの武器データ
     /// </summary>
     namespace Ranger
     {
+        constexpr int RANGER_WEAPON_NUM = 2;    // 二つまで装備
+
         /// <summary>
         /// 装備する武器のカテゴリ
         /// </summary>
@@ -53,6 +116,5 @@ namespace WeaponData
 
             NUM,
         };
-
     };
 };
