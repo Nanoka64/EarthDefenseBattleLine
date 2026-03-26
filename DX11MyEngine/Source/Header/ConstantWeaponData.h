@@ -35,13 +35,14 @@ namespace WeaponData
         float _accuracy = 0.0f;         // 精度
         float _zoomLength = 0.0f;       // ズーム倍率（0.0以外の時に作動）
         bool _isLaserSight = true;      // レーザーサイトはあるか
+        int _soundID;                   // 発射音のID
 
         BulletData::BULLET_TYPE _bulletType = BulletData::BULLET_TYPE::NORMAL;  // 弾の種類
 
         // variantは共用体（union）を使いやすくしてくれるやつ
+        // 必ず「_bulletType」と一致したデータを入れる
         using BulletParamVariant = std::variant<BulletData::NormalBulletData, BulletData::ExplosionBulletData>;
         BulletParamVariant _bulletParam;    // 弾のパラメータ
-
 
         /// <summary>
         /// リセット

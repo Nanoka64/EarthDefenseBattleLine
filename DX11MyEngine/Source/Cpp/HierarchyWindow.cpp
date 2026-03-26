@@ -78,7 +78,7 @@ void HierarchyWindow::Update(RendererEngine &renderer)
         bool isSelected = false;
         id++;
         // IDを名前に入れて一意にする（##ID は表示されず、内部的な識別子になる）
-        std::string label = obj->get_Tag() + "##" + std::to_string(id);
+        std::string label = std::to_string(obj->get_LayerRank()) + obj->get_Tag() + "##" + std::to_string(id);
 
         // 選択可能なリストアイテムを作成
         if (Master::m_pDebugger->DG_Selectable(label, &isSelected, ImGuiSelectableFlags_None, VECTOR2::VEC2(300, 20)))

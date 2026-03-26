@@ -19,6 +19,7 @@
 #include "Component_BillboardRenderer.h"
 #include "Component_SkyRenderer.h"
 #include "Component_AssultRifle.h"
+#include "Component_GunWeapon.h"
 #include "Component_BoxCollider.h"
 #include "Component_SphereCollider.h"
 #include "Component_TrailRenderer.h"
@@ -172,12 +173,12 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
             transform->set_Pos(pos);
             transform->set_RotateToDeg(rot);
-            transform->set_Scale(0.1f, 0.1f, 0.1f);
+            transform->set_Scale(0.15f, 0.15f, 0.15f);
 
 
             // コライダーの追加
             auto collider = obj->add_Component<BoxCollider>();
-            collider->set_Size(VEC3(20, 15, 20));
+            collider->set_Size(VEC3(30, 20, 30));
             collider->set_Center(VEC3(0, 10, 0));
             // 衝突カテゴリ
             collider->set_CollisionCategory(COLLISION_CATEGORY::ENEMY);
@@ -498,13 +499,30 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         model.MatNum = 1;
         model.SetupMaterial = matInfo;
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
+        model.ObjLayer = 91;
         auto obj = MeshFactory::CreateModel(model);
 
         // 破棄しない
         obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
 
         // アサルトライフル
-        obj->add_Component<AssultRifle>();
+        //obj->add_Component<AssultRifle>(1);
+        auto rifle = obj->add_Component<GunWeapon>(1);
+        WeaponData::GunWeaponData gunData;
+        gunData._accuracy = 0.05f;
+        gunData._bulletMaxNum = 8;
+        gunData._bulletType = BulletData::BULLET_TYPE::NORMAL;
+        gunData._fireRate = 20;
+        gunData._zoomLength = 1.1f;
+        gunData._reloadTime = 2.0f;
+        gunData._isLaserSight = true;
+        gunData._bulletSimultaneousNum = 10;
+        // 弾自身のパラメータ
+        BulletData::NormalBulletData bulletData;
+        bulletData._range = 800.0f;
+        bulletData._speed = 1500.0f;
+        gunData._bulletParam = bulletData;
+        rifle->Setup(gunData);
 
         // フラッシュ用ポイントライト
         auto flash = obj->add_Component<PointLight>();

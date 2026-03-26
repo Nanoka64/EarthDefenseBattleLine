@@ -34,7 +34,6 @@ namespace BulletData
         float _acceleration = 0.0f;                 // ’e‚Ì‰Á‘¬“x
         float _range = 0.0f;                        // ’e‚ÌË’ö‹——£
         float _penetrationsCount = 0.0f;            // ŠÑ’Ê‰Â”\‰ñ”
-        float _lifeTime = 0.0f;                     // ’e‚Ìõ–½
         float _collisionSize = 0.0f;                // Õ“Ë”»’è‚Ì”¼Œa
         float _gravityScale = 0.0f;                 // d—Í‚Ì‰e‹¿‚ğó‚¯‚é‚©‚Ç‚¤‚©i0.0f‚È‚çó‚¯‚È‚¢j
 

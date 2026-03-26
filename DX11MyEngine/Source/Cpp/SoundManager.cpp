@@ -277,9 +277,6 @@ bool SoundManager::InitXA2Sound(void)
 	Load_Wav("Resource/Sound/SE/Enemy/DSGNImpt_Impact High Spark 04_RSCPC_HV.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_DEAD));
 	
 	
-	Load_Wav("Resource/Sound/BGM/Taboo Marionette.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::TEST));
-
-
 	// BGM
 	Load_Wav("Resource/Sound/BGM/Flash_Shadow.wav", SOUND_TYPE::BGM, SOUND_ID_TO_INT(BGM_ID::BGM_TITLE_01));
 

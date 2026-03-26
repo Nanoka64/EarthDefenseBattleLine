@@ -29,17 +29,19 @@ struct CreateMesh_Base
 {
     RendererEngine* pRenderer;      // 描画
     std::string ObjTag;             // オブジェクトのタグ
+    int ObjLayer;                   // オブジェクトの更新レイヤー
     bool IsActive;                  // 生成時にオブジェクトをアクティブにするか
+    bool IsTransparent;             // 透明度があるか（ある場合はフォワード用のシェーダにしてね）
     SHADER_TYPE ShaderType;         // 使用するシェーダの種類
     SHADER_TYPE Shadow_ShaderType;  // シャドウマップ生成に使用するシェーダの種類
-    bool IsTransparent;             // 透明度があるか（ある場合はフォワード用のシェーダにしてね）
 
     CreateMesh_Base() :
         pRenderer(nullptr),
         IsActive(true),
         ShaderType(SHADER_TYPE::DEFERRED_STD_STATIC),
         Shadow_ShaderType(SHADER_TYPE::POST_SHADOWMAP),
-        IsTransparent(false)
+        IsTransparent(false),
+        ObjLayer(100)
     {};
 };
 

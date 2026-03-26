@@ -234,9 +234,9 @@ void NormalBullet::Setup()
 
     m_MoveDir = transform->get_Forward(); // 前方向ベクトル
 
-    m_MoveDir.x += Tool::RandRange(-0.03f, 0.03f);
-    m_MoveDir.y += Tool::RandRange(-0.03f, 0.03f);
-    m_MoveDir.z += Tool::RandRange(-0.03f, 0.03f);
+    //m_MoveDir.x += Tool::RandRange(-0.03f, 0.03f);
+    //m_MoveDir.y += Tool::RandRange(-0.03f, 0.03f);
+    //m_MoveDir.z += Tool::RandRange(-0.03f, 0.03f);
 
     m_MoveDir = m_MoveDir.Normalize();
 }

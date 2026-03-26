@@ -85,6 +85,7 @@
 #include <array>
 #include <span>
 #include <variant>	// 共用体
+#include <random>	// 乱数生成用
 
 /* 定数 */
 constexpr int POINTLIGHT_MAX_NUM		= 100; // ポイントライトの最大数

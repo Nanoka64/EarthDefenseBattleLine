@@ -49,6 +49,7 @@ void c_Title_LoadProcess::OnEnter(SceneManager *pOwner)
             assert(false);
         }
         obj->Init(*m_pRenderer);
+        obj->set_LayerRank(1);
         obj->set_Tag("Camera");
         obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
         obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
@@ -185,6 +186,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         model.SetupMaterial = matInfo;
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
         model.Shadow_ShaderType = SHADER_TYPE::POST_SHADOWMAP;
+        model.ObjLayer = 90;
         pPlayerObj = MeshFactory::CreateModel(model);
         pPlayerObj->get_Component<MyTransform>()->set_Scale(0.1f, 0.1f, 0.1f);
         pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);

@@ -13,7 +13,7 @@ using namespace DirectX;
 
 #define CAMERA_ANGLE_SPEED		0.05f		// カメラの方向転換スピード
 #define CAMERA_MOVE_FACTOR		0.5f		// 
-#define CAMERA_POS_OFFSET		18.0f		// 位置のオフセット
+#define CAMERA_POS_OFFSET		45.0f		// 位置のオフセット
 #define CAMERA_FOCUS_Y_OFFSET	22.0f		// 中視点オブジェクトのオフセット
 
 //*---------------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ m_CameraPos({ 0.0f,0.0f,0.0f }),
 m_LookDir({ 0.0f,0.0f,0.0f }),
 m_Angle_H(1.57f),
 m_Angle_V(0.f),
-m_Fov(90.0f),
+m_Fov(45.0f),
 m_NearClipDist(1.0f),
 m_FarClipDist(6000.0f),
 m_IsControl(true)
@@ -62,7 +62,8 @@ Camera3D::~Camera3D()
 //*----------------------------------------------------------------------------------------
 void Camera3D::Start(RendererEngine& renderer)
 {
-
+	// デフォルトFOVの設定
+	Master::m_pDataManager->set_DefaultFov(m_Fov);
 }
 
 

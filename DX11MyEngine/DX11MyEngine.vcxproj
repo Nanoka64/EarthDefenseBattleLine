@@ -263,6 +263,7 @@
     <ClInclude Include="Source\Header\EffectManager.h" />
     <ClInclude Include="Source\Header\EnemyStateFactory.h" />
     <ClInclude Include="Source\Header\GaussianBlur.h" />
+    <ClInclude Include="Source\Header\Gun_StateHeader.h" />
     <ClInclude Include="Source\Header\HierarchyWindow.h" />
     <ClInclude Include="Source\Header\IDX_BlendState.h" />
     <ClInclude Include="Source\Header\IMoveBehaviour.h" />
@@ -281,6 +282,7 @@
     <ClInclude Include="Source\Header\ObjectFactory.h" />
     <ClInclude Include="Source\Header\ObjectPool.h" />
     <ClInclude Include="Source\Header\ObjectSelect.h" />
+    <ClInclude Include="Source\Header\RandomManager.h" />
     <ClInclude Include="Source\Header\RenderPipeline.h" />
     <ClInclude Include="Source\Header\IState.h" />
     <ClInclude Include="Source\Header\Object.h" />
@@ -334,6 +336,7 @@
     <ClInclude Include="Source\Header\VertexBuffer.h" />
     <ClInclude Include="Source\Header\VertexShader.h" />
     <ClInclude Include="Source\Header\WeaponManager.h" />
+    <ClInclude Include="Source\Header\WeaponStateFactory.h" />
     <ClInclude Include="Source\Header\Window.h" />
     <ClInclude Include="Source\Lib\DirectXTex\DirectXTex.h" />
     <ClInclude Include="Source\Lib\Imgui\backends\imgui_impl_dx11.h" />
@@ -432,6 +435,9 @@
     <ClCompile Include="Source\Cpp\EffectManager.cpp" />
     <ClCompile Include="Source\Cpp\EnemyStateFactory.cpp" />
     <ClCompile Include="Source\Cpp\GaussianBlur.cpp" />
+    <ClCompile Include="Source\Cpp\Gun_FireState.cpp" />
+    <ClCompile Include="Source\Cpp\Gun_IdleState.cpp" />
+    <ClCompile Include="Source\Cpp\Gun_ReloadingState.cpp" />
     <ClCompile Include="Source\Cpp\HierarchyWindow.cpp" />
     <ClCompile Include="Source\Cpp\IDX_BlendState.cpp" />
     <ClCompile Include="Source\Cpp\IMoveBehaviour.cpp" />
@@ -451,6 +457,7 @@
     <ClCompile Include="Source\Cpp\ObjectFactory.cpp" />
     <ClCompile Include="Source\Cpp\ObjectPool.cpp" />
     <ClCompile Include="Source\Cpp\ObjectSelect.cpp" />
+    <ClCompile Include="Source\Cpp\RandomManager.cpp" />
     <ClCompile Include="Source\Cpp\RenderPipeline.cpp" />
     <ClCompile Include="Source\Cpp\IState.cpp" />
     <ClCompile Include="Source\Cpp\Object.cpp">
@@ -604,6 +611,7 @@
     <ClCompile Include="Source\Cpp\VertexBuffer.cpp" />
     <ClCompile Include="Source\Cpp\VertexShader.cpp" />
     <ClCompile Include="Source\Cpp\WeaponManager.cpp" />
+    <ClCompile Include="Source\Cpp\WeaponStateFactory.cpp" />
     <ClCompile Include="Source\Cpp\WinMain.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>

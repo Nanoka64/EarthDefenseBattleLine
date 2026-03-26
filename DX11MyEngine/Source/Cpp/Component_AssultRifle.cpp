@@ -86,7 +86,7 @@ void AssultRifle::Update(RendererEngine &renderer)
     forward *= -1;  // プレイヤーが-Z前になってしまっているので
 
     // 弾を発射してないときはフラッシュライトをオフ
-    m_pFlashPointLight.lock()->set_Intensity(0.0f);
+    //m_pFlashPointLight.lock()->set_Intensity(0.0f);
 
     // レーザーサイトの始点と方向
     m_pLineRendererComp.lock()->set_Dir(VEC3::FromXMVECTOR(XMVector3Normalize(forward)));
@@ -102,13 +102,13 @@ void AssultRifle::Update(RendererEngine &renderer)
     m_FireRate = m_IsExplosionBullet ? 20 : 5;
 
     // 右クリックでズーム
-    renderer.get_CameraComponent()->set_Fov(90.0f);
+    renderer.get_CameraComponent()->set_Fov(45.0f);
     if (GetMouseClick(MOUSE_BUTTON_STATE::RIGHT))
     {
-        renderer.get_CameraComponent()->set_Fov(40.0f);
+        renderer.get_CameraComponent()->set_Fov(35.0f);
     }
     // 左クリックで発射
-	if(GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, m_FireRate, m_FireRate))
+	if(GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, m_FireRate, m_FireRate) && !GetInput(GAME_CONFIG::MOVE_DASH))
     {
         // ****************************************************
         //				 発射音再生
@@ -121,6 +121,10 @@ void AssultRifle::Update(RendererEngine &renderer)
         rad.x = (c_AngleV) * -1;
         rad.y = (c_AngleH - 1.57f) * -1;
         rad.z = 0.0f;
+
+        rad.x += Tool::RandRange(-0.03f, 0.03f);
+        rad.y += Tool::RandRange(-0.03f, 0.03f);
+        rad.z += Tool::RandRange(-0.03f, 0.03f);
 
         // トランスフォームパラメータ
         BulletTransformData bulletTransform;
@@ -147,8 +151,9 @@ void AssultRifle::Update(RendererEngine &renderer)
         }
 
         // フラッシュ
-        m_pFlashPointLight.lock()->set_Range(30.0f);
-        m_pFlashPointLight.lock()->set_Intensity(5.5f);
+        m_pFlashPointLight.lock()->Flash(0.05f, 8.0f, 80.0f);
+        //m_pFlashPointLight.lock()->set_Range(30.0f);
+        //m_pFlashPointLight.lock()->set_Intensity(5.5f);
         m_pFlashPointLight.lock()->set_LightColor(VEC3(1.0f, 1.0f, 1.0f));
 	}
 }

@@ -33,8 +33,11 @@ std::shared_ptr<class GameObject> MeshFactory::CreateModel(const CreateModelInfo
         return{};
     }
 
+    auto obj = std::make_shared<GameObject>();
+    obj->set_LayerRank(info.ObjLayer);  // 更新レイヤーの設定
+
     // オブジェクトの生成
-    std::shared_ptr<GameObject> pModelObj = Instantiate3D(std::move(std::make_shared<GameObject>()), info.IsTransparent);
+    std::shared_ptr<GameObject> pModelObj = Instantiate3D(std::move(obj), info.IsTransparent);
     pModelObj->Init(*info.pRenderer);
     pModelObj->set_Tag(info.ObjTag.c_str());
     pModelObj->set_IsShadow(true);  // シャドウをする

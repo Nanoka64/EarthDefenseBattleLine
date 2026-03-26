@@ -34,6 +34,7 @@ TimeManager             *Master::m_pTimeManager         = nullptr;   // 時間管理
 DataManager             *Master::m_pDataManager         = nullptr;   // データ管理
 BulletManager           *Master::m_pBulletManager       = nullptr;   // 弾管理
 UIManager               *Master::m_pUIManager           = nullptr;   // UI管理
+RandomManager           *Master::m_pRandomManager       = nullptr;   // 乱数管理
 
 
 //*---------------------------------------------------------------------------------------
@@ -100,11 +101,22 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
     Master::m_pDataManager          = new DataManager();            // データ管理
     Master::m_pBulletManager        = new BulletManager();          // 弾管理 
     Master::m_pUIManager            = new UIManager();              // UI管理
+    Master::m_pRandomManager        = new RandomManager();          // 乱数管理
 
     // *************************************************************************************************
     /**  ウインドウの初期化 **/
     // *************************************************************************************************
     if (FAILED(this->InitWindow(hInstance, nCmdShow))) 
+    {
+        assert(false);
+        return false;
+    }
+
+
+    // *************************************************************************************************
+    /**  ランダムマネージャー初期化 **/
+    // *************************************************************************************************
+    if (!Master::m_pRandomManager->Init())
     {
         assert(false);
         return false;

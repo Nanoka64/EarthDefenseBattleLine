@@ -253,6 +253,9 @@
     <Filter Include="ソース ファイル\Game\Component\Weapon\Gun">
       <UniqueIdentifier>{98fe35fe-a629-425a-8351-aaf3ad34af5f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Game\Component\Weapon\Gun\State">
+      <UniqueIdentifier>{a128b6e8-5f98-4aa6-9598-5ad70908ef49}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Cpp\SHADER.cpp">
@@ -632,6 +635,21 @@
     </ClCompile>
     <ClCompile Include="Source\Cpp\Component_WeaponBase.cpp">
       <Filter>ソース ファイル\Game\Component\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\RandomManager.cpp">
+      <Filter>ソース ファイル\Tool\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\WeaponStateFactory.cpp">
+      <Filter>ソース ファイル\State\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Gun_IdleState.cpp">
+      <Filter>ソース ファイル\Game\Component\Weapon\Gun\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Gun_ReloadingState.cpp">
+      <Filter>ソース ファイル\Game\Component\Weapon\Gun\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Gun_FireState.cpp">
+      <Filter>ソース ファイル\Game\Component\Weapon\Gun\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1051,6 +1069,15 @@
     </ClInclude>
     <ClInclude Include="Source\Header\Component_WeaponBase.h">
       <Filter>ソース ファイル\Game\Component\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\RandomManager.h">
+      <Filter>ソース ファイル\Tool\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\WeaponStateFactory.h">
+      <Filter>ソース ファイル\State\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Gun_StateHeader.h">
+      <Filter>ソース ファイル\Game\Component\Weapon\Gun\State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

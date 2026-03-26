@@ -19,7 +19,8 @@ namespace Tool
     /*      乱数    */
     //-----------------------------------------
 
-    /* 指定範囲の乱数取得（rand()なので精度は...ね） */
+    // 指定範囲の乱数取得（rand()なので精度は...ね） 
+    // ※なるべくRandomManagerのメルセンヌ・ツイスタの乱数生成を使用して…！
     inline float RandRange(float _min, float _max)
     {
         float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);

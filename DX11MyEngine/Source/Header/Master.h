@@ -14,8 +14,8 @@
 #include "TimeManager.h"
 #include "BulletManager.h"
 #include "DataManager.h"
-#include "BulletManager.h"
 #include "UIManager.h"
+#include "RandomManager.h"
 
 // ***************************************************************************************
 // ---------------------------------------------------------------------------------------
@@ -46,4 +46,5 @@ public:
 	static DataManager			* m_pDataManager;		// ƒf[ƒ^ŠÇ—
 	static BulletManager		* m_pBulletManager;		// ’eŠÇ—
 	static UIManager			* m_pUIManager;			// UIŠÇ—
+	static RandomManager		* m_pRandomManager;		// —”ŠÇ—
 };

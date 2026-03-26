@@ -236,9 +236,9 @@ void ExplosionBullet::Setup()
 
     m_MoveDir = transform->get_Forward(); // 前方向ベクトル
 
-    m_MoveDir.x += Tool::RandRange(-0.03f, 0.03f);
-    m_MoveDir.y += Tool::RandRange(-0.03f, 0.03f);
-    m_MoveDir.z += Tool::RandRange(-0.03f, 0.03f);
+    //m_MoveDir.x += Tool::RandRange(-0.03f, 0.03f);
+    //m_MoveDir.y += Tool::RandRange(-0.03f, 0.03f);
+    //m_MoveDir.z += Tool::RandRange(-0.03f, 0.03f);
 
     m_MoveDir = m_MoveDir.Normalize();
 }
@@ -250,26 +250,26 @@ void ExplosionBullet::Setup()
 //*----------------------------------------------------------------------------------------
 void ExplosionBullet::Reset()
 {
-    auto transform = m_pOwner.lock()->get_Transform().lock();
-    VEC3 pos = transform->get_VEC3ToPos();
+    //auto transform = m_pOwner.lock()->get_Transform().lock();
+    //VEC3 pos = transform->get_VEC3ToPos();
 
-    // エフェクト
-    VEC3 effectRot = VEC3();
-    int exp_handle = Master::m_pEffectManager->PlayEffect(m_Parameter._explosionEffectHandleTag);   // 爆発
-    int exp_smoke_handle = Master::m_pEffectManager->PlayEffect("Explosion_Smoke_01");   // 煙
+    //// エフェクト
+    //VEC3 effectRot = VEC3();
+    //int exp_handle = Master::m_pEffectManager->PlayEffect(m_Parameter._explosionEffectHandleTag);   // 爆発
+    //int exp_smoke_handle = Master::m_pEffectManager->PlayEffect("Explosion_Smoke_01");   // 煙
 
-    float expSize = m_Parameter._explosionRadius;   // 爆発半径
-    VEC3 expRot = VEC3(Tool::RandRange(0.0f, 3.14f), Tool::RandRange(0.0f, 3.14f), Tool::RandRange(0.0f, 3.14f));
+    //float expSize = m_Parameter._explosionRadius;   // 爆発半径
+    //VEC3 expRot = VEC3(Tool::RandRange(0.0f, 3.14f), Tool::RandRange(0.0f, 3.14f), Tool::RandRange(0.0f, 3.14f));
 
-    // 爆発
-    Master::m_pEffectManager->SetScaleEffect(exp_handle, expSize, expSize, expSize);
-    Master::m_pEffectManager->SetPositionEffect(exp_handle, pos.x, pos.y, pos.z);
-    Master::m_pEffectManager->SetRotationEffect(exp_handle, expRot.x, expRot.y, expRot.z);
+    //// 爆発
+    //Master::m_pEffectManager->SetScaleEffect(exp_handle, expSize, expSize, expSize);
+    //Master::m_pEffectManager->SetPositionEffect(exp_handle, pos.x, pos.y, pos.z);
+    //Master::m_pEffectManager->SetRotationEffect(exp_handle, expRot.x, expRot.y, expRot.z);
 
-    // 爆発煙
-    Master::m_pEffectManager->SetScaleEffect(exp_smoke_handle, expSize, expSize, expSize);
-    Master::m_pEffectManager->SetPositionEffect(exp_smoke_handle, pos.x, pos.y, pos.z);
-    Master::m_pEffectManager->SetRotationEffect(exp_smoke_handle, expRot.x, expRot.y, expRot.z);
+    //// 爆発煙
+    //Master::m_pEffectManager->SetScaleEffect(exp_smoke_handle, expSize, expSize, expSize);
+    //Master::m_pEffectManager->SetPositionEffect(exp_smoke_handle, pos.x, pos.y, pos.z);
+    //Master::m_pEffectManager->SetRotationEffect(exp_smoke_handle, expRot.x, expRot.y, expRot.z);
 
 
 

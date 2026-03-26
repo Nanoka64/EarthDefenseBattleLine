@@ -416,6 +416,7 @@ void GameObjectManager::add_Object(OBJECT_TYPE _type, std::shared_ptr<GameObject
     auto begin = m_3DOpaqueList.begin();
     auto end = m_3DOpaqueList.end();
 
+
     // 不透明オブジェクトのみ更新順にソート
     std::sort(begin, end,
         [](const std::shared_ptr<GameObject> &a, const std::shared_ptr<GameObject> &b) {

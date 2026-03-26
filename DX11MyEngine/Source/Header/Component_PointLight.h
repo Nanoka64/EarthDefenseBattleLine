@@ -15,6 +15,11 @@ class PointLight : public Light
 {
 private:
 	float m_Range;	// 影響範囲
+	float m_FlashElapsed;		// フラッシュ経過時間
+	float m_FlashDuration;		// フラッシュ時間
+	float m_FlashMaxRange;		// フラッシュ最大光度
+	float m_FlashMaxIntensity;	// フラッシュ最大範囲
+	bool m_IsFlash;
 
 public:
 	PointLight(std::weak_ptr<GameObject> pOwner, int updateRank);
@@ -30,6 +35,14 @@ public:
 	/// </summary>
 	/// <param name="r"></param>
 	void set_Range(float r) { m_Range = r; }
+
+	/// <summary>
+	/// フラッシュ
+	/// </summary>
+	/// <param name="_duration">フラッシュ時間</param>
+	/// <param name="_maxIntensity">最大光度</param>
+	/// <param name="_maxRange">最大範囲</param>
+	void Flash(float _duration, float _maxIntensity, float _maxRange);
 
     float get_Range() const { return m_Range; }
 };
