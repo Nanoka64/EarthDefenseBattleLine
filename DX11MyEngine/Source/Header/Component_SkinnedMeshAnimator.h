@@ -66,6 +66,8 @@ public:
 	int get_PrevAnimIndex()const { return m_PrevAnimIndex; }
 	bool get_IsAnim()const { return m_IsAnimationFlag; };
 
+	DirectX::XMMATRIX& get_BoneLocalWorldMatrix(const std::string& _nodeName);	// ノード名からボーンのワールド変換行列を取得する
+
 	std::vector<AnimationData *> get_AnimationDataList()const { return m_Animations; }
 
 private:

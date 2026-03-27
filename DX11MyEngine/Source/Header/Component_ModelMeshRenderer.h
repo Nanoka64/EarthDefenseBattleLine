@@ -8,6 +8,7 @@ private:
 	std::weak_ptr<class ModelMeshResource> m_pMeshResource;	// メッシュ情報の参照
 	bool m_IsDrawWireframe;
 
+
 	int m_DebugDrawBoneNum;
 
 public:
@@ -18,6 +19,7 @@ public:
 	void Update(RendererEngine &renderer) override;	// 更新処理
 	void Draw(RendererEngine &renderer) override;		// 描画処理
 	void set_MeshResource(std::shared_ptr<class ModelMeshResource> meshResource);
+
 
 	/* ワイヤーフレームで表示するかどうか */
 	bool get_IsDrawWireframe()const { return m_IsDrawWireframe; };

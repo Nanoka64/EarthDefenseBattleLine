@@ -42,6 +42,8 @@ protected:
 
     bool m_isDirty; // 座標更新が行われたか
 
+    DirectX::XMMATRIX m_OffsetWorldTransfomationMatrix;	// オフセット用ワールド変換行列（別のモデルのフレームに何か武器などを持たせるときなどに）
+
 	std::weak_ptr<MyTransform> m_pParent;	        // 親オブジェクト
 
     void Start(RendererEngine &renderer) override {};	// 初期化
@@ -110,6 +112,20 @@ public:
     
     virtual DirectX::XMMATRIX get_WorldMtx()const;              // ワールド行列取得
     virtual DirectX::XMMATRIX get_ExcludingRotWorldMtx()const;  // 回転を除くワールド行列取得
+
+    /// <summary>
+    /// オフセットワールド変換行列の設定（別のモデルのフレームに何か武器などを持たせるときなどに）
+    /// </summary>
+    /// <param name="_mat">ワールド変換行列</param>
+    void set_OffsetWorldTransfomationMatrix(const DirectX::XMMATRIX& _mat) { m_OffsetWorldTransfomationMatrix = _mat; }
+
+    /// <summary>
+    /// オフセットワールド変換行列の取得
+    /// </summary>
+    /// <returns></returns>
+    DirectX::XMMATRIX get_OffsetWorldTransfomationMatrix()const { return m_OffsetWorldTransfomationMatrix; }
+
+
 
     /// <summary>
     /// パラメータを個別に設定するver

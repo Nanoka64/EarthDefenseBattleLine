@@ -136,7 +136,7 @@ int c_Title_MissionSelect::Update(SceneManager *pOwner)
 	{
 		UIData::STATE state = button.lock()->get_State();;
 
-		m_MissionItems[i]._isHovered = false;
+		//m_MissionItems[i]._isHovered = false;
 
 		switch (state)
 		{

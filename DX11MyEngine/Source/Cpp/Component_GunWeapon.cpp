@@ -13,6 +13,7 @@
 #include "GameManager.h"
 #include "Gun_StateHeader.h"
 #include "WeaponStateFactory.h"
+#include "Component_SkinnedMeshAnimator.h"
 
 using namespace GIGA_Engine;
 using namespace Input;
@@ -79,6 +80,15 @@ void GunWeapon::Update(RendererEngine& renderer)
     float c_AngleV = renderer.get_CameraComponent()->get_Angle_V();
 
     auto transform = m_pOwner.lock()->get_Transform().lock();
+
+
+    auto player = Master::m_pGameObjectManager->get_ObjectByTag("Player");
+    auto skinnedMesh = player->get_Component<SkinnedMeshAnimator>();
+    auto& boneMtx = skinnedMesh->get_BoneLocalWorldMatrix("index_01_r");
+    transform->set_OffsetWorldTransfomationMatrix(boneMtx);
+
+
+
     VEC3 pos = transform->get_WorldVEC3ToPos();
 
     // •Ší‚ð‰ñ“]‚³‚¹‚é
@@ -121,6 +131,9 @@ void GunWeapon::Update(RendererEngine& renderer)
         // Fov‚ÌÝ’è
         renderer.get_CameraComponent()->set_Fov(zoomFov);
     }
+
+
+
 
     Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"•Šíî•ñ"));
     Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"’e”F%d / %d"), m_AmmoRemaining, m_WeaponParameter._bulletMaxNum);
@@ -229,7 +242,6 @@ void GunWeapon::Shoot(RendererEngine& renderer)
     //				 ”­ŽË‰¹Ä¶
     // ****************************************************
     Master::m_pSoundManager->Play_RandPitch(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::GUN_FIRE02), 300);
-
         
     // “¯Žž”­ŽË
     for (int i = 0; i < m_WeaponParameter._bulletSimultaneousNum; i++)

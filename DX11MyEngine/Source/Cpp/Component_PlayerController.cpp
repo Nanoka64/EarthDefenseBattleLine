@@ -139,7 +139,7 @@ void PlayerController::Update(RendererEngine &renderer)
 	VEC3 crntRot = m_pMyTransformComp.lock()->get_VEC3ToRotateToRad();	// 現在の回転
 
 	// 待機アニメーション
-	ChangeAnimation(PLAYER_ANIMATION_ID::IDLE_LOOP);
+	ChangeAnimation(PLAYER_ANIMATION_ID::PISTOL_IDLE_LOOP);
 
 	// 前方向と右方向ベクトルを作る 
 	// 右方向ベクトルは上方向と前方向ベクトルの外積を取ることでできる
@@ -297,7 +297,7 @@ void PlayerController::Update(RendererEngine &renderer)
 			if (m_IsJump == false)
 			{
 				// 走りアニメーション
-				ChangeAnimation(PLAYER_ANIMATION_ID::JOG_FWD_LOOP);
+				ChangeAnimation(PLAYER_ANIMATION_ID::PISTOL_IDLE_LOOP);
 			}
 
 			if (!m_IsContinuousAngle)

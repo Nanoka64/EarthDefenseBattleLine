@@ -43,7 +43,8 @@ MyTransform::MyTransform(std::weak_ptr<GameObject> pOwner, int updateRank)
     m_Local_RotationQ(DirectX::XMQuaternionIdentity()),
     m_Local_Scale(DirectX::XMVectorZero()),
 	m_pParent(),
-    m_isDirty(false)
+    m_isDirty(false),
+    m_OffsetWorldTransfomationMatrix(XMMatrixIdentity())
 {
     this->set_Tag("MyTransform");
 }
@@ -387,6 +388,8 @@ XMMATRIX MyTransform::get_WorldMtx()const {
 
     XMMATRIX localMtx = mtxS * mtxRot * mtxT;
 
+    localMtx *= m_OffsetWorldTransfomationMatrix;
+
 
     // 親がいるなら自分と親を掛けたものを返す
     if (m_pParent.lock())
@@ -433,6 +436,8 @@ XMMATRIX MyTransform::get_ExcludingRotWorldMtx()const{
     XMMATRIX mtxT = XMMatrixTranslationFromVector(pos);
 
     XMMATRIX localMtx = mtxS * mtxT;
+
+    localMtx *= m_OffsetWorldTransfomationMatrix;
 
     // 親がいるなら自分と親を掛けたものを返す
     if (m_pParent.lock())

@@ -135,31 +135,34 @@ void Debugger::DG_SameLine(float offsetStart_X)
 //      2.ƒJƒ‰[‚ÌŠi”[æ
 //=======================================================================================
 /****** RGB ******/
-void Debugger::DG_ColorPicker3(const std::string &label, float col[])
+bool Debugger::DG_ColorPicker3(const std::string &label, float col[])
 {
-    ImGui::ColorPicker3(label.c_str(), col);
+    return ImGui::ColorPicker3(label.c_str(), col);
 }
 
-void Debugger::DG_ColorPicker3(const std::string &label, VECTOR3::VEC3* col3V)
+bool Debugger::DG_ColorPicker3(const std::string &label, VECTOR3::VEC3* col3V)
 {
     float col[3] = { col3V->x, col3V->y, col3V->z };
 
-    ImGui::ColorPicker3(label.c_str(), col);
+    bool res = ImGui::ColorPicker3(label.c_str(), col);
     *col3V = col;
+    return res;
+
 }
 
 /****** RGBA ******/
-void Debugger::DG_ColorPicker4(const std::string &label, float col[])
+bool Debugger::DG_ColorPicker4(const std::string &label, float col[])
 {
-    ImGui::ColorPicker4(label.c_str(), col);
+    return ImGui::ColorPicker4(label.c_str(), col);
 }
 
-void Debugger::DG_ColorPicker4(const std::string &label, VECTOR4::VEC4* col4V)
+bool Debugger::DG_ColorPicker4(const std::string &label, VECTOR4::VEC4* col4V)
 {
     float col[4] = { col4V->x, col4V->y, col4V->z,col4V->w };
 
-    ImGui::ColorPicker4(label.c_str(), col);
+    bool res = ImGui::ColorPicker4(label.c_str(), col);
     *col4V = col;
+    return res;
 }
 
 
@@ -169,31 +172,34 @@ void Debugger::DG_ColorPicker4(const std::string &label, VECTOR4::VEC4* col4V)
 //      2.ƒJƒ‰[‚ÌŠi”[æ
 //=======================================================================================
 /****** RGB ******/
-void Debugger::DG_ColorEdit3(const std::string &label, float col[])
+bool Debugger::DG_ColorEdit3(const std::string &label, float col[])
 {
-    ImGui::ColorEdit3(label.c_str(), col);
+    return ImGui::ColorEdit3(label.c_str(), col);
 }
 
-void Debugger::DG_ColorEdit3(const std::string &label, VECTOR3::VEC3* col3V)
+bool Debugger::DG_ColorEdit3(const std::string &label, VECTOR3::VEC3* col3V)
 {
     float col[3] = { col3V->x, col3V->y, col3V->z };
 
-    ImGui::ColorEdit3(label.c_str(), col);
+    bool res = ImGui::ColorEdit3(label.c_str(), col);
     *col3V = col;
+    return res;
+
 }
 
 /****** RGBA ******/
-void Debugger::DG_ColorEdit4(const std::string &label, float col[])
+bool Debugger::DG_ColorEdit4(const std::string &label, float col[])
 {
-    ImGui::ColorEdit4(label.c_str(), col);
+    return ImGui::ColorEdit4(label.c_str(), col);
 }
 
-void Debugger::DG_ColorEdit4(const std::string &label, VECTOR4::VEC4* col4V)
+bool Debugger::DG_ColorEdit4(const std::string &label, VECTOR4::VEC4* col4V)
 {
     float col[4] = { col4V->x, col4V->y, col4V->z,col4V->w };
 
-    ImGui::ColorEdit4(label.c_str(), col);
+    bool res = ImGui::ColorEdit4(label.c_str(), col);
     *col4V = col;
+    return res;
 }
 
 //**************************************************************************************

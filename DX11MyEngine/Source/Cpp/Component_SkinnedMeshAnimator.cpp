@@ -425,3 +425,17 @@ void SkinnedMeshAnimator::CalcInterpolatedScaling(DirectX::XMMATRIX &out, float 
     out = XMMatrixScaling(tempVec.x, tempVec.y, tempVec.z);
 }
 
+//*---------------------------------------------------------------------------------------
+//*【?】ノード名からボーンのワールド変換行列を取得する
+//*
+//* [引数]
+//* _nodeName : ノード名
+//*
+//* [返値]
+//* ボーンのワールド変換行列 
+//*----------------------------------------------------------------------------------------
+XMMATRIX& SkinnedMeshAnimator::get_BoneLocalWorldMatrix(const std::string& _nodeName)
+{
+    int index = m_BoneIndexMap[_nodeName];
+    return m_BoneList[index].DebugWorldMatrix;  // Final...の方だとXMFLOAT4X4になってしまってるので
+}

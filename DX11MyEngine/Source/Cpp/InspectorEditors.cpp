@@ -597,6 +597,7 @@ void ModelMeshResourceEditor::OnEditorGUI(RendererEngine &renderer, GameObject &
 
                 VEC4 diffuseCol     = mat->m_DiffuseColor;
                 VEC4 specCol        = mat->m_SpecularColor;
+                VEC3 emissiveCol    = mat->m_EmissiveColor;
                 float specPow       = mat->m_SpecularPower;
                 float emissivePow   = mat->m_EmissivePower;
 
@@ -627,9 +628,12 @@ void ModelMeshResourceEditor::OnEditorGUI(RendererEngine &renderer, GameObject &
                 if (Master::m_pDebugger->DG_TreeNode(U8ToChar(u8"マテリアル") + std::to_string(i + 1)))
                 {
                     Master::m_pDebugger->DG_Separator();    // 区切り線
-                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ディフューズ"));
+                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ディフューズ色"));
                     Master::m_pDebugger->DG_Image(diffSRV, VEC2(100, 100));
-                    Master::m_pDebugger->DG_ColorEdit4("##Diffuse" + std::to_string(i), &diffuseCol);
+                    if (Master::m_pDebugger->DG_ColorEdit4("##Diffuse" + std::to_string(i), &diffuseCol))
+                    {
+                        mat->m_DiffuseColor = diffuseCol;
+                    }
 
 
                     Master::m_pDebugger->DG_Separator();    // 区切り線
@@ -638,19 +642,34 @@ void ModelMeshResourceEditor::OnEditorGUI(RendererEngine &renderer, GameObject &
 
 
                     Master::m_pDebugger->DG_Separator();    // 区切り線
-                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"スペキュラ"));
+                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"スペキュラ色"));
                     Master::m_pDebugger->DG_Image(specSRV, VEC2(100, 100));
-                    Master::m_pDebugger->DG_ColorEdit4("##Speular" + std::to_string(i), &specCol);
-
+                    if (Master::m_pDebugger->DG_ColorEdit4("##Speular" + std::to_string(i), &specCol))
+                    {
+                        mat->m_SpecularColor = specCol;
+                    }
 
                     Master::m_pDebugger->DG_BulletText(U8ToChar(u8"スペキュラ強度"));
                     Master::m_pDebugger->DG_SameLine();
-                    Master::m_pDebugger->DG_DragFloat("##SpecularPower" + std::to_string(i), 1, &specPow, 0.01f, 0.0f, 255.0f);
+                    if (Master::m_pDebugger->DG_DragFloat("##SpecularPower" + std::to_string(i), 1, &specPow, 1.0f, 0.0f, 255.0f))
+                    {
+                        mat->m_SpecularPower = specPow;
+                    }
 
-                    
-                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"エミッシブ"));
+                    Master::m_pDebugger->DG_Separator();    // 区切り線
+                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"エミッシブ色"));
+                    Master::m_pDebugger->DG_Image(specSRV, VEC2(100, 100));
+                    if (Master::m_pDebugger->DG_ColorEdit3("##EmissiveColor" + std::to_string(i), &emissiveCol))
+                    {
+                        mat->m_EmissiveColor = emissiveCol;
+                    }
+
+                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"エミッシブ強度"));
                     Master::m_pDebugger->DG_SameLine();
-                    Master::m_pDebugger->DG_DragFloat("##EmissivePower" + std::to_string(i), 1, &emissivePow, 0.01f, 0.0f, 255.0f);
+                    if (Master::m_pDebugger->DG_DragFloat("##EmissivePower" + std::to_string(i), 1, &emissivePow, 0.5f, 0.0f, 255.0f))
+                    {
+                        mat->m_EmissivePower = emissivePow;
+                    }
 
                     Master::m_pDebugger->DG_TreePop();
                 }
