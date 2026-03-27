@@ -41,6 +41,8 @@ public:
     void SetScaleEffect(int handle, float x, float y, float z);     // エフェクトの大きさを設定
     void SetRotationEffect(int handle, float x, float y, float z);  // エフェクトの回転地を設定
     bool IsPlayingEffect(int handle);                               // エフェクトの再生状態を取得
+
+    void StopAllEffects();  // 全てのエフェクトの停止
 private:
     // コピー禁止
     EffectManager(const EffectManager &) = delete;

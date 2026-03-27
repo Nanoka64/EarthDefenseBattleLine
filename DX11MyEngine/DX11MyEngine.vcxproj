@@ -335,7 +335,7 @@
     <ClInclude Include="Source\Header\VERTEX.h" />
     <ClInclude Include="Source\Header\VertexBuffer.h" />
     <ClInclude Include="Source\Header\VertexShader.h" />
-    <ClInclude Include="Source\Header\WeaponManager.h" />
+    <ClInclude Include="Source\Header\Component_WeaponController.h" />
     <ClInclude Include="Source\Header\WeaponStateFactory.h" />
     <ClInclude Include="Source\Header\Window.h" />
     <ClInclude Include="Source\Lib\DirectXTex\DirectXTex.h" />
@@ -610,7 +610,7 @@
     <ClCompile Include="Source\Cpp\UIManager.cpp" />
     <ClCompile Include="Source\Cpp\VertexBuffer.cpp" />
     <ClCompile Include="Source\Cpp\VertexShader.cpp" />
-    <ClCompile Include="Source\Cpp\WeaponManager.cpp" />
+    <ClCompile Include="Source\Cpp\Component_WeaponController.cpp" />
     <ClCompile Include="Source\Cpp\WeaponStateFactory.cpp" />
     <ClCompile Include="Source\Cpp\WinMain.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -840,6 +840,8 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">VSMain</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Resource\CSO\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Resource\CSO\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="Source\Shader\XBlur_VS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>

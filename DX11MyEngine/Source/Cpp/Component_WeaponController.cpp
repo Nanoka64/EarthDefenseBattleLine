@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "WeaponManager.h"
+#include "Component_WeaponController.h"
 #include "Component_GunWeapon.h"
 #include "Component_WeaponBase.h"
 
@@ -8,16 +8,17 @@ using namespace VECTOR2;
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
 //*----------------------------------------------------------------------------------------
-WeaponManager::WeaponManager():
-m_CrntWeaponSlotIndex(-1),
-m_MaxSlot(-1)
+WeaponController::WeaponController(std::weak_ptr<GameObject> pOwner, int updateRank):
+	IComponent(pOwner, updateRank),
+	m_CrntWeaponSlotIndex(-1),
+	m_MaxSlot(-1)
 {
 }
 
 //*---------------------------------------------------------------------------------------
 //*【?】デストラクタ
 //*----------------------------------------------------------------------------------------
-WeaponManager::~WeaponManager()
+WeaponController::~WeaponController()
 {
 	m_WeaponArray.clear();
 }
@@ -33,14 +34,13 @@ WeaponManager::~WeaponManager()
 //* 
 //* [返値] なし
 //*----------------------------------------------------------------------------------------
-bool WeaponManager::Init(RendererEngine& renderer, int _maxSlot)
+bool WeaponController::Setup(RendererEngine& renderer, int _maxSlot)
 {
 	m_MaxSlot = _maxSlot;
 	
 	// 最大数分メモリ確保
 	m_WeaponArray.reserve(m_MaxSlot);
 
-	SwitchWeapon(0);
 	return true;
 }
 
@@ -53,7 +53,7 @@ bool WeaponManager::Init(RendererEngine& renderer, int _maxSlot)
 //*
 //* [返値] なし
 //*----------------------------------------------------------------------------------------
-void WeaponManager::Update(RendererEngine& renderer)
+void WeaponController::Update(RendererEngine& renderer)
 {
 	// 武器１
 	if (GetInputDown(GAME_CONFIG::WEAPON_CHANGE1))
@@ -88,9 +88,20 @@ void WeaponManager::Update(RendererEngine& renderer)
 //*
 //* [返値] なし
 //*----------------------------------------------------------------------------------------
-void WeaponManager::SwitchWeapon(int _index)
+void WeaponController::SwitchWeapon(int _index)
 {
-	if (_index < 0 || _index >= (int)m_WeaponArray.size()) return;
+	if (_index < 0 || _index >= (int)m_WeaponArray.size() || _index == m_CrntWeaponSlotIndex) return;
+
+	// 現在の武器がセットされていない
+	if (m_CrntWeaponSlotIndex < 0)
+	{
+		return;
+	}
+
+	//*****************************************************************************************
+	//						武器の切り替え音再生
+	//*****************************************************************************************
+	Master::m_pSoundManager->Play_RandPitch(SOUND_TYPE::SE, INT_CAST(SOUND_ID::GUN_CHANGE01), 200);
 
 	// 現在の武器を非表示に
 	m_WeaponArray[m_CrntWeaponSlotIndex]->get_OwnerObj().lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
@@ -106,7 +117,7 @@ void WeaponManager::SwitchWeapon(int _index)
 //* [引数] なし
 //* [返値] なし
 //*----------------------------------------------------------------------------------------
-void WeaponManager::NextWeapon()
+void WeaponController::NextWeapon()
 {
 	int nextIdx = (m_CrntWeaponSlotIndex + 1) % (int)m_WeaponArray.size();
 	SwitchWeapon(nextIdx);
@@ -118,7 +129,7 @@ void WeaponManager::NextWeapon()
 //* [引数] なし
 //* [返値] なし
 //*----------------------------------------------------------------------------------------
-void WeaponManager::PrevWeapon()
+void WeaponController::PrevWeapon()
 {
 	int count = (int)m_WeaponArray.size();
 	int prevIdx = (m_CrntWeaponSlotIndex - 1 + count) % count;
@@ -133,9 +144,33 @@ void WeaponManager::PrevWeapon()
 //* _slot : 武器をセットするスロット 
 //* [返値] なし
 //*----------------------------------------------------------------------------------------
-void WeaponManager::RegisterWeapon(std::shared_ptr<class GunWeapon> _pWeapon, int _slot)
+void WeaponController::RegisterWeapon(std::shared_ptr<class GunWeapon> _pWeapon, int _slot)
 {
 	if (_slot >= m_MaxSlot)return;
 
 	m_WeaponArray.emplace_back(_pWeapon);
+}
+
+
+//*----------------------------------------------------------------------------------------
+//*【?】開始時に持っている武器の設定
+//*
+//* [引数] 
+//* _slot : 武器スロット（ 0以上 m_MaxSlot以下） 
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void WeaponController::StartingWeapon(int _slot)
+{
+	m_CrntWeaponSlotIndex = _slot;
+
+	// アクティブ状態に
+	m_WeaponArray[m_CrntWeaponSlotIndex]->get_OwnerObj().lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
+	// 装備武器以外は非アクティブに
+	for (int i = 0; i < m_MaxSlot; i++)
+	{
+		if (m_CrntWeaponSlotIndex != i) {
+			m_WeaponArray[i]->get_OwnerObj().lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+		}
+	}
 }

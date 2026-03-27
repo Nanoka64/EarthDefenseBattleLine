@@ -29,6 +29,7 @@ public:
 	void Update(RendererEngine& renderer) override;		// 更新処理
 	void Draw(RendererEngine& renderer)override;		// 描画処理
 
+	void Shoot(RendererEngine& renderer);	// 弾の発射
 	bool Setup(const WeaponData::GunWeaponData& _weaponData);	
 
 	std::weak_ptr<class PointLight> get_FlashPointLight() { return m_pFlashPointLight; }	// フラッシュライト取得

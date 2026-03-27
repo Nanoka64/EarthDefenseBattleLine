@@ -26,6 +26,7 @@
 #include "Component_EnemyController.h"
 #include "Component_Health.h"
 #include "Component_LineRenderer.h"
+#include "Component_WeaponController.h"
 
 using namespace SceneStateEnums;
 using namespace VECTOR4;
@@ -470,79 +471,169 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
     }
 
 
+    // プレイヤーオブジェクトの取得
+    auto playerObj = Master::m_pGameObjectManager->get_ObjectByTag("Player");
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //						武器
+    // 
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // プレイヤーの武器制御コンポーネントへの登録用のキャッシュ
+    std::shared_ptr<GunWeapon>weapon_1;
+    std::shared_ptr<GunWeapon>weapon_2;
+
+    {
+        /* アサルトライフル */
+        {
+            // マテリアル取得
+            auto matPtr1 = Master::m_pResourceManager->FindMaterial("AssultRifle");
+
+            SetupMaterialInfo matInfo[1];
+            matInfo[0].Index = 0;
+            matInfo[0].pMaterialData = matPtr1; // 体
+
+            CreateModelInfo model;
+            model.pRenderer = m_pRenderer;
+            model.Path = "Resource/Model/Weapon/M4A1.fbx";
+            model.ObjTag = "AssultRifle";
+            model.IsAnim = false;
+            model.MatNum = 1;
+            model.SetupMaterial = matInfo;
+            model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
+            model.ObjLayer = 91;
+            auto obj = MeshFactory::CreateModel(model);
+
+            // 破棄しない
+            obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+
+
+            // アサルトライフル
+            //obj->add_Component<AssultRifle>(1);
+            weapon_1 = obj->add_Component<GunWeapon>(1);
+            WeaponData::GunWeaponData gunData;
+            gunData._accuracy = 0.05f;
+            gunData._bulletMaxNum = 120;
+            gunData._bulletType = BulletData::BULLET_TYPE::NORMAL;
+            gunData._fireRate = 5;
+            gunData._zoomLength = 1.1f;
+            gunData._reloadTime = 2.0f;
+            gunData._isLaserSight = true;
+            gunData._bulletSimultaneousNum = 1;
+            // 弾自身のパラメータ
+            BulletData::NormalBulletData bulletData;
+            bulletData._range = 800.0f;
+            bulletData._speed = 1500.0f;
+            gunData._bulletParam = bulletData;
+            weapon_1->Setup(gunData);
+
+
+            // フラッシュ用ポイントライト
+            auto flash = obj->add_Component<PointLight>();
+            flash->set_Intensity(0.0f);
+            flash->set_Range(0.0f);
+
+            // レーザーサイト
+            auto line = obj->add_Component<LineRenderer>();
+            line->set_Color(VEC4(1.0f, 0.0f, 0.0f, 1.0f));
+            line->set_Emissive(3.0f);
+            line->set_Width(0.5f);
+            line->set_Length(1000.0f);
+
+            // プレイヤーを親に設定
+            obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
+            obj->get_Transform().lock()->set_VEC3ToLocal_Scale(VEC3(-0.985f, -0.985f, -0.985f));
+            obj->get_Transform().lock()->set_VEC3ToLocal_RotateToDeg(VEC3(0.0f, 0.0f, 90.0f));
+            obj->get_Transform().lock()->set_VEC3ToLocal_Pos(VEC3(-40.0f, 150.0f, 0.0f));
+        }
+
+
+        /* ロケットランチャー */
+        {
+            // マテリアル取得
+            auto matPtr1 = Master::m_pResourceManager->FindMaterial("RocketLauncher");
+
+            SetupMaterialInfo matInfo[1];
+            matInfo[0].Index = 0;
+            matInfo[0].pMaterialData = matPtr1; // 体
+
+            CreateModelInfo model;
+            model.pRenderer = m_pRenderer;
+            model.Path = "Resource/Model/Weapon/RocketLauncher/Simple rocket launcher.fbx";
+            model.ObjTag = "RocketLauncher";
+            model.IsAnim = false;
+            model.MatNum = 1;
+            model.SetupMaterial = matInfo;
+            model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
+            model.ObjLayer = 91;
+            auto obj = MeshFactory::CreateModel(model);
+
+            // 破棄しない
+            obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+
+            // コンポーネントの追加
+            weapon_2 = obj->add_Component<GunWeapon>(1);
+            // 武器のパラメータ
+            WeaponData::GunWeaponData gunData;
+            gunData._accuracy = 0.01f;
+            gunData._bulletMaxNum = 2;
+            gunData._bulletType = BulletData::BULLET_TYPE::EXPLOSION;
+            gunData._fireRate = 30;
+            gunData._zoomLength = 2.0f;
+            gunData._reloadTime = 2.5f;
+            gunData._isLaserSight = true;
+            gunData._bulletSimultaneousNum = 1;
+            // 弾自身のパラメータ
+            BulletData::ExplosionBulletData bulletData;
+            bulletData._range = 1500.0f;
+            bulletData._speed = 1000.0f;
+            bulletData._explosionRadius = 20.0f;
+            bulletData._explosionEffectHandleTag = "Explosion_01";
+            gunData._bulletParam = bulletData;
+            weapon_2->Setup(gunData);
+
+            // フラッシュ用ポイントライト
+            auto flash = obj->add_Component<PointLight>();
+            flash->set_Intensity(0.0f);
+            flash->set_Range(0.0f);
+
+            // レーザーサイト
+            auto line = obj->add_Component<LineRenderer>();
+            line->set_Color(VEC4(1.0f, 0.0f, 0.0f, 1.0f));
+            line->set_Emissive(3.0f);
+            line->set_Width(0.5f);
+            line->set_Length(1000.0f);
+
+            // プレイヤーを親に設定
+            obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
+            obj->get_Transform().lock()->set_Scale(VEC3(1.5f, 1.5f, 1.5f));
+            obj->get_Transform().lock()->set_VEC3ToLocal_Pos(VEC3(-40.0f, 150.0f, 0.0f));
+        }
+    }
+
     // カメラ操作をオンに
     m_pRenderer->get_CameraComponent()->set_IsControl(true);
 
 
     // プレイヤーに操作コンポーネントつける
-    auto playerObj = Master::m_pGameObjectManager->get_ObjectByTag("Player");
-    playerObj->get_Transform().lock()->set_Pos(-900.0f, 0.0f, 900.0f); // プレイヤーの初期位置を設定
+    playerObj->get_Transform().lock()->set_Pos(-900.0f, 0.0f, 900.0f);  // プレイヤーの初期位置を設定
     playerObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+    auto playerControl = playerObj->add_Component<PlayerController>(1); // コンポーネントの追加
 
-    auto comp = playerObj->add_Component<PlayerController>(1);
-    comp->Start(*m_pRenderer);
 
-    /* アサルトライフル */
-    {
-        // マテリアル取得
-        auto matPtr1 = Master::m_pResourceManager->FindMaterial("AssultRifle");
+    //*****************************************************************************************
+    //						プレイヤーに武器制御コンポーネントの追加し、
+    //                                  GunWeaponを登録
+    //*****************************************************************************************
+    constexpr int WEAPON_MAX_SLOT = 2;  // プレイヤーの装備する最大武器スロット
+    auto weaponControl = playerObj->add_Component<WeaponController>();
+    weaponControl->Setup(*m_pRenderer, WEAPON_MAX_SLOT);
+    weaponControl->RegisterWeapon(weapon_1, 0);
+    weaponControl->RegisterWeapon(weapon_2, 1);
+    weaponControl->StartingWeapon(0); // 0の武器を初期装備に
 
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr1; // 体
-
-        CreateModelInfo model;
-        model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Weapon/M4A1.fbx";
-        model.ObjTag = "AssultRifle";
-        model.IsAnim = false;
-        model.MatNum = 1;
-        model.SetupMaterial = matInfo;
-        model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
-        model.ObjLayer = 91;
-        auto obj = MeshFactory::CreateModel(model);
-
-        // 破棄しない
-        obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
-
-        // アサルトライフル
-        //obj->add_Component<AssultRifle>(1);
-        auto rifle = obj->add_Component<GunWeapon>(1);
-        WeaponData::GunWeaponData gunData;
-        gunData._accuracy = 0.05f;
-        gunData._bulletMaxNum = 8;
-        gunData._bulletType = BulletData::BULLET_TYPE::NORMAL;
-        gunData._fireRate = 20;
-        gunData._zoomLength = 1.1f;
-        gunData._reloadTime = 2.0f;
-        gunData._isLaserSight = true;
-        gunData._bulletSimultaneousNum = 10;
-        // 弾自身のパラメータ
-        BulletData::NormalBulletData bulletData;
-        bulletData._range = 800.0f;
-        bulletData._speed = 1500.0f;
-        gunData._bulletParam = bulletData;
-        rifle->Setup(gunData);
-
-        // フラッシュ用ポイントライト
-        auto flash = obj->add_Component<PointLight>();
-        flash->set_Intensity(0.0f);
-        flash->set_Range(0.0f);
-
-        // レーザーサイト
-        auto line = obj->add_Component<LineRenderer>();
-        line->set_Color(VEC4(1.0f, 0.0f, 0.0f, 1.0f));
-        line->set_Emissive(3.0f);
-        line->set_Width(0.5f);
-        line->set_Length(1000.0f);
-
-        // プレイヤーを親に設定
-        obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
-        obj->get_Transform().lock()->set_VEC3ToLocal_Scale(VEC3(-0.985f, -0.985f, -0.985f));
-        obj->get_Transform().lock()->set_VEC3ToLocal_RotateToDeg(VEC3(0.0f, 0.0f, 90.0f));
-        obj->get_Transform().lock()->set_VEC3ToLocal_Pos(VEC3(-40.0f, 150.0f, 0.0f));
-    }
-
+    playerControl->Start(*m_pRenderer);
 
 
     // ロード画面用スプライトをオフに

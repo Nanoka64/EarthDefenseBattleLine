@@ -95,7 +95,7 @@ namespace UIData
     {
         std::function<void()> _onClicFunction;          // クリック時の処理
         std::string _text;                              // 表示する文字
-        std::shared_ptr<SpriteRenderer> _pSprite;   // 使用する画像
+        std::shared_ptr<SpriteRenderer> _pSprite;       // 使用する画像
         VECTOR2::VEC2 _textOffsetPos = VECTOR2::VEC2(); // 文字の位置補正
         STATE _inputValidationState = STATE::PRESSED;	// 入力判定とするステート（functionの実行タイミング）
 

@@ -208,3 +208,63 @@ bool GunWeapon::Setup(const WeaponData::GunWeaponData& _weaponData)
 
     return true;
 }
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】弾の発射処理
+//*
+//* [引数]
+//* &renderer : 描画エンジンの参照
+//* [返値]なし
+//*----------------------------------------------------------------------------------------
+void GunWeapon::Shoot(RendererEngine& renderer)
+{
+    float c_AngleH = renderer.get_CameraComponent()->get_Angle_H();
+    float c_AngleV = renderer.get_CameraComponent()->get_Angle_V();
+
+    auto transform = m_pOwner.lock()->get_Transform().lock();
+    VEC3 pos = transform->get_WorldVEC3ToPos();
+
+    // ****************************************************
+    //				 発射音再生
+    // ****************************************************
+    Master::m_pSoundManager->Play_RandPitch(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::GUN_FIRE02), 300);
+
+        
+    // 同時発射
+    for (int i = 0; i < m_WeaponParameter._bulletSimultaneousNum; i++)
+    {
+        // 親の向き等を参照
+        VEC3 rad;
+        rad.x = (c_AngleV) * -1;
+        rad.y = (c_AngleH - 1.57f) * -1;
+        rad.z = 0.0f;
+        float accuracy = m_WeaponParameter._accuracy;
+
+        // 弾のバラつき
+        rad.x += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
+        rad.y += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
+        rad.z += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
+
+        // トランスフォームパラメータ
+        BulletTransformData bulletTransform;
+        bulletTransform._pos = pos;
+        bulletTransform._rotRad = rad;
+        bulletTransform._scale = VEC3(0.01f, 0.01f, 0.01f);
+
+        BULLET_TYPE type = m_WeaponParameter._bulletType;
+
+        // 弾データを共用体で持っているので、弾タイプにあったパラメータを入れるようにする
+        std::visit([&](auto& param) {
+            Master::m_pBulletManager->Shot(renderer, bulletTransform, param);
+            }, m_WeaponParameter._bulletParam);
+    }
+
+    // フラッシュ
+    m_pFlashPointLight.lock()->set_Range(30.0f);
+    m_pFlashPointLight.lock()->set_Intensity(5.5f);
+    m_pFlashPointLight.lock()->set_LightColor(VEC3(1.0f, 1.0f, 1.0f));
+
+    // 弾数減らす
+    m_AmmoRemaining--;
+}

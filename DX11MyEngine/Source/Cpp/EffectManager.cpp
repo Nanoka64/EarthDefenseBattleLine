@@ -251,3 +251,9 @@ bool EffectManager::IsPlayingEffect(int handle)
 {
     return m_EfkManager->Exists(handle);
 }
+
+// 全てのエフェクトの停止
+void EffectManager::StopAllEffects()
+{
+    m_EfkManager->StopAllEffects();
+}

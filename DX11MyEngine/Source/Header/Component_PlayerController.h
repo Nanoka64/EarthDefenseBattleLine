@@ -124,8 +124,10 @@ class PlayerController : public IComponent
 private:
 	std::weak_ptr<class Camera3D> m_pCameraComp;
 	std::weak_ptr<class MyTransform> m_pMyTransformComp;
-	std::weak_ptr<class SkinnedMeshAnimator> m_pAnimatorComp;	// アニメータコンポーネント
-	std::weak_ptr<class Health> m_pHealthComp;					// 体力管理コンポーネント
+	std::weak_ptr<class SkinnedMeshAnimator> m_pAnimatorComp;		// アニメータコンポーネント
+	std::weak_ptr<class Health> m_pHealthComp;						// 体力管理コンポーネント
+	std::weak_ptr<class WeaponController> m_pWeaponController;		// 武器制御用
+
     bool m_IsAnim;					// アニメーション中かどうか
     float m_MoveSpeed;				// 移動速度
 	bool m_IsJump;					// ジャンプしたか

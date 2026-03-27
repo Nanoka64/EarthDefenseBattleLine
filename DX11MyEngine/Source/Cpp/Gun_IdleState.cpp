@@ -51,19 +51,11 @@ int Gun_IdleState::Update(GunWeapon* pOwner)
     flashLight->set_Intensity(0.0f);
 	auto &weapon_param = pOwner->get_WeaponParameter();
 
-    float c_AngleH = m_pRenderer->get_CameraComponent()->get_Angle_H();
-    float c_AngleV = m_pRenderer->get_CameraComponent()->get_Angle_V();
+    int ammoRemaining = pOwner->get_AmmoRemaining();    // 残弾
 
-    auto transform = pOwner->get_OwnerObj().lock()->get_Transform().lock();
-    VEC3 pos = transform->get_WorldVEC3ToPos();
-
-    int ammoRemaining = pOwner->get_AmmoRemaining();
-
-	// 左クリックで発射
-	if (GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, weapon_param._fireRate, weapon_param._fireRate))
+	// 左クリックで発射 (LShiftが押されて無いとき)
+	if (GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, weapon_param._fireRate, weapon_param._fireRate) && GetInput(GAME_CONFIG::MOVE_DASH) == false)
 	{
-
-
 		return GUN_STATE::GUN_STATE_FIRE;
 	}
     // リロード

@@ -2,6 +2,7 @@
 #include "Component_PlayerController.h"
 #include "Component_3DCamera.h"
 #include "Component_SkinnedMeshAnimator.h"
+#include "Component_WeaponController.h"
 #include "Component_Health.h"
 #include "GameObject.h"
 #include "InputFactory.h"
@@ -76,6 +77,9 @@ void PlayerController::Start(RendererEngine& renderer)
 	// アニメーションコンポーネントの取得
 	m_pAnimatorComp = m_pOwner.lock()->get_Component<SkinnedMeshAnimator>();
 
+	//武器制御用コンポーネントの取得
+	m_pWeaponController = m_pOwner.lock()->get_Component<WeaponController>();
+
 	m_CrntAnimID = PLAYER_ANIMATION_ID::CROUCH_FWD_LOOP;
 
 	// HP管理コンポーネントの取得
@@ -119,6 +123,9 @@ void PlayerController::Update(RendererEngine &renderer)
 		RollingUpdate();
 		return;
 	}
+
+	// 武器制御の更新
+	m_pWeaponController.lock()->Update(renderer);
 
 	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 

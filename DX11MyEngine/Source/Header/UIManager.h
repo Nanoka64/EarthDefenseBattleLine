@@ -58,6 +58,13 @@ public:
     /// <returns></returns>
     GameObject* GetButton(RendererEngine &renderer, const UIData::RectTransformData &_transformData, const UIData::ButtonUIData &_param);
 
+
+
+
+
+
+    void PlayerUI();
+
 private:
 	// ÉRÉsÅ[ã÷é~
 	UIManager(const UIManager &) = delete;

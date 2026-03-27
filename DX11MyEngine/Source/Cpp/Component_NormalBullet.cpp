@@ -61,6 +61,7 @@ void NormalBullet::Start(RendererEngine& renderer)
     m_CollisionTask =
         [this, &renderer](const class CollisionInfo& _other)
         {
+
             auto matPtr = Master::m_pResourceManager->FindMaterial("Decal_BulletHole");
 
             SetupMaterialInfo matInfo[1];
@@ -79,6 +80,7 @@ void NormalBullet::Start(RendererEngine& renderer)
 
             auto transform = m_pOwner.lock()->get_Transform().lock();
             VEC3 pos = transform->get_VEC3ToPos();
+
 
             VEC3 hitNormal = _other.get_HitNormal();    // Õ“Ë‘Šè‚Ì–@ü
 

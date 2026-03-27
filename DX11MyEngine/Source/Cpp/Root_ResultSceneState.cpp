@@ -17,6 +17,8 @@ using namespace Tool::UV;
 //*----------------------------------------------------------------------------------------
 void Root_ResultSceneState::OnEnter(SceneManager *pOwner)
 {
+	Master::m_pEffectManager->StopAllEffects();	// 全てのエフェクトを停止する
+
 	this->SetInitChildState(pOwner, c_RESULT::c_GETITEM_CHECK);
 }
 

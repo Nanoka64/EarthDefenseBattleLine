@@ -44,6 +44,12 @@ enum class SOUND_ID
     GUN_FIRE01,            
     GUN_FIRE02,
 
+    /* •Šíƒ`ƒFƒ“ƒW */
+    GUN_CHANGE01,
+
+    /* ’µ’e */
+    ROCOCHET01,
+
     /* ”š”­ */
     EXPLOSION01,
 
