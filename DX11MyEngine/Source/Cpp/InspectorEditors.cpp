@@ -324,7 +324,7 @@ void PlayerControllerEditor::OnEditorGUI(RendererEngine &renderer, GameObject &p
 
     // beginはInspectorWindowで行っている
     float moveSpeed             = pComp->get_MoveSpeed();
-    PLAYER_ANIMATION_ID animId  = pComp->get_AnimID();
+    PlayerData::PLAYER_RANGER_ANIM_ID animId  = pComp->get_AnimID();
     VEC3 moveVelocity           = pComp->get_MoveVelocity();
     bool isJump                 = pComp->get_IsJump();
     bool isAngle                 = pComp->get_IsContinuousAngle();
@@ -346,7 +346,7 @@ void PlayerControllerEditor::OnEditorGUI(RendererEngine &renderer, GameObject &p
 
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"再生中のアニメーション"));
         Master::m_pDebugger->DG_TextValue("ID : %d",static_cast<int>(animId));
-        Master::m_pDebugger->DG_TextValue(U8ToChar(u8"名前 : %s"), g_PlayerAnimationNames[static_cast<int>(animId) + 1].c_str());
+        Master::m_pDebugger->DG_TextValue(U8ToChar(u8"名前 : %s"), PlayerData::g_PlayerAnimationNames[static_cast<int>(animId) + 1].c_str());
 
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ジャンプフラグ"));
         Master::m_pDebugger->DG_SameLine();

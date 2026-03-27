@@ -245,6 +245,7 @@
     <ClInclude Include="Source\Header\CompositeState.h" />
     <ClInclude Include="Source\Header\Component_GunWeapon.h" />
     <ClInclude Include="Source\Header\ConstantBulletData.h" />
+    <ClInclude Include="Source\Header\ConstantPlayerData.h" />
     <ClInclude Include="Source\Header\ConstantUIData.h" />
     <ClInclude Include="Source\Header\ConstantWeaponData.h" />
     <ClInclude Include="Source\Header\c_Game_LoadProcess.h" />

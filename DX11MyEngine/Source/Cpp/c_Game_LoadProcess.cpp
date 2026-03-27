@@ -85,14 +85,15 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
         CreateModelInfo model;
         model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Player/chara.fbx";
+        model.Path = "Resource/Model/Ranger/Swat_01.fbx";
         model.ObjTag = "Soldier";
         model.IsAnim = true;
         model.MatNum = 3;
         model.SetupMaterial = matInfo;
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
         auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(-1);
+        obj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(5);
+        obj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
     }
 
     std::shared_ptr<GameObject> sphireObj;
@@ -485,6 +486,26 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
     std::shared_ptr<GunWeapon>weapon_2;
 
     {
+        // マテリアル取得
+        auto matPtr1 = Master::m_pResourceManager->FindMaterial("AssultRifle");
+
+        SetupMaterialInfo matInfo[1];
+        matInfo[0].Index = 0;
+        matInfo[0].pMaterialData = matPtr1; // 体
+
+        CreateModelInfo model;
+        model.pRenderer = m_pRenderer;
+        model.Path = "Resource/Model/Weapon/M4A1.fbx";
+        model.ObjTag = "AssultRifle_Test";
+        model.IsAnim = false;
+        model.MatNum = 1;
+        model.SetupMaterial = matInfo;
+        model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
+        model.ObjLayer = 91;
+        auto obj = MeshFactory::CreateModel(model);
+    }
+
+    {
         /* アサルトライフル */
         {
             // マテリアル取得
@@ -517,7 +538,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             gunData._bulletMaxNum = 120;
             gunData._bulletType = BulletData::BULLET_TYPE::NORMAL;
             gunData._fireRate = 5;
-            gunData._zoomLength = 1.1f;
+            gunData._zoomLength = 1.0f;
             gunData._reloadTime = 2.0f;
             gunData._isLaserSight = true;
             gunData._bulletSimultaneousNum = 1;
@@ -543,9 +564,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
             // プレイヤーを親に設定
             obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
-            obj->get_Transform().lock()->set_VEC3ToLocal_Scale(VEC3(-0.985f, -0.985f, -0.985f));
-            obj->get_Transform().lock()->set_VEC3ToLocal_RotateToDeg(VEC3(0.0f, 0.0f, 90.0f));
-            obj->get_Transform().lock()->set_VEC3ToLocal_Pos(VEC3(-40.0f, 150.0f, 0.0f));
         }
 
 
@@ -560,7 +578,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
             CreateModelInfo model;
             model.pRenderer = m_pRenderer;
-            model.Path = "Resource/Model/Weapon/RocketLauncher/Simple rocket launcher.fbx";
+            model.Path = "Resource/Model/Weapon/RocketLauncher/RocketLauncher_01.fbx";
             model.ObjTag = "RocketLauncher";
             model.IsAnim = false;
             model.MatNum = 1;
@@ -579,7 +597,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             gunData._accuracy = 0.01f;
             gunData._bulletMaxNum = 2;
             gunData._bulletType = BulletData::BULLET_TYPE::EXPLOSION;
-            gunData._fireRate = 30;
+            gunData._fireRate = 120;
             gunData._zoomLength = 2.0f;
             gunData._reloadTime = 2.5f;
             gunData._isLaserSight = true;
@@ -608,7 +626,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             // プレイヤーを親に設定
             obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
             obj->get_Transform().lock()->set_Scale(VEC3(1.5f, 1.5f, 1.5f));
-            obj->get_Transform().lock()->set_VEC3ToLocal_Pos(VEC3(-40.0f, 150.0f, 0.0f));
         }
     }
 

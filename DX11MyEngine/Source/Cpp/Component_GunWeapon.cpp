@@ -84,7 +84,8 @@ void GunWeapon::Update(RendererEngine& renderer)
 
     auto player = Master::m_pGameObjectManager->get_ObjectByTag("Player");
     auto skinnedMesh = player->get_Component<SkinnedMeshAnimator>();
-    auto& boneMtx = skinnedMesh->get_BoneLocalWorldMatrix("index_01_r");
+    //auto& boneMtx = skinnedMesh->get_BoneLocalWorldMatrix("mixamorig:RightHand");
+    auto& boneMtx = skinnedMesh->get_BoneLocalWorldMatrix("WeaponSocket_Right");
     transform->set_OffsetWorldTransfomationMatrix(boneMtx);
 
 
@@ -93,7 +94,7 @@ void GunWeapon::Update(RendererEngine& renderer)
 
     // 武器を回転させる
     // 水平方向はプレイヤーに合わせているので垂直方向のみ、カメラの回転を使う。
-    transform->set_RotateToRad(VEC3(c_AngleV * -1, 0.0f, 0.0f));
+    //transform->set_RotateToRad(VEC3(c_AngleV * -1, 0.0f, 0.0f));
 
     // レーザーサイト
     if (m_WeaponParameter._isLaserSight)
@@ -101,7 +102,7 @@ void GunWeapon::Update(RendererEngine& renderer)
         // ワールド変換行列から方向をとる
         XMMATRIX worldMtx = transform->get_WorldMtx();
         XMVECTOR forward = worldMtx.r[2];  // Z
-        forward *= -1;  // プレイヤーが-Z前になってしまっているので
+        //forward *= -1;  // プレイヤーが-Z前になってしまっているので
 
         // レーザーサイトの始点と方向
         m_pLineRendererComp.lock()->set_Dir(VEC3::FromXMVECTOR(XMVector3Normalize(forward)));

@@ -256,6 +256,9 @@
     <Filter Include="ソース ファイル\Game\Component\Weapon\Gun\State">
       <UniqueIdentifier>{a128b6e8-5f98-4aa6-9598-5ad70908ef49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Game\Constant">
+      <UniqueIdentifier>{53d4c155-2ccd-4fcb-8e3d-c1c90f153528}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Cpp\SHADER.cpp">
@@ -609,9 +612,6 @@
     <ClCompile Include="Source\Cpp\UIManager.cpp">
       <Filter>ソース ファイル\Game\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Cpp\ConstantUIData.cpp">
-      <Filter>ソース ファイル\Game\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Cpp\Component_BulletBase.cpp">
       <Filter>ソース ファイル\Game\Component\Weapon\Bullet</Filter>
     </ClCompile>
@@ -650,6 +650,9 @@
     </ClCompile>
     <ClCompile Include="Source\Cpp\Component_WeaponController.cpp">
       <Filter>ソース ファイル\Game\Component\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\ConstantUIData.cpp">
+      <Filter>ソース ファイル\Game\Constant</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -769,9 +772,6 @@
     </ClInclude>
     <ClInclude Include="Source\Header\IState.h">
       <Filter>ソース ファイル\State</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\SceneStateEnums.h">
-      <Filter>ソース ファイル\Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\StateMachine.h">
       <Filter>ソース ファイル\State</Filter>
@@ -995,12 +995,6 @@
     <ClInclude Include="Source\Header\BulletManager.h">
       <Filter>ソース ファイル\Game\Weapon</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\ConstantBulletData.h">
-      <Filter>ソース ファイル\Game\Weapon</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\ConstantWeaponData.h">
-      <Filter>ソース ファイル\Game\Weapon</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Header\GameManager.h">
       <Filter>ソース ファイル\Game\Manager</Filter>
     </ClInclude>
@@ -1040,9 +1034,6 @@
     <ClInclude Include="Source\Header\ObjectFactory.h">
       <Filter>ソース ファイル\Obj</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\ConstantUIData.h">
-      <Filter>ソース ファイル\Game\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Header\UIManager.h">
       <Filter>ソース ファイル\Game\UI</Filter>
     </ClInclude>
@@ -1078,6 +1069,21 @@
     </ClInclude>
     <ClInclude Include="Source\Header\Component_WeaponController.h">
       <Filter>ソース ファイル\Game\Component\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ConstantBulletData.h">
+      <Filter>ソース ファイル\Game\Constant</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ConstantWeaponData.h">
+      <Filter>ソース ファイル\Game\Constant</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ConstantUIData.h">
+      <Filter>ソース ファイル\Game\Constant</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\SceneStateEnums.h">
+      <Filter>ソース ファイル\Game\Constant</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ConstantPlayerData.h">
+      <Filter>ソース ファイル\Game\Constant</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

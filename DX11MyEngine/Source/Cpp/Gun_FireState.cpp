@@ -46,7 +46,7 @@ int Gun_FireState::Update(GunWeapon* pOwner)
     if (pOwner->get_IsStopFire())return GUN_STATE::GUN_STATE_IDLE;
 
     auto player = Master::m_pGameObjectManager->get_ObjectByTag("Player");
-    if (player->get_Component<PlayerController>()->get_AnimID() == PLAYER_ANIMATION_ID::ROLL)return GUN_STATE::GUN_STATE_IDLE;
+    if (player->get_Component<PlayerController>()->get_AnimID() == PlayerData::PLAYER_RANGER_ANIM_ID::RUNING_DIVE_ROLL)return GUN_STATE::GUN_STATE_IDLE;
 
 	auto& weapon_param = pOwner->get_WeaponParameter();
 	int ammoRemaining = pOwner->get_AmmoRemaining();

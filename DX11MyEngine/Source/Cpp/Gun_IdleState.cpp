@@ -42,7 +42,7 @@ void Gun_IdleState::OnExit(GunWeapon* pOwner)
 int Gun_IdleState::Update(GunWeapon* pOwner)
 {
     auto player = Master::m_pGameObjectManager->get_ObjectByTag("Player");
-    if (player->get_Component<PlayerController>()->get_AnimID() == PLAYER_ANIMATION_ID::ROLL)return GUN_STATE::GUN_STATE_IDLE;
+    if (player->get_Component<PlayerController>()->get_AnimID() == PlayerData::PLAYER_RANGER_ANIM_ID::RUNING_DIVE_ROLL)return GUN_STATE::GUN_STATE_IDLE;
 
 
 

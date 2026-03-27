@@ -2,11 +2,17 @@
 #include "IComponent.h"
 #include "RootSceneState.h"
 #include "StateMachine.h"
+#include "ConstantPlayerData.h"
 
-/// <summary>
+
+
+
+
 /// プレイヤーのアニメーション
 /// 末尾にRMとついているものはアニメーション自体に移動成分が入っているもの
-/// </summary>
+/// 
+/// [注意] モデルを変えたのでもう使わない ***********************************
+/*
 enum class PLAYER_ANIMATION_ID
 {
 	NONE = -1,
@@ -109,6 +115,7 @@ const std::string g_PlayerAnimationNames[] =
 	"WALK_FORMAL_LOOP",
 	"WALK_LOOP",
 };
+*/
 
 // ***************************************************************************************
 // ---------------------------------------------------------------------------------------
@@ -133,7 +140,7 @@ private:
 	bool m_IsJump;					// ジャンプしたか
 	VECTOR3::VEC3 m_MoveVelocity;	// 移動
 	float m_JumpVelocity;			// ジャンプベクトル
-	PLAYER_ANIMATION_ID m_CrntAnimID;	// 現在のアニメーションID
+	PlayerData::PLAYER_RANGER_ANIM_ID m_CrntAnimID;	// 現在のアニメーションID
 	bool m_IsRolling;
 
 	// リジッドボディコンポーネントを作って移す
@@ -145,6 +152,8 @@ private:
 
 	int m_RollingDuration;				// ローリングの持続時間	
 	int m_RollingCounter;				// ローリング用のカウンタ
+
+	bool m_IsReloading;		// リロード中
 
 public:
 	PlayerController(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
@@ -164,8 +173,8 @@ public:
     void set_MoveSpeed(float speed) { m_MoveSpeed = speed; }
 
 	/* アニメーションID */
-	void set_AnimID(PLAYER_ANIMATION_ID id) { m_CrntAnimID = id; };
-	PLAYER_ANIMATION_ID get_AnimID()const { return m_CrntAnimID; };
+	void set_AnimID(PlayerData::PLAYER_RANGER_ANIM_ID id) { m_CrntAnimID = id; };
+	PlayerData::PLAYER_RANGER_ANIM_ID get_AnimID()const { return m_CrntAnimID; };
 
 	/* 移動速度ベクトル */
 	void set_MoveVelocity(const VECTOR3::VEC3 &vec) { m_MoveVelocity = vec; }
@@ -186,12 +195,16 @@ public:
 	void set_IsContinuousAngle(bool _flag) { m_IsContinuousAngle = _flag; };
 	bool get_IsContinuousAngle()const { return m_IsContinuousAngle; };
 
+	/* リロード中か */
+	void set_IsReloading(bool _flag) { m_IsReloading = _flag; };
+	bool get_IsReloading()const { return m_IsReloading; };
+
 private:
 	/// <summary>
 	/// アニメーションの変更
 	/// </summary>
 	/// <param name="id"></param>
-	void ChangeAnimation(PLAYER_ANIMATION_ID id);
+	void ChangeAnimation(PlayerData::PLAYER_RANGER_ANIM_ID id);
 
 
 	/// <summary>

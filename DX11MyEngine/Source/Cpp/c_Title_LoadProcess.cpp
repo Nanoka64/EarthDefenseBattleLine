@@ -171,26 +171,55 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
     /* プレイヤー モデルの生成 */
     {
         // マテリアル取得
-        auto matPtr = Master::m_pResourceManager->FindMaterial("PlayerModel");
+        auto matPtr1 = Master::m_pResourceManager->FindMaterial("Soldier_body");
+        auto matPtr2 = Master::m_pResourceManager->FindMaterial("Soldier_head");
 
-        SetupMaterialInfo matInfo[1];
+        SetupMaterialInfo matInfo[3];
         matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr;
+        matInfo[0].pMaterialData = matPtr1; // 体
+
+        matInfo[1].Index = 1;
+        matInfo[1].pMaterialData = matPtr1; // ヘルメット（体）
+
+        matInfo[2].Index = 2;
+        matInfo[2].pMaterialData = matPtr2; // 頭
 
         CreateModelInfo model;
         model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Player2/AL_Standard.fbx";
+        model.Path = "Resource/Model/Ranger/Swat_01.fbx";
         model.ObjTag = "Player";
         model.IsAnim = true;
-        model.MatNum = 1;
+        model.MatNum = 3;
         model.SetupMaterial = matInfo;
-        model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
-        model.Shadow_ShaderType = SHADER_TYPE::POST_SHADOWMAP;
         model.ObjLayer = 90;
+        model.Shadow_ShaderType = SHADER_TYPE::POST_SHADOWMAP;
+        model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
         pPlayerObj = MeshFactory::CreateModel(model);
         pPlayerObj->get_Component<MyTransform>()->set_Scale(0.1f, 0.1f, 0.1f);
         pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
         pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(0);
+
+        //// マテリアル取得
+        //auto matPtr = Master::m_pResourceManager->FindMaterial("PlayerModel");
+
+        //SetupMaterialInfo matInfo[1];
+        //matInfo[0].Index = 0;
+        //matInfo[0].pMaterialData = matPtr;
+
+        //CreateModelInfo model;
+        //model.pRenderer = m_pRenderer;
+        //model.Path = "Resource/Model/Player2/AL_Standard.fbx";
+        //model.ObjTag = "Player";
+        //model.IsAnim = true;
+        //model.MatNum = 1;
+        //model.SetupMaterial = matInfo;
+        //model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
+        //model.Shadow_ShaderType = SHADER_TYPE::POST_SHADOWMAP;
+        //model.ObjLayer = 90;
+        //pPlayerObj = MeshFactory::CreateModel(model);
+        //pPlayerObj->get_Component<MyTransform>()->set_Scale(0.1f, 0.1f, 0.1f);
+        //pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
+        //pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(0);
 
         // 破棄しない
         pPlayerObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);

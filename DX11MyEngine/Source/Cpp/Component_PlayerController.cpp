@@ -14,6 +14,8 @@ using namespace Input;
 using namespace VECTOR3;
 using namespace VECTOR2;
 
+using namespace PlayerData;
+
 using namespace DirectX;
 using namespace Tool;
 
@@ -36,7 +38,7 @@ m_IsRolling(false),
 m_IsContinuousAngle(true),
 m_MoveVelocity(VEC3()),
 m_MoveSpeed(MOVE_SPEED),
-m_CrntAnimID(PLAYER_ANIMATION_ID::T_POSE),
+m_CrntAnimID(PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE),
 m_JumpVelocity(0.0f),
 m_RollingCounter(0),
 m_RollingDuration(ROLLING_DURATION)
@@ -80,7 +82,7 @@ void PlayerController::Start(RendererEngine& renderer)
 	//武器制御用コンポーネントの取得
 	m_pWeaponController = m_pOwner.lock()->get_Component<WeaponController>();
 
-	m_CrntAnimID = PLAYER_ANIMATION_ID::CROUCH_FWD_LOOP;
+	m_CrntAnimID = PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE;
 
 	// HP管理コンポーネントの取得
 	m_pHealthComp = m_pOwner.lock()->get_Component<Health>();
@@ -91,7 +93,7 @@ void PlayerController::Start(RendererEngine& renderer)
 	m_pHealthComp.lock()->RegisterOnDamage(
 		[this] (float _damage)
 		{
-			ChangeAnimation(PLAYER_ANIMATION_ID::HIT_HEAD); 
+			//ChangeAnimation(PLAYER_ANIMATION_ID::HIT_HEAD); 
 		}
 	);	
 	// 死亡時のコールバック
@@ -99,7 +101,7 @@ void PlayerController::Start(RendererEngine& renderer)
 		[this] 
 		{
 			m_IsDead = true;
-			ChangeAnimation(PLAYER_ANIMATION_ID::DEATH01); 
+			//ChangeAnimation(PLAYER_ANIMATION_ID::DEATH01); 
 		}
 	);
 }
@@ -139,7 +141,7 @@ void PlayerController::Update(RendererEngine &renderer)
 	VEC3 crntRot = m_pMyTransformComp.lock()->get_VEC3ToRotateToRad();	// 現在の回転
 
 	// 待機アニメーション
-	ChangeAnimation(PLAYER_ANIMATION_ID::PISTOL_IDLE_LOOP);
+	ChangeAnimation(PLAYER_RANGER_ANIM_ID::RELOADING_IDLE);
 
 	// 前方向と右方向ベクトルを作る 
 	// 右方向ベクトルは上方向と前方向ベクトルの外積を取ることでできる
@@ -231,13 +233,13 @@ void PlayerController::Update(RendererEngine &renderer)
 			Master::m_pSoundManager->Play_Rand(SOUND_TYPE::VOICE, SOUND_ID_TO_INT(VOICE_ID::SOLDIER_R_SHOUT_01), 3);
 
 			// ジャンプ開始アニメーション
-			ChangeAnimation(PLAYER_ANIMATION_ID::JUMP_START);
+			ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_UP);
 		}
 	}
 	else
 	{
 		// ジャンプ中アニメーション
-		ChangeAnimation(PLAYER_ANIMATION_ID::JUMP_LOOP);
+		ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_LOOP);
 		m_JumpVelocity -= m_Gravity;	// 重力
 	}
 
@@ -271,7 +273,7 @@ void PlayerController::Update(RendererEngine &renderer)
 				newPos.y = 0.0f;
 				m_JumpVelocity = 0.0f;
 				m_IsJump = false;
-				ChangeAnimation(PLAYER_ANIMATION_ID::JUMP_LAND);
+				ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_DOWN);
 			}
 		}
 
@@ -297,7 +299,7 @@ void PlayerController::Update(RendererEngine &renderer)
 			if (m_IsJump == false)
 			{
 				// 走りアニメーション
-				ChangeAnimation(PLAYER_ANIMATION_ID::PISTOL_IDLE_LOOP);
+				ChangeAnimation(PLAYER_RANGER_ANIM_ID::RUNING);
 			}
 
 			if (!m_IsContinuousAngle)
@@ -341,7 +343,7 @@ void PlayerController::Draw(RendererEngine& renderer)
 void PlayerController::RollingUpdate()
 {
 	// ローリングアニメーションに
-	ChangeAnimation(PLAYER_ANIMATION_ID::ROLL);
+	ChangeAnimation(PLAYER_RANGER_ANIM_ID::RUNING_DIVE_ROLL);
 
 	auto pOwner = m_pOwner.lock();
 	m_pMyTransformComp = pOwner->get_Transform().lock();
@@ -405,7 +407,7 @@ void PlayerController::OnCollisionEnter(const class CollisionInfo &other)
 //* id : アニメーション番号
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-void PlayerController::ChangeAnimation(PLAYER_ANIMATION_ID id)
+void PlayerController::ChangeAnimation(PlayerData::PLAYER_RANGER_ANIM_ID id)
 {
 	// 同じ又はアニメーションが止まっているなら返す
 	if (id == m_CrntAnimID)
@@ -421,7 +423,7 @@ void PlayerController::ChangeAnimation(PLAYER_ANIMATION_ID id)
 	// 現在のアニメーションIDセット
 	m_pAnimatorComp.lock()->set_AnimIndex(static_cast<int>(m_CrntAnimID));
 
-	if (m_CrntAnimID == PLAYER_ANIMATION_ID::ROLL)
+	if (m_CrntAnimID == PLAYER_RANGER_ANIM_ID::RUNING_DIVE_ROLL)
 	{
 		m_pAnimatorComp.lock()->set_AnimProcTime(0.0f);
 		m_pAnimatorComp.lock()->set_ShadowAnimProcTime(0.0f);
@@ -440,7 +442,7 @@ void PlayerController::ContinuousAngle(const VECTOR3::VEC3 &_crntRot)
 	float angle_V = m_pCameraComp.lock()->get_Angle_V();	// 垂直アングル取得
 
 	POINT mousePos = Master::m_pInputManager->GetMousePos();
-	float targetAngleY = (angle_H - 1.57) * -1;
+	float targetAngleY = (angle_H + 1.57) * -1;
 
 	// 目標とするクォータニオン
 	XMVECTOR targetRotQ = XMQuaternionRotationRollPitchYaw(0.0f, targetAngleY, 0.0f);
@@ -464,7 +466,7 @@ void PlayerController::MovedAngle(const VECTOR3::VEC3 &_crntRot, const VECTOR3::
 {
 	//目標の方向ベクトルから角度値を算出c
 	float targetAngleY = atan2(_velocity.x, _velocity.z);
-	targetAngleY -= 3.14f;	// ※ プレイヤーモデルが前後反転してしまっているため
+	//targetAngleY -= 3.14f;	// ※ プレイヤーモデルが前後反転してしまっているため  追記：直した
 
 	// 目標とするクォータニオン
 	XMVECTOR targetRotQ = XMQuaternionRotationRollPitchYaw(0.0f, targetAngleY, 0.0f);
