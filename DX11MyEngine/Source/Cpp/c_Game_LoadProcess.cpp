@@ -66,7 +66,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         assert(false);
     }
 
-
+    std::shared_ptr<GameObject> soldier;
     /* •ºŽm */
     {
         // ƒ}ƒeƒŠƒAƒ‹Žæ“¾
@@ -92,8 +92,9 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         model.SetupMaterial = matInfo;
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
         auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(5);
+        obj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(INT_CAST(PlayerData::PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE));
         obj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
+        soldier = obj;
     }
 
     std::shared_ptr<GameObject> sphireObj;
@@ -503,6 +504,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
         model.ObjLayer = 91;
         auto obj = MeshFactory::CreateModel(model);
+        obj->get_Transform().lock()->set_Parent(soldier->get_Transform());
     }
 
     {

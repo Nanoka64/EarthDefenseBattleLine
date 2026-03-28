@@ -450,7 +450,10 @@ void BulletManager::Update(RendererEngine &renderer)
 
     //////////////////////////////////////////////////////////////////////////////////////////
     //						デバッグ用
+    //              ※ デバッグモードが有効の際に表示
     //////////////////////////////////////////////////////////////////////////////////////////
+    if (Master::m_pDataManager->get_IsDebugMode() == false)return;
+
     Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"弾プールの確認"));
 
     for (int i = 0; i < static_cast<int>(BULLET_TYPE::NUM); i++)
@@ -536,7 +539,8 @@ void BulletManager::Shot(RendererEngine &renderer, const BulletTransformData &_t
     // トランスフォームの設定
     auto transform = obj->get_Transform().lock();
     transform->set_Pos(_transformData._pos);
-    transform->set_RotateToRad(_transformData._rotRad);
+    transform->set_RotationQuaternion(_transformData._rotQ);
+    //transform->set_RotateToRad(_transformData._rotRad);
     transform->set_Scale(_transformData._scale);
 
 
@@ -574,7 +578,8 @@ void BulletManager::Shot(RendererEngine &renderer, const BulletTransformData &_t
     // トランスフォームの設定
     auto transform = bulletObj->get_Transform().lock();
     transform->set_Pos(_transformData._pos);
-    transform->set_RotateToRad(_transformData._rotRad);
+    transform->set_RotationQuaternion(_transformData._rotQ);
+    //transform->set_RotateToRad(_transformData._rotRad);
     transform->set_Scale(_transformData._scale);
 
 
@@ -613,7 +618,8 @@ void BulletManager::Shot(RendererEngine &renderer, const BulletTransformData &_t
 
     auto transform = obj->get_Transform().lock();
     transform->set_Pos(_transformData._pos);
-    transform->set_RotateToRad(_transformData._rotRad);
+    transform->set_RotationQuaternion(_transformData._rotQ);
+    //transform->set_RotateToRad(_transformData._rotRad);
     transform->set_Scale(_transformData._scale);
 
     // 更新リストに登録

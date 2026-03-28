@@ -104,6 +104,11 @@ private:
     void CopyToFrameBuffer_PathRender(RendererEngine &renderer); // フレームバッファへ描画＆トーンマッピング
 
     /// <summary>
+    /// ImGuiを使用したレンダーターゲットのデバッグ表示
+    /// </summary>
+    void DebugRenderTargetImGui();
+
+    /// <summary>
     /// レンダーターゲットの作成
     /// </summary>
     /// <param name="renderer"></param>

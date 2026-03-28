@@ -177,13 +177,18 @@ void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
 //* 引数：1.RendererEngine
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-void GameObjectManager::ObjectMainRenderPass(RendererEngine &renderer)
+void GameObjectManager::ObjectMainRenderPass(RendererEngine& renderer)
 {
     int id = 0;
-    Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"コンポーネント確認"));
-    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"こちらでは追加されている\nすべてのコンポーネントを確認できます。"));
-    Master::m_pDebugger->DG_Separator();
-    Master::m_pDebugger->DG_BulletText("Count : %d", m_3DOpaqueList.size());
+    bool isDrawComponent = Master::m_pDataManager->get_IsDebugMode();
+
+    if (isDrawComponent)
+    {
+        Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"コンポーネント確認"));
+        Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"こちらでは追加されている\nすべてのコンポーネントを確認できます。"));
+        Master::m_pDebugger->DG_Separator();
+        Master::m_pDebugger->DG_BulletText("Count : %d", m_3DOpaqueList.size());
+    }
 
     // 描画
     for (auto& obj : m_3DOpaqueList)
@@ -207,6 +212,8 @@ void GameObjectManager::ObjectMainRenderPass(RendererEngine &renderer)
         //******************************************************
         // 各オブジェクトのコンポーネントをツリー上に表示
         //******************************************************
+        if (isDrawComponent == false)continue;
+
         id++;
         // IDを名前に入れて一意にする（##ID は表示されず、内部的な識別子になる）
         std::string label = obj->get_Tag() + "##" + std::to_string(id);
@@ -221,7 +228,9 @@ void GameObjectManager::ObjectMainRenderPass(RendererEngine &renderer)
             Master::m_pDebugger->DG_TreePop();
         }
     }
-    Master::m_pDebugger->EndDebugWindow();
+    if (isDrawComponent) {
+        Master::m_pDebugger->EndDebugWindow();
+    }
 }
 
 

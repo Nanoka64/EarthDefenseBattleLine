@@ -5,13 +5,17 @@
 
 using namespace VECTOR3;
 using namespace VECTOR2;
+
+constexpr int WEAPON_CHANGE_INTERVAL = 10;	// 武器の切り替え間隔
+
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
 //*----------------------------------------------------------------------------------------
 WeaponController::WeaponController(std::weak_ptr<GameObject> pOwner, int updateRank):
 	IComponent(pOwner, updateRank),
 	m_CrntWeaponSlotIndex(-1),
-	m_MaxSlot(-1)
+	m_MaxSlot(-1),
+	m_WeaponChangeIntervalCounter(0)
 {
 }
 
@@ -55,6 +59,12 @@ bool WeaponController::Setup(RendererEngine& renderer, int _maxSlot)
 //*----------------------------------------------------------------------------------------
 void WeaponController::Update(RendererEngine& renderer)
 {
+	if (m_WeaponChangeIntervalCounter != 0)
+	{
+		m_WeaponChangeIntervalCounter--;
+		return;
+	}
+
 	// 武器１
 	if (GetInputDown(GAME_CONFIG::WEAPON_CHANGE1))
 	{
@@ -109,6 +119,9 @@ void WeaponController::SwitchWeapon(int _index)
 	// 新しい武器を表示
 	m_CrntWeaponSlotIndex = _index;
 	m_WeaponArray[m_CrntWeaponSlotIndex]->get_OwnerObj().lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
+
+	m_WeaponChangeIntervalCounter = WEAPON_CHANGE_INTERVAL;
 }
 
 //*---------------------------------------------------------------------------------------

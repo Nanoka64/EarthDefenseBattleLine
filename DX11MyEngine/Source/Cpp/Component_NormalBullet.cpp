@@ -169,7 +169,7 @@ void NormalBullet::Update(RendererEngine &renderer)
     auto moveComp = m_pOwner.lock()->get_Component<MoveLogic>();
 
     MoveParam param;
-    param._moveDirection = -m_MoveDir;// ※マイナスにしているのはプレイヤーの方向がおかしいせい（後で直す）
+    param._moveDirection = m_MoveDir;
     param._moveSpeed = m_Parameter._speed;
 
 
@@ -234,7 +234,7 @@ void NormalBullet::Setup()
     m_StartPos = transform->get_VEC3ToPos();
     m_PrevPos = m_StartPos;
 
-    m_MoveDir = transform->get_Forward(); // 前方向ベクトル
+    m_MoveDir = transform->get_WorldForward(); // 前方向ベクトル
 
     //m_MoveDir.x += Tool::RandRange(-0.03f, 0.03f);
     //m_MoveDir.y += Tool::RandRange(-0.03f, 0.03f);

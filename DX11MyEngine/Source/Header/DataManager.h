@@ -23,6 +23,8 @@ private:
 	float m_ScreenWidth;
 	float m_ScreenHeight;
 	float m_DefaultFov;	// デフォルトのFOV
+	bool m_IsDebugMode;
+
 public:
 	DataManager();
 	~DataManager();
@@ -37,11 +39,12 @@ public:
 	void set_ScreenWidth(float _w) { m_ScreenWidth = _w; };			// スクリーンの横幅を設定（基本的にRendererEngine以外からは設定しない）
 	void set_ScreenHeight(float _h) { m_ScreenHeight = _h; };		// スクリーンの縦幅を設定（基本的にRendererEngine以外からは設定しない）
 	void set_DefaultFov(float _f) { m_DefaultFov = _f; }			// デフォルトFOVの設定
+	void set_IdDebugMode(bool flag) { m_IsDebugMode = flag; }		// デバッグ用エディタのフラグ設定
 
 	float get_ScreenWidth() const { return m_ScreenWidth; };		// スクリーンの横幅を取得
 	float get_ScreenHeight() const { return m_ScreenHeight; }		// スクリーンの縦幅を取得
 	float get_DefaultFov()const { return m_DefaultFov; }			// デフォルトFOVを取得
-
+	bool get_IsDebugMode()const { return m_IsDebugMode; }			// デバッグ用エディタのフラグ取得
 private:
 	// コピー禁止
 	DataManager(const DataManager&) = delete;

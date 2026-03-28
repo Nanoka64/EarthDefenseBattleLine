@@ -127,7 +127,7 @@ void PlayerController::Update(RendererEngine &renderer)
 	}
 
 	// 武器制御の更新
-	m_pWeaponController.lock()->Update(renderer);
+	//m_pWeaponController.lock()->Update(renderer);
 
 	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 
@@ -141,7 +141,7 @@ void PlayerController::Update(RendererEngine &renderer)
 	VEC3 crntRot = m_pMyTransformComp.lock()->get_VEC3ToRotateToRad();	// 現在の回転
 
 	// 待機アニメーション
-	ChangeAnimation(PLAYER_RANGER_ANIM_ID::RELOADING_IDLE);
+	ChangeAnimation(PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE);
 
 	// 前方向と右方向ベクトルを作る 
 	// 右方向ベクトルは上方向と前方向ベクトルの外積を取ることでできる

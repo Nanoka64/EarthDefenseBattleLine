@@ -200,7 +200,8 @@ namespace VECTOR4
 		VEC4 operator+() const { return *this; };
 		VEC4 operator-() const { return { -this->x, -this->y, -this->z,-this->w }; };
 		operator DirectX::XMFLOAT4()const { return DirectX::XMFLOAT4(x, y, z, w); }    // XMFLOAT4‚É“n‚·Û‚Ì•ÏŠ·
-		
+		operator DirectX::XMVECTOR()const { return DirectX::XMVectorSet(x, y, z, 1.0f); }    // XMVECTOR‚É“n‚·Û‚Ì•ÏŠ·
+
 		// ‘ã“ü‰‰Zq float[4]
 		template<size_t N>
 		VEC4& operator=(const float(&other)[N]){

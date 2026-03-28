@@ -146,7 +146,7 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     float moveDistance = VEC3::Distance(crntPos, m_PrevPos);
 
     MoveParam param;
-    param._moveDirection = -m_MoveDir;// ※マイナスにしているのはプレイヤーの方向がおかしいせい（後で直す）
+    param._moveDirection = m_MoveDir;// ※マイナスにしているのはプレイヤーの方向がおかしいせい（後で直す）
     param._moveSpeed = m_Parameter._speed;
 
 

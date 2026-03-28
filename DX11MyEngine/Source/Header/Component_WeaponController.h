@@ -20,6 +20,7 @@ private:
     std::vector<std::shared_ptr<WeaponBase>> m_WeaponArray;    // 武器配列
     int m_CrntWeaponSlotIndex;  // 現在の武器スロットのインデックス
     int m_MaxSlot;              // 武器の最大スロット
+    int m_WeaponChangeIntervalCounter; // 武器の切り替え間隔用のカウンタ
 public:
     WeaponController(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
     ~WeaponController();

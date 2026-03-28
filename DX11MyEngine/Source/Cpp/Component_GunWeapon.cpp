@@ -97,7 +97,7 @@ void GunWeapon::Update(RendererEngine& renderer)
     //transform->set_RotateToRad(VEC3(c_AngleV * -1, 0.0f, 0.0f));
 
     // レーザーサイト
-    if (m_WeaponParameter._isLaserSight)
+    if (m_WeaponParameter._isLaserSight && !m_pLineRendererComp.expired())
     {
         // ワールド変換行列から方向をとる
         XMMATRIX worldMtx = transform->get_WorldMtx();
@@ -109,8 +109,10 @@ void GunWeapon::Update(RendererEngine& renderer)
         m_pLineRendererComp.lock()->set_StartPos(pos);
     }
 
-    // 弾を発射してないときはフラッシュライトをオフ
-    m_pFlashPointLight.lock()->set_Intensity(0.0f);
+    if (!m_pFlashPointLight.expired()) {
+        // 弾を発射してないときはフラッシュライトをオフ
+        m_pFlashPointLight.lock()->set_Intensity(0.0f);
+    }
 
     // ズーム倍率があるなら
     if (m_WeaponParameter._zoomLength > 1.0f)
@@ -248,21 +250,38 @@ void GunWeapon::Shoot(RendererEngine& renderer)
     for (int i = 0; i < m_WeaponParameter._bulletSimultaneousNum; i++)
     {
         // 親の向き等を参照
-        VEC3 rad;
-        rad.x = (c_AngleV) * -1;
-        rad.y = (c_AngleH - 1.57f) * -1;
-        rad.z = 0.0f;
-        float accuracy = m_WeaponParameter._accuracy;
+        //rad.x = (c_AngleV);
+        //rad.y = (c_AngleH - 1.57f);
+        //rad.z = 0.0f;
+
+        // ワールド変換行列から方向をとる
+        XMMATRIX worldMtx = transform->get_WorldMtx();
+        DirectX::XMVECTOR scale;
+        DirectX::XMVECTOR rotQuat; 
+        DirectX::XMVECTOR trans;
+        // 変換行列の分解しクォータニオンを取得する
+        DirectX::XMMatrixDecompose(&scale, &rotQuat, &trans, worldMtx);
+
 
         // 弾のバラつき
-        rad.x += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
-        rad.y += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
-        rad.z += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
+        float accuracy = m_WeaponParameter._accuracy;
+        VEC3 accuracyRot;
+        accuracyRot.x += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
+        accuracyRot.y += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
+        accuracyRot.z = 0.0f;
+
+        // バラつきクォータニオン
+        XMVECTOR spreadQuat = XMQuaternionRotationRollPitchYaw(accuracyRot.x, accuracyRot.y, accuracyRot.z);
+
+        // 最終的なクォータニオン作成
+        XMVECTOR finalRotQuat = XMQuaternionMultiply(rotQuat, spreadQuat);
+        finalRotQuat = XMQuaternionNormalize(finalRotQuat); // 念のため正規化
+
 
         // トランスフォームパラメータ
         BulletTransformData bulletTransform;
         bulletTransform._pos = pos;
-        bulletTransform._rotRad = rad;
+        bulletTransform._rotQ = finalRotQuat;
         bulletTransform._scale = VEC3(0.01f, 0.01f, 0.01f);
 
         BULLET_TYPE type = m_WeaponParameter._bulletType;
@@ -273,10 +292,12 @@ void GunWeapon::Shoot(RendererEngine& renderer)
             }, m_WeaponParameter._bulletParam);
     }
 
-    // フラッシュ
-    m_pFlashPointLight.lock()->set_Range(30.0f);
-    m_pFlashPointLight.lock()->set_Intensity(5.5f);
-    m_pFlashPointLight.lock()->set_LightColor(VEC3(1.0f, 1.0f, 1.0f));
+    if (!m_pFlashPointLight.expired()) {
+        // フラッシュ
+        m_pFlashPointLight.lock()->set_Range(30.0f);
+        m_pFlashPointLight.lock()->set_Intensity(5.5f);
+        m_pFlashPointLight.lock()->set_LightColor(VEC3(1.0f, 1.0f, 1.0f));
+    }
 
     // 弾数減らす
     m_AmmoRemaining--;

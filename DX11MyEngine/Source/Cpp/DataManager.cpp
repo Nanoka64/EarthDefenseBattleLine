@@ -25,7 +25,8 @@
 DataManager::DataManager():
 m_ScreenWidth(0.0f),
 m_ScreenHeight(0.0f),
-m_DefaultFov(0.0f)
+m_DefaultFov(0.0f),
+m_IsDebugMode(true)
 {
 }
 

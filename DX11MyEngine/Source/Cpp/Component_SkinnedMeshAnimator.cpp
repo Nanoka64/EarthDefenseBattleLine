@@ -2,6 +2,7 @@
 #include "Component_SkinnedMeshAnimator.h"
 #include "Component_ModelMeshResource.h"
 #include "RendererEngine.h"
+#include "Component_3DCamera.h"
 
 using namespace DirectX;
 using namespace VERTEX;
@@ -114,6 +115,10 @@ void SkinnedMeshAnimator::BoneTransformsUpdate(RendererEngine &renderer, float t
     float timeInTicks = 0.0f;
     float animTimeTicks = 0.0f;
 
+    m_AimPitchAngle = renderer.get_CameraComponent()->get_Angle_V();
+    m_AimYawAngle = renderer.get_CameraComponent()->get_Angle_H();
+
+
     //// 範囲外チェック
     //if (animIdx > m_Animations.size()) {
     //    OutputDebugString("アニメーションインデックスが範囲外です。");
@@ -214,6 +219,39 @@ void SkinnedMeshAnimator::TransformBone(float animTimeTicks, UINT nodeIdx, const
                 localTransformMtx = scalingMtx * RotationMtx * TranslationMtx;
             }
         }
+    }
+
+
+    // =====================================================================
+    // 上半身のプロシージャル回転（エイムの上下対応）
+    // =====================================================================
+    // 曲げたいボーンの名前を指定
+    if (nodeName == "mixamorig:Spine" || nodeName == "mixamorig:Spine1" || nodeName == "mixamorig:Spine2"/* || nodeName == "WeaponSocket_Right"*/)
+    {
+        // カメラのピッチ角（上下角）を取得する
+        float pitchAngle = -m_AimPitchAngle;
+        float yawAngle = -m_AimYawAngle;
+
+        // 複数のボーンで角度を分散させる（1つのボーンだけ曲げると体が折れるため）
+        // 例: Spine1で30%、Spine2で30%、Chestで40% など
+        if (nodeName == "mixamorig:Spine") { pitchAngle *= 0.2f;  yawAngle *= 0.4f; }
+        if (nodeName == "mixamorig:Spine1") { pitchAngle *= 0.3f; yawAngle *= 0.3f; }
+        if (nodeName == "mixamorig:Spine2") { pitchAngle *= 0.5f; yawAngle *= 0.3f; }
+        if (nodeName == "WeaponSocket_Right") { pitchAngle; }
+
+
+        // 左右制限
+        //if(yawAngle > FLOAT_CAST(M_PI_4) || yawAngle < FLOAT_CAST(M_PI_4))
+        //{
+        //    yawAngle = std::clamp(yawAngle, -FLOAT_CAST(M_PI_4), FLOAT_CAST(M_PI_4));
+        //}
+
+        // 追加の回転行列を作成する
+        XMMATRIX aimPitchRotMtx = DirectX::XMMatrixRotationX(pitchAngle);
+        XMMATRIX aimYawRotMtx = DirectX::XMMatrixRotationY(yawAngle);
+
+        // ローカル行列に追加の回転を合成する
+        localTransformMtx = aimPitchRotMtx * localTransformMtx;
     }
 
 

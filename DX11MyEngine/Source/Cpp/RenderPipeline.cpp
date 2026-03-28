@@ -116,6 +116,54 @@ bool RenderPipeline::Setup(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void RenderPipeline::Execute(RendererEngine &renderer)
 {
+    if (Master::m_pDataManager->get_IsDebugMode()) {
+        // レンダーターゲットデバッグ表示
+        DebugRenderTargetImGui();
+    }
+
+    /* シャドウパス */
+    Shadow_PathRender(renderer);
+    // パス終了時にSRVを解除する
+    ID3D11ShaderResourceView* nullSRVs[8] = { nullptr };
+    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
+    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
+
+    /* ジオメトリパス */
+    Geometry_PathRender(renderer);
+    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
+    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
+
+    /* デカールパス */
+    Decal_PathRender(renderer);
+    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
+    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
+
+    /* ディファードライティングパス */
+    Lighting_PathRender(renderer);
+    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
+    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
+
+    /* フォワードパス */
+    Forward_PathRender(renderer);
+ 
+    /* ポストエフェクトパス */
+    PostEffect_PathRender(renderer);
+
+    /* 最終パス（フレームバッファにコピー） */
+    CopyToFrameBuffer_PathRender(renderer);
+}
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】ImGuiを使用したレンダーターゲットのデバッグ表示
+//*
+//* [引数]
+//* なし
+//* [返値]
+//* なし 
+//*----------------------------------------------------------------------------------------
+void RenderPipeline::DebugRenderTargetImGui()
+{
 
     // レンダーターゲットデバッグ
     {
@@ -172,18 +220,18 @@ void RenderPipeline::Execute(RendererEngine &renderer)
         if (Master::m_pDebugger->DG_TreeNode(U8ToChar(u8"シャドウ")))
         {
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"シャドウマップ"));
-            Master::m_pDebugger->DG_Image(m_pShadowMap_RT->get_SRV_ComPtr().Get(), VEC2(400, 200));    
+            Master::m_pDebugger->DG_Image(m_pShadowMap_RT->get_SRV_ComPtr().Get(), VEC2(400, 200));
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"分散シャドウ用ブラー掛け"));
             Master::m_pDebugger->DG_Image(m_pShadowGaussianBlur->get_AfterBlurTexture().Get(), VEC2(400, 200));
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"バイアス"));
             Master::m_pDebugger->DG_SameLine();
-            Master::m_pDebugger->DG_DragFloat("##BaseBias", 1, &m_ShadowData.baseShadowBias,   0.0001f, 0.0f,   0.1f);
+            Master::m_pDebugger->DG_DragFloat("##BaseBias", 1, &m_ShadowData.baseShadowBias, 0.0001f, 0.0f, 0.1f);
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"傾斜バイアス"));
             Master::m_pDebugger->DG_SameLine();
-            Master::m_pDebugger->DG_DragFloat("##SlopeBias", 1, &m_ShadowData.slopeScaledBias, 0.0001f, 0.0f,   1.0);
+            Master::m_pDebugger->DG_DragFloat("##SlopeBias", 1, &m_ShadowData.slopeScaledBias, 0.0001f, 0.0f, 1.0);
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"最大バイアス"));
             Master::m_pDebugger->DG_SameLine();
-            Master::m_pDebugger->DG_DragFloat("##ClampBias", 1, &m_ShadowData.depthBiasClamp,  0.0001f, 0.0001f,  0.1f);
+            Master::m_pDebugger->DG_DragFloat("##ClampBias", 1, &m_ShadowData.depthBiasClamp, 0.0001f, 0.0001f, 0.1f);
 
             Master::m_pDebugger->DG_Separator();
 
@@ -197,38 +245,9 @@ void RenderPipeline::Execute(RendererEngine &renderer)
 
         Master::m_pDebugger->EndDebugWindow();
     }
-
-    /* シャドウパス */
-    Shadow_PathRender(renderer);
-    // パス終了時にSRVを解除する
-    ID3D11ShaderResourceView* nullSRVs[8] = { nullptr };
-    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
-    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
-
-    /* ジオメトリパス */
-    Geometry_PathRender(renderer);
-    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
-    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
-
-    /* デカールパス */
-    Decal_PathRender(renderer);
-    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
-    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
-
-    /* ディファードライティングパス */
-    Lighting_PathRender(renderer);
-    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
-    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
-
-    /* フォワードパス */
-    Forward_PathRender(renderer);
- 
-    /* ポストエフェクトパス */
-    PostEffect_PathRender(renderer);
-
-    /* 最終パス（フレームバッファにコピー） */
-    CopyToFrameBuffer_PathRender(renderer);
 }
+
+
 
 //*---------------------------------------------------------------------------------------
 //*【?】解放

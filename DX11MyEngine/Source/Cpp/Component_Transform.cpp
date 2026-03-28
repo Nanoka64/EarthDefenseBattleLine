@@ -241,6 +241,13 @@ XMVECTOR MyTransform::get_RotationQuaternion()const
 {
     return m_RotationQ;
 }
+//
+// オイラーの取得
+//
+VEC3 MyTransform::get_EulerAngles()const
+{
+    return m_EulerAngles;
+}
 
 /*--------------- Scale ---------------*/
 XMVECTOR MyTransform::get_XMVecToScale() const {
@@ -388,7 +395,7 @@ XMMATRIX MyTransform::get_WorldMtx()const {
 
     XMMATRIX localMtx = mtxS * mtxRot * mtxT;
 
-    localMtx *= m_OffsetWorldTransfomationMatrix;
+    localMtx *= m_OffsetWorldTransfomationMatrix;   
 
 
     // 親がいるなら自分と親を掛けたものを返す
@@ -475,6 +482,22 @@ XMMATRIX MyTransform::get_ExcludingRotWorldMtx(const DirectX::XMMATRIX& _scl, co
 const VEC3 MyTransform::get_Forward() const
 {
     return VEC3::FromXMVECTOR(DirectX::XMVector3Rotate(FORWARD, m_RotationQ));
+}
+
+const VEC3 MyTransform::get_WorldForward() const
+{
+    // 最終的なワールド行列を取得
+    DirectX::XMMATRIX worldMat = get_WorldMtx();
+
+    // Z方向(0,0,1)のベクトルを、ワールド行列の「回転成分だけ」で変換する
+    // TransformNormal を使うことで、移動量やスケールを無視して純粋な方向だけを取り出せます
+    DirectX::XMVECTOR worldForward = DirectX::XMVector3TransformNormal(
+        DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f),
+        worldMat
+    );
+
+    // 正規化して返す
+    return VEC3::FromXMVECTOR(DirectX::XMVector3Normalize(worldForward));
 }
 
 

@@ -538,8 +538,6 @@ void SceneManager::Update(RendererEngine& renderer)
     // 遅延更新
     Master::m_pGameObjectManager->ObjectLateUpdate(renderer);
 
-    // エディタの更新
-    Master::m_pEditorManager->Update(renderer);
 }
 
 

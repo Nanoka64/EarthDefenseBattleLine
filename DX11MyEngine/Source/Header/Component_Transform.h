@@ -92,6 +92,7 @@ public:
     DirectX::XMVECTOR get_XMVecToRotateToRad() const;    // 回転取得 - XMVECTOR ラジアン 
     DirectX::XMVECTOR get_XMVecToRotateToDeg() const;    // 回転取得 - XMVECTOR デグリー 
     DirectX::XMVECTOR get_RotationQuaternion() const;    // 回転取得 - クオータニオン
+    VECTOR3::VEC3 get_EulerAngles()const;                // 回転取得 - オイラー角
     DirectX::XMVECTOR get_XMVecToScale() const;          // 拡大取得 - XMVECTOR   
     const VECTOR3::VEC3 get_VEC3ToPos() const;          // 位置取得 - VEC3
     const VECTOR3::VEC3 get_VEC3ToRotateToRad() const;  // 回転取得 - VEC3  ラジアン
@@ -140,6 +141,7 @@ public:
     std::weak_ptr<MyTransform> get_Parent()const;
 
     const VECTOR3::VEC3 get_Forward()const;
+    const VECTOR3::VEC3 get_WorldForward()const;
     VECTOR3::VEC3 get_Up()const;
     VECTOR3::VEC3 get_Right()const;
 

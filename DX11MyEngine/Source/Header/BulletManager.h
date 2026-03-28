@@ -20,6 +20,7 @@ struct CreateBulletInfo
 struct BulletTransformData {
     VECTOR3::VEC3 _pos;
     VECTOR3::VEC3 _rotRad;
+    DirectX::XMVECTOR _rotQ;
     VECTOR3::VEC3 _scale;
 };
 

@@ -47,8 +47,10 @@ int Gun_IdleState::Update(GunWeapon* pOwner)
 
 
 	// 弾を発射してないときはフラッシュライトをオフ
-    auto flashLight = pOwner->get_FlashPointLight().lock();
-    flashLight->set_Intensity(0.0f);
+    if (pOwner->get_FlashPointLight().lock()) {
+        auto flashLight = pOwner->get_FlashPointLight().lock();
+        flashLight->set_Intensity(0.0f);
+    }
 	auto &weapon_param = pOwner->get_WeaponParameter();
 
     int ammoRemaining = pOwner->get_AmmoRemaining();    // 残弾

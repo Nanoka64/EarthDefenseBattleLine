@@ -74,13 +74,14 @@ void InputManager::Update()
     ScreenToClient(FindWindowA(g_WindowClassNameA, nullptr), &m_MousePos);
 
 
-    Master::m_pDebugger->BeginDebugWindow(U8ToChar(u8"マウス情報"));
+    Master::m_pDebugger->BeginDebugWindow(U8ToChar(u8"マウス情報"),0);
     Master::m_pDebugger->DG_TextValue("CrntCount : %d",m_CrntMouseState._count[0]);
     Master::m_pDebugger->DG_TextValue("PrevCount : %d", m_PrevMouseState._count[0]);
     Master::m_pDebugger->DG_TextValue("X : %d", m_MousePos.x);
     Master::m_pDebugger->DG_TextValue("Y : %d", m_MousePos.y);
     Master::m_pDebugger->DG_TextValue("lX : %d", m_CrntMouseState._state.lX);
     Master::m_pDebugger->DG_TextValue("lY : %d", m_CrntMouseState._state.lY);   
+    Master::m_pDebugger->DG_TextValue("lZ : %d", m_CrntMouseState._state.lZ);   
     Master::m_pDebugger->EndDebugWindow();
 
 

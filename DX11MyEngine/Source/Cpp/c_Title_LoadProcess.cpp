@@ -197,7 +197,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         pPlayerObj = MeshFactory::CreateModel(model);
         pPlayerObj->get_Component<MyTransform>()->set_Scale(0.1f, 0.1f, 0.1f);
         pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
-        pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(0);
+        pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(INT_CAST(PlayerData::PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE));
 
         //// ƒ}ƒeƒŠƒAƒ‹Žæ“¾
         //auto matPtr = Master::m_pResourceManager->FindMaterial("PlayerModel");
