@@ -24,12 +24,13 @@ private:
 	float m_ScreenHeight;
 	float m_DefaultFov;	// デフォルトのFOV
 	bool m_IsDebugMode;
+	std::shared_ptr<class RendererEngine> m_pRenderer;// 描画エンジンのポインタ
 
 public:
 	DataManager();
 	~DataManager();
 
-	bool Init();
+	bool Init(std::shared_ptr<RendererEngine>pRenderer);
 
 	bool SettingsData_TitleLoadOnEnter(RendererEngine& renderer);			// タイトルロード時
 	bool SettingsData_TitleLoadOnExit(RendererEngine& renderer);			// タイトルロード時
@@ -45,6 +46,10 @@ public:
 	float get_ScreenHeight() const { return m_ScreenHeight; }		// スクリーンの縦幅を取得
 	float get_DefaultFov()const { return m_DefaultFov; }			// デフォルトFOVを取得
 	bool get_IsDebugMode()const { return m_IsDebugMode; }			// デバッグ用エディタのフラグ取得
+
+	void set_Fov(float _fov);	// FOVの設定
+	float get_Fov();			// FOVの取得
+
 private:
 	// コピー禁止
 	DataManager(const DataManager&) = delete;

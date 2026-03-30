@@ -66,37 +66,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         assert(false);
     }
 
-    std::shared_ptr<GameObject> soldier;
-    /* 兵士 */
-    {
-        // マテリアル取得
-        auto matPtr1 = Master::m_pResourceManager->FindMaterial("Soldier_body");
-        auto matPtr2 = Master::m_pResourceManager->FindMaterial("Soldier_head");
-
-        SetupMaterialInfo matInfo[3];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr1; // 体
-
-        matInfo[1].Index = 1;
-        matInfo[1].pMaterialData = matPtr1; // ヘルメット（体）
-
-        matInfo[2].Index = 2;
-        matInfo[2].pMaterialData = matPtr2; // 頭
-
-        CreateModelInfo model;
-        model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Ranger/Swat_01.fbx";
-        model.ObjTag = "Soldier";
-        model.IsAnim = true;
-        model.MatNum = 3;
-        model.SetupMaterial = matInfo;
-        model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
-        auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(INT_CAST(PlayerData::PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE));
-        obj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
-        soldier = obj;
-    }
-
     std::shared_ptr<GameObject> sphireObj;
 
     /* スフィア */
@@ -148,7 +117,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         {
             model.ObjTag = "Ant"/* + std::to_string(i + 1)*/;   // タグ
 
-            auto obj  = MeshFactory::CreateModel(model);
+            auto obj = MeshFactory::CreateModel(model);
             auto transform = obj->get_Component<MyTransform>();
 
             // 動的オブジェクト
@@ -156,7 +125,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
             obj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
             obj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(0);
-            
+
             // エネミーコントローラーと体力管理を追加
             obj->add_Component<EnemyController>();
             obj->add_Component<Health>();
@@ -170,7 +139,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             pos.x = Tool::RandRange(-600.0, 600.0);
             pos.y = 15.0f;
             pos.z = Tool::RandRange(-600.0, 600.0);
-            
+
             VEC3 rot = VEC3();
             rot.y = Tool::RandRange(-360.0f, 360.0f);
 
@@ -239,6 +208,34 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         obj->get_Component<MyTransform>()->set_Pos(0.0f, 100.0f, 400.0f);
     }
 
+    /* テストUV球 モデルの生成 */
+    {
+        // マテリアル取得
+        auto matPtr = Master::m_pResourceManager->FindMaterial("Ground");
+
+        SetupMaterialInfo matInfo[1];
+        matInfo[0].Index = 0;
+        matInfo[0].pMaterialData = matPtr;
+
+        CreateModelInfo model;
+        model.pRenderer = m_pRenderer;
+        model.Path = "Resource/Model/TestSphere.fbx";
+        model.ObjTag = "TestSphere";
+        model.IsAnim = false;
+        model.MatNum = 1;
+        model.SetupMaterial = matInfo;
+        model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
+        auto obj = MeshFactory::CreateModel(model);
+        obj->get_Component<MyTransform>()->set_Scale(1.0f, 1.0f, 1.0f);
+        obj->get_Component<MyTransform>()->set_Pos(-800.0f, 0.0f, 900.0f);
+
+        auto collider = obj->add_Component<BoxCollider>();
+        collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
+        collider->set_Center(VEC3(0, 0, 0));
+        collider->set_IsStatic(true);
+        Master::m_pCollisionManager->RegisterCollider(collider);
+    }
+
     /* 建物 モデルの生成 */
     {
         // マテリアル取得
@@ -267,7 +264,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         collider->set_Center(VEC3(0.0f, 300.0f, 0.0f));
         collider->set_IsStatic(true);
         // 衝突カテゴリ
-        collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);   
+        collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
 
 
         // コライダーの登録
@@ -393,34 +390,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
     }
 
-    /* ビルボードの生成 */
-    {
-        // マテリアル取得
-        auto matPtr = Master::m_pResourceManager->FindMaterial("Billboard");
-
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr;
-
-
-        CreateBillboradInfo billboard;
-        billboard.pRenderer = m_pRenderer;
-        billboard.Type = BILLBOARD_USAGE_TYPE::SIMPLE;
-        billboard.ShaderType = SHADER_TYPE::FORWARD_UNLIT_STATIC;
-        billboard.IsActive = true;
-        billboard.MatNum = 1;
-        billboard.MaterialData = matInfo;
-        billboard.IsTransparent = true; // 透明度があり
-
-        VEC3 pos = VEC3(-600.0f, 50.0f, 800.0f);
-
-        //mat->m_DiffuseColor = VEC4(0.5, 0.5, 0.5, 1.0f);
-        auto obj = MeshFactory::CreateBillboard(billboard);
-        obj->get_Transform().lock()->set_Pos(pos);
-        obj->get_Transform().lock()->set_Scale(50, 50, 50);
-        obj->set_Tag("Billboard");
-    }
-
     /* ポイントライトの生成 (Cubuで分かりやすく)*/
     {
         // マテリアル取得
@@ -472,7 +441,27 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         }
     }
 
-
+    /* 武器のサイト用スプライト*/
+    {
+        CreateSpriteInfo sprite;
+        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/crosshair094.png");
+        sprite.IsActive = true;
+        sprite.ObjTag = "GunSight01";
+        sprite.pRenderer = m_pRenderer;
+        sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+        sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
+        sprite.Width = 50.0f;
+        sprite.Height = 50.0f;
+        sprite.IsActive = true;
+        sprite.IsTransparent = true;
+        auto obj = MeshFactory::CreateSprite(sprite);
+        if (obj)
+        {
+            obj->get_RectTransform().lock()->set_AnchorMax(VEC2(0.5f, 0.5f));
+            obj->get_RectTransform().lock()->set_AnchorMin(VEC2(0.5f, 0.5f));
+            obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+        }
+    }
     // プレイヤーオブジェクトの取得
     auto playerObj = Master::m_pGameObjectManager->get_ObjectByTag("Player");
 
@@ -485,28 +474,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
     // プレイヤーの武器制御コンポーネントへの登録用のキャッシュ
     std::shared_ptr<GunWeapon>weapon_1;
     std::shared_ptr<GunWeapon>weapon_2;
-
-    {
-        // マテリアル取得
-        auto matPtr1 = Master::m_pResourceManager->FindMaterial("AssultRifle");
-
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr1; // 体
-
-        CreateModelInfo model;
-        model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Weapon/M4A1.fbx";
-        model.ObjTag = "AssultRifle_Test";
-        model.IsAnim = false;
-        model.MatNum = 1;
-        model.SetupMaterial = matInfo;
-        model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
-        model.ObjLayer = 91;
-        auto obj = MeshFactory::CreateModel(model);
-        obj->get_Transform().lock()->set_Parent(soldier->get_Transform());
-    }
-
     {
         /* アサルトライフル */
         {
@@ -535,21 +502,22 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             // アサルトライフル
             //obj->add_Component<AssultRifle>(1);
             weapon_1 = obj->add_Component<GunWeapon>(1);
-            WeaponData::GunWeaponData gunData;
-            gunData._accuracy = 0.05f;
-            gunData._bulletMaxNum = 120;
-            gunData._bulletType = BulletData::BULLET_TYPE::NORMAL;
-            gunData._fireRate = 5;
-            gunData._zoomLength = 1.0f;
-            gunData._reloadTime = 2.0f;
-            gunData._isLaserSight = true;
-            gunData._bulletSimultaneousNum = 1;
+            WeaponData::GunWeaponData *gunData = new WeaponData::GunWeaponData();
+            gunData->_name = L"ART-26";
+            gunData->_accuracy = 0.05f;
+            gunData->_bulletMaxNum = 120;
+            gunData->_bulletType = BulletData::BULLET_TYPE::NORMAL;
+            gunData->_fireRate = 4;
+            gunData->_zoomLength = 1.0f;
+            gunData->_reloadTime = 2.0f;
+            gunData->_isLaserSight = true;
+            gunData->_bulletSimultaneousNum = 1;
             // 弾自身のパラメータ
             BulletData::NormalBulletData bulletData;
-            bulletData._range = 800.0f;
-            bulletData._speed = 1500.0f;
-            gunData._bulletParam = bulletData;
-            weapon_1->Setup(gunData);
+            bulletData._range = 1000.0f;
+            bulletData._speed = 2500.0f;
+            gunData->_bulletParam = bulletData;
+            weapon_1->Setup(Master::m_pWeaponDataManager->FindWeaponData(0));
 
 
             // フラッシュ用ポイントライト
@@ -567,7 +535,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             // プレイヤーを親に設定
             obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
         }
-
 
         /* ロケットランチャー */
         {
@@ -595,23 +562,24 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             // コンポーネントの追加
             weapon_2 = obj->add_Component<GunWeapon>(1);
             // 武器のパラメータ
-            WeaponData::GunWeaponData gunData;
-            gunData._accuracy = 0.01f;
-            gunData._bulletMaxNum = 2;
-            gunData._bulletType = BulletData::BULLET_TYPE::EXPLOSION;
-            gunData._fireRate = 120;
-            gunData._zoomLength = 2.0f;
-            gunData._reloadTime = 2.5f;
-            gunData._isLaserSight = true;
-            gunData._bulletSimultaneousNum = 1;
+            WeaponData::GunWeaponData* gunData = new WeaponData::GunWeaponData();
+            gunData->_name = L"サンダーカノンTA-1";
+            gunData->_accuracy = 0.01f;
+            gunData->_bulletMaxNum = 20;
+            gunData->_bulletType = BulletData::BULLET_TYPE::EXPLOSION;
+            gunData->_fireRate = 2;
+            gunData->_zoomLength = 2.0f;
+            gunData->_reloadTime = 2.5f;
+            gunData->_isLaserSight = true;
+            gunData->_bulletSimultaneousNum = 1;
             // 弾自身のパラメータ
             BulletData::ExplosionBulletData bulletData;
             bulletData._range = 1500.0f;
             bulletData._speed = 1000.0f;
             bulletData._explosionRadius = 20.0f;
             bulletData._explosionEffectHandleTag = "Explosion_01";
-            gunData._bulletParam = bulletData;
-            weapon_2->Setup(gunData);
+            gunData->_bulletParam = bulletData;
+            weapon_2->Setup(Master::m_pWeaponDataManager->FindWeaponData(1));
 
             // フラッシュ用ポイントライト
             auto flash = obj->add_Component<PointLight>();
@@ -628,6 +596,34 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             // プレイヤーを親に設定
             obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
             obj->get_Transform().lock()->set_Scale(VEC3(1.5f, 1.5f, 1.5f));
+        }
+
+        /* レーザーポインタ ビルボードの生成 */
+        {
+            // マテリアル取得
+            auto matPtr = Master::m_pResourceManager->FindMaterial("LaserPointBillboard");
+
+            SetupMaterialInfo matInfo[1];
+            matInfo[0].Index = 0;
+            matInfo[0].pMaterialData = matPtr;
+
+            CreateBillboradInfo billboard;
+            billboard.pRenderer = m_pRenderer;
+            billboard.Type = BILLBOARD_USAGE_TYPE::SIMPLE;
+            billboard.ShaderType = SHADER_TYPE::FORWARD_UNLIT_STATIC;
+            billboard.IsActive = true;
+            billboard.MatNum = 1;
+            billboard.MaterialData = matInfo;
+            billboard.IsTransparent = true; // 透明度があり
+
+            VEC3 pos = VEC3(-600.0f, 50.0f, 800.0f);
+
+            //mat->m_DiffuseColor = VEC4(0.5, 0.5, 0.5, 1.0f);
+            auto obj = MeshFactory::CreateBillboard(billboard);
+            obj->get_Transform().lock()->set_Pos(pos);
+            obj->get_Transform().lock()->set_Scale(50, 50, 50);
+            obj->set_Tag("LaserPointBillboard");
+            obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
         }
     }
 

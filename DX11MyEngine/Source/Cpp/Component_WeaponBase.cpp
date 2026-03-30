@@ -7,8 +7,10 @@
 //* pOwner : オーナーオブジェクト
 //* updateRank : 更新レイヤー
 //*----------------------------------------------------------------------------------------
-WeaponBase::WeaponBase(std::weak_ptr<GameObject> pOwner, int updateRank ) 
-	: IComponent(pOwner, updateRank)
+WeaponBase::WeaponBase(std::weak_ptr<GameObject> pOwner, int updateRank )
+	: IComponent(pOwner, updateRank),
+	m_WeaponFlags(),
+	m_pParameter(nullptr)
 {
 
 }

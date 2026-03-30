@@ -327,6 +327,7 @@ void PlayerControllerEditor::OnEditorGUI(RendererEngine &renderer, GameObject &p
     PlayerData::PLAYER_RANGER_ANIM_ID animId  = pComp->get_AnimID();
     VEC3 moveVelocity           = pComp->get_MoveVelocity();
     bool isJump                 = pComp->get_IsJump();
+    bool isGrounded             = pComp->get_IsGrounded();
     bool isAngle                 = pComp->get_IsContinuousAngle();
     float jumpFoce              = pComp->get_JumpFoce();
     float gravity               = pComp->get_Gravity();
@@ -351,6 +352,10 @@ void PlayerControllerEditor::OnEditorGUI(RendererEngine &renderer, GameObject &p
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ジャンプフラグ"));
         Master::m_pDebugger->DG_SameLine();
         Master::m_pDebugger->DG_RadioButton("##JumpFlag", isJump);
+
+        Master::m_pDebugger->DG_BulletText(U8ToChar(u8"接地"));
+        Master::m_pDebugger->DG_SameLine();
+        Master::m_pDebugger->DG_RadioButton("##Grounded", isGrounded);
 
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ジャンプ力"));
         Master::m_pDebugger->DG_SameLine();

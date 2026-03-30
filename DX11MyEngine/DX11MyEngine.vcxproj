@@ -83,7 +83,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>Source/Header;Source/Lib/DirectXTex;Source/Shader;Source/Lib/Imgui;Source/Lib/Imgui/backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source/Header;Source/Lib/DirectXTex;Source/Shader;Source/Lib/Imgui;Source/Lib/Imgui/backends;%(AdditionalIncludeDirectories);C:\Users\edama\Documents\GitHub\DX11_EDF_3DGame\DX11_3D_Game_Test\DX11MyEngine\Source\Lib\nlohmann</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -110,7 +110,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>Source/Header;Source/Lib/DirectXTex;Source/Lib/Imgui/backends;Source/Lib/Imgui;Source/Shader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source/Header;Source/Lib/DirectXTex;Source/Lib/Imgui/backends;Source/Lib/Imgui;Source/Shader;%(AdditionalIncludeDirectories);C:\Users\edama\Documents\GitHub\DX11_EDF_3DGame\DX11_3D_Game_Test\DX11MyEngine\Source\Lib\nlohmann</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -135,7 +135,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>Source/Header;Source/Lib/DirectXTex;Source/Shader;Source/Lib/Imgui;Source/Lib/Imgui/backends;%(AdditionalIncludeDirectories);Source/Lib/Effekseer/Include/Effekseer;Source/Lib/Effekseer/Include/EffekseerRendererDX11</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source/Header;Source/Lib/DirectXTex;Source/Shader;Source/Lib/Imgui;Source/Lib/Imgui/backends;%(AdditionalIncludeDirectories);Source/Lib/Effekseer/Include/Effekseer;Source/Lib/Effekseer/Include/EffekseerRendererDX11;C:\Users\edama\Documents\GitHub\DX11_EDF_3DGame\DX11_3D_Game_Test\DX11MyEngine\Source\Lib\nlohmann;C:\Users\edama\Documents\GitHub\DX11_EDF_3DGame\DX11_3D_Game_Test\DX11MyEngine\Source\Lib</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -166,7 +166,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>Source/Header;Source/Lib/DirectXTex;Source/Lib/Imgui/backends;Source/Lib/Imgui;Source/Shader;%(AdditionalIncludeDirectories);Source/Lib/Effekseer/Include/Effekseer;Source/Lib/Effekseer/Include/EffekseerRendererDX11</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source/Header;Source/Lib/DirectXTex;Source/Lib/Imgui/backends;Source/Lib/Imgui;Source/Shader;%(AdditionalIncludeDirectories);Source/Lib/Effekseer/Include/Effekseer;Source/Lib/Effekseer/Include/EffekseerRendererDX11;C:\Users\edama\Documents\GitHub\DX11_EDF_3DGame\DX11_3D_Game_Test\DX11MyEngine\Source\Lib\nlohmann;C:\Users\edama\Documents\GitHub\DX11_EDF_3DGame\DX11_3D_Game_Test\DX11MyEngine\Source\Lib</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -247,6 +247,7 @@
     <ClInclude Include="Source\Header\ConstantBulletData.h" />
     <ClInclude Include="Source\Header\ConstantPlayerData.h" />
     <ClInclude Include="Source\Header\ConstantUIData.h" />
+    <ClInclude Include="Source\Header\ConstantUtilityData.h" />
     <ClInclude Include="Source\Header\ConstantWeaponData.h" />
     <ClInclude Include="Source\Header\c_Game_LoadProcess.h" />
     <ClInclude Include="Source\Header\c_Game_Play.h" />
@@ -337,6 +338,7 @@
     <ClInclude Include="Source\Header\VertexBuffer.h" />
     <ClInclude Include="Source\Header\VertexShader.h" />
     <ClInclude Include="Source\Header\Component_WeaponController.h" />
+    <ClInclude Include="Source\Header\WeaponDataManager.h" />
     <ClInclude Include="Source\Header\WeaponStateFactory.h" />
     <ClInclude Include="Source\Header\Window.h" />
     <ClInclude Include="Source\Lib\DirectXTex\DirectXTex.h" />
@@ -612,6 +614,7 @@
     <ClCompile Include="Source\Cpp\VertexBuffer.cpp" />
     <ClCompile Include="Source\Cpp\VertexShader.cpp" />
     <ClCompile Include="Source\Cpp\Component_WeaponController.cpp" />
+    <ClCompile Include="Source\Cpp\WeaponDataManager.cpp" />
     <ClCompile Include="Source\Cpp\WeaponStateFactory.cpp" />
     <ClCompile Include="Source\Cpp\WinMain.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>

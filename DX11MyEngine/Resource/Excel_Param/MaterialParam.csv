@@ -17,3 +17,4 @@ PointLight,1,1,1,1,1,1,1,1,50,1,1,1,0.1,Resource/Texture/Wall_W040.jpg,Resource/
 Decal_BulletHole,1,1,1,1,1,1,1,1,100,1,1,1,1,Resource/Texture/BulletHole.png,Resource/Texture/BulletHole_n.png,-1,0
 Decal_Ant_Splash,1,1,1,1,1,1,1,1,100,1,1,1,1.5,Resource/Texture/Acid.png,Resource/Texture/Acid_n.png,-1,0
 RocketLauncher,1,1,1,1,1,1,1,1,100,0,0,0,0,Resource/Model/Weapon/RocketLauncher/Simple rocket launcher Tex.png,-1,-1,0
+LaserPointBillboard,5,1,1,1,1,1,1,1,100,1,0,0,1,Resource/Effect/Texture/Particle04_clear_soft.png,-1,-1,1

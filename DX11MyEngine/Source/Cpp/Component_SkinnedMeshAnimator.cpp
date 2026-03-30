@@ -47,6 +47,22 @@ void SkinnedMeshAnimator::Start(RendererEngine &renderer)
     m_ConstanrBufferBonesData = m_pMeshResource.lock()->get_ModelData().lock()->GetConstantBufferBonesData();
 }
 
+//*---------------------------------------------------------------------------------------
+//* @:SkinnedMeshAnimator Class 
+//*【?】更新
+//* 引数：1.RendererEngine 
+//* 返値：void
+//*----------------------------------------------------------------------------------------
+void SkinnedMeshAnimator::Update(RendererEngine& renderer)
+{
+    if (m_IsAnimationFlag)
+    {
+        m_AnimProcTime += 0.023f;
+    }
+
+    BoneTransformsUpdate(renderer, m_AnimProcTime, m_CurrentAnimIndex);
+}
+
 
 //*---------------------------------------------------------------------------------------
 //* @:SkinnedMeshAnimator Class 
@@ -64,28 +80,54 @@ void SkinnedMeshAnimator::Draw(RendererEngine &renderer)
     //Master::m_pDebugger->DG_SliderInt("AnimationIndex##" + m_pOwner.lock()->get_Tag(), 1, &m_CurrentAnimIndex, 0, m_Animations.size() - 1);    // アニメーションインデックス
     //Master::m_pDebugger->EndDebugWindow();
 
-    // メインパス
-    if (renderer.get_CrntRenderPass() == RENDER_PASS::MAIN)
-    {
-        //if (m_CurrentAnimIndex == -1)return;
-        if (m_IsAnimationFlag)
-        {
-            m_AnimProcTime += 0.023f;
-        }
+    //// メインパス
+    //if (renderer.get_CrntRenderPass() == RENDER_PASS::MAIN)
+    //{
+    //    //if (m_CurrentAnimIndex == -1)return;
+    //    if (m_IsAnimationFlag)
+    //    {
+    //        m_AnimProcTime += 0.023f;
+    //    }
 
 
-        BoneTransformsUpdate(renderer, m_AnimProcTime, m_CurrentAnimIndex);
-    }
-    // シャドウパス
-    else if (renderer.get_CrntRenderPass() == RENDER_PASS::SHADOW)
+    //    BoneTransformsUpdate(renderer, m_AnimProcTime, m_CurrentAnimIndex);
+    //}
+    //// シャドウパス
+    //else if (renderer.get_CrntRenderPass() == RENDER_PASS::SHADOW)
+    //{
+    //    //if (m_CurrentAnimIndex == -1)return;
+    //    if (m_IsAnimationFlag)
+    //    {
+    //        m_ShadowAnimProcTime += 0.023f;
+    //    }
+    //    BoneTransformsUpdate(renderer, m_ShadowAnimProcTime, m_CurrentAnimIndex);
+    //}
+    
+
+    auto pContext = renderer.get_DeviceContext();
+
+    // 定数バッファに詰め込む
+    for (size_t i = 0; i < ARRAYSIZE(m_ConstanrBufferBonesData->Data.BonesMatrices); i++)
     {
-        //if (m_CurrentAnimIndex == -1)return;
-        if (m_IsAnimationFlag)
-        {
-            m_ShadowAnimProcTime += 0.023f;
-        }
-        BoneTransformsUpdate(renderer, m_ShadowAnimProcTime, m_CurrentAnimIndex);
+        if (m_BoneList.size() <= i)break;
+        m_ConstanrBufferBonesData->Data.BonesMatrices[i] = m_BoneList[i].FinalTransformation;
     }
+
+    // モデルシェーダに切り替え
+    Master::m_pShaderManager->DeviceToSetShader(m_pMeshResource.lock()->get_ModelData().lock()->get_ShaderType());
+
+    // 定数バッファ更新
+    pContext->UpdateSubresource(
+        m_ConstanrBufferBonesData->pBuff,
+        0,
+        nullptr,
+        &m_ConstanrBufferBonesData->Data,
+        0,
+        0
+    );
+
+    // ボーン変換用の定数バッファの更新＆セット
+    pContext->VSSetConstantBuffers(3, 1, &m_ConstanrBufferBonesData->pBuff);
 }
 
 
@@ -149,30 +191,6 @@ void SkinnedMeshAnimator::BoneTransformsUpdate(RendererEngine &renderer, float t
         TransformBone(animTimeTicks, 0, XMMatrixIdentity(), animIdx);
     }
 
-    auto pContext = renderer.get_DeviceContext();
-
-    // 定数バッファに詰め込む
-    for (size_t i = 0; i < ARRAYSIZE(m_ConstanrBufferBonesData->Data.BonesMatrices); i++)
-    {
-        if (m_BoneList.size() <= i)break;
-        m_ConstanrBufferBonesData->Data.BonesMatrices[i] = m_BoneList[i].FinalTransformation;
-    }
-
-    // モデルシェーダに切り替え
-    Master::m_pShaderManager->DeviceToSetShader(m_pMeshResource.lock()->get_ModelData().lock()->get_ShaderType());
-
-    // 定数バッファ更新
-    pContext->UpdateSubresource(
-        m_ConstanrBufferBonesData->pBuff,
-        0,
-        nullptr,
-        &m_ConstanrBufferBonesData->Data,
-        0,
-        0
-    );
-
-    // ボーン変換用の定数バッファの更新＆セット
-    pContext->VSSetConstantBuffers(3, 1, &m_ConstanrBufferBonesData->pBuff);
 }
 
 
@@ -226,7 +244,7 @@ void SkinnedMeshAnimator::TransformBone(float animTimeTicks, UINT nodeIdx, const
     // 上半身のプロシージャル回転（エイムの上下対応）
     // =====================================================================
     // 曲げたいボーンの名前を指定
-    if (nodeName == "mixamorig:Spine" || nodeName == "mixamorig:Spine1" || nodeName == "mixamorig:Spine2"/* || nodeName == "WeaponSocket_Right"*/)
+    if (/*nodeName == "mixamorig:Spine" || nodeName == "mixamorig:Spine1" || nodeName == "mixamorig:Spine2" || */nodeName == "WeaponSocket_Right")
     {
         // カメラのピッチ角（上下角）を取得する
         float pitchAngle = -m_AimPitchAngle;
@@ -234,10 +252,11 @@ void SkinnedMeshAnimator::TransformBone(float animTimeTicks, UINT nodeIdx, const
 
         // 複数のボーンで角度を分散させる（1つのボーンだけ曲げると体が折れるため）
         // 例: Spine1で30%、Spine2で30%、Chestで40% など
-        if (nodeName == "mixamorig:Spine") { pitchAngle *= 0.2f;  yawAngle *= 0.4f; }
-        if (nodeName == "mixamorig:Spine1") { pitchAngle *= 0.3f; yawAngle *= 0.3f; }
-        if (nodeName == "mixamorig:Spine2") { pitchAngle *= 0.5f; yawAngle *= 0.3f; }
-        if (nodeName == "WeaponSocket_Right") { pitchAngle; }
+        if (nodeName == "mixamorig:Spine") { pitchAngle *= 0.1f;  yawAngle *= 0.4f; }
+        if (nodeName == "mixamorig:Spine1") { pitchAngle *= 0.1f; yawAngle *= 0.3f; }
+        if (nodeName == "mixamorig:Spine2") { pitchAngle *= 0.1f; yawAngle *= 0.3f; }
+        // TODO:一旦ソケットも直接回転させる
+        if (nodeName == "WeaponSocket_Right") { pitchAngle *= -1.0f; }
 
 
         // 左右制限

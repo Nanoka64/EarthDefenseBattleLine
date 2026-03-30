@@ -1,0 +1,25 @@
+{
+  "level": 0,
+  "name": "サンダーカノンTA-1",
+  "bulletMaxNum": 3,
+  "bulletSimultaneousNum": 1,
+  "fireRate": 60.0,
+  "reloadTime": 2.0,
+  "accuracy": 0.01,
+  "zoomLength": 2.0,
+  "isLaserSight": true,
+  "soundID": 0,
+  "bulletType": "EXPLOSION",
+  "bulletParam": {
+    "damage": 200.0,
+    "damageDistAttenuationRate": 0.5,
+    "speed": 1000.0,
+    "acceleration": 0.0,
+    "range": 2500.0,
+    "penetrationsCount": 0,
+    "collisionSize": 0.0,
+    "gravityScale": 0.0,
+    "explosionRadius": 25.0,
+    "explosionEffectHandleTag": "Explosion_01"
+  }
+}

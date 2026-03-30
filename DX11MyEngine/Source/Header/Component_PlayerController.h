@@ -140,12 +140,13 @@ private:
 	bool m_IsJump;					// ジャンプしたか
 	VECTOR3::VEC3 m_MoveVelocity;	// 移動
 	float m_JumpVelocity;			// ジャンプベクトル
+	bool m_IsGrounded;				// 地面にいるか
 	PlayerData::PLAYER_RANGER_ANIM_ID m_CrntAnimID;	// 現在のアニメーションID
 	bool m_IsRolling;
 
 	// リジッドボディコンポーネントを作って移す
-	float m_JumpForce = 3.0f;	// ジャンプ力
-	float m_Gravity = 0.18f;	// 重力
+	float m_JumpForce = 2.0f;	// ジャンプ力
+	float m_Gravity = 0.098f;	// 重力
 
 	bool m_IsDead;
 	bool m_IsContinuousAngle ;	// マウスに合わせて継続的に回転させるか
@@ -161,7 +162,7 @@ public:
 
 	void Start(RendererEngine& renderer) override;		// 初期化
 	void Update(RendererEngine& renderer) override;	// 更新処理
-	void Draw(RendererEngine& renderer)override;		// 描画処理
+	void LateUpdate(RendererEngine& renderer) override;	// 更新処理
 
 	void RollingUpdate();
 
@@ -198,6 +199,7 @@ public:
 	/* リロード中か */
 	void set_IsReloading(bool _flag) { m_IsReloading = _flag; };
 	bool get_IsReloading()const { return m_IsReloading; };
+	bool get_IsGrounded()const { return m_IsGrounded; };
 
 private:
 	/// <summary>

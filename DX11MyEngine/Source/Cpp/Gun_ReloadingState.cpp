@@ -14,6 +14,7 @@ using namespace VECTOR2;
 //*----------------------------------------------------------------------------------------
 void Gun_ReloadingState::OnEnter(GunWeapon* pOwner)
 {
+	pOwner->get_WeaponFlags().EnableFlag(WEAPON_STATUS::RELODING);
 	pOwner->set_AmmoRemaining(0); // リロード開始時、弾を0に
 
 	m_ReloadElapsed = 0.0f;
@@ -27,6 +28,8 @@ void Gun_ReloadingState::OnEnter(GunWeapon* pOwner)
 //*----------------------------------------------------------------------------------------
 void Gun_ReloadingState::OnExit(GunWeapon* pOwner)
 {
+	pOwner->get_WeaponFlags().DisableFlag(WEAPON_STATUS::RELODING);
+
 	m_ReloadElapsed = 0.0f;
 }
 
@@ -38,16 +41,16 @@ void Gun_ReloadingState::OnExit(GunWeapon* pOwner)
 //*----------------------------------------------------------------------------------------
 int Gun_ReloadingState::Update(GunWeapon* pOwner)
 {
-	auto& weapon_param = pOwner->get_WeaponParameter();
+	const auto& weapon_param = pOwner->get_GunWeaponParameter();
 	m_ReloadElapsed += Master::m_pTimeManager->get_DeltaTime();
 
 
-	float t = m_ReloadElapsed / weapon_param._reloadTime;
+	float t = m_ReloadElapsed / weapon_param->_reloadTime;
 
 	// リロード終了
-	if (m_ReloadElapsed >= weapon_param._reloadTime)
+	if (m_ReloadElapsed >= weapon_param->_reloadTime)
 	{
-		pOwner->set_AmmoRemaining(weapon_param._bulletMaxNum); // 弾込め
+		pOwner->set_AmmoRemaining(weapon_param->_bulletMaxNum); // 弾込め
 
 		return GUN_STATE::GUN_STATE_IDLE;
 	}

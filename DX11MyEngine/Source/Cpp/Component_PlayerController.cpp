@@ -35,6 +35,7 @@ m_IsAnim(false),
 m_IsJump(false),
 m_IsDead(false),
 m_IsRolling(false),
+m_IsGrounded (true),
 m_IsContinuousAngle(true),
 m_MoveVelocity(VEC3()),
 m_MoveSpeed(MOVE_SPEED),
@@ -117,8 +118,22 @@ void PlayerController::Start(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void PlayerController::Update(RendererEngine &renderer)
 {
+	m_IsGrounded = false;
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】遅延更新
+//*
+//* [引数]
+//* RendererEngine& : 描画エンジンの参照
+//*
+//* [返値]
+//* void
+//*----------------------------------------------------------------------------------------
+void PlayerController::LateUpdate(RendererEngine& renderer)
+{
 	if (m_IsDead)return;
-	
+
 	// ローリングの処理のみ行って返す
 	if (m_IsRolling)
 	{
@@ -155,7 +170,7 @@ void PlayerController::Update(RendererEngine &renderer)
 
 	// 右方向ベクトル
 	VEC3 right = VEC3::Cross(upVec, forward);
-	
+
 	// 正規化
 	forward = forward.Normalize();
 	right = right.Normalize();
@@ -177,11 +192,11 @@ void PlayerController::Update(RendererEngine &renderer)
 		m_MoveVelocity -= forward;
 	}
 	if (GetInput(GAME_CONFIG::MOVE_RIGHT))		// 右へ
-	{ 
+	{
 		m_MoveVelocity += right;
 
 		// 右ローリング
-		if (GetInputDown(GAME_CONFIG::MOVE_JUMP) && m_IsJump == false)	
+		if (GetInputDown(GAME_CONFIG::MOVE_JUMP) && m_IsJump == false)
 		{
 			m_MoveVelocity = m_MoveVelocity.Normalize();
 			m_IsRolling = true;
@@ -211,17 +226,31 @@ void PlayerController::Update(RendererEngine &renderer)
 			return;
 		}
 	}
-	
+
 	// 正規化
 	m_MoveVelocity = m_MoveVelocity.Normalize();
 
 	//-----------------------------------------------------------------------------
 	// ■ ジャンプ入力受付 / ジャンプ中処理
 	//-----------------------------------------------------------------------------
-	// ジャンプ状態ではない、かつ、ローリング中でもない
-	if (m_IsJump == false && m_IsRolling == false)
+	// 接地しているならジャンプ可能
+	if (m_IsGrounded)
 	{
-		if (GetInputDown(GAME_CONFIG::MOVE_JUMP))
+		// ジャンプ中に接地した場合、リセット
+		if (m_IsJump)
+		{
+			// ****************************************************
+			//				 ジャンプ - 着地音 再生
+			// ****************************************************
+			Master::m_pSoundManager->Play(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SOLDIER_R_JUMP_LAND));
+			ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_DOWN);
+
+			m_JumpVelocity = 0.0f;
+			m_IsJump = false;
+		}
+
+		// ジャンプ状態ではない、かつ、ローリング中でもない
+		if (GetInputDown(GAME_CONFIG::MOVE_JUMP) && m_IsRolling == false)
 		{
 			m_IsJump = true;
 			m_JumpVelocity = m_JumpForce;
@@ -238,11 +267,21 @@ void PlayerController::Update(RendererEngine &renderer)
 	}
 	else
 	{
-		// ジャンプ中アニメーション
-		ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_LOOP);
-		m_JumpVelocity -= m_Gravity;	// 重力
-	}
+		// 空中にいる場合は重力をかけ続ける
+		if (m_IsJump) {
+			ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_LOOP);
+		}
+		m_JumpVelocity -= m_Gravity;
 
+		// 世界の裏側に落下した場合
+		if (m_JumpVelocity < -20.0f)
+		{
+			m_IsJump = false;
+			m_JumpVelocity = m_Gravity;
+			m_pMyTransformComp.lock()->set_Pos(VEC3(0.0f,100.0f,0.0f));
+			return;
+		}
+	}
 	// 正規化後に入れる
 	m_MoveVelocity.y = m_JumpVelocity;
 
@@ -260,29 +299,30 @@ void PlayerController::Update(RendererEngine &renderer)
 		// 移動計算
 		newPos = (crntPos + (m_MoveVelocity * (m_MoveSpeed * deltaTime)));
 
-		if (m_IsJump)
-		{
-			// 地面判定
-			if (newPos.y < 0.0f)
-			{
-				// ****************************************************
-				//				 ジャンプ - 着地音再生
-				// ****************************************************
-				Master::m_pSoundManager->Play(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SOLDIER_R_JUMP_LAND));
+		// 上に持ってった
+		//if (m_IsJump)
+		//{
+		//	// 地面判定
+		//	if (newPos.y < 0.0f)
+		//	{
+		//		// ****************************************************
+		//		//				 ジャンプ - 着地音再生
+		//		// ****************************************************
+		//		Master::m_pSoundManager->Play(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SOLDIER_R_JUMP_LAND));
 
-				newPos.y = 0.0f;
-				m_JumpVelocity = 0.0f;
-				m_IsJump = false;
-				ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_DOWN);
-			}
-		}
+		//		newPos.y = 0.0f;
+		//		m_JumpVelocity = 0.0f;
+		//		m_IsJump = false;
+		//		ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_DOWN);
+		//	}
+		//}
 
 		// 移動ベクトルを加算
 		m_pMyTransformComp.lock()->set_Pos(newPos);
 
 		// 動いているならアニメーション
 		m_IsAnim = true;
-		
+
 		/*
 		// 移動ベクトルに合わせてY軸のみ回転させる
 		// ジャンプ時に回転しないよう、X/Zのみ考慮
@@ -304,30 +344,28 @@ void PlayerController::Update(RendererEngine &renderer)
 
 			if (!m_IsContinuousAngle)
 			{
-				MovedAngle(crntRot,m_MoveVelocity);
+				MovedAngle(crntRot, m_MoveVelocity);
 			}
 		}
 	}
+
+
+	if (m_pWeaponController.lock()->get_IsCrntWeaponReloading())
+	{
+		if (m_MoveVelocity.Length() > 0.001f) {
+			ChangeAnimation(PLAYER_RANGER_ANIM_ID::RUNNNING_RELOAD);
+		}
+		else {
+			ChangeAnimation(PLAYER_RANGER_ANIM_ID::RELOADING_IDLE);
+		}
+	}
+
 
 	// 継続的に視点を変える
 	if (m_IsContinuousAngle)
 	{
 		ContinuousAngle(crntRot);
 	}
-}
-
-//*---------------------------------------------------------------------------------------
-//*【?】描画
-//*
-//* [引数]
-//* RendererEngine& : 描画エンジンの参照
-//*
-//* [返値]
-//* void
-//*----------------------------------------------------------------------------------------
-void PlayerController::Draw(RendererEngine& renderer)
-{
-	return;
 }
 
 //*---------------------------------------------------------------------------------------
@@ -397,6 +435,20 @@ void PlayerController::OnCollisionEnter(const class CollisionInfo &other)
 	if (other.get_HitObject().lock()->get_Tag() == "Ant")
 	{
 		//m_pHealthComp.lock()->TakeDamage(1.0f);
+	}
+
+	VEC3 normal = other.get_HitNormal();
+
+	// 法線のY成分が一定以上（例：0.7f以上で約45度以下の坂）なら床とみなす
+	// 反転された法線が来る仕様なら normal.y < -0.7f になる可能性があります。
+	if (normal.y < -0.7f)
+	{
+		m_IsGrounded = true;
+
+		// めり込み防止のため、下方向への速度（重力による落下速度）をリセット
+		if (m_JumpVelocity < 0.0f) {
+			m_JumpVelocity = 0.0f;
+		}
 	}
 }
 

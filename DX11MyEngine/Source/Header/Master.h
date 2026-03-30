@@ -16,6 +16,7 @@
 #include "DataManager.h"
 #include "UIManager.h"
 #include "RandomManager.h"
+#include "WeaponDataManager.h"
 
 // ***************************************************************************************
 // ---------------------------------------------------------------------------------------
@@ -47,4 +48,5 @@ public:
 	static BulletManager		* m_pBulletManager;		// ’eŠÇ—
 	static UIManager			* m_pUIManager;			// UIŠÇ—
 	static RandomManager		* m_pRandomManager;		// —”ŠÇ—
+	static WeaponDataManager	* m_pWeaponDataManager;	// •Šíƒf[ƒ^ŠÇ—
 };

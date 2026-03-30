@@ -126,8 +126,20 @@ void CollisionManager::CollisionProcess()
                     pushVector = info.get_HitNormal() * info.get_PenetrationDepth();
 
                     // 静的オブジェクトの場合は0.0にする（押し出さない）
-                    float ratioA = isStaticA ? 0.0f : 0.5f;
-                    float ratioB = isStaticB ? 0.0f : 0.5f;
+                    // 押し出し比率
+                    float ratioA = 0.5f;
+                    float ratioB = 0.5f;
+
+                    if (isStaticA && !isStaticB) {
+                        // Aが静的、Bが動的
+                        ratioA = 0.0f;
+                        ratioB = 1.0f;
+                    }
+                    else if (!isStaticA && isStaticB) {
+                        // Aが動的、Bが静的
+                        ratioA = 1.0f;
+                        ratioB = 0.0f;
+                    }
 
 
                     // Aは法線方向に押し出す *******************************************

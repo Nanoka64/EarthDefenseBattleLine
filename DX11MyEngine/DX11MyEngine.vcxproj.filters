@@ -654,6 +654,9 @@
     <ClCompile Include="Source\Cpp\ConstantUIData.cpp">
       <Filter>ソース ファイル\Game\Constant</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Cpp\WeaponDataManager.cpp">
+      <Filter>ソース ファイル\Game\Weapon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Header\SHADER.h">
@@ -1083,6 +1086,12 @@
       <Filter>ソース ファイル\Game\Constant</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\ConstantPlayerData.h">
+      <Filter>ソース ファイル\Game\Constant</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\WeaponDataManager.h">
+      <Filter>ソース ファイル\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ConstantUtilityData.h">
       <Filter>ソース ファイル\Game\Constant</Filter>
     </ClInclude>
   </ItemGroup>

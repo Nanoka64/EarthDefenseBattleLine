@@ -71,8 +71,11 @@ void LineRenderer::Start(RendererEngine& renderer)
 //* &renderer : 描画エンジンの参照
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-void LineRenderer::Update(RendererEngine& renderer)
+void LineRenderer::LateUpdate(RendererEngine& renderer)
 {
+	// 頂点更新
+	VertexUpdate(renderer);
+
 }
 
 //*---------------------------------------------------------------------------------------
@@ -90,9 +93,6 @@ void LineRenderer::Draw(RendererEngine& renderer)
 	}
 
 	auto pContext = renderer.get_DeviceContext();
-
-	// 頂点更新
-	VertexUpdate(renderer);
 
 	// 定数バッファ更新
 	ConstantBufferUpdate(renderer);

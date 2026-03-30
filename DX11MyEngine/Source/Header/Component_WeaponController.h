@@ -39,6 +39,12 @@ public:
     void Update(RendererEngine& renderer)override;
 
     /// <summary>
+    /// •`‰æ
+    /// </summary>
+    /// <param name="renderer">•`‰æƒGƒ“ƒWƒ“‚ÌQÆ</param>
+    void Draw(RendererEngine& renderer)override;
+
+    /// <summary>
     /// •Ší‚Ì“o˜^
     /// </summary>
     void RegisterWeapon(std::shared_ptr<class GunWeapon> _pWeapon, int _slot);
@@ -54,6 +60,12 @@ public:
     /// </summary>
     /// <returns></returns>
     int get_CrntWeaponSlotIndex()const { return m_CrntWeaponSlotIndex; }
+
+    /// <summary>
+    /// Œ»İ‘•”õ‚µ‚Ä‚¢‚é•Ší‚ªƒŠƒ[ƒh’†‚©
+    /// </summary>
+    /// <returns></returns>
+    bool get_IsCrntWeaponReloading();
 
 private:
     /// <summary>

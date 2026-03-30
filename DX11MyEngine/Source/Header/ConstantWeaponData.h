@@ -12,7 +12,7 @@ namespace WeaponData
     struct BaseWeaponData
     {
         int _level = -1;                // 武器レベル
-        std::string _name;              // 武器名
+        std::wstring _name;             // 武器名
 
         /// <summary>
         /// リセット
@@ -35,7 +35,7 @@ namespace WeaponData
         float _accuracy = 0.0f;         // 精度（ラジアン）
         float _zoomLength = 0.0f;       // ズーム倍率（0.0以外の時に作動）
         bool _isLaserSight = true;      // レーザーサイトはあるか
-        int _soundID;                   // 発射音のID
+        int _soundID = -1;              // 発射音のID
 
         BulletData::BULLET_TYPE _bulletType = BulletData::BULLET_TYPE::NORMAL;  // 弾の種類
 

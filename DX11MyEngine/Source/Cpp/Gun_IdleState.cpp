@@ -20,6 +20,7 @@ using namespace WeaponData;
 //*----------------------------------------------------------------------------------------
 void Gun_IdleState::OnEnter(GunWeapon* pOwner)
 {
+    pOwner->get_WeaponFlags().EnableFlag(WEAPON_STATUS::IDLE);
 }
 
 //*---------------------------------------------------------------------------------------
@@ -30,7 +31,7 @@ void Gun_IdleState::OnEnter(GunWeapon* pOwner)
 //*----------------------------------------------------------------------------------------
 void Gun_IdleState::OnExit(GunWeapon* pOwner)
 {
-
+    pOwner->get_WeaponFlags().DisableFlag(WEAPON_STATUS::IDLE);
 }
 
 //*---------------------------------------------------------------------------------------
@@ -51,12 +52,12 @@ int Gun_IdleState::Update(GunWeapon* pOwner)
         auto flashLight = pOwner->get_FlashPointLight().lock();
         flashLight->set_Intensity(0.0f);
     }
-	auto &weapon_param = pOwner->get_WeaponParameter();
+    const auto& weapon_param = pOwner->get_GunWeaponParameter();
 
     int ammoRemaining = pOwner->get_AmmoRemaining();    // 残弾
 
 	// 左クリックで発射 (LShiftが押されて無いとき)
-	if (GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, weapon_param._fireRate, weapon_param._fireRate) && GetInput(GAME_CONFIG::MOVE_DASH) == false)
+	if (GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, weapon_param->_fireRate, weapon_param->_fireRate) && GetInput(GAME_CONFIG::MOVE_DASH) == false)
 	{
 		return GUN_STATE::GUN_STATE_FIRE;
 	}

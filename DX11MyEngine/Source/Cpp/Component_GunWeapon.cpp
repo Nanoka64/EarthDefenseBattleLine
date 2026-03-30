@@ -19,6 +19,7 @@ using namespace GIGA_Engine;
 using namespace Input;
 using namespace VECTOR3;
 using namespace BulletData;
+using namespace WeaponData;
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
@@ -64,6 +65,9 @@ void GunWeapon::Start(RendererEngine& renderer)
     // ステートの作成
     WeaponStateFactory::CreateGunWeapon(m_StateMachine, 0, renderer);
     m_StateMachine.SetCrntState(GUN_STATE::GUN_STATE_IDLE);
+
+    // 全ビットを0に
+    m_WeaponFlags.Init();
 }
 
 
@@ -88,16 +92,16 @@ void GunWeapon::Update(RendererEngine& renderer)
     auto& boneMtx = skinnedMesh->get_BoneLocalWorldMatrix("WeaponSocket_Right");
     transform->set_OffsetWorldTransfomationMatrix(boneMtx);
 
-
-
     VEC3 pos = transform->get_WorldVEC3ToPos();
 
     // 武器を回転させる
     // 水平方向はプレイヤーに合わせているので垂直方向のみ、カメラの回転を使う。
     //transform->set_RotateToRad(VEC3(c_AngleV * -1, 0.0f, 0.0f));
 
+    auto gunParam = get_GunWeaponParameter();
+
     // レーザーサイト
-    if (m_WeaponParameter._isLaserSight && !m_pLineRendererComp.expired())
+    if (gunParam->_isLaserSight && !m_pLineRendererComp.expired())
     {
         // ワールド変換行列から方向をとる
         XMMATRIX worldMtx = transform->get_WorldMtx();
@@ -107,6 +111,15 @@ void GunWeapon::Update(RendererEngine& renderer)
         // レーザーサイトの始点と方向
         m_pLineRendererComp.lock()->set_Dir(VEC3::FromXMVECTOR(XMVector3Normalize(forward)));
         m_pLineRendererComp.lock()->set_StartPos(pos);
+
+        // レーザーポインタ
+        auto laserPoint = Master::m_pGameObjectManager->get_ObjectByTag("LaserPointBillboard");
+
+        VEC3 laserDir = m_pLineRendererComp.lock()->get_Dir();
+        VEC3 laserPointPos = pos + laserDir * m_pLineRendererComp.lock()->get_Length();
+        laserPoint->get_Transform().lock()->set_Pos(laserPointPos);
+        laserPoint->get_Transform().lock()->set_Scale(VEC3(5.0f));
+
     }
 
     if (!m_pFlashPointLight.expired()) {
@@ -115,7 +128,7 @@ void GunWeapon::Update(RendererEngine& renderer)
     }
 
     // ズーム倍率があるなら
-    if (m_WeaponParameter._zoomLength > 1.0f)
+    if (gunParam->_zoomLength > 1.0f)
     {
         // FOVに倍率
         float defaultFov = Master::m_pDataManager->get_DefaultFov();
@@ -128,7 +141,7 @@ void GunWeapon::Update(RendererEngine& renderer)
 
         // ズーム
         if (m_IsNowZoom) {
-            zoomFov = defaultFov / m_WeaponParameter._zoomLength; // 倍率が高いほどFovが小さくなる
+            zoomFov = defaultFov / gunParam->_zoomLength; // 倍率が高いほどFovが小さくなる
         }
 
         // Fovの設定
@@ -136,64 +149,15 @@ void GunWeapon::Update(RendererEngine& renderer)
     }
 
 
-
-
     Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"武器情報"));
-    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"弾数：%d / %d"), m_AmmoRemaining, m_WeaponParameter._bulletMaxNum);
-    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"リロード時間：%.2f"), m_WeaponParameter._reloadTime);
-    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"ズーム倍率：%.2f"), m_WeaponParameter._zoomLength);
-    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"連射速度：%.2f"), m_WeaponParameter._fireRate);
+    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"弾数：%d / %d"), m_AmmoRemaining, gunParam->_bulletMaxNum);
+    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"リロード時間：%.2f"), gunParam->_reloadTime);
+    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"ズーム倍率：%.2f"), gunParam->_zoomLength);
+    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"連射速度：%.2f"), gunParam->_fireRate);
     Master::m_pDebugger->EndDebugWindow();
 
     // ステート更新
     m_StateMachine.Update();
-
-    //// 左クリックで発射
-    //if (GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, m_WeaponParameter._fireRate, m_WeaponParameter._fireRate))
-    //{
-    //    // ****************************************************
-    //    //				 発射音再生
-    //    // ****************************************************
-    //    Master::m_pSoundManager->Play_RandPitch(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::GUN_FIRE02), 300);
-
-    //        
-    //    // 同時発射
-    //    for (int i = 0; i < m_WeaponParameter._bulletSimultaneousNum; i++)
-    //    {
-    //        // 親の向き等を参照
-    //        VEC3 rad;
-    //        rad.x = (c_AngleV) * -1;
-    //        rad.y = (c_AngleH - 1.57f) * -1;
-    //        rad.z = 0.0f;
-    //        float accuracy = m_WeaponParameter._accuracy;
-
-    //        // 弾のバラつき
-    //        rad.x += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
-    //        rad.y += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
-    //        rad.z += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
-
-    //        // トランスフォームパラメータ
-    //        BulletTransformData bulletTransform;
-    //        bulletTransform._pos = pos;
-    //        bulletTransform._rotRad = rad;
-    //        bulletTransform._scale = VEC3(0.01f, 0.01f, 0.01f);
-
-    //        BULLET_TYPE type = m_WeaponParameter._bulletType;
-
-    //        // 弾データを共用体で持っているので、弾タイプにあったパラメータを入れるようにする
-    //        std::visit([&](auto& param) {
-    //            Master::m_pBulletManager->Shot(renderer, bulletTransform, param);
-    //            }, m_WeaponParameter._bulletParam);
-    //    }
-
-    //    // フラッシュ
-    //    m_pFlashPointLight.lock()->set_Range(30.0f);
-    //    m_pFlashPointLight.lock()->set_Intensity(5.5f);
-    //    m_pFlashPointLight.lock()->set_LightColor(VEC3(1.0f, 1.0f, 1.0f));
-
-    //    // 弾数減らす
-    //    m_AmmoRemaining--;
-    //}
 }
 
 
@@ -208,6 +172,16 @@ void GunWeapon::Draw(RendererEngine& renderer)
 {
 
 }
+//*---------------------------------------------------------------------------------------
+//*【?】武器のパラメータ取得
+//*
+//* [引数] なし
+//* [返値] 書き換え不可の武器パラメータ
+//*----------------------------------------------------------------------------------------
+const WeaponData::GunWeaponData* GunWeapon::get_GunWeaponParameter()const
+{
+    return static_cast<const WeaponData::GunWeaponData*>(m_pParameter);
+}
 
 //*---------------------------------------------------------------------------------------
 //*【?】セットアップ
@@ -216,13 +190,34 @@ void GunWeapon::Draw(RendererEngine& renderer)
 //* & _weaponData : 武器データ
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-bool GunWeapon::Setup(const WeaponData::GunWeaponData& _weaponData)
+bool GunWeapon::Setup(const WeaponData::BaseWeaponData* _pWeaponData)
 {
-    m_WeaponParameter = _weaponData;
+    m_pParameter = static_cast<const GunWeaponData*>(_pWeaponData);
+    if (!m_pParameter)
+    {
+        MessageBox(NULL, "武器のパラメータが一致しません", "GunWeapon", MB_OK);
+        return false;
+    }
 
-    m_AmmoRemaining = m_WeaponParameter._bulletMaxNum;
+    auto gunParam = get_GunWeaponParameter();
+
+    m_AmmoRemaining = gunParam->_bulletMaxNum;
 
     return true;
+}
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】武器切り替え時のリセット
+//*
+//* [引数] 
+//* &renderer : 描画エンジンの参照
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void GunWeapon::SwicthReset()
+{
+	// ズーム解除
+    Master::m_pDataManager->set_Fov(Master::m_pDataManager->get_DefaultFov());
 }
 
 
@@ -246,8 +241,11 @@ void GunWeapon::Shoot(RendererEngine& renderer)
     // ****************************************************
     Master::m_pSoundManager->Play_RandPitch(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::GUN_FIRE02), 300);
         
+    auto gunParam = get_GunWeaponParameter();
+
+
     // 同時発射
-    for (int i = 0; i < m_WeaponParameter._bulletSimultaneousNum; i++)
+    for (int i = 0; i < gunParam->_bulletSimultaneousNum; i++)
     {
         // 親の向き等を参照
         //rad.x = (c_AngleV);
@@ -264,7 +262,7 @@ void GunWeapon::Shoot(RendererEngine& renderer)
 
 
         // 弾のバラつき
-        float accuracy = m_WeaponParameter._accuracy;
+        float accuracy = gunParam->_accuracy;
         VEC3 accuracyRot;
         accuracyRot.x += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
         accuracyRot.y += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
@@ -284,12 +282,12 @@ void GunWeapon::Shoot(RendererEngine& renderer)
         bulletTransform._rotQ = finalRotQuat;
         bulletTransform._scale = VEC3(0.01f, 0.01f, 0.01f);
 
-        BULLET_TYPE type = m_WeaponParameter._bulletType;
+        BULLET_TYPE type = gunParam->_bulletType;
 
         // 弾データを共用体で持っているので、弾タイプにあったパラメータを入れるようにする
         std::visit([&](auto& param) {
             Master::m_pBulletManager->Shot(renderer, bulletTransform, param);
-            }, m_WeaponParameter._bulletParam);
+            }, gunParam->_bulletParam);
     }
 
     if (!m_pFlashPointLight.expired()) {

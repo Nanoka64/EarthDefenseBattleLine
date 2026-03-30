@@ -49,7 +49,7 @@ public:
 	~SkinnedMeshAnimator();
 
 	void Start(RendererEngine& renderer)override;
-	//void Update(RendererEngine& renderer)override;
+	void Update(RendererEngine& renderer)override;
 	void Draw(RendererEngine& renderer)override;
 
 	void BoneTransformsUpdate(RendererEngine &renderer, float timeInSeconds, int animIdx);	// ボーンの更新

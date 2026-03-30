@@ -88,6 +88,37 @@ void WeaponController::Update(RendererEngine& renderer)
 	}
 }
 
+//*---------------------------------------------------------------------------------------
+//*y?z•`‰æˆ—
+//*
+//* [ˆø”]
+//* renderer : •`‰æƒGƒ“ƒWƒ“‚ÌŽQÆ
+//*
+//* [•Ô’l] ‚È‚µ
+//*----------------------------------------------------------------------------------------
+void WeaponController::Draw(RendererEngine& renderer)
+{
+	int ammoMax = 0, ammoRemaining = 0;	
+	m_WeaponArray[m_CrntWeaponSlotIndex];
+
+
+	//Master::m_pDirectWriteManager->DrawFormatString("Žc‚è‚Ì“G”F{:d}", VECTOR2::VEC2(0, 540), "White_40_STD", m_EnemyNum);
+	//Master::m_pDirectWriteManager->DrawFormatString("Žc‚è‚Ì“G”F{:d}", VECTOR2::VEC2(0, 540), "White_40_STD", m_EnemyNum);
+	//Master::m_pDirectWriteManager->DrawFormatString("Žc‚è‚Ì“G”F{:d}", VECTOR2::VEC2(0, 540), "White_40_STD", m_EnemyNum);
+
+}
+
+
+//*---------------------------------------------------------------------------------------
+//*y?z Œ»Ý‘•”õ‚µ‚Ä‚¢‚é•Ší‚ªƒŠƒ[ƒh’†‚©
+//*
+//* [ˆø”] ‚È‚µ
+//* [•Ô’l] ‚È‚µ
+//*----------------------------------------------------------------------------------------
+bool WeaponController::get_IsCrntWeaponReloading()
+{
+	return m_WeaponArray[m_CrntWeaponSlotIndex]->get_WeaponFlags().GetFlag(WEAPON_STATUS::RELODING);
+}
 
 
 //*---------------------------------------------------------------------------------------
@@ -113,13 +144,15 @@ void WeaponController::SwitchWeapon(int _index)
 	//*****************************************************************************************
 	Master::m_pSoundManager->Play_RandPitch(SOUND_TYPE::SE, INT_CAST(SOUND_ID::GUN_CHANGE01), 200);
 
+	// Ø‚è‘Ö‚¦Žž‚ÌƒŠƒZƒbƒg
+	m_WeaponArray[m_CrntWeaponSlotIndex]->SwicthReset(); 
+	
 	// Œ»Ý‚Ì•Ší‚ð”ñ•\Ž¦‚É
 	m_WeaponArray[m_CrntWeaponSlotIndex]->get_OwnerObj().lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 
 	// V‚µ‚¢•Ší‚ð•\Ž¦
 	m_CrntWeaponSlotIndex = _index;
 	m_WeaponArray[m_CrntWeaponSlotIndex]->get_OwnerObj().lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-
 
 	m_WeaponChangeIntervalCounter = WEAPON_CHANGE_INTERVAL;
 }
