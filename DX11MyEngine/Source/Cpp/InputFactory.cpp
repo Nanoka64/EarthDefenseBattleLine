@@ -108,7 +108,7 @@ bool GetMouseClickUp(MOUSE_BUTTON_STATE key)
 /// </summary>
 /// <param name="_button"></param>
 /// <returns></returns>
-bool GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE _button, int _waitFrame, int _repeatFrame)
+bool GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE _button, int _waitFrame, int _repeatFrame, bool _isStartPushJudge )
 {
-	return Master::m_pInputManager->GetMouseClickHoldRepeat(_button, _waitFrame, _repeatFrame);
+	return Master::m_pInputManager->GetMouseClickHoldRepeat(_button, _waitFrame, _repeatFrame, _isStartPushJudge);
 }

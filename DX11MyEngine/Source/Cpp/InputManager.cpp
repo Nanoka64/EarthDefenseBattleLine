@@ -290,14 +290,16 @@ bool InputManager::GetMouseClickDown(MOUSE_BUTTON_STATE _button)const
 /// </summary>
 /// <param name="_button"></param>
 /// <returns></returns>
-bool InputManager::GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE _button, int _waitFrame, int _repeatFrame)const
+bool InputManager::GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE _button, int _waitFrame, int _repeatFrame, bool _isStartPushJudge)const
 {
     if (m_InputStopFlag) return false;
     if (_button == MOUSE_BUTTON_STATE::NUM)return false;
     int frame = m_CrntMouseState._count[static_cast<int>(_button)];
 
-    // ‰Ÿ‚µŽn‚ß
-    if (frame == 1) return true;
+	// ‰Ÿ‚µŽn‚ß‚à“ü—Í”»’è‚É‚·‚é‚©
+    if (_isStartPushJudge) {
+        if (frame == 1) return true;
+    }
 
     if (frame >= _waitFrame && (frame - _waitFrame) % _repeatFrame == 0)
     {

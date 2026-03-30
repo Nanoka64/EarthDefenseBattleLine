@@ -4,6 +4,7 @@
 #include "Component_Transform.h"
 #include "Component_DecalRenderer.h"
 #include "Component_TimerDestruction.h"
+#include "Component_Health.h"
 #include "Component_MoveLogic.h"
 #include "RendererEngine.h"
 #include "GameObjectManager.h"
@@ -12,6 +13,7 @@
 #include "MeshFactory.h"
 #include "CollisionInfo.h"
 #include "ResourceManager.h"
+#include "Component_Collider.h"
 
 using namespace GIGA_Engine;
 using namespace Input;
@@ -209,14 +211,45 @@ void NormalBullet::Update(RendererEngine &renderer)
     }
 }
 
-void NormalBullet::OnCollisionEnter(const class CollisionInfo &other)
+//*---------------------------------------------------------------------------------------
+//*【?】衝突処理
+//* 
+//* [引数]
+// * &other : 衝突情報
+//* [返値]なし
+//*----------------------------------------------------------------------------------------
+void NormalBullet::OnCollisionEnter(const class CollisionInfo& _other)
 {
     if (m_CollisionTask)
     {
-        m_CollisionTask(other);
+        m_CollisionTask(_other);
     }
 
-    m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
+    auto hitObj = _other.get_HitObject().lock();
+    if (!hitObj) return;
+
+    // 相手がHealthComponentを持っているか確認
+    auto health = hitObj->get_Component<Health>();
+    if (health)
+    {
+        // 弾が保持しているダメージ値を渡す
+        health->TakeDamage(m_Parameter._damage);
+    }
+
+	// 建物に当たったら即消えるようにして、その他は貫通数を減らす
+    if (_other.get_HitCollider().lock()->get_CollisionCategory() == COLLISION_CATEGORY::BUILDING)
+    {
+        m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
+    }
+    else 
+    {
+        m_CrntPenetrationCount++; // 貫通数を増やす
+        
+        if (m_CrntPenetrationCount >= m_Parameter._penetrationsCount) 
+        {
+            m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
+        }
+    }
 }
 
 
@@ -252,4 +285,6 @@ void NormalBullet::Setup()
 void NormalBullet::Reset()
 {
     m_Parameter.Reset();
+
+    m_CrntPenetrationCount = 0;
 }

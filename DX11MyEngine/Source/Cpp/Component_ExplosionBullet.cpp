@@ -190,11 +190,11 @@ void ExplosionBullet::Update(RendererEngine &renderer)
 //*  &other : 衝突相手の情報
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-void ExplosionBullet::OnTriggerEnter(const class CollisionInfo &other)
+void ExplosionBullet::OnTriggerEnter(const class CollisionInfo &_other)
 {
     if (m_CollisionTask)
     {
-        m_CollisionTask(other);
+        m_CollisionTask(_other);
     }    
     
     if (m_pOwner.expired())return;
@@ -209,10 +209,17 @@ void ExplosionBullet::OnTriggerEnter(const class CollisionInfo &other)
     auto targets = Master::m_pCollisionManager->CheckSphere(pos, m_Parameter._explosionRadius * 2, mask);
 
     // 範囲内の全員にダメージ
-    for (auto target : targets) {
-        auto obj = target->get_OwnerObj().lock();
-        obj->get_Component <Health>()->TakeDamage(100.0f);
+    for (auto& target : targets) {
+
+        if (auto obj = target->get_OwnerObj().lock())
+        {
+            if (auto health = obj->get_Component<Health>())
+            {
+                health->TakeDamage(m_Parameter._damage);
+            }
+        }
     }
+
 
     m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 }

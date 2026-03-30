@@ -78,7 +78,7 @@ void GunWeapon::Start(RendererEngine& renderer)
 //* &renderer : 描画エンジンの参照
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-void GunWeapon::Update(RendererEngine& renderer)
+void GunWeapon::LateUpdate(RendererEngine& renderer)
 {
     float c_AngleH = renderer.get_CameraComponent()->get_Angle_H();
     float c_AngleV = renderer.get_CameraComponent()->get_Angle_V();
@@ -149,7 +149,8 @@ void GunWeapon::Update(RendererEngine& renderer)
     }
 
 
-    Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"武器情報"));
+    Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"武器情報"),0);
+    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"名前：%s"), Tool::WStringToString(gunParam->_name).c_str());
     Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"弾数：%d / %d"), m_AmmoRemaining, gunParam->_bulletMaxNum);
     Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"リロード時間：%.2f"), gunParam->_reloadTime);
     Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"ズーム倍率：%.2f"), gunParam->_zoomLength);

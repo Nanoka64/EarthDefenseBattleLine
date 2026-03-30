@@ -92,5 +92,5 @@ extern bool GetMouseClickUp(MOUSE_BUTTON_STATE _button);
 /// </summary>
 /// <param name="_button"></param>
 /// <returns></returns>
-extern bool GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE _button, int _waitFrame, int _repeatFrame);
+extern bool GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE _button, int _waitFrame, int _repeatFrame, bool _isStartPushJudge = false);
 

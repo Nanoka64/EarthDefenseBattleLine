@@ -17,6 +17,7 @@ WeaponController::WeaponController(std::weak_ptr<GameObject> pOwner, int updateR
 	m_MaxSlot(-1),
 	m_WeaponChangeIntervalCounter(0)
 {
+	this->set_Tag("WeaponController");
 }
 
 //*---------------------------------------------------------------------------------------

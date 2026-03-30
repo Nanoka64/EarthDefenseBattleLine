@@ -145,8 +145,8 @@ private:
 	bool m_IsRolling;
 
 	// リジッドボディコンポーネントを作って移す
-	float m_JumpForce = 2.0f;	// ジャンプ力
-	float m_Gravity = 0.098f;	// 重力
+	float m_JumpForce = 1.5f;	// ジャンプ力
+	float m_Gravity = 0.07f;	// 重力
 
 	bool m_IsDead;
 	bool m_IsContinuousAngle ;	// マウスに合わせて継続的に回転させるか

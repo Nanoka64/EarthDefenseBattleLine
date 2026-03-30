@@ -73,8 +73,7 @@ void LineRenderer::Start(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void LineRenderer::LateUpdate(RendererEngine& renderer)
 {
-	// 頂点更新
-	VertexUpdate(renderer);
+
 
 }
 
@@ -91,6 +90,9 @@ void LineRenderer::Draw(RendererEngine& renderer)
 	if (renderer.get_CrntRenderPass() == RENDER_PASS::SHADOW) {
 		return;
 	}
+
+	// 頂点更新
+	VertexUpdate(renderer);
 
 	auto pContext = renderer.get_DeviceContext();
 

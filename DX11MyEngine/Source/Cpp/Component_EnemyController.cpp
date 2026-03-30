@@ -267,17 +267,17 @@ void EnemyController::Draw(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void EnemyController::OnCollisionEnter(const class CollisionInfo& _other)
 {
-	// ’Êí’e
-	if (_other.get_HitObject().lock()->get_Tag() == "Bullet_Normal")
-	{
-		m_pHealthComp->TakeDamage(50.0f);
-	}
+	//// ’Êí’e
+	//if (_other.get_HitObject().lock()->get_Tag() == "Bullet_Normal")
+	//{
+	//	m_pHealthComp->TakeDamage(50.0f);
+	//}
 
-	// ”š”­
-	if (_other.get_HitObject().lock()->get_Tag() == "Bullet_Explosion")
-	{
-		m_pHealthComp->TakeDamage(100.0f);
-	}
+	//// ”š”­
+	//if (_other.get_HitObject().lock()->get_Tag() == "Bullet_Explosion")
+	//{
+	//	m_pHealthComp->TakeDamage(100.0f);
+	//}
 }
 
 //*---------------------------------------------------------------------------------------

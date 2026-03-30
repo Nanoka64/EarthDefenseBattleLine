@@ -7,7 +7,7 @@
   "reloadTime": 2.0,
   "accuracy": 0.01,
   "zoomLength": 2.0,
-  "isLaserSight": true,
+  "isLaserSight": false,
   "soundID": 0,
   "bulletType": "EXPLOSION",
   "bulletParam": {

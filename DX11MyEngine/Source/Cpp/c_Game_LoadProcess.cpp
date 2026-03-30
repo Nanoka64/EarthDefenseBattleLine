@@ -502,22 +502,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             // アサルトライフル
             //obj->add_Component<AssultRifle>(1);
             weapon_1 = obj->add_Component<GunWeapon>(1);
-            WeaponData::GunWeaponData *gunData = new WeaponData::GunWeaponData();
-            gunData->_name = L"ART-26";
-            gunData->_accuracy = 0.05f;
-            gunData->_bulletMaxNum = 120;
-            gunData->_bulletType = BulletData::BULLET_TYPE::NORMAL;
-            gunData->_fireRate = 4;
-            gunData->_zoomLength = 1.0f;
-            gunData->_reloadTime = 2.0f;
-            gunData->_isLaserSight = true;
-            gunData->_bulletSimultaneousNum = 1;
-            // 弾自身のパラメータ
-            BulletData::NormalBulletData bulletData;
-            bulletData._range = 1000.0f;
-            bulletData._speed = 2500.0f;
-            gunData->_bulletParam = bulletData;
-            weapon_1->Setup(Master::m_pWeaponDataManager->FindWeaponData(0));
+            weapon_1->Setup(Master::m_pWeaponDataManager->FindWeaponData(2));
 
 
             // フラッシュ用ポイントライト
@@ -561,24 +546,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
             // コンポーネントの追加
             weapon_2 = obj->add_Component<GunWeapon>(1);
-            // 武器のパラメータ
-            WeaponData::GunWeaponData* gunData = new WeaponData::GunWeaponData();
-            gunData->_name = L"サンダーカノンTA-1";
-            gunData->_accuracy = 0.01f;
-            gunData->_bulletMaxNum = 20;
-            gunData->_bulletType = BulletData::BULLET_TYPE::EXPLOSION;
-            gunData->_fireRate = 2;
-            gunData->_zoomLength = 2.0f;
-            gunData->_reloadTime = 2.5f;
-            gunData->_isLaserSight = true;
-            gunData->_bulletSimultaneousNum = 1;
-            // 弾自身のパラメータ
-            BulletData::ExplosionBulletData bulletData;
-            bulletData._range = 1500.0f;
-            bulletData._speed = 1000.0f;
-            bulletData._explosionRadius = 20.0f;
-            bulletData._explosionEffectHandleTag = "Explosion_01";
-            gunData->_bulletParam = bulletData;
             weapon_2->Setup(Master::m_pWeaponDataManager->FindWeaponData(1));
 
             // フラッシュ用ポイントライト

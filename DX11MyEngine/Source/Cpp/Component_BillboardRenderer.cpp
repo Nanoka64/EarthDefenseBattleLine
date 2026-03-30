@@ -69,6 +69,11 @@ void BillboardRenderer::Update(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void BillboardRenderer::Draw(RendererEngine& renderer)
 {
+    // シャドウパス時には返す
+    if (renderer.get_CrntRenderPass() == RENDER_PASS::SHADOW) {
+        return;
+    }
+
     auto pContext = renderer.get_DeviceContext();
     std::shared_ptr<MeshResourceData> meshData = m_pResource.lock()->m_pMeshData;
     CB_TRANSFORM_SET* cbTransSet = m_pResource.lock()->m_pCBTransformSet;
