@@ -298,6 +298,9 @@ GameObject *UIManager::GetSprite(RendererEngine &renderer, const UIData::RectTra
 
     UIData::RectTransformData::SetRectTransformData(*transform.get(), _transformData);
 
+    obj->set_LayerRank(_param._layerRank);  // 描画ランクの設定
+	obj->set_Tag(_param._tag);              // タグの設定
+
     // テクスチャの読み込み
     auto texture = Master::m_pResourceManager->LoadWIC_Texture(Tool::StringToWstring(_param._imagePath));
     
@@ -343,6 +346,8 @@ GameObject *UIManager::GetButton(RendererEngine &renderer, const UIData::RectTra
     }
     UIData::RectTransformData::SetRectTransformData(*transform.get(), _transformData); // データのセット
 
+    obj->set_LayerRank(_param._layerRank);  // 描画ランクの設定
+    obj->set_Tag(_param._tag);              // タグの設定
 
     // スプライトの初期化 *********************************************************************
     auto sprite = obj->get_Component<SpriteRenderer>();
@@ -360,6 +365,7 @@ GameObject *UIManager::GetButton(RendererEngine &renderer, const UIData::RectTra
         return nullptr;
     }
     UIData::ButtonUIData::SetButtonData(*button.get(), _param); // データのセット
+    button->set_Sprite(sprite);
 
     // 更新リストに登録
     m_ExtractedUIMap[UIData::UI_TYPE::BUTTON].push_back(obj);

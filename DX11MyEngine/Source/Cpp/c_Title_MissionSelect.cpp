@@ -39,56 +39,29 @@ void c_Title_MissionSelect::OnEnter(SceneManager *pOwner)
 {
 	m_NextState = c_TITLE_MISSION_SELECT;
 
-	// すでに初期化済みなら返す
-	if (m_IsInit)
+	// メニュー項目のオブジェクトとコンポーネントの取得と設定
+	for (int i = 0; i < static_cast<int>(MISSION_NUM); i++)
 	{
-		// 背景画像をアクティブに
-		for (int i = 0; i < MISSION_NUM; i++)
-		{
-			auto obj = m_pMenuItem_RectTransform[i]->get_OwnerObj();
-			if (obj.expired())
-			{
-				assert(false);
-				continue;
-			}
-			obj.lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+		UIData::RectTransformData rectTrans;
+		UIData::ButtonUIData buttonData;
+		buttonData._imagePath = "Resource/Texture/Title/Line.png";
+		buttonData._text = g_MissionNames[i];
+		buttonData._layerRank = 105;
+		buttonData._inputValidationState = UIData::STATE::PRESSED;
+		buttonData._onClicFunction = [this, i]() { m_NextState = c_TITLE::c_GO_GAME_SCENE; };
+		buttonData._textOffsetPos = VEC2(100.0f, 0.0f);
+		rectTrans._size = g_MissionItemSize;
+		rectTrans._pos = g_MissionItemPosArray[i];
+		m_pButtonsObjArray[i]		 = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
+		m_pButtonArray[i]				 = m_pButtonsObjArray[i]->get_Component<ButtonUI>();
+		m_pMenuItemRectTransformArray[i] = m_pButtonsObjArray[i]->get_RectTransform();
 
-			auto button = m_pButtons[i].lock();
-
-			// ボタンにテキスト設定
-			button->set_Text(g_MissionNames[i]);
-
-			// 処理設定
-			button->OnClickFunc([this, i]() {m_NextState = c_TITLE::c_GO_GAME_SCENE; });
-
-		}
-		return;
+		m_ItemInfoArray[i]._pos = g_MissionItemPosArray[i];
+		m_ItemInfoArray[i]._name = g_MissionNames[i];
 	}
 
 	m_PrevHoveredMIssionItem = 0;
 
-	// アクティブにしてトランスフォームを取得
-	for (int i = 0; i < MISSION_NUM; i++)
-	{
-		auto obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_" + std::to_string(i + 1));
-		if (obj)
-		{
-			obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-			m_pMenuItem_RectTransform[i] = obj->get_RectTransform().lock();
-
-			// ボタンコンポーネント
-			auto button = obj->get_Component<ButtonUI>();
-			button->set_Text(g_MissionNames[i]);
-
-			// シーンを遷移させる処理
-			button->OnClickFunc([this, i]() {m_NextState = c_TITLE::c_GO_GAME_SCENE; });
-
-			m_pButtons[i] = button;
-		}
-
-		m_MissionItems[i]._pos = g_MissionItemPosArray[i];
-		m_MissionItems[i]._name = g_MissionNames[i];
-	}
 	m_IsInit = true;
 }
 
@@ -101,16 +74,10 @@ void c_Title_MissionSelect::OnEnter(SceneManager *pOwner)
 //*----------------------------------------------------------------------------------------
 void c_Title_MissionSelect::OnExit(SceneManager *pOwner)
 {
-	// オブジェクトを非アクティブに
+	// オブジェクトを非アクティブに（プールに返す）
 	for (int i = 0; i < MISSION_NUM; i++)
 	{
-		auto obj = m_pMenuItem_RectTransform[i]->get_OwnerObj();
-		if (obj.expired())
-		{
-			assert(false);
-			continue;
-		}
-		obj.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+		m_pButtonsObjArray[i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	}
 }
 
@@ -132,7 +99,7 @@ int c_Title_MissionSelect::Update(SceneManager *pOwner)
 	//m_NextState = c_TITLE_MISSION_SELECT;
 
 	int i = 0;
-	for (auto &button : m_pButtons)
+	for (auto &button : m_pButtonArray)
 	{
 		UIData::STATE state = button.lock()->get_State();;
 
@@ -143,12 +110,13 @@ int c_Title_MissionSelect::Update(SceneManager *pOwner)
 		case UIData::STATE::NORMAL:
 			break;
 		case UIData::STATE::HIGH_LIGHTED:
-			m_MissionItems[i]._isHovered = true;	// マウスが乗ってる
+			m_ItemInfoArray[i]._isHovered = true;	// マウスが乗ってる
 			break;
 		case UIData::STATE::PRESSED:
-			m_MissionItems[i]._isHovered = true;	// マウスが乗ってる
+			m_ItemInfoArray[i]._isHovered = true;	// マウスが乗ってる
 			break;
 		case UIData::STATE::SELECTED:
+			m_ItemInfoArray[i]._isHovered = true;	// マウスが乗ってる
 			break;
 		case UIData::STATE::DISABLED:
 			break;
@@ -171,7 +139,7 @@ int c_Title_MissionSelect::Update(SceneManager *pOwner)
 //*----------------------------------------------------------------------------------------
 void c_Title_MissionSelect::Draw(SceneManager *pOwner)
 {
-	for (auto& item : m_MissionItems)
+	for (auto& item : m_ItemInfoArray)
 	{
 		// 項目の位置
 		VEC2 menuItemPos = item._pos;
@@ -201,8 +169,8 @@ void c_Title_MissionSelect::Draw(SceneManager *pOwner)
 			spritePos.x += 50.0f;
 		}
 
-		m_pMenuItem_RectTransform[0]->set_RectPosition(VEC2(spritePos.x, spritePos.y));
-		m_pMenuItem_RectTransform[0]->set_Size(500.0f, 100.0f);
+		m_pMenuItemRectTransformArray[0].lock()->set_RectPosition(VEC2(spritePos.x, spritePos.y));
+		m_pMenuItemRectTransformArray[0].lock()->set_Size(500.0f, 100.0f);
 
 		// 文字表示
 		//Master::m_pDirectWriteManager->DrawString(item._name, menuItemPos, "White_40_STD");

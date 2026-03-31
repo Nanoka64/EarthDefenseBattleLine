@@ -12,7 +12,8 @@
 class c_Title_LoadProcess : public IState<SceneManager>
 {
 private:
-	std::shared_ptr<class SpriteRenderer>m_pLoadBackSprite;
+	//std::shared_ptr<class SpriteRenderer>m_pLoadBackSprite;
+	class GameObject* m_pLoadBackObj;
 	bool m_IsLoad = false;	// すでにロード済みか
 	bool m_IsMatLoad = false;	// すでにロード済みか
 	std::shared_ptr<class Camera3D> m_pCameraComp;

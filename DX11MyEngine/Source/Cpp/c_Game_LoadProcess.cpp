@@ -46,6 +46,17 @@ void c_Game_LoadProcess::OnEnter(SceneManager *pOwner)
 	{
 		obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	}
+
+    // ロード画面用用スプライトを作る **********************************************
+    float width = static_cast<float>(m_pRenderer->get_ScreenWidth());
+    float height = static_cast<float>(m_pRenderer->get_ScreenHeight());
+    UIData::RectTransformData rectData;
+    rectData._size = VEC2(width, height);
+    UIData::SpriteUIData spriteData;
+    spriteData._tag = "LoadSprite";
+    spriteData._imagePath = "Resource/Texture/Title/Load.png";
+    spriteData._layerRank = 101;
+    m_pLoadBackObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
 }
 
 
@@ -65,6 +76,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         MessageBox(NULL, "弾管理クラスの初期化に失敗しました", "GameLoad", MB_OK);
         assert(false);
     }
+
+
 
     std::shared_ptr<GameObject> sphireObj;
 
@@ -136,9 +149,9 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             trail->set_EmissivePower(2.0f);
 
             VEC3 pos = VEC3();
-            pos.x = Tool::RandRange(-600.0, 600.0);
+            pos.x = Tool::RandRange(-550.0, 550.0);
             pos.y = 15.0f;
-            pos.z = Tool::RandRange(-600.0, 600.0);
+            pos.z = Tool::RandRange(-550.0, 550.0);
 
             VEC3 rot = VEC3();
             rot.y = Tool::RandRange(-360.0f, 360.0f);
@@ -408,11 +421,11 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         mesh.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
         mesh.IsNormalMap = true;
 
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 20; i++)
         {
             VEC3 pt;
             pt.x = static_cast<float>(rand() % 1000) - 500.0f;
-            pt.y = 50.0f;
+            pt.y = 40.0f;
             pt.z = static_cast<float>(rand() % 1000) - 500.0f;
             VEC3 col;
             col.x = static_cast<float>(rand() % 255) / 255.0f;
@@ -440,6 +453,41 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             Master::m_pCollisionManager->RegisterCollider(collider);
         }
     }
+    /* 足場 */
+    {
+        // マテリアル取得
+        auto matPtr = Master::m_pResourceManager->FindMaterial("PointLight");
+
+        SetupMaterialInfo matInfo[1];
+        matInfo[0].Index = 0;
+        matInfo[0].pMaterialData = matPtr;
+
+        CreateUtilityMeshInfo mesh;
+        mesh.pRenderer = m_pRenderer;
+        mesh.Type = UTILITY_MESH_TYPE::CUBE;
+        mesh.MatNum = 1;
+        mesh.MaterialData = matInfo;
+        mesh.IsActive = true;
+        mesh.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
+        mesh.IsNormalMap = true;
+
+        auto obj = MeshFactory::CreateUtilityMesh(mesh);
+        obj->get_Transform().lock()->set_Pos(VEC3(0.0f, 100.0f, 0.0f));
+        obj->get_Transform().lock()->set_Scale(VEC3(100, 10, 100));
+        obj->set_Tag("足場");
+
+        // コライダーの追加
+        auto collider = obj->add_Component<BoxCollider>();
+        collider->set_Size(VEC3(100, 10, 100));
+        collider->set_Center(VEC3(0, 0, 0));
+        collider->set_IsStatic(true);
+
+        // 衝突カテゴリ
+        collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
+
+        // コライダーの登録
+        Master::m_pCollisionManager->RegisterCollider(collider);
+    }
 
     /* 武器のサイト用スプライト*/
     {
@@ -459,11 +507,12 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         {
             obj->get_RectTransform().lock()->set_AnchorMax(VEC2(0.5f, 0.5f));
             obj->get_RectTransform().lock()->set_AnchorMin(VEC2(0.5f, 0.5f));
-            obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+            obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
         }
     }
     // プレイヤーオブジェクトの取得
     auto playerObj = Master::m_pGameObjectManager->get_ObjectByTag("Player");
+    playerObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -496,13 +545,14 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             auto obj = MeshFactory::CreateModel(model);
 
             // 破棄しない
-            obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+            //obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+            obj->set_State(OBJECT_STATE::DYNAMIC);
 
 
             // アサルトライフル
             //obj->add_Component<AssultRifle>(1);
             weapon_1 = obj->add_Component<GunWeapon>(1);
-            weapon_1->Setup(Master::m_pWeaponDataManager->FindWeaponData(2));
+            weapon_1->Setup(Master::m_pWeaponDataManager->FindWeaponData(Master::m_pDataManager->get_SelectWeaponID(0)));
 
 
             // フラッシュ用ポイントライト
@@ -542,11 +592,12 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             auto obj = MeshFactory::CreateModel(model);
 
             // 破棄しない
-            obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+            //obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+            obj->set_State(OBJECT_STATE::DYNAMIC);
 
             // コンポーネントの追加
             weapon_2 = obj->add_Component<GunWeapon>(1);
-            weapon_2->Setup(Master::m_pWeaponDataManager->FindWeaponData(1));
+            weapon_2->Setup(Master::m_pWeaponDataManager->FindWeaponData(Master::m_pDataManager->get_SelectWeaponID(1)));
 
             // フラッシュ用ポイントライト
             auto flash = obj->add_Component<PointLight>();
@@ -578,7 +629,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             billboard.pRenderer = m_pRenderer;
             billboard.Type = BILLBOARD_USAGE_TYPE::SIMPLE;
             billboard.ShaderType = SHADER_TYPE::FORWARD_UNLIT_STATIC;
-            billboard.IsActive = true;
+            billboard.IsActive = false;
             billboard.MatNum = 1;
             billboard.MaterialData = matInfo;
             billboard.IsTransparent = true; // 透明度があり
@@ -590,7 +641,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             obj->get_Transform().lock()->set_Pos(pos);
             obj->get_Transform().lock()->set_Scale(50, 50, 50);
             obj->set_Tag("LaserPointBillboard");
-            obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+            //obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
         }
     }
 
@@ -624,6 +675,9 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
     {
         obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
     }
+
+    // ロード画面スプライトをオフに（プールへ返す）
+	m_pLoadBackObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 }
 
 

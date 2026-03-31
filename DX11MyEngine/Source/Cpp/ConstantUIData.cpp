@@ -44,7 +44,7 @@ void UIData::SpriteUIData::SetSpriteData(SpriteRenderer &_out, const UIData::Spr
 /// <param name="_param">ÉpÉâÉÅÅ[É^</param>
 void UIData::ButtonUIData::SetButtonData(ButtonUI &_out, const UIData::ButtonUIData &_param)
 {
-    _out.OnClickFunc(_param._onClicFunction);
+    _out.OnClickFunc(_param._onClicFunction, _param._inputValidationState);
     _out.set_Sprite(_param._pSprite);
     _out.set_Text(_param._text);
     _out.set_TextOffsetPos(_param._textOffsetPos);

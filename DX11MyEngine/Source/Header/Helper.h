@@ -357,6 +357,16 @@ namespace Tool
         return reinterpret_cast<const char*>(str);
     }
 
+    // value: 変換したい数値 / precision: 小数点以下の表示桁数（デフォルトは1桁）
+    inline std::wstring FormatFloat(float value, int precision = 1)
+    {
+        std::wstringstream stream;
+        // std::fixed で固定小数点表記にし、std::setprecision で桁数を指定
+        stream << std::fixed << std::setprecision(precision) << value;
+        return stream.str();
+    }
+
+
     /// <summary>
     /// 接線・副接線を求める
     /// </summary>

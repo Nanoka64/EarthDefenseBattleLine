@@ -25,6 +25,8 @@ private:
 	float m_DefaultFov;	// デフォルトのFOV
 	bool m_IsDebugMode;
 	std::shared_ptr<class RendererEngine> m_pRenderer;// 描画エンジンのポインタ
+	int m_SelectWeaponID[2];	// 武器選択で選択した武器のID 一時的にここに置く
+
 
 public:
 	DataManager();
@@ -49,6 +51,9 @@ public:
 
 	void set_Fov(float _fov);	// FOVの設定
 	float get_Fov();			// FOVの取得
+
+	void set_SelectWeaponID(int _id, int _slot) { m_SelectWeaponID[_slot] = _id; }	// 武器選択で選択した武器のIDを設定
+	int get_SelectWeaponID( int _slot) { return m_SelectWeaponID[_slot]; }	// 武器選択で選択した武器のIDを取得
 
 private:
 	// コピー禁止

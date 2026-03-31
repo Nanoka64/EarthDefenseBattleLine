@@ -327,6 +327,26 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
     Master::m_pDirectWriteManager->SetFontData(pFontData);
     SAFE_DELETE(pFontData);
 
+    // 白 15サイズ 標準 ----------------------------------------------
+    pFontData = new FONT_DATA("White_15_STD");  
+    pFontData->fontSize = 15.0f;
+    pFontData->fontWeight = DWRITE_FONT_WEIGHT_BOLD;
+    pFontData->color = D2D1::ColorF(D2D1::ColorF::White);
+
+    // 登録
+    Master::m_pDirectWriteManager->SetFontData(pFontData);
+    SAFE_DELETE(pFontData);
+
+    // 白 10サイズ 標準 ----------------------------------------------
+    pFontData = new FONT_DATA("White_10_STD");  
+    pFontData->fontSize = 10.0f;
+    pFontData->fontWeight = DWRITE_FONT_WEIGHT_BOLD;
+    pFontData->color = D2D1::ColorF(D2D1::ColorF::White);
+
+    // 登録
+    Master::m_pDirectWriteManager->SetFontData(pFontData);
+    SAFE_DELETE(pFontData);
+
 
     // 正常終了
     return true;
@@ -476,16 +496,21 @@ void DXApp::AppEditDrawImGui()
     Master::m_pDebugger->DG_Text(U8ToChar(u8"DirectX11を使用した自作3Dグラフィックフレームワークです。"));
     Master::m_pDebugger->DG_Text(U8ToChar(u8"レンダリングパイプラインから自作し、ディファードシェーディングによる\n基本的なライティング、ポストエフェクト、シャドウ等を実装しました。"));
     Master::m_pDebugger->DG_Text(U8ToChar(u8"プログラム側はコンポーネント指向で設計し、\n柔軟にオブジェクトを作成できるようにしています。"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"※ 現在は技術デモ的なものとなってしまっているため、\n敵を一定数倒すだけのシンプルなものになっています。"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"※ 現在は敵を一定数倒すだけのシンプルなものになっていますが、\n今後ゲーム部分の拡張を続けていきます。"));
     Master::m_pDebugger->DG_Separator();    // 区切り
     Master::m_pDebugger->DG_BulletText(U8ToChar(u8"☆操作方法"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"[キーボード]"));
     Master::m_pDebugger->DG_Text(U8ToChar(u8"WASD：移動"));
     Master::m_pDebugger->DG_Text(U8ToChar(u8"マウスまたは矢印キー：視点操作"));
     Master::m_pDebugger->DG_Text(U8ToChar(u8"Space：ジャンプ"));
     Master::m_pDebugger->DG_Text(U8ToChar(u8"AまたはDを押しながらSpace：緊急回避"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"左Shift：押している間、弾が発射されなくなります。"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"1または2：武器切り替え"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"ESC：終了"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"[マウス]"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"マウスホイール：武器切り替え"));
     Master::m_pDebugger->DG_Text(U8ToChar(u8"左クリック：射撃"));
     Master::m_pDebugger->DG_Text(U8ToChar(u8"右クリック：ズーム"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"ESC：終了"));
     Master::m_pDebugger->DG_Separator();    // 区切り
     Master::m_pDebugger->DG_BulletText(
         U8ToChar(
@@ -516,7 +541,7 @@ void DXApp::AppEditDrawImGui()
 
 
     Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ゲームプレイ用"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"・PlayerController\n・EnemyController\n・Health\n"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"・PlayerController\n・EnemyController\n・Health...など\n"));
     Master::m_pDebugger->DG_Separator();    // 区切り
 
     Master::m_pDebugger->EndDebugWindow();

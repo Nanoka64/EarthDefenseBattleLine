@@ -27,7 +27,8 @@ m_ScreenWidth(0.0f),
 m_ScreenHeight(0.0f),
 m_DefaultFov(0.0f),
 m_IsDebugMode(true),
-m_pRenderer(nullptr)
+m_pRenderer(nullptr),
+m_SelectWeaponID()
 {
 }
 
@@ -49,6 +50,10 @@ DataManager::~DataManager()
 bool DataManager::Init(std::shared_ptr<RendererEngine>pRenderer)
 {
 	m_pRenderer = pRenderer;
+
+	// ‰Šú•Ší
+	m_SelectWeaponID[0] = 0;
+	m_SelectWeaponID[1] = 1;
 
 	return true;
 }

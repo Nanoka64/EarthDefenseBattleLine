@@ -67,6 +67,8 @@ public:
     /// <returns></returns>
     bool get_IsCrntWeaponReloading();
 
+    void ClearWeapon() ;
+
 private:
     /// <summary>
     /// •Ší‚ÌØ‚è‘Ö‚¦

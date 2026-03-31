@@ -25,6 +25,11 @@ private:
 	std::shared_ptr<class SpriteRenderer> m_pBackSprite3;		
 	std::shared_ptr<class RectTransform> m_pBackSprite3_Rect;	
 
+	class GameObject* m_pTitleLogoObj = nullptr;			// タイトルロゴオブジェクト
+	class GameObject* m_pTitleBackObj = nullptr;			// タイトル背景の緑のスプライトオブジェクト
+	class GameObject* m_pTitleBackGridObj_Red = nullptr;	// タイトル背景のグリッドスプライトオブジェクト - 赤
+	class GameObject* m_pTitleBackGridObj_Blue = nullptr;	// タイトル背景のグリッドスプライトオブジェクト - 青
+
 	VECTOR2::VEC2 m_UVScroll;
 	VECTOR2::VEC2 m_UVScroll2;
 public:

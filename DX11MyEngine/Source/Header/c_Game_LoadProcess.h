@@ -13,6 +13,7 @@ class c_Game_LoadProcess : public IState<SceneManager>
 {
 private:
 	bool m_IsLoad = false;
+	class GameObject* m_pLoadBackObj;
 
 public:
 	void OnEnter(SceneManager * pOwner) override;

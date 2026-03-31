@@ -66,7 +66,7 @@ enum class SOUND_ID
     
     /* システム */
     SYSTEM_MOVING_CURSOR01, // 項目にカーソルがホバーしている状態
-    
+	SYSTEM_DECISION01,      // 決定音
     
     TEST,
 

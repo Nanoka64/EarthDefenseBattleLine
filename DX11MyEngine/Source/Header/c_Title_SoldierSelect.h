@@ -27,12 +27,17 @@ class c_Title_SoldierSelect : public IState<SceneManager>
 {
 private:
 	SOLDIER_TYPE m_CrntSelectedSoldierType;	// 現在選択している兵科
-	int m_PrevHoveredMIssionItem;	// 前にマウスが乗っていた項目（SE用）
+	int m_CrntSelectItem;	// 選択されている項目
 	SceneStateEnums::c_TITLE m_NextState = SceneStateEnums::c_TITLE::c_TITLE_MAIN_MENU;
 	bool m_IsInit;	// 既に初期化済みか
-	std::shared_ptr<class RectTransform> m_pMenuItem_RectTransform[UINT_CAST(SOLDIER_TYPE::NUM)];
-	std::weak_ptr<class ButtonUI> m_pButtons[static_cast<int>(UINT_CAST(SOLDIER_TYPE::NUM))];	// ボタン用
 
+	std::weak_ptr<class RectTransform> m_pMenuItemRectTransformArray[UINT_CAST(SOLDIER_TYPE::NUM)];
+	std::weak_ptr<class ButtonUI> m_pButtonArray[UINT_CAST(SOLDIER_TYPE::NUM)];	// ボタン用
+	class GameObject* m_pButtonsObjArray[UINT_CAST(SOLDIER_TYPE::NUM)];			// ボタンオブジェクトの配列
+	class GameObject* m_pWeaponDescriptionbackSpriteObj;	//  武器説明用のスプライトオブジェクト
+	
+	int m_DecisionTextDrawCounter; // 装備決定時のテキストを表示するためのカウンター
+	int m_DecisionSoldierTypeIndex; // 決定した兵科のインデックス
 
 	/// <summary>
 	/// 項目情報
@@ -49,7 +54,7 @@ private:
 			_isHovered(false)
 		{
 		};
-	}m_Items[UINT_CAST(SOLDIER_TYPE::NUM)];
+	}m_ItemInfoArray[UINT_CAST(SOLDIER_TYPE::NUM)];
 
 public:
 	void OnEnter(SceneManager *pOwner) override;

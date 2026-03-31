@@ -1,0 +1,25 @@
+{
+  "level": 0,
+  "name": "サンダープラズマカノンTA-2R",
+  "bulletMaxNum": 24,
+  "bulletSimultaneousNum": 1,
+  "fireRate": 6.0,
+  "reloadTime": 2.5,
+  "accuracy": 0.015,
+  "zoomLength": 1.5,
+  "isLaserSight": true,
+  "soundID": 0,
+  "bulletType": "EXPLOSION",
+  "bulletParam": {
+    "damage": 50.0,
+    "damageDistAttenuationRate": 0.5,
+    "speed": 1400.0,
+    "acceleration": 0.0,
+    "range": 1700.0,
+    "penetrationsCount": 0,
+    "collisionSize": 0.0,
+    "gravityScale": 0.0,
+    "explosionRadius": 25.0,
+    "explosionEffectHandleTag": "Explosion_Plasma_01"
+  }
+}

@@ -302,6 +302,13 @@ void GameObjectManager::Alpha_2DObjectRenderPass(RendererEngine &renderer)
     auto begin = m_2DTranslucentList.begin();
     auto end = m_2DTranslucentList.end();
 
+	// レイヤーの順番にソートする
+    std::sort(begin, end, 
+        [](const std::shared_ptr<GameObject>& a, const std::shared_ptr<GameObject>& b)
+        {
+			return a->get_LayerRank() < b->get_LayerRank();
+        });
+
     // 描画
     for (auto &obj : m_2DTranslucentList)
     {

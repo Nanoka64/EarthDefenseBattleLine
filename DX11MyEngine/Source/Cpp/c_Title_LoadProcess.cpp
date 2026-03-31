@@ -37,9 +37,17 @@ void c_Title_LoadProcess::OnEnter(SceneManager *pOwner)
 {
 	// すでにロードされているなら返す
 	if (m_IsLoad) {
-		m_pLoadBackSprite->get_OwnerObj().lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 		return;
 	}
+
+    // *************************************************************************************************
+    /**  UI管理の初期化 **/
+    // *************************************************************************************************
+    if (!Master::m_pUIManager->Init(*m_pRenderer))
+    {
+        MessageBox(NULL, "UI管理クラスの初期化に失敗しました", "GameLoad", MB_OK);
+        assert(false);
+    }
 
     /* カメラの作成 */
     {
@@ -65,24 +73,34 @@ void c_Title_LoadProcess::OnEnter(SceneManager *pOwner)
     Master::m_pLightManager->set_CameraTransform(m_pCameraComp->get_OwnerObj().lock()->get_Transform());
 
 
-    // ロード画面用用スプライト**********************************************
-	CreateSpriteInfo sprite;
-	sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Load.png");
-	sprite.IsActive = true;
-	sprite.ObjTag = "LoadScreen_Sp";
-	sprite.pRenderer = m_pRenderer;
-	sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-	sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-	sprite.Width = m_pRenderer->get_ScreenWidth();
-	sprite.Height = m_pRenderer->get_ScreenHeight();
-	sprite.IsActive = true;
-	sprite.IsTransparent = true;
-	auto obj = MeshFactory::CreateSprite(sprite);
-	if (obj) {
-		obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
-        m_pLoadBackSprite = obj->get_Component<SpriteRenderer>();
-    }
+ //   // ロード画面用用スプライト**********************************************
+	//CreateSpriteInfo sprite;
+	//sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Load.png");
+	//sprite.IsActive = true;
+	//sprite.ObjTag = "LoadScreen_Sp";
+	//sprite.pRenderer = m_pRenderer;
+	//sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+	//sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
+	//sprite.Width = m_pRenderer->get_ScreenWidth();
+	//sprite.Height = m_pRenderer->get_ScreenHeight();
+	//sprite.IsActive = true;
+	//sprite.IsTransparent = true;
+	//auto obj = MeshFactory::CreateSprite(sprite);
+	//if (obj) {
+	//	obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
+ //       m_pLoadBackSprite = obj->get_Component<SpriteRenderer>();
+ //   }
 
+    // ロード画面用用スプライトを作る **********************************************
+	float width = static_cast<float>(m_pRenderer->get_ScreenWidth());
+	float height = static_cast<float>(m_pRenderer->get_ScreenHeight());
+	UIData::RectTransformData rectData;
+    rectData._size = VEC2(width, height);
+	UIData::SpriteUIData spriteData;
+    spriteData._tag = "LoadSprite";
+    spriteData._imagePath = "Resource/Texture/Title/Load.png";
+    spriteData._layerRank = 101;
+    m_pLoadBackObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
 }
 
 
@@ -94,21 +112,13 @@ void c_Title_LoadProcess::OnEnter(SceneManager *pOwner)
 //*----------------------------------------------------------------------------------------
 void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
 {
-    // ロード画面用スプライトオフ
-    m_pLoadBackSprite->get_OwnerObj().lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+    //// ロード画面用スプライトオフ
+    //m_pLoadBackSprite->get_OwnerObj().lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
     if (m_IsMatLoad)
     {
         return;
     }
 
-    // *************************************************************************************************
-    /**  UI管理の初期化 **/
-    // *************************************************************************************************
-    if (!Master::m_pUIManager->Init(*m_pRenderer))
-    {
-        MessageBox(NULL, "UI管理クラスの初期化に失敗しました", "GameLoad", MB_OK);
-        assert(false);
-    }
 
     // CSVからマテリアルデータの読み込み
     if (!Master::m_pResourceManager->ImportCSV_AllMaterialData("Resource/Excel_Param/MaterialParam.csv"))
@@ -194,6 +204,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         model.ObjLayer = 90;
         model.Shadow_ShaderType = SHADER_TYPE::POST_SHADOWMAP;
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
+        model.IsActive = false;
         pPlayerObj = MeshFactory::CreateModel(model);
         pPlayerObj->get_Component<MyTransform>()->set_Scale(0.1f, 0.1f, 0.1f);
         pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
@@ -290,131 +301,93 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         obj->get_Transform().lock()->set_RotateToDeg(VEC3(50.0f, 150.0f, 0.0f));
     }
 
-    /* タイトル画面背景用スプライト1 */
-    {
-        CreateSpriteInfo sprite;
-        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/TitleBack.png");
-        sprite.ObjTag = "TitleBack_Sp";
-        sprite.pRenderer = m_pRenderer;
-        sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-        sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-        sprite.Width = m_pRenderer->get_ScreenWidth();
-        sprite.Height = m_pRenderer->get_ScreenHeight();
-        sprite.IsActive = true;
-        sprite.IsTransparent = true;
-        auto obj = MeshFactory::CreateSprite(sprite);
-        if (obj) {
-            obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
-        }
-    }
-    /* タイトル画面背景用スプライト2 */
-    {
-        CreateSpriteInfo sprite;
-        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/2221833.png");
-        sprite.ObjTag = "TitleBack_Sp2";
-        sprite.pRenderer = m_pRenderer;
-        sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-        sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-        sprite.Width = 2000.0f;
-        sprite.Height = 2300.0f;
-        sprite.IsActive = true;
-        sprite.IsTransparent = true;
-        auto obj = MeshFactory::CreateSprite(sprite);
-        if (obj) {
-            obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
-        }
+    ///* タイトル画面背景用スプライト1 */
+    //{
+    //    CreateSpriteInfo sprite;
+    //    sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/TitleBack.png");
+    //    sprite.ObjTag = "TitleBack_Sp";
+    //    sprite.pRenderer = m_pRenderer;
+    //    sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+    //    sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
+    //    sprite.Width = m_pRenderer->get_ScreenWidth();
+    //    sprite.Height = m_pRenderer->get_ScreenHeight();
+    //    sprite.IsActive = true;
+    //    sprite.IsTransparent = true;
+    //    auto obj = MeshFactory::CreateSprite(sprite);
+    //    if (obj) {
+    //        obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
+    //    }
+    //}
+    ///* タイトル画面背景用スプライト2 */
+    //{
+    //    CreateSpriteInfo sprite;
+    //    sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/2221833.png");
+    //    sprite.ObjTag = "TitleBack_Sp2";
+    //    sprite.pRenderer = m_pRenderer;
+    //    sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+    //    sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
+    //    sprite.Width = 2000.0f;
+    //    sprite.Height = 2300.0f;
+    //    sprite.IsActive = true;
+    //    sprite.IsTransparent = true;
+    //    auto obj = MeshFactory::CreateSprite(sprite);
+    //    if (obj) {
+    //        obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
+    //    }
 
-        // もう一つ作る
-        sprite.ObjTag = "TitleBack_Sp3";
-        obj = MeshFactory::CreateSprite(sprite);
-        if (obj) {
-            obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
-        }
-    }
-    
-    /* タイトルロゴ用スプライト */
-    {
-        CreateSpriteInfo sprite;
-        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Title_logo.png");
-        sprite.ObjTag = "TitleLogo_Sp";
-        sprite.pRenderer = m_pRenderer;
-        sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-        sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-        sprite.Width = m_pRenderer->get_ScreenWidth();
-        sprite.Height = m_pRenderer->get_ScreenHeight();
-        sprite.IsActive = true;
-        sprite.IsTransparent = true;
-        auto obj = MeshFactory::CreateSprite(sprite);
-        if (obj) {
-            obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
-        }
-    }
-
-    /* タイトルメニュー項目背景用スプライト */
-    {
-        CreateSpriteInfo sprite;
-        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Line.png");
-        sprite.pRenderer = m_pRenderer;
-        sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-        sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-        sprite.Width = 500.0f;
-        sprite.Height = 200.0f;
-        sprite.IsActive = true;
-        sprite.IsTransparent = true;
-
-
-        // 項目分生成
-        for (int i = 0; i < 4; i++)
-        {
-            sprite.ObjTag = "MenuItemBack_Sp" + std::to_string(i + 1);
-            auto obj = MeshFactory::CreateSprite(sprite);
-        }
-    }
-
-    /* タイトル項目説明用スプライト */
-    {
-        CreateSpriteInfo sprite;
-        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Title_Description_01.png");
-        sprite.pRenderer = m_pRenderer;
-        sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-        sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-        sprite.Width = 427.0f;
-        sprite.Height = 240.0f;
-        sprite.IsActive = false;
-        sprite.IsTransparent = true;
-        // 項目分生成
-        for (int i = 0; i < 4; i++)
-        {
-            sprite.ObjTag = "TitleDescription01_Sp" + std::to_string(i + 1);
-            //auto obj = MeshFactory::CreateSprite(sprite);
-        }
-    }
+    //    // もう一つ作る
+    //    sprite.ObjTag = "TitleBack_Sp3";
+    //    obj = MeshFactory::CreateSprite(sprite);
+    //    if (obj) {
+    //        obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
+    //    }
+    //}
+    ///* タイトルロゴ用スプライト */
+    //{
+    //    CreateSpriteInfo sprite;
+    //    sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Title_logo.png");
+    //    sprite.ObjTag = "TitleLogo_Sp";
+    //    sprite.pRenderer = m_pRenderer;
+    //    sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+    //    sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
+    //    sprite.Width = m_pRenderer->get_ScreenWidth();
+    //    sprite.Height = m_pRenderer->get_ScreenHeight();
+    //    sprite.IsActive = true;
+    //    sprite.IsTransparent = true;
+    //    auto obj = MeshFactory::CreateSprite(sprite);
+    //    if (obj) {
+    //        obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
+    //    }
+    //}
 
     /* ボタンテスト用 */
-    {
-        CreateSpriteInfo sprite;
-        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Line.png");
-        sprite.pRenderer = m_pRenderer;
-        sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-        sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-        sprite.Width = 500.0f;
-        sprite.Height = 200.0f;
-        sprite.IsActive = true;
-        sprite.IsTransparent = true;
-        // 項目分生成
-        for (int i = 0; i < 4; i++)
-        {
-            sprite.ObjTag = "MenuItem_Button_" + std::to_string(i + 1);
-            auto obj = MeshFactory::CreateSprite(sprite);
-            obj->get_RectTransform().lock()->set_RectPosition(VEC2(960.0f, 500.0f));
+    //{
+    //    CreateSpriteInfo sprite;
+    //    sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Line.png");
+    //    sprite.pRenderer = m_pRenderer;
+    //    sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+    //    sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
+    //    sprite.Width = 500.0f;
+    //    sprite.Height = 200.0f;
+    //    sprite.IsActive = true;
+    //    sprite.IsTransparent = true;
+    //    // 項目分生成
+    //    for (int i = 0; i < 4; i++)
+    //    {
+    //        sprite.ObjTag = "MenuItem_Button_" + std::to_string(i + 1);
+    //        auto obj = MeshFactory::CreateSprite(sprite);
+    //        obj->get_RectTransform().lock()->set_RectPosition(VEC2(960.0f, 500.0f));
 
-            // ボタンコンポーネントの追加
-            auto button = obj->add_Component<ButtonUI>();
-            button->set_Sprite(obj->get_Component<SpriteRenderer>());
-            button->set_Text("ボタン");
-            button->set_TextOffsetPos(VEC2(100.0f, 0.0f));
-        }
-    }
+    //        // ボタンコンポーネントの追加
+    //        auto button = obj->add_Component<ButtonUI>();
+    //        button->set_Sprite(obj->get_Component<SpriteRenderer>());
+    //        button->set_Text("ボタン");
+    //        button->set_TextOffsetPos(VEC2(100.0f, 0.0f));
+    //    }
+    //}
+
+	// ロード画面用スプライトオフ
+    m_pLoadBackObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 
     m_IsMatLoad = true;
 }

@@ -26,16 +26,42 @@ void Root_TitleSceneState::OnEnter(SceneManager* pOwner)
 	// 最初はロード
 	this->SetInitChildState(pOwner, c_TITLE::c_TITLE_LOAD_PROCESS);
 
+	float width = static_cast<float>(Master::m_pDataManager->get_ScreenWidth());
+	float height = static_cast<float>(Master::m_pDataManager->get_ScreenHeight());
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+	//
+	//						タイトル画面UIスプライトの生成
+	// 
+	//////////////////////////////////////////////////////////////////////////////////////////
+	
+	UIData::SpriteUIData spriteData;
+	UIData::RectTransformData spriteRect;
+	// タイトルロゴのスプライト
+	spriteData._imagePath = "Resource/Texture/Title/Title_logo.png";
+	spriteData._tag = "TitleLogo_Sp";
+	spriteData._layerRank = 100;
+	spriteRect._size = VEC2(width, height);
+	m_pTitleLogoObj = Master::m_pUIManager->GetSprite(*m_pRenderer, spriteRect, spriteData);
+
+	// タイトル背景の緑のスプライト
+	spriteData._imagePath = "Resource/Texture/Title/TitleBack.png";
+	spriteData._tag = "TitleBack_Sp";
+	spriteData._layerRank = 97;
+	spriteRect._size = VEC2(width, height);
+	m_pTitleBackObj = Master::m_pUIManager->GetSprite(*m_pRenderer, spriteRect, spriteData);
+
+	// タイトル背景のグリッドスプライト 赤青
+	spriteData._imagePath = "Resource/Texture/Title/2221833.png";
+	spriteData._tag = "TitleBackGrid_Sp";
+	spriteData._layerRank = 99;
+	spriteRect._size = VEC2(2000.0f, 2300.0f);
+	m_pTitleBackGridObj_Red = Master::m_pUIManager->GetSprite(*m_pRenderer, spriteRect, spriteData);
+	m_pTitleBackGridObj_Blue = Master::m_pUIManager->GetSprite(*m_pRenderer, spriteRect, spriteData);
+
+
 	// タイトル用のスプライトをオフに
-	auto obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp");
-	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp2");
-	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp3");
-	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleLogo_Sp");
-	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_1");
+	auto obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_1");
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_2");
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
@@ -56,16 +82,21 @@ void Root_TitleSceneState::OnExit(SceneManager* pOwner)
 {
     //Master::m_pGameObjectManager->clear_AllObject();
 
+	m_pTitleLogoObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+	m_pTitleBackObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+	m_pTitleBackGridObj_Red->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+	m_pTitleBackGridObj_Blue->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
+	m_pBackSprite.reset();
+	m_pBackSprite2.reset();
+	m_pBackSprite2_Rect.reset();
+	m_pBackSprite3.reset();
+	m_pBackSprite3_Rect.reset();
+
+
+
 	// タイトル用のスプライトをオフに
-	auto obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp");
-	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp2");
-	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp3");
-	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleLogo_Sp");
-	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_1");
+	auto obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_1");
 	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_2");
 	if (obj)obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
@@ -113,6 +144,8 @@ int Root_TitleSceneState::Update(SceneManager* pOwner)
 	// ※ c_GO_GAME_SCENE＆c_GO_EXIT以外
 	if (newState != m_CrntChildStateID)
 	{
+		Master::m_pInputManager->StopInput(20);	// 入力を少しの間受け付けないようにする（シーン遷移の瞬間に入力されるのを防止）
+
 		ChangeChildState(pOwner, newState);
 	}
 
@@ -142,17 +175,18 @@ void Root_TitleSceneState::Draw(SceneManager* pOwner)
 	// スプライト取得
 	if (!m_pBackSprite)
 	{
-		auto obj = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp");
-		auto obj2 = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp2");
-		auto obj3 = Master::m_pGameObjectManager->get_ObjectByTag("TitleBack_Sp3");
-
-		if (obj && obj2)
+		if (m_pTitleBackObj && m_pTitleBackGridObj_Red && m_pTitleBackGridObj_Blue)
 		{
-			m_pBackSprite = obj->get_Component<SpriteRenderer>();
-			m_pBackSprite2 = obj2->get_Component<SpriteRenderer>();
-			m_pBackSprite2_Rect = obj2->get_RectTransform().lock();
-			m_pBackSprite3 = obj3->get_Component<SpriteRenderer>();
-			m_pBackSprite3_Rect = obj3->get_RectTransform().lock();
+			// 最奥背景（緑のやつ）のスプライト
+			m_pBackSprite		= m_pTitleBackObj->get_Component<SpriteRenderer>();
+			
+			// 背景のグリッドスプライト（赤）
+			m_pBackSprite2		= m_pTitleBackGridObj_Red->get_Component<SpriteRenderer>();
+			m_pBackSprite2_Rect = m_pTitleBackGridObj_Red->get_RectTransform().lock();
+
+			// 背景のグリッドスプライト（青）
+			m_pBackSprite3		= m_pTitleBackGridObj_Blue->get_Component<SpriteRenderer>();
+			m_pBackSprite3_Rect = m_pTitleBackGridObj_Blue->get_RectTransform().lock();
 		}
 	}
 	else
@@ -197,7 +231,7 @@ void Root_TitleSceneState::Draw(SceneManager* pOwner)
 
 
 
-	Master::m_pDirectWriteManager->DrawString("マウス：選択",	  VECTOR2::VEC2(1000.0f, 900.0f), "White_30_STD");
-	Master::m_pDirectWriteManager->DrawString("左クリック：決定", VECTOR2::VEC2(1000.0f, 940.0f), "White_30_STD");
-	Master::m_pDirectWriteManager->DrawString("右クリック：戻る", VECTOR2::VEC2(1000.0f, 980.0f), "White_30_STD");
+	Master::m_pDirectWriteManager->DrawString("マウス：選択",	  VECTOR2::VEC2(0.0f, 800.0f), "White_30_STD");
+	Master::m_pDirectWriteManager->DrawString("左クリック：決定", VECTOR2::VEC2(0.0f, 840.0f), "White_30_STD");
+	Master::m_pDirectWriteManager->DrawString("右クリック：戻る", VECTOR2::VEC2(0.0f, 880.0f), "White_30_STD");
 }

@@ -121,7 +121,7 @@ public:
 
     void InitDefaultKeyConfig();            // コンフィグデフォルト設定
 
-    void ClearInput();  // シーン遷移などの際には必ず呼ぶ
+	void StopInput(int stopTime);    // 入力を一定時間受け付けないようにする
 
 private:
     // コピー禁止

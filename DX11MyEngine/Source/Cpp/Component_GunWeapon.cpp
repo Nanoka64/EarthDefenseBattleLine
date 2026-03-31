@@ -114,6 +114,7 @@ void GunWeapon::LateUpdate(RendererEngine& renderer)
 
         // レーザーポインタ
         auto laserPoint = Master::m_pGameObjectManager->get_ObjectByTag("LaserPointBillboard");
+        laserPoint->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 
         VEC3 laserDir = m_pLineRendererComp.lock()->get_Dir();
         VEC3 laserPointPos = pos + laserDir * m_pLineRendererComp.lock()->get_Length();
@@ -148,13 +149,16 @@ void GunWeapon::LateUpdate(RendererEngine& renderer)
         renderer.get_CameraComponent()->set_Fov(zoomFov);
     }
 
+    const auto& baseBulletData = std::visit([](const auto& arg) -> const BulletData::NormalBulletData& {
+        return arg;
+        }, gunParam->_bulletParam);
 
-    Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"武器情報"),0);
+    Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"武器情報"));
     Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"名前：%s"), Tool::WStringToString(gunParam->_name).c_str());
     Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"弾数：%d / %d"), m_AmmoRemaining, gunParam->_bulletMaxNum);
+    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"ダメージ：%.2f"), baseBulletData._damage);
     Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"リロード時間：%.2f"), gunParam->_reloadTime);
     Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"ズーム倍率：%.2f"), gunParam->_zoomLength);
-    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"連射速度：%.2f"), gunParam->_fireRate);
     Master::m_pDebugger->EndDebugWindow();
 
     // ステート更新
@@ -219,6 +223,9 @@ void GunWeapon::SwicthReset()
 {
 	// ズーム解除
     Master::m_pDataManager->set_Fov(Master::m_pDataManager->get_DefaultFov());
+
+    auto laserPoint = Master::m_pGameObjectManager->get_ObjectByTag("LaserPointBillboard");
+    laserPoint->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 }
 
 
@@ -267,7 +274,7 @@ void GunWeapon::Shoot(RendererEngine& renderer)
         VEC3 accuracyRot;
         accuracyRot.x += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
         accuracyRot.y += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
-        accuracyRot.z = 0.0f;
+        accuracyRot.z += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
 
         // バラつきクォータニオン
         XMVECTOR spreadQuat = XMQuaternionRotationRollPitchYaw(accuracyRot.x, accuracyRot.y, accuracyRot.z);

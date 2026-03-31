@@ -50,6 +50,9 @@ namespace UIData
     /// </summary>
     struct UIBase 
     {
+		int _layerRank = 0;  // 描画順を決めるためのランク（低い順に描画される）
+		std::string _tag = "UI_Unknown";    // タグ
+
         virtual ~UIBase() = default;
 
         /// <summary>

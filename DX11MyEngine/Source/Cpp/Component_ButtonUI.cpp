@@ -97,12 +97,12 @@ void ButtonUI::Update(RendererEngine &renderer)
 		if (GetMouseClick(MOUSE_BUTTON_STATE::LEFT) || GetInput(GAME_CONFIG::DECITION))
 		{
 			m_CrntState = UIData::STATE::PRESSED;	// 押されている状態
-			
-			// キーが離されたら入力判定
-			if (GetMouseClickUp(MOUSE_BUTTON_STATE::LEFT) || GetInputUp(GAME_CONFIG::DECITION))
-			{
-				m_CrntState = UIData::STATE::SELECTED;	// 選択された状態
-			}
+		}
+
+		// キーが離されたら入力判定
+		if (GetMouseClickUp(MOUSE_BUTTON_STATE::LEFT) || GetInputUp(GAME_CONFIG::DECITION))
+		{
+			m_CrntState = UIData::STATE::SELECTED;	// 選択された状態
 		}
 	}
 
@@ -113,6 +113,7 @@ void ButtonUI::Update(RendererEngine &renderer)
 		// クリック処理実行
 		if (m_OnClick)
 		{
+			Master::m_pSoundManager->Play(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SYSTEM_DECISION01));	// 決定音再生
 			m_OnClick();
 		}
 	}

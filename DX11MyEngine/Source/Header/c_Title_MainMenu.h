@@ -49,19 +49,16 @@ private:
 		};
 	};
 
-	SceneStateEnums::c_TITLE m_NextState = SceneStateEnums::c_TITLE::c_TITLE_MAIN_MENU;
+	SceneStateEnums::c_TITLE m_NextState = SceneStateEnums::c_TITLE::c_TITLE_MAIN_MENU;	// 次のステート
 
-	MenuItemInfo m_MenuItemInfoArray[static_cast<int>(TITLEMENU_ITEM::NUM)];
+	MenuItemInfo m_MenuItemInfoArray[static_cast<int>(TITLEMENU_ITEM::NUM)];				// メニュー項目情報配列
+	class GameObject* m_pButtonsObjArray[static_cast<int>(TITLEMENU_ITEM::NUM)];		// メニュー項目オブジェクト配列
+	std::weak_ptr<class ButtonUI> m_pButtonArray[static_cast<int>(TITLEMENU_ITEM::NUM)];	// メニュー項目のButtonUI配列  
+	std::weak_ptr<class RectTransform> m_pMenuItemRectTransformArray[static_cast<int>(TITLEMENU_ITEM::NUM)]; // メニュー項目のRectTransform配列
 
-	std::weak_ptr<class ButtonUI> m_pButtons[static_cast<int>(TITLEMENU_ITEM::NUM)];	// ボタン用
 
 	TITLEMENU_ITEM m_PrevHoveredMenuItem;	// 前にマウスが乗っていた項目（SE用）
 	bool m_IsInit;	// 既に初期化済みか
-
-
-	//static const VECTOR2::VEC2 m_MenuItemPosArray[static_cast<int>(TITLEMENU_ITEM::NUM)];
-	std::weak_ptr<class RectTransform> m_pMenuItem_RectTransform[static_cast<int>(TITLEMENU_ITEM::NUM)];
-
 
 public:
 	void OnEnter(SceneManager* pOwner) override;

@@ -65,7 +65,9 @@ public:
     /// <param name="pos">:座標</param>
     /// <param name="formatTag">:文字の情報を格納した配列へのキー </param>
     /// <param name="options">:整形オプション</param>
-    void DrawString(std::string str, const VECTOR2::VEC2 &_pos, const std::string& formatTag, D2D1_DRAW_TEXT_OPTIONS options = D2D1_DRAW_TEXT_OPTIONS_NONE);
+    /// <param name="_isUnderLine">:下線を引くか</param>
+    void DrawString(std::string str, const VECTOR2::VEC2 &_pos, const std::string& formatTag, D2D1_DRAW_TEXT_OPTIONS options = D2D1_DRAW_TEXT_OPTIONS_NONE, bool _isUnderLine = true);
+    void DrawString(std::wstring str, const VECTOR2::VEC2 &_pos, const std::string& formatTag, D2D1_DRAW_TEXT_OPTIONS options = D2D1_DRAW_TEXT_OPTIONS_NONE, bool _isUnderLine = true);
 
 
 

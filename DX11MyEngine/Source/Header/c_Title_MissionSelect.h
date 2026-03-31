@@ -40,15 +40,17 @@ private:
 			_isHovered(false)
 		{
 		};
-	}m_MissionItems[1];
+	}m_ItemInfoArray[1];
 
 
 	SceneStateEnums:: c_TITLE m_NextState = SceneStateEnums::c_TITLE::c_TITLE_MAIN_MENU;
 	int m_PrevHoveredMIssionItem;	// 前にマウスが乗っていた項目（SE用）
 	bool m_IsInit;	// 既に初期化済みか
 	
-	std::shared_ptr<class RectTransform> m_pMenuItem_RectTransform[MISSION_NUM];
-	std::weak_ptr<class ButtonUI> m_pButtons[static_cast<int>(MISSION_NUM)];	// ボタン用
+	class GameObject* m_pButtonsObjArray[MISSION_NUM];							// ミッション項目オブジェクト配列
+	std::weak_ptr<class ButtonUI> m_pButtonArray[MISSION_NUM];						// ミッション項目のButtonUI配列  
+	std::weak_ptr<class RectTransform> m_pMenuItemRectTransformArray[MISSION_NUM];  // ミッション項目のRectTransform配列
+
 
 public:
 	void OnEnter(SceneManager *pOwner) override;

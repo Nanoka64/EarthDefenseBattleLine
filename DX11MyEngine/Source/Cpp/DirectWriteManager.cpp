@@ -258,7 +258,7 @@ HRESULT DirectWriteManager::SetFontData(FONT_DATA *data)
 //       :使用するフォーマットキー
 //       :整形オプション
 //--------------------------------------------------------------------------------------
-void DirectWriteManager::DrawString(std::string str, const VECTOR2::VEC2& _pos, const std::string &formatTag,  D2D1_DRAW_TEXT_OPTIONS options)
+void DirectWriteManager::DrawString(std::string _str, const VECTOR2::VEC2& _pos, const std::string &_formatTag,  D2D1_DRAW_TEXT_OPTIONS _options, bool _isUnderLine)
 {
     HRESULT hr = S_OK;
 
@@ -269,7 +269,7 @@ void DirectWriteManager::DrawString(std::string str, const VECTOR2::VEC2& _pos, 
     Microsoft::WRL::ComPtr<IDWriteTextLayout> pTextLayout;  // テキスト情報
 
     // ワイド文字に変換
-    std::wstring wstr = StringToWString(str);
+    std::wstring wstr = StringToWString(_str);
 
     // レンダーターゲットのサイズ取得
     D2D1_SIZE_F RVSize = m_pRenderTarget->GetSize();
@@ -278,7 +278,7 @@ void DirectWriteManager::DrawString(std::string str, const VECTOR2::VEC2& _pos, 
     hr = m_pWriteFactory->CreateTextLayout(
         wstr.c_str(),
         static_cast<UINT32>(wstr.size()),
-        m_pTextFormatMap[formatTag].Get(),
+        m_pTextFormatMap[_formatTag].Get(),
         RVSize.width,
         RVSize.height,
         pTextLayout.GetAddressOf()
@@ -286,12 +286,15 @@ void DirectWriteManager::DrawString(std::string str, const VECTOR2::VEC2& _pos, 
     CHECK_HRESULT_NO_BOOL(hr);
 
     // 下線
-    DWRITE_TEXT_RANGE textRange = { 0,      // 下線を引く始まりの文字インデックス
-                                    static_cast<UINT32>(str.length())};    // 下線の長さ(何文字分か).
+    if (_isUnderLine) {
+        // 下線
+        DWRITE_TEXT_RANGE textRange = { 0,      // 下線を引く始まりの文字インデックス
+                                        static_cast<UINT32>(wstr.length()) };    // 下線の長さ(何文字分か).
 
-    // 下線設定
-    hr = pTextLayout->SetUnderline(TRUE, textRange);
-    CHECK_HRESULT_NO_BOOL(hr);
+        // 下線設定
+        hr = pTextLayout->SetUnderline(TRUE, textRange);
+        CHECK_HRESULT_NO_BOOL(hr);
+    }
 
     // 描画位置の確定
     D2D1_POINT_2F pos = { 0,0 };
@@ -303,7 +306,64 @@ void DirectWriteManager::DrawString(std::string str, const VECTOR2::VEC2& _pos, 
         pos,
         pTextLayout.Get(),
         m_pSolidBrush,
-        options
+        _options
+    );
+#endif
+}
+
+//--------------------------------------------------------------------------------------
+//      * DirectWriteManager Class - 文字列の描画 - *
+//       :文字列
+//       :座標
+//       :使用するフォーマットキー
+//       :整形オプション
+//--------------------------------------------------------------------------------------
+void DirectWriteManager::DrawString(std::wstring _wstr, const VECTOR2::VEC2& _pos, const std::string & _formatTag,  D2D1_DRAW_TEXT_OPTIONS _options, bool _isUnderLine)
+{
+    HRESULT hr = S_OK;
+
+
+#ifndef IS_ENABLE
+    return;
+#else
+    Microsoft::WRL::ComPtr<IDWriteTextLayout> pTextLayout;  // テキスト情報
+
+    // ワイド文字に変換
+    // レンダーターゲットのサイズ取得
+    D2D1_SIZE_F RVSize = m_pRenderTarget->GetSize();
+
+    // テキストレイアウトの作成
+    hr = m_pWriteFactory->CreateTextLayout(
+        _wstr.c_str(),
+        static_cast<UINT32>(_wstr.size()),
+        m_pTextFormatMap[_formatTag].Get(),
+        RVSize.width,
+        RVSize.height,
+        pTextLayout.GetAddressOf()
+    );
+    CHECK_HRESULT_NO_BOOL(hr);
+    
+	// 下線
+    if (_isUnderLine) {
+        // 下線
+        DWRITE_TEXT_RANGE textRange = { 0,      // 下線を引く始まりの文字インデックス
+                                        static_cast<UINT32>(_wstr.length()) };    // 下線の長さ(何文字分か).
+
+        // 下線設定
+        hr = pTextLayout->SetUnderline(TRUE, textRange);
+        CHECK_HRESULT_NO_BOOL(hr);
+    }
+    // 描画位置の確定
+    D2D1_POINT_2F pos = { 0,0 };
+    pos.x = _pos.x;
+    pos.y = _pos.y;
+
+    // 描画
+    m_pRenderTarget->DrawTextLayout(
+        pos,
+        pTextLayout.Get(),
+        m_pSolidBrush,
+        _options
     );
 #endif
 }

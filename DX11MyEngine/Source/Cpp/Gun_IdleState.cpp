@@ -57,7 +57,7 @@ int Gun_IdleState::Update(GunWeapon* pOwner)
     int ammoRemaining = pOwner->get_AmmoRemaining();    // 残弾
 
 	// 左クリックで発射 (LShiftが押されて無いとき)
-	if (GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, weapon_param->_fireRate, weapon_param->_fireRate) && GetInput(GAME_CONFIG::MOVE_DASH) == false)
+	if (GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, weapon_param->_fireRate, weapon_param->_fireRate,true) && GetInput(GAME_CONFIG::MOVE_DASH) == false)
 	{
 		return GUN_STATE::GUN_STATE_FIRE;
 	}

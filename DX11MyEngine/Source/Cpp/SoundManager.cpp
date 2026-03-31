@@ -262,6 +262,7 @@ bool SoundManager::InitXA2Sound(void)
 
 	// ÉVÉXÉeÉÄ
 	Load_Wav("Resource/Sound/SE/System/moving-cursor-2.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SYSTEM_MOVING_CURSOR01));
+	Load_Wav("Resource/Sound/SE/System/Decision_01.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SYSTEM_DECISION01));
 
 	// ïêäÌ
 	Load_Wav("Resource/Sound/SE/Weapon/GunFire_01.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::GUN_FIRE01));

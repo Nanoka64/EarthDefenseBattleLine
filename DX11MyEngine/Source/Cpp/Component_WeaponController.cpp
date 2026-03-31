@@ -221,3 +221,8 @@ void WeaponController::StartingWeapon(int _slot)
 		}
 	}
 }
+
+void WeaponController::ClearWeapon()
+{ 
+	m_WeaponArray.clear(); 
+}

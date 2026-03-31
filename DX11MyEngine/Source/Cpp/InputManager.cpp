@@ -74,15 +74,15 @@ void InputManager::Update()
     ScreenToClient(FindWindowA(g_WindowClassNameA, nullptr), &m_MousePos);
 
 
-    Master::m_pDebugger->BeginDebugWindow(U8ToChar(u8"マウス情報"),0);
-    Master::m_pDebugger->DG_TextValue("CrntCount : %d",m_CrntMouseState._count[0]);
-    Master::m_pDebugger->DG_TextValue("PrevCount : %d", m_PrevMouseState._count[0]);
-    Master::m_pDebugger->DG_TextValue("X : %d", m_MousePos.x);
-    Master::m_pDebugger->DG_TextValue("Y : %d", m_MousePos.y);
-    Master::m_pDebugger->DG_TextValue("lX : %d", m_CrntMouseState._state.lX);
-    Master::m_pDebugger->DG_TextValue("lY : %d", m_CrntMouseState._state.lY);   
-    Master::m_pDebugger->DG_TextValue("lZ : %d", m_CrntMouseState._state.lZ);   
-    Master::m_pDebugger->EndDebugWindow();
+    //Master::m_pDebugger->BeginDebugWindow(U8ToChar(u8"マウス情報"),0);
+    //Master::m_pDebugger->DG_TextValue("CrntCount : %d",m_CrntMouseState._count[0]);
+    //Master::m_pDebugger->DG_TextValue("PrevCount : %d", m_PrevMouseState._count[0]);
+    //Master::m_pDebugger->DG_TextValue("X : %d", m_MousePos.x);
+    //Master::m_pDebugger->DG_TextValue("Y : %d", m_MousePos.y);
+    //Master::m_pDebugger->DG_TextValue("lX : %d", m_CrntMouseState._state.lX);
+    //Master::m_pDebugger->DG_TextValue("lY : %d", m_CrntMouseState._state.lY);   
+    //Master::m_pDebugger->DG_TextValue("lZ : %d", m_CrntMouseState._state.lZ);   
+    //Master::m_pDebugger->EndDebugWindow();
 
 
     if (m_InputStopTime <= 0)
@@ -310,10 +310,18 @@ bool InputManager::GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE _button, int _wait
 }
 
 
-void InputManager::ClearInput()
+//*---------------------------------------------------------------------------------------
+//*【?】入力を一定時間受け付けないようにする
+//*
+//* [引数]
+//* stopTime: 入力を受け付けない時間（フレーム数） 
+//*
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void InputManager::StopInput(int stopTime)
 {
     m_InputStopFlag = true;
-    m_InputStopTime = 10;
+    m_InputStopTime = stopTime;
 }
 
 //--------------------------------------------------------------------------------------

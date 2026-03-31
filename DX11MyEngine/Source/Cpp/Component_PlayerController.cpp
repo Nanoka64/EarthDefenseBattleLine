@@ -278,7 +278,7 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 		{
 			m_IsJump = false;
 			m_JumpVelocity = m_Gravity;
-			m_pMyTransformComp.lock()->set_Pos(VEC3(0.0f,100.0f,0.0f));
+			m_pMyTransformComp.lock()->set_Pos(VEC3(0.0f,150.0f,0.0f));
 			return;
 		}
 	}
@@ -352,6 +352,8 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 
 	if (m_pWeaponController.lock()->get_IsCrntWeaponReloading())
 	{
+		Master::m_pDirectWriteManager->DrawString("ƒŠƒ[ƒh’†", VEC2(900.0f, 490.0f), "White_30_STD", D2D1_DRAW_TEXT_OPTIONS_NONE, false);
+
 		if (m_MoveVelocity.Length() > 0.001f) {
 			ChangeAnimation(PLAYER_RANGER_ANIM_ID::RUNNNING_RELOAD);
 		}

@@ -3,6 +3,7 @@
 #include "GameObjectManager.h"
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
+#include "Component_WeaponController.h"
 #include "InputFactory.h"
 
 using namespace SceneStateEnums;
@@ -17,8 +18,6 @@ using namespace Tool::UV;
 //*----------------------------------------------------------------------------------------
 void Root_ResultSceneState::OnEnter(SceneManager *pOwner)
 {
-	Master::m_pEffectManager->StopAllEffects();	// 全てのエフェクトを停止する
-
 	this->SetInitChildState(pOwner, c_RESULT::c_GETITEM_CHECK);
 }
 
@@ -31,7 +30,16 @@ void Root_ResultSceneState::OnEnter(SceneManager *pOwner)
 //*----------------------------------------------------------------------------------------
 void Root_ResultSceneState::OnExit(SceneManager *pOwner)
 {
+	auto player = Master::m_pGameObjectManager->get_ObjectByTag("Player");
+	if (player)
+	{
+		// プレイヤーの武器をクリアする
+		player->get_Component<WeaponController>()->ClearWeapon();
+		player->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+	}
 	Master::m_pGameObjectManager->clear_NotIsDontDestroyObject();
+
+	Master::m_pEffectManager->StopAllEffects();	// 全てのエフェクトを停止する
 }
 
 
