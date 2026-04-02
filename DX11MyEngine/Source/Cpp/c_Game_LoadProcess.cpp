@@ -223,30 +223,30 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
     /* テストUV球 モデルの生成 */
     {
-        // マテリアル取得
-        auto matPtr = Master::m_pResourceManager->FindMaterial("Ground");
+        //// マテリアル取得
+        //auto matPtr = Master::m_pResourceManager->FindMaterial("Ground");
 
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr;
+        //SetupMaterialInfo matInfo[1];
+        //matInfo[0].Index = 0;
+        //matInfo[0].pMaterialData = matPtr;
 
-        CreateModelInfo model;
-        model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/TestSphere.fbx";
-        model.ObjTag = "TestSphere";
-        model.IsAnim = false;
-        model.MatNum = 1;
-        model.SetupMaterial = matInfo;
-        model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
-        auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<MyTransform>()->set_Scale(1.0f, 1.0f, 1.0f);
-        obj->get_Component<MyTransform>()->set_Pos(-800.0f, 0.0f, 900.0f);
+        //CreateModelInfo model;
+        //model.pRenderer = m_pRenderer;
+        //model.Path = "Resource/Model/TestSphere.fbx";
+        //model.ObjTag = "TestSphere";
+        //model.IsAnim = false;
+        //model.MatNum = 1;
+        //model.SetupMaterial = matInfo;
+        //model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
+        //auto obj = MeshFactory::CreateModel(model);
+        //obj->get_Component<MyTransform>()->set_Scale(1.0f, 1.0f, 1.0f);
+        //obj->get_Component<MyTransform>()->set_Pos(-800.0f, 0.0f, 900.0f);
 
-        auto collider = obj->add_Component<BoxCollider>();
-        collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
-        collider->set_Center(VEC3(0, 0, 0));
-        collider->set_IsStatic(true);
-        Master::m_pCollisionManager->RegisterCollider(collider);
+        //auto collider = obj->add_Component<BoxCollider>();
+        //collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
+        //collider->set_Center(VEC3(0, 0, 0));
+        //collider->set_IsStatic(true);
+        //Master::m_pCollisionManager->RegisterCollider(collider);
     }
 
     /* 建物 モデルの生成 */
@@ -260,7 +260,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
         CreateModelInfo model;
         model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Building/01/building01.fbx";
+        model.Path = "Resource/Model/Building/Building_01.fbx";
         model.ObjTag = "Building";
         model.IsAnim = false;
         model.MatNum = 1;
@@ -453,6 +453,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             Master::m_pCollisionManager->RegisterCollider(collider);
         }
     }
+
     /* 足場 */
     {
         // マテリアル取得
@@ -474,7 +475,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         auto obj = MeshFactory::CreateUtilityMesh(mesh);
         obj->get_Transform().lock()->set_Pos(VEC3(0.0f, 100.0f, 0.0f));
         obj->get_Transform().lock()->set_Scale(VEC3(100, 10, 100));
-        obj->set_Tag("足場");
+        obj->set_Tag("Scaffolding");
 
         // コライダーの追加
         auto collider = obj->add_Component<BoxCollider>();
@@ -510,6 +511,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
         }
     }
+
     // プレイヤーオブジェクトの取得
     auto playerObj = Master::m_pGameObjectManager->get_ObjectByTag("Player");
     playerObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);

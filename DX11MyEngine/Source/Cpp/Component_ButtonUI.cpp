@@ -22,7 +22,8 @@ ButtonUI::ButtonUI(std::weak_ptr<GameObject> pOwner, int updateRank)
 	m_FadeDuration(0.1f),
 	m_IsInteractable(true),
 	m_Text("Button"),
-	m_TextOffsetPos(VEC2())
+	m_TextOffsetPos(VEC2()),
+	m_InputSoundID(SOUND_ID_TO_INT(SOUND_ID::SYSTEM_DECISION01))
 {
 	this->set_Tag("Button");
 }
@@ -113,7 +114,7 @@ void ButtonUI::Update(RendererEngine &renderer)
 		// クリック処理実行
 		if (m_OnClick)
 		{
-			Master::m_pSoundManager->Play(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SYSTEM_DECISION01));	// 決定音再生
+			Master::m_pSoundManager->Play(SOUND_TYPE::SE, m_InputSoundID);	// 決定音再生
 			m_OnClick();
 		}
 	}

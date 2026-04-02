@@ -187,18 +187,6 @@
     <Filter Include="ソース ファイル\Tool\Resource">
       <UniqueIdentifier>{7d1e8573-a9e4-4491-bdc8-c43e7e5697bd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Game\Scene">
-      <UniqueIdentifier>{8a5958dd-6daa-4a39-b22a-699ee97eaade}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Game\Scene\Title">
-      <UniqueIdentifier>{e7cf2ee8-ba38-41b7-9550-8d3f6bbfbb5f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Game\Scene\Game">
-      <UniqueIdentifier>{893dea6c-ff6d-4704-8ca4-97c1a21ccf37}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Game\Scene\Result">
-      <UniqueIdentifier>{cb343d01-e87d-425e-ba78-85e3a10a87e2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\BaseComponent">
       <UniqueIdentifier>{3b7d2d54-5de9-4946-863e-76d7b31b612a}</UniqueIdentifier>
     </Filter>
@@ -258,6 +246,18 @@
     </Filter>
     <Filter Include="ソース ファイル\Game\Constant">
       <UniqueIdentifier>{53d4c155-2ccd-4fcb-8e3d-c1c90f153528}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Scene">
+      <UniqueIdentifier>{8a5958dd-6daa-4a39-b22a-699ee97eaade}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Scene\Title">
+      <UniqueIdentifier>{e7cf2ee8-ba38-41b7-9550-8d3f6bbfbb5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Scene\Game">
+      <UniqueIdentifier>{893dea6c-ff6d-4704-8ca4-97c1a21ccf37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Scene\Result">
+      <UniqueIdentifier>{cb343d01-e87d-425e-ba78-85e3a10a87e2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

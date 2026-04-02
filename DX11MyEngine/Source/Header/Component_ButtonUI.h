@@ -20,17 +20,17 @@ public:
 
 
 private:
-
 	VECTOR4::VEC4 m_StateColor[UINT_CAST(UIData::STATE::NUM)];	// それぞれのステートごとのカラー
-	UIData::STATE m_CrntState;					// 現在の状態
-	UIData::STATE m_InputValidationState;		// 入力判定とするステート
-	float m_FadeDuration;				// ステート間の色の遷移時間
-	std::function<void()> m_OnClick;	// クリックされた際の処理
-	bool m_IsInteractable;				// 入力を受け付けるかどうか
-	std::string m_Text;					// テキスト
+	VECTOR2::VEC2 m_TextOffsetPos;					// テキストの位置補正用
+	UIData::STATE m_CrntState;						// 現在の状態
+	UIData::STATE m_InputValidationState;			// 入力判定とするステート
+	std::function<void()> m_OnClick;				// クリックされた際の処理
+	std::string m_Text;								// テキスト
 	std::weak_ptr<RectTransform> m_pMyTransform;	// 自分のトランスフォーム
 	std::weak_ptr<SpriteRenderer> m_pSprite;		// スプライト
-	VECTOR2::VEC2 m_TextOffsetPos;		// テキストの位置補正用
+	float m_FadeDuration;							// ステート間の色の遷移時間
+	int m_InputSoundID;								// 入力されたときのサウンドID
+	bool m_IsInteractable;							// 入力を受け付けるかどうか
 
 public:
 	ButtonUI(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
@@ -109,5 +109,17 @@ public:
 	/// </summary>
 	/// <returns>補正値</returns>
 	VECTOR2::VEC2 get_TextOffsetPos()const { return m_TextOffsetPos; };
+
+	/// <summary>
+	/// 入力判定時のサウンドIDの設定
+	/// </summary>
+	/// <param name="_id">サウンドID</param>
+	void set_InputSoundID(int _id) { m_InputSoundID = _id; }
+
+	/// <summary>
+	/// 入力判定時のサウンドIDの取得
+	/// </summary>
+	/// <returns>サウンドID</returns>
+	int get_InputSoundID()const { return m_InputSoundID; }
 };
 

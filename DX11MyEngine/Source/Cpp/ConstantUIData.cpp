@@ -48,4 +48,5 @@ void UIData::ButtonUIData::SetButtonData(ButtonUI &_out, const UIData::ButtonUID
     _out.set_Sprite(_param._pSprite);
     _out.set_Text(_param._text);
     _out.set_TextOffsetPos(_param._textOffsetPos);
+    _out.set_InputSoundID(_param._inputSoundID);
 }
