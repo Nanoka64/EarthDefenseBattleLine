@@ -252,29 +252,40 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
     /* 建物 モデルの生成 */
     {
         // マテリアル取得
-        auto matPtr = Master::m_pResourceManager->FindMaterial("Building");
+        auto matPtr1 = Master::m_pResourceManager->FindMaterial("Building01_Top");
+        auto matPtr2 = Master::m_pResourceManager->FindMaterial("Building01_Base1");
+        auto matPtr3 = Master::m_pResourceManager->FindMaterial("Building01_Base2");
+        auto matPtr4 = Master::m_pResourceManager->FindMaterial("Building01_Base3");
 
-        SetupMaterialInfo matInfo[1];
+        SetupMaterialInfo matInfo[4];
         matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr;
+        matInfo[0].pMaterialData = matPtr1;
+        matInfo[1].Index = 1;
+        matInfo[1].pMaterialData = matPtr2;
+        matInfo[2].Index = 2;
+        matInfo[2].pMaterialData = matPtr3;
+        matInfo[3].Index = 3;
+        matInfo[3].pMaterialData = matPtr4;
+
+		const VEC3 BUILDING_COLIDER_SCALE = VEC3(60.0f, 180.0f, 30.0f);
 
         CreateModelInfo model;
         model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Building/Building_01.fbx";
+        model.Path = "Resource/Model/Building/02/Building_01.fbx";
         model.ObjTag = "Building";
         model.IsAnim = false;
-        model.MatNum = 1;
+        model.MatNum = 4;
         model.SetupMaterial = matInfo;
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
         auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<MyTransform>()->set_Scale(0.5f, 0.5f, 0.5f);
-        obj->get_Component<MyTransform>()->set_Pos(300.0f, 0.0f, 0.0f);
+        obj->get_Component<MyTransform>()->set_Scale(3.0f, 3.0f, 3.0f);
+        obj->get_Component<MyTransform>()->set_Pos(-700.0f, 0.0f, 1000.0f);
         obj->get_Component<MyTransform>()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
 
         // コライダーの追加
         auto collider = obj->add_Component<BoxCollider>();
-        collider->set_Size(VEC3(170.0f, 300.0f, 170.0f));
-        collider->set_Center(VEC3(0.0f, 300.0f, 0.0f));
+        collider->set_Size(VEC3(60.0f, 180.0f, 30.0f));
+        collider->set_Center(VEC3(0.0f, 0.0f, 0.0f));
         collider->set_IsStatic(true);
         // 衝突カテゴリ
         collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
