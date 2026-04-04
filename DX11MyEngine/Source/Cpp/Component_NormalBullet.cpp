@@ -123,7 +123,6 @@ void NormalBullet::Start(RendererEngine& renderer)
             float angleZ = Tool::RandRange(0.0f, 6.14f);
 
             VEC3 scale = transform->get_VEC3ToScale();
-            scale += DECAL_SIZE_FACTOR;
             scale.z += DECAL_Z_AXIS_SIZE_FACTOR;
 
 
@@ -141,7 +140,7 @@ void NormalBullet::Start(RendererEngine& renderer)
             int spark_handle = Master::m_pEffectManager->PlayEffect("Spark");   // 火花
             int smoke_handle = Master::m_pEffectManager->PlayEffect("Smoke");   // 煙
             
-            VEC3 effectScale = 5.0f;
+            VEC3 effectScale = 0.5f;
 
             // 火花
             Master::m_pEffectManager->SetScaleEffect(spark_handle, effectScale.x, effectScale.y, effectScale.z);
@@ -177,37 +176,56 @@ void NormalBullet::Update(RendererEngine &renderer)
 
     m_PrevPos = crntPos;
 
-
-    //// 移動ベクトルを求める
-    //VEC3 moveVec = m_MoveDir * (m_Parameter._speed * deltaTime);
-
-    //// ※マイナスにしているのはプレイヤーの方向がおかしいせい（後で直す）
-    //crntPos = crntPos - moveVec;
-    //transform->set_Pos(crntPos);
-    //CollInData_Ray ray;
-    //ray._point = crntPos;
-    //ray._dir = param._moveDirection;
-    //CollInData_Plane pln;
-    //pln._point = VEC3(0.0f, 0.0f, 0.0f);
-    //pln._norm = VEC3(0.0f, 1.0f, 0.0f);
-    //CollisionInfo hitInfo;
-    //if (Master::m_pCollisionManager->HitCheck_PlaneVsRay(pln, ray, hitInfo))
-    //{
-    //    if (VEC3::Distance(hitInfo.get_HitPoint(), crntPos) < 10.0f)
-    //    {
-    //        transform->set_Pos(hitInfo.get_HitPoint());
-    //        this->OnTriggerEnter(hitInfo);
-    //        return;
-    //    }
-    //}
+	// 移動処理
     moveComp->Calculate(param);
 
-
+    // 移動後の位置
+    VEC3 newPos = transform->get_VEC3ToPos();
 
     // 射程距離外で削除
-    float distSq =  VEC3::DistanceSq(crntPos, m_StartPos);
+    float distSq = VEC3::DistanceSq(newPos, m_StartPos);
     if (distSq > m_Parameter._range * m_Parameter._range) {
         m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
+    }
+    // レイキャストで衝突判定（コライダーの衝突処理をこっちに移動）
+    CollInData_Ray ray;
+    ray._point = crntPos;
+	ray._dir = newPos - crntPos;    // 前回の位置から新しい位置へのベクトル
+    unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING);
+    CollisionInfo hitInfo;
+
+    if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
+    {
+        if (m_CollisionTask)
+        {
+            m_CollisionTask(hitInfo);
+        }
+
+        auto hitObj = hitInfo.get_HitObject().lock();
+        if (!hitObj) return;
+
+        // 相手がHealthComponentを持っているか確認
+        auto health = hitObj->get_Component<Health>();
+        if (health)
+        {
+            // 弾が保持しているダメージ値を渡す
+            health->TakeDamage(m_Parameter._damage);
+        }
+
+        // 建物に当たったら即消えるようにして、その他は貫通数を減らす
+        if (hitInfo.get_HitCollider().lock()->get_CollisionCategory() == COLLISION_CATEGORY::BUILDING)
+        {
+            m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
+        }
+        else
+        {
+            m_CrntPenetrationCount++; // 貫通数を増やす
+
+            if (m_CrntPenetrationCount >= m_Parameter._penetrationsCount)
+            {
+                m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
+            }
+        }
     }
 }
 
@@ -220,36 +238,36 @@ void NormalBullet::Update(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void NormalBullet::OnCollisionEnter(const class CollisionInfo& _other)
 {
-    if (m_CollisionTask)
-    {
-        m_CollisionTask(_other);
-    }
+ //   if (m_CollisionTask)
+ //   {
+ //       m_CollisionTask(_other);
+ //   }
 
-    auto hitObj = _other.get_HitObject().lock();
-    if (!hitObj) return;
+ //   auto hitObj = _other.get_HitObject().lock();
+ //   if (!hitObj) return;
 
-    // 相手がHealthComponentを持っているか確認
-    auto health = hitObj->get_Component<Health>();
-    if (health)
-    {
-        // 弾が保持しているダメージ値を渡す
-        health->TakeDamage(m_Parameter._damage);
-    }
+ //   // 相手がHealthComponentを持っているか確認
+ //   auto health = hitObj->get_Component<Health>();
+ //   if (health)
+ //   {
+ //       // 弾が保持しているダメージ値を渡す
+ //       health->TakeDamage(m_Parameter._damage);
+ //   }
 
-	// 建物に当たったら即消えるようにして、その他は貫通数を減らす
-    if (_other.get_HitCollider().lock()->get_CollisionCategory() == COLLISION_CATEGORY::BUILDING)
-    {
-        m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
-    }
-    else 
-    {
-        m_CrntPenetrationCount++; // 貫通数を増やす
-        
-        if (m_CrntPenetrationCount >= m_Parameter._penetrationsCount) 
-        {
-            m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
-        }
-    }
+	//// 建物に当たったら即消えるようにして、その他は貫通数を減らす
+ //   if (_other.get_HitCollider().lock()->get_CollisionCategory() == COLLISION_CATEGORY::BUILDING)
+ //   {
+ //       m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
+ //   }
+ //   else 
+ //   {
+ //       m_CrntPenetrationCount++; // 貫通数を増やす
+ //       
+ //       if (m_CrntPenetrationCount >= m_Parameter._penetrationsCount) 
+ //       {
+ //           m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
+ //       }
+ //   }
 }
 
 

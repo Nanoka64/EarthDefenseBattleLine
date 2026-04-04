@@ -57,8 +57,10 @@ void GameObjectManager::ObjectUpdate(RendererEngine &renderer)
     // 不透明オブジェクト
     // 
     // ******************************************************************
+	int count = 0;
     for (auto it = m_3DOpaqueList.begin(); it != m_3DOpaqueList.end(); it++)
     {
+        count++;
         if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
         {
             (*it).get()->Update(renderer);
@@ -91,8 +93,6 @@ void GameObjectManager::ObjectUpdate(RendererEngine &renderer)
             (*it).get()->ComponentUpdate(renderer);
         }
     }
-
-
 }
 
 //*---------------------------------------------------------------------------------------

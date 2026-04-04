@@ -158,9 +158,7 @@ public:
     // î†Ç∆ì_
     bool HitCheck_BoxVsPoint(const CollInData_AABB &box, const VECTOR3::VEC3& _p);    
     
-    // î†Ç∆ê¸
-    bool HitCheck_BoxVsRay(const CollInData_AABB &_box, const CollInData_Ray &_ray);
-    
+
     // î†Ç∆ãÖ
     bool HitCheck_BoxVsSphere(const CollInData_AABB &_box, const CollInData_Sphere &_sphere);
 
@@ -174,8 +172,9 @@ public:
     bool HitCheck_PlaneVsRay(const CollInData_Plane& _plane, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo );
     
     // î†Ç∆ê¸
-    bool HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo );
-    
+    bool HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo);
+
+
     // ãÖÇ∆ê¸
     bool HitCheck_SphereVsRay(const CollInData_Sphere& _sphere, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo );
 

@@ -133,8 +133,8 @@ bool BulletManager::Init(RendererEngine &renderer)
             obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 
             // コライダーの使用をオンに
-            auto collider = obj->get_Component<BoxCollider>();
-            collider->set_IsEnable(true); 
+            //auto collider = obj->get_Component<BoxCollider>();
+            //collider->set_IsEnable(true); 
         },
         // 返却時に実行 ******************************************************************************************
         [](GameObject *obj) 
@@ -143,8 +143,8 @@ bool BulletManager::Init(RendererEngine &renderer)
             bulletComp->Reset();
 
             // コライダーの使用をオフに
-            auto collider = obj->get_Component<BoxCollider>();
-            collider->set_IsEnable(false); 
+            //auto collider = obj->get_Component<BoxCollider>();
+            //collider->set_IsEnable(false); 
 
             // 軌跡データをクリア
             auto trail = obj->get_Component<TrailRenderer>();
@@ -195,20 +195,20 @@ bool BulletManager::Init(RendererEngine &renderer)
             trail->set_EmissivePower(5.0f);
             trail->set_Color(VECTOR4::VEC4(0.0f, 1.0f, 0.0f, 1.0f));
 
-            // コライダーの追加
-            auto collider = obj->add_Component<BoxCollider>();
-            collider->set_Size(VEC3(5.0f, 5.0f, 5.0f));
-            collider->set_Center(VEC3(0.0f, 2.0f, 0.0f));
-            collider->set_IsEnable(false);  // 初期化時は使用フラグオフに
-            collider->Start(renderer);
+            //// コライダーの追加
+            //auto collider = obj->add_Component<BoxCollider>();
+            //collider->set_Size(VEC3(0.5f, 0.5f, 0.5f));
+            //collider->set_Center(VEC3(0.0f, 0.0f, 0.0f));
+            //collider->set_IsEnable(false);  // 初期化時は使用フラグオフに
+            //collider->Start(renderer);
 
-            // カテゴリ
-            collider->set_CollisionCategory(COLLISION_CATEGORY::PLAYER_BULLET);
-            // 衝突マスク
-            collider->set_CollisionBitMask(UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING));
+            //// カテゴリ
+            //collider->set_CollisionCategory(COLLISION_CATEGORY::PLAYER_BULLET);
+            //// 衝突マスク
+            //collider->set_CollisionBitMask(UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING));
 
-            // コライダーの登録
-            Master::m_pCollisionManager->RegisterCollider(collider);
+            //// コライダーの登録
+            //Master::m_pCollisionManager->RegisterCollider(collider);
 
             // 初期化
             bulletComp->Start(renderer);
@@ -233,9 +233,9 @@ bool BulletManager::Init(RendererEngine &renderer)
             // アクティブに
             obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE); 
 
-            // コライダーの使用をオンに
-            auto collider = obj->get_Component<BoxCollider>();
-            collider->set_IsEnable(true);
+            //// コライダーの使用をオンに
+            //auto collider = obj->get_Component<BoxCollider>();
+            //collider->set_IsEnable(true);
         },
         // 返却時に実行 ******************************************************************************************
         [this](GameObject* obj)          
@@ -244,9 +244,9 @@ bool BulletManager::Init(RendererEngine &renderer)
             float explosionRadius = bulletComp->get_Parameter()._explosionRadius;   // 爆発半径を取得
             bulletComp->Reset();
 
-            // コライダーの使用をオフに
-            auto collider = obj->get_Component<BoxCollider>();
-            collider->set_IsEnable(false);
+            //// コライダーの使用をオフに
+            //auto collider = obj->get_Component<BoxCollider>();
+            //collider->set_IsEnable(false);
 
             // 軌跡データをクリア
             auto trail = obj->get_Component<TrailRenderer>();
@@ -318,28 +318,28 @@ bool BulletManager::Init(RendererEngine &renderer)
 
             // 軌跡コンポーネントの追加
             auto trail = obj->add_Component<TrailRenderer>();
-            trail->set_Width(1.0f);
-            trail->set_MinVertexDistance(10.0f);
+            trail->set_Width(0.1f);
+            trail->set_MinVertexDistance(1.0f);
             trail->set_DrawTime(30.0f);
             trail->set_EmissivePower(10.0f);
             trail->set_Color(VECTOR4::VEC4(1.0f, 1.0f, 0.0f, 1.0f));
-            trail->set_PosRandVec(VEC3(5.0f));
+            trail->set_PosRandVec(VEC3(1.0f));
 
-            // 衝突用コライダーの追加
-            auto collider = obj->add_Component<BoxCollider>();
-            collider->set_Size(VEC3(5.0f, 5.0f, 5.0f));
-            collider->set_Center(VEC3(0.0f, 2.0f, 0.0f));
-            collider->set_IsEnable(false);  // 初期化時は使用フラグオフに
-            collider->set_IsTrigger(true);  // トリガーとして設定
-            collider->Start(renderer);
+            //// 衝突用コライダーの追加
+            //auto collider = obj->add_Component<BoxCollider>();
+            //collider->set_Size(VEC3(1.0f, 1.0f, 1.0f));
+            //collider->set_Center(VEC3(0.0f, 0.0f, 0.0f));
+            //collider->set_IsEnable(false);  // 初期化時は使用フラグオフに
+            //collider->set_IsTrigger(true);  // トリガーとして設定
+            //collider->Start(renderer);
 
-            // カテゴリ
-            collider->set_CollisionCategory(COLLISION_CATEGORY::PLAYER_BULLET);
-            // 衝突マスク
-            collider->set_CollisionBitMask(UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING));
+            //// カテゴリ
+            //collider->set_CollisionCategory(COLLISION_CATEGORY::PLAYER_BULLET);
+            //// 衝突マスク
+            //collider->set_CollisionBitMask(UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING));
 
-            // コライダーの登録
-            Master::m_pCollisionManager->RegisterCollider(collider);
+            //// コライダーの登録
+            //Master::m_pCollisionManager->RegisterCollider(collider);
 
             // 初期化
             bulletComp->Start(renderer);
@@ -588,8 +588,8 @@ void BulletManager::Shot(RendererEngine &renderer, const BulletTransformData &_t
     bulletComp->set_Parameter(_param);
     bulletComp->Setup();
 
-    auto collider = bulletObj->get_Component<BoxCollider>();
-    collider->set_Size(VEC3(_transformData._scale));
+    //auto collider = bulletObj->get_Component<BoxCollider>();
+    //collider->set_Size(VEC3(_transformData._scale));
 
     // 更新リストに登録
     m_ExtractedBulletMap[BULLET_TYPE::EXPLOSION].push_back(bulletObj);

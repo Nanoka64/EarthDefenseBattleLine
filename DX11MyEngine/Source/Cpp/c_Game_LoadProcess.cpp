@@ -119,14 +119,14 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
         CreateModelInfo model;
         model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Enemy/ant_lowpoly.fbx";
+        model.Path = "Resource/Model/Enemy/GiantAnt01.fbx";
         model.ObjTag = "Ant1";
         model.IsAnim = true;
         model.MatNum = 1;
         model.SetupMaterial = matInfo;
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
 
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 5; i++)
         {
             model.ObjTag = "Ant"/* + std::to_string(i + 1)*/;   // タグ
 
@@ -142,32 +142,25 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             // エネミーコントローラーと体力管理を追加
             obj->add_Component<EnemyController>();
             obj->add_Component<Health>();
-            auto trail = obj->add_Component<TrailRenderer>();
-            trail->set_Color(VEC4(1.0f, 0.0f, 0.0f, 1.0f));
-            trail->set_Width(15.0f);
-            trail->set_DrawTime(120.0f);
-            trail->set_EmissivePower(2.0f);
 
             VEC3 pos = VEC3();
-            pos.x = Tool::RandRange(-550.0, 550.0);
-            pos.y = 15.0f;
-            pos.z = Tool::RandRange(-550.0, 550.0);
+            pos.x = Tool::RandRange(-50.0, 50.0);
+            pos.y = 0.0f;
+            pos.z = Tool::RandRange(-50.0, 50.0);
 
             VEC3 rot = VEC3();
             rot.y = Tool::RandRange(-360.0f, 360.0f);
 
             transform->set_Pos(pos);
             transform->set_RotateToDeg(rot);
-            transform->set_Scale(0.15f, 0.15f, 0.15f);
-
+            transform->set_Scale(1);
 
             // コライダーの追加
             auto collider = obj->add_Component<BoxCollider>();
-            collider->set_Size(VEC3(30, 20, 30));
-            collider->set_Center(VEC3(0, 10, 0));
+            collider->set_Size(VEC3(1.0f, 1.0f, 1.0f));
+            collider->set_Center(VEC3(0.0f, 1.0f, 0.0f));
             // 衝突カテゴリ
             collider->set_CollisionCategory(COLLISION_CATEGORY::ENEMY);
-
 
             // コライダーの登録
             Master::m_pCollisionManager->RegisterCollider(collider);
@@ -290,7 +283,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         // 衝突カテゴリ
         collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
 
-
         // コライダーの登録
         Master::m_pCollisionManager->RegisterCollider(obj->get_Component<BoxCollider>());
     }
@@ -376,14 +368,14 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         mesh.IsNormalMap = true;
 
         auto obj = MeshFactory::CreateUtilityMesh(mesh);
-        obj->get_Transform().lock()->set_Scale(1000.0f, 500.0f, 1000.0f);
+        obj->get_Transform().lock()->set_Scale(100.0f, 10.0f, 100.0f);
         obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
         obj->get_Transform().lock()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
 
         // コライダーの追加
         auto collider = obj->add_Component<BoxCollider>();
-        collider->set_Size(VEC3(1000, 1, 1000));
-        collider->set_Center(VEC3(0, 0, 0));
+        collider->set_Size(VEC3(100.0f, 1.0f, 100.0f));
+        collider->set_Center(VEC3(0, -1.0f, 0)); // コライダーの中心を地面の厚み分だけ下げる
         collider->set_IsStatic(true);
         // 衝突カテゴリ
         collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
@@ -432,7 +424,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         mesh.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
         mesh.IsNormalMap = true;
 
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 0; i++)
         {
             VEC3 pt;
             pt.x = static_cast<float>(rand() % 1000) - 500.0f;
@@ -484,13 +476,13 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         mesh.IsNormalMap = true;
 
         auto obj = MeshFactory::CreateUtilityMesh(mesh);
-        obj->get_Transform().lock()->set_Pos(VEC3(0.0f, 100.0f, 0.0f));
-        obj->get_Transform().lock()->set_Scale(VEC3(100, 10, 100));
+        obj->get_Transform().lock()->set_Pos(VEC3(0.0f, 10.0f, 0.0f));
+        obj->get_Transform().lock()->set_Scale(VEC3(5.0f, 1.0f, 5.0f));
         obj->set_Tag("Scaffolding");
 
         // コライダーの追加
         auto collider = obj->add_Component<BoxCollider>();
-        collider->set_Size(VEC3(100, 10, 100));
+        collider->set_Size(VEC3(5.0f, 1.0f, 5.0f));
         collider->set_Center(VEC3(0, 0, 0));
         collider->set_IsStatic(true);
 
@@ -577,8 +569,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             auto line = obj->add_Component<LineRenderer>();
             line->set_Color(VEC4(1.0f, 0.0f, 0.0f, 1.0f));
             line->set_Emissive(3.0f);
-            line->set_Width(0.5f);
-            line->set_Length(1000.0f);
+            line->set_Width(0.1f);
+            line->set_Length(100.0f);
 
             // プレイヤーを親に設定
             obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
@@ -621,8 +613,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             auto line = obj->add_Component<LineRenderer>();
             line->set_Color(VEC4(1.0f, 0.0f, 0.0f, 1.0f));
             line->set_Emissive(3.0f);
-            line->set_Width(0.5f);
-            line->set_Length(1000.0f);
+            line->set_Width(0.1f);
+            line->set_Length(100.0f);
 
             // プレイヤーを親に設定
             obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
@@ -652,7 +644,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             //mat->m_DiffuseColor = VEC4(0.5, 0.5, 0.5, 1.0f);
             auto obj = MeshFactory::CreateBillboard(billboard);
             obj->get_Transform().lock()->set_Pos(pos);
-            obj->get_Transform().lock()->set_Scale(50, 50, 50);
+            obj->get_Transform().lock()->set_Scale(0.1f, 0.1f, 0.1f);
             obj->set_Tag("LaserPointBillboard");
             //obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
         }
@@ -663,7 +655,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
 
     // プレイヤーに操作コンポーネントつける
-    playerObj->get_Transform().lock()->set_Pos(-900.0f, 0.0f, 900.0f);  // プレイヤーの初期位置を設定
+    playerObj->get_Transform().lock()->set_Pos(-90.0f, 0.0f, 90.0f);  // プレイヤーの初期位置を設定
     playerObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
     auto playerControl = playerObj->add_Component<PlayerController>(1); // コンポーネントの追加
 

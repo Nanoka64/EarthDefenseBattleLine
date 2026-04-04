@@ -119,7 +119,7 @@ void GunWeapon::LateUpdate(RendererEngine& renderer)
         VEC3 laserDir = m_pLineRendererComp.lock()->get_Dir();
         VEC3 laserPointPos = pos + laserDir * m_pLineRendererComp.lock()->get_Length();
         laserPoint->get_Transform().lock()->set_Pos(laserPointPos);
-        laserPoint->get_Transform().lock()->set_Scale(VEC3(5.0f));
+        laserPoint->get_Transform().lock()->set_Scale(VEC3(0.5f));
 
     }
 
@@ -288,7 +288,7 @@ void GunWeapon::Shoot(RendererEngine& renderer)
         BulletTransformData bulletTransform;
         bulletTransform._pos = pos;
         bulletTransform._rotQ = finalRotQuat;
-        bulletTransform._scale = VEC3(0.01f, 0.01f, 0.01f);
+        bulletTransform._scale = VEC3(1.0f, 1.0f, 1.0f);
 
         BULLET_TYPE type = gunParam->_bulletType;
 
@@ -300,7 +300,7 @@ void GunWeapon::Shoot(RendererEngine& renderer)
 
     if (!m_pFlashPointLight.expired()) {
         // ƒtƒ‰ƒbƒVƒ…
-        m_pFlashPointLight.lock()->set_Range(30.0f);
+        m_pFlashPointLight.lock()->set_Range(3.0f);
         m_pFlashPointLight.lock()->set_Intensity(5.5f);
         m_pFlashPointLight.lock()->set_LightColor(VEC3(1.0f, 1.0f, 1.0f));
     }

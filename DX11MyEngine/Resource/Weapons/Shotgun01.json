@@ -13,9 +13,9 @@
   "bulletParam": {
     "damage": 50.0,
     "damageDistAttenuationRate": 0.5,
-    "speed": 2000.0,
+    "speed": 200.0,
     "acceleration": 0.0,
-    "range": 700.0,
+    "range": 30.0,
     "penetrationsCount": 3,
     "collisionSize": 0.0,
     "gravityScale": 0.0

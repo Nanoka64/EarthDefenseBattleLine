@@ -206,7 +206,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
         model.IsActive = false;
         pPlayerObj = MeshFactory::CreateModel(model);
-        pPlayerObj->get_Component<MyTransform>()->set_Scale(0.1f, 0.1f, 0.1f);
+        pPlayerObj->get_Component<MyTransform>()->set_Scale(1.0f, 1.0f, 1.0f);
         pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
         pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(INT_CAST(PlayerData::PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE));
 
@@ -251,8 +251,8 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
 
         // コライダーの追加
         auto collider = pPlayerObj->add_Component<BoxCollider>();
-        collider->set_Size(VEC3(5, 10, 5));
-        collider->set_Center(VEC3(0, 10, 0));
+        collider->set_Size(VEC3(1.0f, 1.0f, 1.0f));
+        collider->set_Center(VEC3(0.0f, 1.0f, 0.0f));
 
         // カテゴリ
         collider->set_CollisionCategory(COLLISION_CATEGORY::PLAYER);

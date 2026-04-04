@@ -179,6 +179,7 @@ bool WeaponDataManager::LoadGunWeaponData(const std::string& _filepath, WeaponDa
         // 派生クラス独自のパラメータを読み込み
         expData._explosionRadius = paramJson.value("explosionRadius", 0.0f);
         expData._explosionEffectHandleTag = paramJson.value("explosionEffectHandleTag", "");
+        expData._isSmoke = paramJson.value("isSmoke", false);
 
         // variantに代入
         _outData._bulletParam = expData;

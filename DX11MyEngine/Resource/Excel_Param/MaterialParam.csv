@@ -14,7 +14,7 @@ Building01_Base1,1,1,1,1,1,1,1,1,150,0,0,0,0,Resource/Model/Building/02/Textures
 Building01_Base2,1,1,1,1,1,1,1,1,150,0,0,0,0,Resource/Model/Building/02/Textures/tex03.jpg,Resource/Texture/DefaultN_Map.png,-1,0
 Building01_Base3,1,1,1,1,1,1,1,1,150,0,0,0,0,Resource/Model/Building/02/Textures/tex02.jpg,Resource/Texture/DefaultN_Map.png,-1,0
 Building,1,1,1,1,1,1,1,1,150,0,0,0,0,Resource/Model/Building/01/texture/building5-lo.jpg,Resource/Texture/DefaultN_Map.png,-1,0
-MotherShip,1,1,1,1,1,1,1,1,150,0,0,0,0,Resource/Texture/metal_plate_02_diff_2k.jpg,Resource/Texture/DefaultN_Map.png,-1,0
+MotherShip,1,1,1,1,1,1,1,1,250,0,0,0,0,Resource/Texture/metal_plate_02_diff_2k.jpg,Resource/Texture/DefaultN_Map.png,-1,0
 Ground,1,1,1,1,1,1,1,1,50,1,1,1,0,Resource/Texture/aerial_grass_rock_diff_4k.png,Resource/Texture/aerial_grass_rock_nor_dx_4k.png,-1,0
 LaserPointBillboard,1,1,1,1,1,1,1,1,50,0,0,0,0,Resource/Texture/Particle/Particle04_bokashi_hard.png,-1,-1,1
 Billboard,1,1,1,1,1,1,1,1,50,0,0,0,0,Resource/Texture/Billboard.png,-1,-1,1

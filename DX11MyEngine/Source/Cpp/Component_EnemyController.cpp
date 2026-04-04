@@ -81,7 +81,7 @@ void EnemyController::Start(RendererEngine& renderer)
 			Master::m_pSoundManager->Play_3D(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_HIT01), pos, 1000.0f);
 
 			int handle = Master::m_pEffectManager->PlayEffect("Hit");
-			Master::m_pEffectManager->SetScaleEffect(handle, 10.0f, 10.0f, 10.0f);
+			Master::m_pEffectManager->SetScaleEffect(handle, 1.0f, 1.0f, 1.0f);
 			Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y, pos.z);
 			Master::m_pEffectManager->SetRotationEffect(handle, rot.x, rot.y, rot.z);
 
@@ -103,12 +103,10 @@ void EnemyController::Start(RendererEngine& renderer)
 			decal.IsNormalMap = false;
 			decal.IsDynamic = true;
 
-
 			VEC3 scale;
-			scale.x = 100.0f;
-			scale.y = 100.0f;
-			scale.z = 100.0f;
-
+			scale.x = 10.0f;
+			scale.y = 10.0f;
+			scale.z = 10.0f;
 			auto obj = MeshFactory::CreateDecal(decal);
 			obj->get_Component<DecalRenderer>()->Start(renderer);
 			obj->get_Transform().lock()->set_Pos(pos);
@@ -125,7 +123,7 @@ void EnemyController::Start(RendererEngine& renderer)
 		{
 			auto transform = m_pOwner.lock()->get_Transform().lock();
 			VEC3 pos = transform->get_VEC3ToPos();
-			
+
 			// ****************************************************
 			//				 死亡音再生
 			// ****************************************************
@@ -134,7 +132,7 @@ void EnemyController::Start(RendererEngine& renderer)
 
             // 死亡エフェクト
 			int handle = Master::m_pEffectManager->PlayEffect("DeadExplosion");
-			Master::m_pEffectManager->SetScaleEffect(handle,15.0f, 15.0f, 15.0f);
+			Master::m_pEffectManager->SetScaleEffect(handle,1.0f, 1.0f, 1.0f);
 			Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y, pos.z);
 			m_IsDead = true;
 			m_IsAnim = false;
@@ -160,9 +158,9 @@ void EnemyController::Start(RendererEngine& renderer)
 
 
 			VEC3 scale;
-			scale.x = 200.0f;
-			scale.y = 200.0f;
-			scale.z = 200.0f;
+			scale.x = 10.0f;
+			scale.y = 10.0f;
+			scale.z = 10.0f;
 
 			auto obj = MeshFactory::CreateDecal(decal);
 			obj->get_Component<DecalRenderer>()->Start(renderer);
@@ -175,7 +173,7 @@ void EnemyController::Start(RendererEngine& renderer)
 		}
 	);
 
-	m_MoveSpeed = 2.0f;
+	m_MoveSpeed = 1.0f;
 
 	// ステートの作成（TODO:外から種類を変えられるようにする）
 	EnemyStateFactory::Create(m_StateMachine, ENEMY_TYPE::ENEMY_TYPE_ANT_Normal, renderer);
@@ -199,6 +197,8 @@ void EnemyController::Update(RendererEngine& renderer)
 		m_pOwner.lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DELETE);
 	}
 
+	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
+
 
 	auto target = Master::m_pGameObjectManager->get_ObjectByTag("Player");
 	m_pTarget = target;
@@ -216,13 +216,13 @@ void EnemyController::Update(RendererEngine& renderer)
 	VEC3 crntPos = myTransform->get_VEC3ToPos();
 	VEC3 crntRot = myTransform->get_VEC3ToRotateToRad();
 
-	VEC3 newPos = crntPos + m_MoveVelocity;
+	VEC3 newPos = crntPos + m_MoveVelocity * deltaTime;
 
 	newPos.y = crntPos.y;	// Yは変えない
 
-	if (newPos.y <= 5.0f)
+	if (newPos.y < 0.0f)
 	{
-		newPos.y = 5.0f;
+		newPos.y = 0.0f;
 	}
 
 	myTransform->set_Pos(newPos);

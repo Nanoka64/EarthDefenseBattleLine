@@ -47,7 +47,7 @@ ExplosionBullet::~ExplosionBullet()
 //* &renderer : 描画エンジンの参照
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-void ExplosionBullet::Start(RendererEngine &renderer)
+void ExplosionBullet::Start(RendererEngine& renderer)
 {
     //////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -103,7 +103,7 @@ void ExplosionBullet::Start(RendererEngine &renderer)
             auto obj = MeshFactory::CreateDecal(decal);
             obj->get_Component<DecalRenderer>()->Start(renderer);
             obj->get_Transform().lock()->set_Pos(pos);
-            obj->get_Transform().lock()->set_Scale(scale + DECAL_SIZE_FACTOR);
+            obj->get_Transform().lock()->set_Scale(scale);
             obj->get_Transform().lock()->set_RotateToRad(angleX, angleY, angleZ);
             obj->set_Tag("BulletHole");
             auto timer = obj->add_Component<TimerDestruction>();
@@ -112,9 +112,8 @@ void ExplosionBullet::Start(RendererEngine &renderer)
             // エフェクト
             VEC3 effectRot = VEC3(abs(angleX - 0.05f), angleY, 0.0f);
             int exp_handle = Master::m_pEffectManager->PlayEffect(m_Parameter._explosionEffectHandleTag);   // 爆発
-            int exp_smoke_handle = Master::m_pEffectManager->PlayEffect("Explosion_Smoke_01");   // 煙
 
-            float expSize = m_Parameter._explosionRadius;   // 爆発半径
+            float expSize = m_Parameter._explosionRadius * 0.1;   // 爆発半径
             VEC3 expRot = VEC3(Tool::RandRange(0.0f, 3.14f), Tool::RandRange(0.0f, 3.14f), Tool::RandRange(0.0f, 3.14f));
 
             // 爆発
@@ -122,11 +121,15 @@ void ExplosionBullet::Start(RendererEngine &renderer)
             Master::m_pEffectManager->SetPositionEffect(exp_handle, pos.x, pos.y, pos.z);
             Master::m_pEffectManager->SetRotationEffect(exp_handle, expRot.x, expRot.y, expRot.z);
 
-            // 爆発煙
-            Master::m_pEffectManager->SetScaleEffect(exp_smoke_handle, expSize, expSize, expSize);
-            Master::m_pEffectManager->SetPositionEffect(exp_smoke_handle, pos.x, pos.y, pos.z);
-            Master::m_pEffectManager->SetRotationEffect(exp_smoke_handle, expRot.x, expRot.y, expRot.z);
-
+            if (m_Parameter._isSmoke) 
+            {
+                int exp_smoke_handle = Master::m_pEffectManager->PlayEffect("Explosion_Smoke_01");   // 煙
+            
+                // 爆発煙
+                Master::m_pEffectManager->SetScaleEffect(exp_smoke_handle, expSize, expSize, expSize);
+                Master::m_pEffectManager->SetPositionEffect(exp_smoke_handle, pos.x, pos.y, pos.z);
+                Master::m_pEffectManager->SetRotationEffect(exp_smoke_handle, expRot.x, expRot.y, expRot.z);
+            }
         };
 }
 
@@ -149,37 +152,62 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     param._moveDirection = m_MoveDir;// ※マイナスにしているのはプレイヤーの方向がおかしいせい（後で直す）
     param._moveSpeed = m_Parameter._speed;
 
-
-    //// レイの生成
-    //CollInData_Ray ray;
-    //ray._point = crntPos;
-    //ray._dir = param._moveDirection;
-    //CollisionInfo hitInfo;
-    //int mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING);
-    //// レイキャスト判定
-    //if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
-    //{
-    //    // 前回までの移動距離で衝突しているか
-    //    if (VEC3::Distance(hitInfo.get_HitPoint(), crntPos) <= moveDistance)
-    //    {
-    //        transform->set_Pos(hitInfo.get_HitPoint());
-    //        this->OnTriggerEnter(hitInfo);
-    //        return;
-    //    }
-    //}
-
     // 前回の位置として保持
-    m_PrevPos = crntPos;        
+    m_PrevPos = crntPos;  
+
 
     // 移動
     moveComp->Calculate(param); 
 
+	// 移動後の位置
+    VEC3 newPos = transform->get_VEC3ToPos();
 
     // 射程距離外で削除
-    float distSq = VEC3::DistanceSq(crntPos, m_StartPos);
+    float distSq = VEC3::DistanceSq(newPos, m_StartPos);
     if (distSq > m_Parameter._range * m_Parameter._range) {
         m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
     }
+
+	// レイキャストで衝突判定（コライダーの衝突処理をこっちに移動）
+    CollInData_Ray ray;
+	ray._point = crntPos;
+	ray._dir = newPos - crntPos;    // 前回の位置から新しい位置へのベクトル
+    unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING);
+	CollisionInfo hitInfo;
+
+    if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
+    {
+        if (m_CollisionTask)
+        {
+            m_CollisionTask(hitInfo);
+        }
+
+        if (m_pOwner.expired())return;
+
+        auto owner = m_pOwner.lock();
+        auto transform = owner->get_Transform().lock();
+        VEC3 pos = transform->get_VEC3ToPos();
+
+        unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY);   // 敵のみ
+
+        // 範囲内チェック
+        auto targets = Master::m_pCollisionManager->CheckSphere(pos, m_Parameter._explosionRadius, mask);
+
+        // 範囲内の全員にダメージ
+        for (auto& target : targets) {
+
+            if (auto obj = target->get_OwnerObj().lock())
+            {
+                if (auto health = obj->get_Component<Health>())
+                {
+                    health->TakeDamage(m_Parameter._damage);
+                }
+            }
+        }
+
+        m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+    }
+
 }
 
 
@@ -192,36 +220,36 @@ void ExplosionBullet::Update(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void ExplosionBullet::OnTriggerEnter(const class CollisionInfo &_other)
 {
-    if (m_CollisionTask)
-    {
-        m_CollisionTask(_other);
-    }    
-    
-    if (m_pOwner.expired())return;
+    //if (m_CollisionTask)
+    //{
+    //    m_CollisionTask(_other);
+    //}    
+    //
+    //if (m_pOwner.expired())return;
 
-    auto owner = m_pOwner.lock();
-    auto transform = owner->get_Transform().lock();
-    VEC3 pos = transform->get_VEC3ToPos();
+    //auto owner = m_pOwner.lock();
+    //auto transform = owner->get_Transform().lock();
+    //VEC3 pos = transform->get_VEC3ToPos();
 
-    unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY);   // 敵のみ
-    
-    // 範囲内チェック
-    auto targets = Master::m_pCollisionManager->CheckSphere(pos, m_Parameter._explosionRadius * 2, mask);
+    //unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY);   // 敵のみ
+    //
+    //// 範囲内チェック
+    //auto targets = Master::m_pCollisionManager->CheckSphere(pos, m_Parameter._explosionRadius, mask);
 
-    // 範囲内の全員にダメージ
-    for (auto& target : targets) {
+    //// 範囲内の全員にダメージ
+    //for (auto& target : targets) {
 
-        if (auto obj = target->get_OwnerObj().lock())
-        {
-            if (auto health = obj->get_Component<Health>())
-            {
-                health->TakeDamage(m_Parameter._damage);
-            }
-        }
-    }
+    //    if (auto obj = target->get_OwnerObj().lock())
+    //    {
+    //        if (auto health = obj->get_Component<Health>())
+    //        {
+    //            health->TakeDamage(m_Parameter._damage);
+    //        }
+    //    }
+    //}
 
 
-    m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+    //m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 }
 
 

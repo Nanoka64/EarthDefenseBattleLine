@@ -13,13 +13,14 @@
   "bulletParam": {
     "damage": 1000.0,
     "damageDistAttenuationRate": 0.5,
-    "speed": 300.0,
+    "speed": 20.0,
     "acceleration": 0.0,
-    "range": 2500.0,
+    "range": 2000.0,
     "penetrationsCount": 0,
     "collisionSize": 0.0,
     "gravityScale": 0.0,
     "explosionRadius": 100.0,
-    "explosionEffectHandleTag": "Explosion_01"
+    "explosionEffectHandleTag": "Explosion_01",
+    "isSmoke" : true
   }
 }

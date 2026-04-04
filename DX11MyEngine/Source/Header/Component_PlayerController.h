@@ -145,8 +145,8 @@ private:
 	bool m_IsRolling;
 
 	// リジッドボディコンポーネントを作って移す
-	float m_JumpForce = 1.5f;	// ジャンプ力
-	float m_Gravity = 0.07f;	// 重力
+	float m_JumpForce;	// ジャンプ力
+	float m_Gravity;	// 重力
 
 	bool m_IsDead;
 	bool m_IsContinuousAngle ;	// マウスに合わせて継続的に回転させるか
@@ -154,7 +154,6 @@ private:
 	int m_RollingDuration;				// ローリングの持続時間	
 	int m_RollingCounter;				// ローリング用のカウンタ
 
-	bool m_IsReloading;		// リロード中
 
 public:
 	PlayerController(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
@@ -196,9 +195,7 @@ public:
 	void set_IsContinuousAngle(bool _flag) { m_IsContinuousAngle = _flag; };
 	bool get_IsContinuousAngle()const { return m_IsContinuousAngle; };
 
-	/* リロード中か */
-	void set_IsReloading(bool _flag) { m_IsReloading = _flag; };
-	bool get_IsReloading()const { return m_IsReloading; };
+	/* 接地中か */
 	bool get_IsGrounded()const { return m_IsGrounded; };
 
 private:

@@ -19,9 +19,11 @@ using namespace PlayerData;
 using namespace DirectX;
 using namespace Tool;
 
-constexpr float MOVE_SPEED = 150.0f;		// プレイヤーの移動速度
-constexpr float ROLLING_SPEED = 10.0f;	// ローリング時のスピード
+constexpr float MOVE_SPEED = 10.0f;		// プレイヤーの移動速度
+constexpr float ROLLING_SPEED = 30.0f;	// ローリング時初速
 constexpr int ROLLING_DURATION = 60;	// ローリング時間
+constexpr float JUMP_HEIGHT = 2.5f;		// ジャンプの高さ
+constexpr float GRAVITY = 18.0f;		// 重力
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
@@ -42,6 +44,8 @@ m_MoveSpeed(MOVE_SPEED),
 m_CrntAnimID(PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE),
 m_JumpVelocity(0.0f),
 m_RollingCounter(0),
+m_Gravity(GRAVITY),
+m_JumpForce(0.0f),
 m_RollingDuration(ROLLING_DURATION)
 {
 	this->set_Tag("PlayerController");
@@ -89,6 +93,10 @@ void PlayerController::Start(RendererEngine& renderer)
 	m_pHealthComp = m_pOwner.lock()->get_Component<Health>();
 	m_pHealthComp.lock()->set_MaxHP(200.0f);
 	m_pHealthComp.lock()->set_CrntHP(200.0f);
+
+	// ジャンプ力の計算
+	// https://heron-no-suugaku.sakura.ne.jp/jump-implementation-math/#toc1
+	m_JumpForce = sqrtf(2.0f * m_Gravity * JUMP_HEIGHT);
 
 	// 被弾時のコールバック
 	m_pHealthComp.lock()->RegisterOnDamage(
@@ -176,29 +184,34 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 	right = right.Normalize();
 
 	/*VEC3 velocity{ 0.0f,0.0f,0.0f };*/
-
+	VEC3 inputDir = VEC3(0.0f, 0.0f, 0.0f);
 	m_MoveVelocity.x = 0.0f;
 	m_MoveVelocity.z = 0.0f;
+
 
 	//-----------------------------------------------------------------------------
 	// ■ 移動入力 / ジャンプ時はローリングさせない
 	//-----------------------------------------------------------------------------
 	if (GetInput(GAME_CONFIG::MOVE_FORWARD))	// 前進
 	{
-		m_MoveVelocity += forward;
+		inputDir += forward;
 	}
 	if (GetInput(GAME_CONFIG::MOVE_BACK))		// 後退
 	{
-		m_MoveVelocity -= forward;
+		inputDir -= forward;
 	}
 	if (GetInput(GAME_CONFIG::MOVE_RIGHT))		// 右へ
 	{
-		m_MoveVelocity += right;
+		inputDir += right;
 
 		// 右ローリング
 		if (GetInputDown(GAME_CONFIG::MOVE_JUMP) && m_IsJump == false)
 		{
-			m_MoveVelocity = m_MoveVelocity.Normalize();
+			inputDir = inputDir.Normalize();
+			m_MoveVelocity.x = inputDir.x;
+			m_MoveVelocity.z = inputDir.z;
+
+
 			m_IsRolling = true;
 			// ****************************************************
 			//				 ローリング開始音/声 再生
@@ -210,12 +223,16 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 	}
 	if (GetInput(GAME_CONFIG::MOVE_LEFT))		// 左へ
 	{
-		m_MoveVelocity -= right;
+		inputDir -= right;
 
 		// 左ローリング
 		if (GetInputDown(GAME_CONFIG::MOVE_JUMP) && m_IsJump == false)
 		{
-			m_MoveVelocity = m_MoveVelocity.Normalize();
+			inputDir = inputDir.Normalize();
+			m_MoveVelocity.x = inputDir.x;
+			m_MoveVelocity.z = inputDir.z;
+
+
 			m_IsRolling = true;
 			// ****************************************************
 			//				 ローリング開始音/声 再生
@@ -228,7 +245,9 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 	}
 
 	// 正規化
-	m_MoveVelocity = m_MoveVelocity.Normalize();
+	inputDir = inputDir.Normalize();
+	m_MoveVelocity.x = inputDir.x;
+	m_MoveVelocity.z = inputDir.z;
 
 	//-----------------------------------------------------------------------------
 	// ■ ジャンプ入力受付 / ジャンプ中処理
@@ -268,17 +287,15 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 	else
 	{
 		// 空中にいる場合は重力をかけ続ける
-		if (m_IsJump) {
-			ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_LOOP);
-		}
-		m_JumpVelocity -= m_Gravity;
+		ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_LOOP);
+		m_JumpVelocity -= m_Gravity * deltaTime;
 
 		// 世界の裏側に落下した場合
-		if (m_JumpVelocity < -20.0f)
+		if (crntPos.y < -100.0f)
 		{
 			m_IsJump = false;
-			m_JumpVelocity = m_Gravity;
-			m_pMyTransformComp.lock()->set_Pos(VEC3(0.0f,150.0f,0.0f));
+			m_JumpVelocity = 0.0f;
+			m_pMyTransformComp.lock()->set_Pos(VEC3(0.0f, 30.0f, 0.0f));
 			return;
 		}
 	}
@@ -294,31 +311,13 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 	//-----------------------------------------------------------------------------
 	if (m_MoveVelocity.Length() > 0.001f)
 	{
-		//m_MoveVelocity = m_MoveVelocity.Normalize();
+		// 水平方向の移動ベクトル
+		VEC3 horizontalMove = m_MoveVelocity;
+		horizontalMove.y = 0;
 
 		// 移動計算
-		newPos = (crntPos + (m_MoveVelocity * (m_MoveSpeed * deltaTime)));
+		newPos = (crntPos + (horizontalMove * m_MoveSpeed * deltaTime) + (VEC3(0, m_JumpVelocity, 0) * deltaTime));
 
-		// 上に持ってった
-		//if (m_IsJump)
-		//{
-		//	// 地面判定
-		//	if (newPos.y < 0.0f)
-		//	{
-		//		// ****************************************************
-		//		//				 ジャンプ - 着地音再生
-		//		// ****************************************************
-		//		Master::m_pSoundManager->Play(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SOLDIER_R_JUMP_LAND));
-
-		//		newPos.y = 0.0f;
-		//		m_JumpVelocity = 0.0f;
-		//		m_IsJump = false;
-		//		ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_DOWN);
-		//	}
-		//}
-
-		// 移動ベクトルを加算
-		m_pMyTransformComp.lock()->set_Pos(newPos);
 
 		// 動いているならアニメーション
 		m_IsAnim = true;
@@ -327,8 +326,7 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 		// 移動ベクトルに合わせてY軸のみ回転させる
 		// ジャンプ時に回転しないよう、X/Zのみ考慮
 		*/
-		VEC2 velocityXZ = VEC2(m_MoveVelocity.x, m_MoveVelocity.z);
-		if (velocityXZ.Length() > 0.001f)
+		if (horizontalMove.Length() > 0.001f)
 		{
 			//!***********************************
 			// 方向の処理を外に出すとガタガタする
@@ -347,6 +345,8 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 				MovedAngle(crntRot, m_MoveVelocity);
 			}
 		}
+
+		m_pMyTransformComp.lock()->set_Pos(newPos);
 	}
 
 
@@ -385,6 +385,8 @@ void PlayerController::RollingUpdate()
 	// ローリングアニメーションに
 	ChangeAnimation(PLAYER_RANGER_ANIM_ID::RUNING_DIVE_ROLL);
 
+	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
+
 	auto pOwner = m_pOwner.lock();
 	m_pMyTransformComp = pOwner->get_Transform().lock();
 
@@ -399,7 +401,7 @@ void PlayerController::RollingUpdate()
 
 	// イージング関数でカウンタに合わせて速度を落としていく
 	float easeOut = 1.0f - Tool::Easing::EaseOutQuad(t);
-	newPos = crntPos + (m_MoveVelocity * (ROLLING_SPEED * easeOut));
+	newPos = crntPos + (m_MoveVelocity * (ROLLING_SPEED * easeOut)) * deltaTime;
 
 	// 時間で止める
 	if (m_RollingCounter >= m_RollingDuration)
