@@ -50,18 +50,32 @@ bool GameObjectManager::Init(RendererEngine &renderer)
 //* 引数：1.RendererEngine
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-void GameObjectManager::ObjectUpdate(RendererEngine &renderer)
+void GameObjectManager::ObjectUpdate(RendererEngine& renderer)
 {
+
+    // 保留していた追加をまとめて処理
+    for (auto& pair : m_PendingAddList)
+    {
+        auto& pendingList = pair.second;
+        if (!pendingList.empty())
+        {
+            this->add_Objects(pair.first, pendingList);
+        }
+    }
+
+    // 保留していた追加を処理した後は、保留リストをクリア
+    m_PendingAddList.clear();
+
     // ******************************************************************
     //
     // 不透明オブジェクト
     // 
     // ******************************************************************
-	int count = 0;
+    int count = 0;
     for (auto it = m_3DOpaqueList.begin(); it != m_3DOpaqueList.end(); it++)
     {
         count++;
-        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
+        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
             (*it).get()->Update(renderer);
             (*it).get()->ComponentUpdate(renderer);
@@ -74,7 +88,7 @@ void GameObjectManager::ObjectUpdate(RendererEngine &renderer)
     // ******************************************************************
     for (auto it = m_3DTranslucentList.begin(); it != m_3DTranslucentList.end(); it++)
     {
-        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
+        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
             (*it).get()->Update(renderer);
             (*it).get()->ComponentUpdate(renderer);
@@ -87,7 +101,7 @@ void GameObjectManager::ObjectUpdate(RendererEngine &renderer)
     // ******************************************************************
     for (auto it = m_2DTranslucentList.begin(); it != m_2DTranslucentList.end(); it++)
     {
-        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
+        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
             (*it).get()->Update(renderer);
             (*it).get()->ComponentUpdate(renderer);
@@ -115,7 +129,6 @@ void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
     {
         if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
         {
-            (*it).get()->Update(renderer);
             (*it).get()->ComponentLateUpdate(renderer);
         }
         // 削除フラグが立っていれば削除リストに追加
@@ -134,7 +147,6 @@ void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
     {
         if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
         {
-            (*it).get()->Update(renderer);
             (*it).get()->ComponentLateUpdate(renderer);
         }
         // 削除フラグが立っていれば削除リストに追加
@@ -153,7 +165,6 @@ void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
     {
         if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
         {
-            (*it).get()->Update(renderer);
             (*it).get()->ComponentLateUpdate(renderer);
         }
         // 削除フラグが立っていれば削除リストに追加
@@ -359,14 +370,20 @@ std::shared_ptr<GameObject> GameObjectManager::Internal_Instantiate3D(std::share
     }
 
 
+    // 遅延追加リストに追加
+
+
     // 透明度があるならフラグ立てる
     if (isTransparent) {
         pObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_TRANSPARENT);
-        this->add_Object(OBJECT_TYPE::TRANSLICENT_3D, pObj);
+
+        m_PendingAddList[OBJECT_TYPE::TRANSLICENT_3D].push_back(pObj);
+        //this->add_Object(OBJECT_TYPE::TRANSLICENT_3D, pObj);
     }
     else
     {
-        this->add_Object(OBJECT_TYPE::OPAQUE_3D, pObj);
+        m_PendingAddList[OBJECT_TYPE::OPAQUE_3D].push_back(pObj);
+        //this->add_Object(OBJECT_TYPE::OPAQUE_3D, pObj);
     }
 
 
@@ -399,8 +416,11 @@ std::shared_ptr<GameObject> GameObjectManager::Internal_Instantiate2D(std::share
         pObj->m_pTransform->set_Parent(parent);
     }
 
-    // リストに追加
-    this->add_Object(OBJECT_TYPE::TRANSLICENT_2D, pObj);   
+    // 遅延追加リストに追加
+    m_PendingAddList[OBJECT_TYPE::TRANSLICENT_2D].push_back(pObj);
+
+    //// リストに追加
+    //this->add_Object(OBJECT_TYPE::TRANSLICENT_2D, pObj);   
 
     return pObj;
 }
@@ -426,6 +446,41 @@ void GameObjectManager::add_Object(OBJECT_TYPE _type, std::shared_ptr<GameObject
         break;
     case OBJECT_TYPE::TRANSLICENT_2D:
         m_2DTranslucentList.push_back(_object);
+        break;
+    }
+
+    auto begin = m_3DOpaqueList.begin();
+    auto end = m_3DOpaqueList.end();
+
+
+    // 不透明オブジェクトのみ更新順にソート
+    std::sort(begin, end,
+        [](const std::shared_ptr<GameObject> &a, const std::shared_ptr<GameObject> &b) {
+            return a->get_LayerRank() < b->get_LayerRank();
+        });
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:GameObjectManager Class 
+//*【?】オブジェクトを追加
+//* 引数：1.オブジェクトの種類
+//* 引数：2.追加するオブジェクトの共有ポインタvector
+//* 返値：void
+//*----------------------------------------------------------------------------------------
+void GameObjectManager::add_Objects(OBJECT_TYPE _type, std::vector<std::shared_ptr<GameObject>>& _objects)
+{
+    switch (_type)
+    {
+        // 不透明オブジェクト
+    case OBJECT_TYPE::OPAQUE_3D:
+        m_3DOpaqueList.insert(m_3DOpaqueList.end(), _objects.begin(), _objects.end());
+        break;
+        // 透明度のあるオブジェクト
+    case OBJECT_TYPE::TRANSLICENT_3D:
+        m_3DTranslucentList.insert(m_3DTranslucentList.end(), _objects.begin(), _objects.end());
+        break;
+    case OBJECT_TYPE::TRANSLICENT_2D:
+        m_2DTranslucentList.insert(m_2DTranslucentList.end(), _objects.begin(), _objects.end());
         break;
     }
 

@@ -19,7 +19,7 @@
     "penetrationsCount": 0,
     "collisionSize": 0.0,
     "gravityScale": 0.0,
-    "explosionRadius": 5.0,
+    "explosionRadius": 7.0,
     "explosionEffectHandleTag": "Explosion_Plasma_01",
     "isSmoke" : false
   }

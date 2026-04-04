@@ -16,9 +16,7 @@ using namespace VECTOR3;
 //*----------------------------------------------------------------------------------------
 void c_Game_Play::OnEnter(SceneManager* pOwner)
 {
-    m_pBomber[0] = Master::m_pGameObjectManager->get_ObjectByTag("B-2_1");
-    m_pBomber[1] = Master::m_pGameObjectManager->get_ObjectByTag("B-2_2");
-    m_pBomber[2] = Master::m_pGameObjectManager->get_ObjectByTag("B-2_3");
+
 }
 
 
@@ -42,6 +40,9 @@ void c_Game_Play::OnExit(SceneManager* pOwner)
 //*----------------------------------------------------------------------------------------
 int c_Game_Play::Update(SceneManager *pOwner)
 {
+    m_pBomber[0] = Master::m_pGameObjectManager->get_ObjectByTag("B-2_1");
+    m_pBomber[1] = Master::m_pGameObjectManager->get_ObjectByTag("B-2_2");
+    m_pBomber[2] = Master::m_pGameObjectManager->get_ObjectByTag("B-2_3");
     static float counter = 0.0f;
     counter += 0.01f;
 

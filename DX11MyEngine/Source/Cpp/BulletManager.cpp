@@ -271,7 +271,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             ExplosionLightData expLigData;
             expLigData._explosionLightRadius = explosionRadius;
             expLigData._normalRadius = transform->get_VEC3ToScale().x;  // 一旦、xスケールを元に
-            expLigData._explosionDuration = 8.0f;
+            expLigData._explosionDuration = 6.0f;
             ligController->set_Parameter(expLigData);
 
             // 取り出したオブジェクトとして追加

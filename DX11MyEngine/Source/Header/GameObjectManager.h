@@ -25,6 +25,11 @@ private:
 	std::vector<std::shared_ptr<class GameObject>> m_3DTranslucentList;	// 3D 透明度あり
 	std::vector<std::shared_ptr<class GameObject>> m_2DTranslucentList;	// 2D 透明度あり
 
+
+	// オブジェクトの追加と削除はフレームの途中で行うとリストのイテレーションに影響が出る可能性があるため、
+	// 追加と削除は一旦保留しておき、フレームの最後にまとめて処理する
+	std::unordered_map<OBJECT_TYPE, std::vector<std::shared_ptr<class GameObject>>>m_PendingAddList;
+
 public:
 	GameObjectManager();
 	~GameObjectManager();
@@ -176,6 +181,12 @@ private:
 	/// </summary>
 	/// <param name="object">追加するオブジェクト</param>
 	void add_Object(OBJECT_TYPE _type, std::shared_ptr<GameObject> _object);
+
+	/// <summary>
+	/// リストにオブジェクトリストを追加
+	/// </summary>
+	/// <param name="object">追加するオブジェクト</param>
+	void add_Objects(OBJECT_TYPE _type, std::vector<std::shared_ptr<GameObject>> &_object);
 };
 
 namespace GIGA_Engine

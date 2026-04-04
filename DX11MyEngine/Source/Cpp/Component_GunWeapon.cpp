@@ -2,6 +2,7 @@
 #include "Component_GunWeapon.h"
 #include "Component_Transform.h"
 #include "Component_NormalBullet.h"
+#include "Component_Collider.h"
 #include "RendererEngine.h"
 #include "GameObjectManager.h"
 #include "GameObject.h"
@@ -14,12 +15,15 @@
 #include "Gun_StateHeader.h"
 #include "WeaponStateFactory.h"
 #include "Component_SkinnedMeshAnimator.h"
+#include "CollisionInfo.h"
 
 using namespace GIGA_Engine;
 using namespace Input;
 using namespace VECTOR3;
 using namespace BulletData;
 using namespace WeaponData;
+
+constexpr float LASER_POINTER_SCALE = 0.25f;	// レーザーポインタの大きさ
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
@@ -117,9 +121,24 @@ void GunWeapon::LateUpdate(RendererEngine& renderer)
         laserPoint->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 
         VEC3 laserDir = m_pLineRendererComp.lock()->get_Dir();
-        VEC3 laserPointPos = pos + laserDir * m_pLineRendererComp.lock()->get_Length();
+		VEC3 laserPointPos = VEC3(10000.0f); // 何処にもあたってない場合、とりあえず遠くに置いておく
+        
+		// レイの情報を作る
+        CollInData_Ray ray;
+		ray._point = pos;
+		ray._dir = laserDir * m_pLineRendererComp.lock()->get_Length();
+        
+		unsigned hitMask = UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::ENEMY);  // 建物と敵に当たるようにする
+        CollisionInfo hitInfo;
+		
+        // レイキャストして当たった位置にレーザーポインタを置く
+        if (Master::m_pCollisionManager->CheckRaycast(ray, hitMask, &hitInfo))
+        {
+			laserPointPos = hitInfo.get_HitPoint(); // 少し浮かせる
+        }
+
         laserPoint->get_Transform().lock()->set_Pos(laserPointPos);
-        laserPoint->get_Transform().lock()->set_Scale(VEC3(0.5f));
+        laserPoint->get_Transform().lock()->set_Scale(VEC3(LASER_POINTER_SCALE));
 
     }
 
