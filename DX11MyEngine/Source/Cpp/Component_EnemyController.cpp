@@ -173,7 +173,7 @@ void EnemyController::Start(RendererEngine& renderer)
 		}
 	);
 
-	m_MoveSpeed = 1.0f;
+	m_MoveSpeed = 1.5f;
 
 	// ステートの作成（TODO:外から種類を変えられるようにする）
 	EnemyStateFactory::Create(m_StateMachine, ENEMY_TYPE::ENEMY_TYPE_ANT_Normal, renderer);
@@ -267,6 +267,11 @@ void EnemyController::Draw(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void EnemyController::OnCollisionEnter(const class CollisionInfo& _other)
 {
+	if (_other.get_HitObject().lock()->get_Tag() == "Player")
+	{
+		_other.get_HitObject().lock()->get_Component<Health>()->TakeDamage(0.1f);
+	}
+
 	//// 通常弾
 	//if (_other.get_HitObject().lock()->get_Tag() == "Bullet_Normal")
 	//{

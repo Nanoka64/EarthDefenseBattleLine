@@ -5,7 +5,7 @@
   "bulletSimultaneousNum": 1,
   "fireRate": 60.0,
   "reloadTime": 2.0,
-  "accuracy": 0.01,
+  "accuracy": 0.005,
   "zoomLength": 2.0,
   "isLaserSight": false,
   "soundID": 0,
@@ -13,7 +13,7 @@
   "bulletParam": {
     "damage": 200.0,
     "damageDistAttenuationRate": 0.5,
-    "speed": 50.0,
+    "speed": 150.0,
     "acceleration": 0.0,
     "range": 2000.0,
     "penetrationsCount": 0,

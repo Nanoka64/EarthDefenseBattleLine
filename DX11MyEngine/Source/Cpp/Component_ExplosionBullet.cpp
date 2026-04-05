@@ -14,7 +14,7 @@
 #include "ResourceManager.h"
 
 constexpr float DECAL_SIZE_FACTOR        = 100.0f;   // デカールの大きさの補正値
-constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 40.0f;    // デカールの奥行に加算する補正値
+constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 2.0f;    // デカールの奥行に加算する補正値
 constexpr float DECAL_LIFE_TIME = 10.0f;             // デカールの生存時間
 using namespace VECTOR3;
 
@@ -98,7 +98,7 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             VEC3 scale;
             scale.x = m_Parameter._explosionRadius;
             scale.y = m_Parameter._explosionRadius;
-            scale.z = m_Parameter._explosionRadius + DECAL_Z_AXIS_SIZE_FACTOR;
+            scale.z = -m_Parameter._explosionRadius;
 
             auto obj = MeshFactory::CreateDecal(decal);
             obj->get_Component<DecalRenderer>()->Start(renderer);
@@ -113,8 +113,12 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             VEC3 effectRot = VEC3(abs(angleX - 0.05f), angleY, 0.0f);
             int exp_handle = Master::m_pEffectManager->PlayEffect(m_Parameter._explosionEffectHandleTag);   // 爆発
 
-            float expSize = m_Parameter._explosionRadius * 0.1;   // 爆発半径
-            VEC3 expRot = VEC3(Tool::RandRange(0.0f, 3.14f), Tool::RandRange(0.0f, 3.14f), Tool::RandRange(0.0f, 3.14f));
+            float expSize = m_Parameter._explosionRadius * 0.15;   // 爆発半径
+            VEC3 expRot = VEC3(
+                Master::m_pRandomManager->GetFloatRandom(0.0f, 3.14f), 
+                Master::m_pRandomManager->GetFloatRandom(0.0f, 3.14f), 
+                Master::m_pRandomManager->GetFloatRandom(0.0f, 3.14f)
+            );
 
             // 爆発
             Master::m_pEffectManager->SetScaleEffect(exp_handle, expSize, expSize, expSize);

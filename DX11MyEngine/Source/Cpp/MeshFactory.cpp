@@ -144,7 +144,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateSprite(const CreateSpriteIn
         pObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
     }
 
-    // TODO:–³ðŒDontDestroy
+    // TODO:–³ðŒDontDestroyiRT‚ªÁ‚³‚ê‚Ä‚µ‚Ü‚¤‚½‚ßj
     pObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
 
 

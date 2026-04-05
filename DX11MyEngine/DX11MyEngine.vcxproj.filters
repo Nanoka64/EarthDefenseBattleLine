@@ -657,6 +657,9 @@
     <ClCompile Include="Source\Cpp\WeaponDataManager.cpp">
       <Filter>ソース ファイル\Game\Weapon</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Cpp\MissionDirector.cpp">
+      <Filter>ソース ファイル\Game\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Header\SHADER.h">
@@ -1094,6 +1097,9 @@
     <ClInclude Include="Source\Header\ConstantUtilityData.h">
       <Filter>ソース ファイル\Game\Constant</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Header\MissionDirector.h">
+      <Filter>ソース ファイル\Game\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Shader\ConstantBuffers_H.hlsli">
@@ -1193,6 +1199,9 @@
       <Filter>HLSL\VS</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\Decal_PS.hlsl">
+      <Filter>HLSL\PS\Foward</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\Sprite_NoTexture_PS.hlsl">
       <Filter>HLSL\PS\Foward</Filter>
     </FxCompile>
   </ItemGroup>

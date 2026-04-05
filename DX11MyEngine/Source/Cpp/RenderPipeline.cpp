@@ -596,15 +596,15 @@ void RenderPipeline::CopyToFrameBuffer_PathRender(RendererEngine &renderer)
     renderer.RegisterCullMode(CULL_MODE::BACK);
 
 
-    // 透明度アリオブジェクト（UIも）の描画
-    Master::m_pGameObjectManager->Alpha_ObjectRenderPass(renderer);
-    Master::m_pGameObjectManager->Alpha_2DObjectRenderPass(renderer);
-
-
     /*
     * エフェクシアの描画もここでする！！
     */
     Master::m_pEffectManager->DrawEffect();
+
+    // 透明度アリオブジェクト（UIも）の描画
+    Master::m_pGameObjectManager->Alpha_ObjectRenderPass(renderer);
+    Master::m_pGameObjectManager->Alpha_2DObjectRenderPass(renderer);
+
 
 
 

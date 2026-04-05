@@ -8,6 +8,7 @@
 //  ★★★シングルトン★★★
 //
 // 【?】UIの管理を行う
+//      プールからスプライトやボタンを取り出す役割を担う
 //
 // ***************************************************************************************
 class UIManager
@@ -57,8 +58,6 @@ public:
     /// <param name="_param">ボタンのパラメータ</param>
     /// <returns></returns>
     GameObject* GetButton(RendererEngine &renderer, const UIData::RectTransformData &_transformData, const UIData::ButtonUIData &_param);
-
-    void PlayerUI();
 
 private:
 	// コピー禁止

@@ -64,6 +64,10 @@ public:
 	void set_BlendMode(const BLEND_MODE _blend) { m_BlendMode = _blend; }
 	BLEND_MODE get_BlendMode()const { return m_BlendMode; }
 
+	// シェーダの設定
+	void set_ShaderType(const SHADER_TYPE _type) { m_ShaderType = _type; }
+	SHADER_TYPE get_ShaderType()const { return m_ShaderType; }
+
 	/// <summary>
 	/// テクスチャの設定
 	/// </summary>

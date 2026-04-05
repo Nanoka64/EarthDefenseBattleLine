@@ -126,7 +126,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         model.SetupMaterial = matInfo;
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 50; i++)
         {
             model.ObjTag = "Ant"/* + std::to_string(i + 1)*/;   // タグ
 
@@ -260,8 +260,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         matInfo[3].Index = 3;
         matInfo[3].pMaterialData = matPtr4;
 
-		const VEC3 BUILDING_COLIDER_SCALE = VEC3(60.0f, 180.0f, 30.0f);
-
         CreateModelInfo model;
         model.pRenderer = m_pRenderer;
         model.Path = "Resource/Model/Building/02/Building_01.fbx";
@@ -270,21 +268,30 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         model.MatNum = 4;
         model.SetupMaterial = matInfo;
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
-        auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<MyTransform>()->set_Scale(3.0f, 3.0f, 3.0f);
-        obj->get_Component<MyTransform>()->set_Pos(-700.0f, 0.0f, 1000.0f);
-        obj->get_Component<MyTransform>()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
 
-        // コライダーの追加
-        auto collider = obj->add_Component<BoxCollider>();
-        collider->set_Size(VEC3(60.0f, 180.0f, 30.0f));
-        collider->set_Center(VEC3(0.0f, 0.0f, 0.0f));
-        collider->set_IsStatic(true);
-        // 衝突カテゴリ
-        collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
+        for (int x = -2; x < 3; x++)
+        {
+            for (int y = -5; y < 5; y++)
+            {
+                VEC3 scale = Master::m_pRandomManager->GetFloatRandom(0.1f, 1.5f);
 
-        // コライダーの登録
-        Master::m_pCollisionManager->RegisterCollider(obj->get_Component<BoxCollider>());
+                auto obj = MeshFactory::CreateModel(model);
+                obj->get_Component<MyTransform>()->set_Scale(scale);
+                obj->get_Component<MyTransform>()->set_Pos(50.0f * x, 0.0f, 30.0f * y);
+                obj->get_Component<MyTransform>()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
+
+                // コライダーの追加
+                auto collider = obj->add_Component<BoxCollider>();
+                collider->set_Size(VEC3(20.0f * scale.x, 30.0f * scale.x, 10.0f * scale.x));
+                collider->set_Center(VEC3(0.0f, 30.0f * scale.x, 0.0f));
+                collider->set_IsStatic(true);
+                // 衝突カテゴリ
+                collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
+
+                // コライダーの登録
+                Master::m_pCollisionManager->RegisterCollider(obj->get_Component<BoxCollider>());
+            }
+        }
     }
 
     /* マザーシップの生成 */

@@ -11,8 +11,8 @@ using namespace VECTOR2;
 using namespace VECTOR3;
 using namespace VECTOR4;
 
-constexpr int NUM_DEFAULT__SPRITE = 15;
-constexpr int NUM_MAX__SPRITE = 30;       
+constexpr int NUM_DEFAULT__SPRITE = 30;
+constexpr int NUM_MAX__SPRITE = 300;       
 constexpr int NUM_DEFAULT__BUTTON = 15;
 constexpr int NUM_MAX__BUTTON = 30;       
 
@@ -74,7 +74,7 @@ bool UIManager::Init(RendererEngine &renderer)
         [&renderer]()->GameObject *
         {
             CreateSpriteInfo sprite;
-            sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/ギガンティック・コントロール_ロゴ2.png");  
+            sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/GIGACON_Logo.png");  
             sprite.ObjTag = "Sprite";
             sprite.pRenderer = &renderer;
             sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
@@ -131,7 +131,7 @@ bool UIManager::Init(RendererEngine &renderer)
         [&renderer]()->GameObject *
         {
             CreateSpriteInfo sprite;
-            sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/ギガンティック・コントロール_ロゴ2.png");
+            sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/GIGACON_Logo.png");
             sprite.ObjTag = "Sprite";
             sprite.pRenderer = &renderer;
             sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
@@ -296,21 +296,20 @@ GameObject *UIManager::GetSprite(RendererEngine &renderer, const UIData::RectTra
         return nullptr;
     }
 
+    // トランスフォームの設定 *********************************************************************
     UIData::RectTransformData::SetRectTransformData(*transform.get(), _transformData);
 
     obj->set_LayerRank(_param._layerRank);  // 描画ランクの設定
 	obj->set_Tag(_param._tag);              // タグの設定
 
-    // テクスチャの読み込み
-    auto texture = Master::m_pResourceManager->LoadWIC_Texture(Tool::StringToWstring(_param._imagePath));
-    
-    // スプライトの初期化
+
+    // スプライトの初期化 *********************************************************************
     auto sprite = obj->get_Component<SpriteRenderer>();
-    sprite->set_Color(_param._color);
-    sprite->set_UVOffset(_param._UVOffset);
-    if (texture != nullptr) {
-        sprite->set_Texture(texture, 0);
+    if (sprite == nullptr) {
+        MessageBox(NULL, "スプライトコンポーネントが見つかりません", "UIManager", MB_OK);
+        return nullptr;
     }
+    UIData::ButtonUIData::SetSpriteData(*sprite.get(), _param); // データのセット
 
     // 更新リストに登録
     m_ExtractedUIMap[UIData::UI_TYPE::SPRITE].push_back(obj);
@@ -372,3 +371,4 @@ GameObject *UIManager::GetButton(RendererEngine &renderer, const UIData::RectTra
 
     return obj;
 }
+

@@ -27,14 +27,19 @@ void UIData::RectTransformData::SetRectTransformData(RectTransform &_out, const 
 /// <param name="_param">パラメータ</param>
 void UIData::SpriteUIData::SetSpriteData(SpriteRenderer &_out, const UIData::SpriteUIData &_param)
 {
-    // テクスチャの読み込み
-    auto texture = Master::m_pResourceManager->LoadWIC_Texture(Tool::StringToWstring(_param._imagePath));
-    // スプライトの初期化
-    _out.set_Color(_param._color);
-    _out.set_UVOffset(_param._UVOffset);
-    if (texture != nullptr) {
-        _out.set_Texture(texture, 0);
+	// パスが空でない場合はテクスチャの読み込みをする 
+    // 空なら、テクスチャは設定せずにカラーのみ設定する
+    if (_param._imagePath.empty() == false)
+    {
+        // テクスチャの読み込み
+        auto texture = Master::m_pResourceManager->LoadWIC_Texture(Tool::StringToWstring(_param._imagePath));
+        _out.set_UVOffset(_param._UVOffset);
+        if (texture != nullptr) {
+            _out.set_Texture(texture, 0);
+        }
     }
+    _out.set_ShaderType(_param._shaderType);
+    _out.set_Color(_param._color);
 }
 
 /// <summary>

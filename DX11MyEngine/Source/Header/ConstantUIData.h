@@ -69,9 +69,10 @@ namespace UIData
     /// </summary>
     struct SpriteUIData : UIBase
     {
-        std::string _imagePath;         // 使用する画像のタグ
+        std::string _imagePath;         // 使用する画像のパス（空なら、テクスチャは設定せずにカラーのみ設定する）
         VECTOR4::VEC4 _color = VECTOR4::VEC4(1.0f);	// 頂点カラー
         VECTOR2::VEC2 _UVOffset = VECTOR2::VEC2();	// uvオフセット
+		SHADER_TYPE _shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;		// シェーダーの種類
 
 
         /// <summary>

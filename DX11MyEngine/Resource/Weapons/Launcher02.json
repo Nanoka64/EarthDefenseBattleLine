@@ -15,11 +15,11 @@
     "damageDistAttenuationRate": 0.5,
     "speed": 200.0,
     "acceleration": 0.0,
-    "range": 600.0,
+    "range": 200.0,
     "penetrationsCount": 0,
     "collisionSize": 0.0,
     "gravityScale": 0.0,
-    "explosionRadius": 7.0,
+    "explosionRadius": 10.0,
     "explosionEffectHandleTag": "Explosion_Plasma_01",
     "isSmoke" : false
   }

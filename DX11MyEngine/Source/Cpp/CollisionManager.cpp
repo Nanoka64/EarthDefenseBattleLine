@@ -825,7 +825,7 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
 
     t_Min = tx_Min;
     t_Max = tx_Max;
-    hitNnormal = (dir.x < 0.0f) ? VEC3(1.0f, 0.0f, 0.0f) : VEC3(-1.0f, 0.0f, 0.0f);
+    hitNnormal = (dir.x < 0.0f) ? VEC3(-1.0f, 0.0f, 0.0f) : VEC3(1.0f, 0.0f, 0.0f);
 
 
 
@@ -870,7 +870,7 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
     // YŽ²‚Ì•û‚ªi“ü‚ª’x‚¢iYŽ²‚Ì–Ê‚©‚ç” ‚É“ü‚Á‚½j
     if (t_Min < ty_Min) {
         t_Min = ty_Min;
-		hitNnormal = (dir.y < 0.0f) ? VEC3(0.0f, 1.0f, 0.0f) : VEC3(0.0f, -1.0f, 0.0f);
+		hitNnormal = (dir.y < 0.0f) ? VEC3(0.0f, -1.0f, 0.0f) : VEC3(0.0f, 1.0f, 0.0f);
     }
 
     if (t_Max > ty_Max)t_Max = ty_Max;
@@ -916,7 +916,7 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
     // XŽ²‚ÆYŽ²‚Ì—Ìˆæ‚ª”í‚Á‚Ä‚¢‚È‚¢
     if (t_Min < tz_Min) {
         t_Min = tz_Min;
-		hitNnormal = (dir.z < 0.0f) ? VEC3(0.0f, 0.0f, 1.0f) : VEC3(0.0f, 0.0f, -1.0f);
+		hitNnormal = (dir.z < 0.0f) ? VEC3(0.0f, 0.0f, -1.0f) : VEC3(0.0f, 0.0f, 1.0f);
     }
     if (t_Max > tz_Max)t_Max = tz_Max;
 
