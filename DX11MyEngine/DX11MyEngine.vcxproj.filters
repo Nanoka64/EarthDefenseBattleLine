@@ -259,6 +259,12 @@
     <Filter Include="ソース ファイル\Game\Scene\Result">
       <UniqueIdentifier>{cb343d01-e87d-425e-ba78-85e3a10a87e2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Game\Component\Building">
+      <UniqueIdentifier>{98a8be31-7d89-4b47-b8b2-05976746ce62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Component\Building\State_Building">
+      <UniqueIdentifier>{93638b94-306b-4f19-abe5-c8ad00379e96}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Cpp\SHADER.cpp">
@@ -659,6 +665,15 @@
     </ClCompile>
     <ClCompile Include="Source\Cpp\MissionDirector.cpp">
       <Filter>ソース ファイル\Game\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_BuildingController.cpp">
+      <Filter>ソース ファイル\Game\Component\Building</Filter>
+    </ClCompile>
+    <ClCompile Include="Building_State.cpp">
+      <Filter>ソース ファイル\Game\Component\Building\State_Building</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\BuildingStateFactory.cpp">
+      <Filter>ソース ファイル\State\Factory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1099,6 +1114,21 @@
     </ClInclude>
     <ClInclude Include="Source\Header\MissionDirector.h">
       <Filter>ソース ファイル\Game\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_BuildingController.h">
+      <Filter>ソース ファイル\Game\Component\Building</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Building_State.h">
+      <Filter>ソース ファイル\Game\Component\Building\State_Building</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ConstantBuildingData.h">
+      <Filter>ソース ファイル\Game\Constant</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ConstantEnemyData.h">
+      <Filter>ソース ファイル\Game\Constant</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\BuildingStateFactory.h">
+      <Filter>ソース ファイル\State\Factory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,130 @@
+#pragma once
+#include "IState.h"
+#include "ConstantBuildingData.h"
+
+// ***************************************************************************************
+// ---------------------------------------------------------------------------------------
+/* --- @:Building_IdleState Class --- */
+//
+//  šŒp³FIComponent š
+//
+// y?z‘Ò‹@ƒXƒe[ƒg
+//		
+// ***************************************************************************************
+class Building_IdleState : public IState<class BuildingController>
+{
+private:
+
+public:
+	void OnEnter(class BuildingController* pOwner) override;
+	void OnExit(class BuildingController* pOwner)override;
+	int Update(class BuildingController* pOwner)override;
+};
+
+
+// ***************************************************************************************
+// ---------------------------------------------------------------------------------------
+/* --- @:Building_CllapseInState Class --- */
+//
+//  šŒp³FIComponent š
+//
+// y?z“|‰ón‚ßƒXƒe[ƒg
+//		
+// ***************************************************************************************
+class Building_CllapseInState : public IState<class BuildingController>
+{
+private:
+
+public:
+	void OnEnter(class BuildingController* pOwner) override;
+	void OnExit(class BuildingController* pOwner)override;
+	int Update(class BuildingController* pOwner)override;
+};
+
+
+// ***************************************************************************************
+// ---------------------------------------------------------------------------------------
+/* --- @:Building_CllapseInState Class --- */
+//
+//  šŒp³FIComponent š
+//
+// y?z“|‰ó’†ƒXƒe[ƒg
+//		
+// ***************************************************************************************
+class Building_CllapseNowState : public IState<class BuildingController>
+{
+private:
+	float m_CrntCollapseTime;	 // Œ»İ‚Ì“|‰óŠÔ
+	float m_CollapseTime;		 // “|‰ó‚É‚©‚©‚éŠÔ
+	float m_CollapseTargetAngle; // “|‚ê‚éŠp“x 
+	float m_SunkRateY;			 // YÀ•W‚ª‚Ç‚Ì‚­‚ç‚¢’¾‚ñ‚¾‚©
+
+public:
+	void OnEnter(class BuildingController* pOwner) override;
+	void OnExit(class BuildingController* pOwner)override;
+	int Update(class BuildingController* pOwner)override;
+};
+
+
+// ***************************************************************************************
+// ---------------------------------------------------------------------------------------
+/* --- @:Building_IdleState Class --- */
+//
+//  šŒp³FIComponent š
+//
+// y?z“|‰óI—¹ƒXƒe[ƒg
+//		
+// ***************************************************************************************
+class Building_CllapseEndState : public IState<class BuildingController>
+{
+private:
+	float m_CrntCollapseEndTime;	// Œ»İ‚Ì“|‰óI—¹ŠÔ
+
+	VECTOR3::VEC3 m_Rot;
+
+public:
+	void OnEnter(class BuildingController* pOwner) override;
+	void OnExit(class BuildingController* pOwner)override;
+	int Update(class BuildingController* pOwner)override;
+};
+
+
+// ***************************************************************************************
+// ---------------------------------------------------------------------------------------
+/* --- @:Building_FallState Class --- */
+//
+//  šŒp³FIComponent š
+//
+// y?z“|‰ó‚ªI‚í‚Á‚ÄA— ¢ŠE‚Ö—‚¿‚Ä‚¢‚­ƒXƒe[ƒg
+//		
+// ***************************************************************************************
+class Building_FallState : public IState<class BuildingController>
+{
+private:
+
+public:
+	void OnEnter(class BuildingController* pOwner) override;
+	void OnExit(class BuildingController* pOwner)override;
+	int Update(class BuildingController* pOwner)override;
+};
+
+
+// ***************************************************************************************
+// ---------------------------------------------------------------------------------------
+/* --- @:Building_EndState Class --- */
+//
+//  šŒp³FIComponent š
+//
+// y?zI—¹ƒXƒe[ƒg
+//		
+// ***************************************************************************************
+class Building_EndState : public IState<class BuildingController>
+{
+private:
+
+public:
+	void OnEnter(class BuildingController* pOwner) override;
+	void OnExit(class BuildingController* pOwner)override;
+	int Update(class BuildingController* pOwner)override;
+};
+

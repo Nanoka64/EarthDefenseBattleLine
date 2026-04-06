@@ -92,6 +92,11 @@ void c_Game_Play::OnEnter(SceneManager* pOwner)
     for (int i = 0; i < 50; i++) {
         m_pRaderEnemySpriteObjArray.push_back(Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData));
     }
+
+    // ****************************************************
+    //				ゲームBGMの再生
+    // ****************************************************
+    Master::m_pSoundManager->PlayBGM(BGM_ID::BGM_GAME_01);
 }
 
 
@@ -110,6 +115,11 @@ void c_Game_Play::OnExit(SceneManager* pOwner)
     for (int i = 0; i < m_pRaderEnemySpriteObjArray.size(); i++) {
         m_pRaderEnemySpriteObjArray[i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
     }
+
+    // ****************************************************
+    //				ゲームBGMの停止
+    // ****************************************************
+    Master::m_pSoundManager->StopBGM(BGM_ID::BGM_GAME_01);
 }
 
 
@@ -153,26 +163,26 @@ int c_Game_Play::Update(SceneManager *pOwner)
     }
 
 
-    if (m_EnemyNum < m_pRaderEnemySpriteObjArray.size())
-    {
-        int diff = m_pRaderEnemySpriteObjArray.size() - m_EnemyNum;
+    //if (m_EnemyNum < m_pRaderEnemySpriteObjArray.size())
+    //{
+    //    int diff = m_pRaderEnemySpriteObjArray.size() - m_EnemyNum;
 
-        for (int i = 0; i < diff; i++)
-        {
-            m_pRaderEnemySpriteObjArray[(m_pRaderEnemySpriteObjArray.size() - 1) - i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // プールへ返す
-            m_pRaderEnemySpriteObjArray.pop_back();
-        }
-    }
+    //    for (int i = 0; i < diff; i++)
+    //    {
+    //        m_pRaderEnemySpriteObjArray[(m_pRaderEnemySpriteObjArray.size() - 1) - i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // プールへ返す
+    //        m_pRaderEnemySpriteObjArray.pop_back();
+    //    }
+    //}
 
 	VEC3 playerPos = m_pPlayerObj.lock()->get_Transform().lock()->get_VEC3ToPos();
     float cameraAngleH = m_pRenderer->get_CameraComponent()->get_Angle_H();
 
     // カメラの水平回転角度に基づいて、サインとコサインを計算（ずれてしまうので0.7で補正）
-	float cameraH_s = sinf(-cameraAngleH - 0.7854f);
-    float cameraH_c = cosf(-cameraAngleH - 0.7854f);
+	float cameraH_s = sinf(-cameraAngleH - M_PI_2);
+    float cameraH_c = cosf(-cameraAngleH - M_PI_2);
 
 	// レーダーの敵の位置更新
-    for (int i = 0; i < m_pRaderEnemySpriteObjArray.size(); i++)
+    for (int i = 0; i < antList.size(); i++)
     {
         auto& enemy = antList[i];
         VEC3 enemyPos = enemy->get_Transform().lock()->get_VEC3ToPos();

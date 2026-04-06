@@ -76,13 +76,15 @@ struct CreateUtilityMeshInfo : public CreateMesh_Base
     bool IsNormalMap;            // 法線マップ使用するかどうか
     SetupMaterialInfo* MaterialData; // マテリアル情報
     UINT MatNum;                     // マテリアル数
+	VECTOR2::VEC2 TilingScale;       // タイリングスケール（UVの繰り返し数） 
 
     // コンストラクタ
     CreateUtilityMeshInfo():
         MaterialData(nullptr),
         MatNum(0),
         Type(UTILITY_MESH_TYPE::NONE),
-        IsNormalMap(false)
+        IsNormalMap(false),
+        TilingScale(VECTOR2::VEC2(1.0f,1.0f))
     {};
 };
 

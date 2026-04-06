@@ -20,6 +20,7 @@
     "collisionSize": 0.0,
     "gravityScale": 0.0,
     "explosionRadius": 12.0,
-    "explosionEffectHandleTag": "Explosion_01"
+    "explosionEffectHandleTag": "Explosion_01",
+    "isSmoke" : true
   }
 }

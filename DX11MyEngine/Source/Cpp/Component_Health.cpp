@@ -63,7 +63,7 @@ void Health::TakeDamage(const float _dmg)
     m_CrntHP -= _dmg;
     
     // ダメージ処理を行う
-    for (auto& callback : m_DamageTaskArray){
+    for (auto& callback : m_DamageTaskArray) {
         callback(_dmg);
     }
 
@@ -73,7 +73,7 @@ void Health::TakeDamage(const float _dmg)
         m_IsDead = true;
 
 
-        // ダメージ処理を行う
+        // 死亡処理を行う
         for (auto& callback : m_DeathTaskArray) {
             callback();
         }

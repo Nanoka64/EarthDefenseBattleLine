@@ -372,10 +372,13 @@ std::shared_ptr<MeshResourceData> MeshInfoFactory::CreateSphereInfo(RendererEngi
 
 // ----------------------------------------------------------------------------------------------------------------------
 //       * MeshFactory Class - 平面の作成- *
-// 引数 1.マテリアル
-// 		2.マテリアル数
+// 引数 1.描画エンジン
+// 		2.マテリアル
+// 		3.マテリアル数
+// 		4.ノーマルマップを使用するか
+// 		5.タイルリングスケール
 // ----------------------------------------------------------------------------------------------------------------------
-std::shared_ptr<MeshResourceData> MeshInfoFactory::CreatePlaneInfo(RendererEngine& renderer, std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap)
+std::shared_ptr<MeshResourceData> MeshInfoFactory::CreatePlaneInfo(RendererEngine& renderer, std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap, const VECTOR2::VEC2& _tilingScale)
 {
 	auto pDevice = renderer.get_Device();
 	auto meshData = std::make_shared<MeshResourceData>();
@@ -390,10 +393,10 @@ std::shared_ptr<MeshResourceData> MeshInfoFactory::CreatePlaneInfo(RendererEngin
 
 	const VEC2 uv[]
 	{
-		VEC2(0.0f, 0.0f),
-		VEC2(1.0f, 0.0f),
-		VEC2(0.0f, 1.0f),
-		VEC2(1.0f, 1.0f),
+		VEC2(0.0f, 0.0f) * _tilingScale,
+		VEC2(1.0f, 0.0f) * _tilingScale,
+		VEC2(0.0f, 1.0f) * _tilingScale,
+		VEC2(1.0f, 1.0f) * _tilingScale,
 	};
 
 	// 法線マップあり

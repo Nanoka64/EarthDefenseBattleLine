@@ -92,24 +92,45 @@ namespace Tool
 
     //-----------------------------------------
     /*      イージング関数    */
+    // In : 加速
+    // Out : 減速
     //-----------------------------------------
     namespace Easing
     {
+        // --------------------------------------
+        //                  加速 
+        // --------------------------------------
+         
         // 軽い加速
-        inline float InQuad(float _t) {
+        inline float EaseInQuad(float _t) {
             return _t * _t;
         }
 
         // 強い加速
-        inline float InCubic(float _t) {
+        inline float EaseInCubic(float _t) {
             return _t * _t * _t;
         }
 
+        // かなり強い加速
+        inline float EaseInQuart(float _t) {
+            return _t * _t * _t * _t;
+        }
+
+        // 超強い加速
+        inline float EaseInQuint(float _t) {
+            return _t * _t * _t * _t * _t;
+        }
+
         // 自然な加速
-        inline float InSine(float _t) {
+        inline float EaseInSine(float _t) {
             return 1.0f - cosf((_t * DirectX::XM_PI) / 2.0f);
         }
 
+
+        // --------------------------------------
+        //                  減速
+        // --------------------------------------
+        
         // ヒュッ...シュタッって感じ
         // 2乗
         inline float EaseOutQuad(float _t){
@@ -133,6 +154,21 @@ namespace Tool
         inline float EaseOutQuint(float _t){
             float invT = 1.0f - _t;
             return 1.0f - (invT * invT * invT * invT * invT);
+        }
+
+
+        // --------------------------------------
+        //          ばねみたいなやつ
+        // --------------------------------------
+
+        // 行って戻る
+        inline float EaseOutBack(float t) {
+            const float c1 = 1.70158f;
+            const float c3 = c1 + 1.0f;
+
+            // (t-1) を計算
+            float t1 = t - 1.0f;
+            return 1.0f + c3 * pow(t1, 3) + c1 * pow(t1, 2);
         }
     }
 

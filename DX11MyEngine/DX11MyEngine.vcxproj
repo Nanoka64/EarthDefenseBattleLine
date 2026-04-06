@@ -193,6 +193,8 @@
     <ClInclude Include="Source\Header\Ant_TrackingState.h" />
     <ClInclude Include="Source\Header\BitFlag.h" />
     <ClInclude Include="Source\Header\BlendManager.h" />
+    <ClInclude Include="Source\Header\BuildingStateFactory.h" />
+    <ClInclude Include="Source\Header\Building_State.h" />
     <ClInclude Include="Source\Header\BulletManager.h" />
     <ClInclude Include="Source\Header\CollisionManager.h" />
     <ClInclude Include="Source\Header\Component_BoxCollider.h" />
@@ -201,6 +203,7 @@
     <ClInclude Include="Source\Header\Component_AssultRifle.h" />
     <ClInclude Include="Source\Header\Component_BillboardRenderer.h" />
     <ClInclude Include="Source\Header\Component_BillboardResource.h" />
+    <ClInclude Include="Source\Header\Component_BuildingController.h" />
     <ClInclude Include="Source\Header\Component_BulletBase.h">
       <SubType>
       </SubType>
@@ -244,7 +247,9 @@
     <ClInclude Include="Source\Header\Component_WeaponBase.h" />
     <ClInclude Include="Source\Header\CompositeState.h" />
     <ClInclude Include="Source\Header\Component_GunWeapon.h" />
+    <ClInclude Include="Source\Header\ConstantBuildingData.h" />
     <ClInclude Include="Source\Header\ConstantBulletData.h" />
+    <ClInclude Include="Source\Header\ConstantEnemyData.h" />
     <ClInclude Include="Source\Header\ConstantPlayerData.h" />
     <ClInclude Include="Source\Header\ConstantUIData.h" />
     <ClInclude Include="Source\Header\ConstantUtilityData.h" />
@@ -367,10 +372,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Building_State.cpp" />
     <ClCompile Include="Source\Cpp\Ant_IdleState.cpp" />
     <ClCompile Include="Source\Cpp\Ant_TrackingState.cpp" />
     <ClCompile Include="Source\Cpp\BitFlag.cpp" />
     <ClCompile Include="Source\Cpp\BlendManager.cpp" />
+    <ClCompile Include="Source\Cpp\BuildingStateFactory.cpp" />
     <ClCompile Include="Source\Cpp\BulletManager.cpp" />
     <ClCompile Include="Source\Cpp\CollisionManager.cpp" />
     <ClCompile Include="Source\Cpp\Component_BoxCollider.cpp" />
@@ -379,6 +386,7 @@
     <ClCompile Include="Source\Cpp\Component_AssultRifle.cpp" />
     <ClCompile Include="Source\Cpp\Component_BillboardRenderer.cpp" />
     <ClCompile Include="Source\Cpp\Component_BillboardResource.cpp" />
+    <ClCompile Include="Source\Cpp\Component_BuildingController.cpp" />
     <ClCompile Include="Source\Cpp\Component_BulletBase.cpp">
       <SubType>
       </SubType>

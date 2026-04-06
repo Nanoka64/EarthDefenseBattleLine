@@ -16,6 +16,8 @@
 #include "Texture.h"
 
 using namespace GIGA_Engine;
+using namespace VECTOR3;
+using namespace VECTOR2;
 
 //*---------------------------------------------------------------------------------------
 //* @:MeshFactory Class 
@@ -117,7 +119,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateUtilityMesh(const CreateUti
     auto meshRenderer = pObj->add_Component<MeshRenderer>();
 
     // リソースのセットアップ
-    if (!meshResource->Setup(*info.pRenderer,info.ShaderType, info.Type, info.MaterialData->pMaterialData, info.MatNum, info.IsNormalMap))return {};
+    if (!meshResource->Setup(*info.pRenderer,info.ShaderType, info.Type, info.MaterialData->pMaterialData, info.MatNum, info.IsNormalMap, info.TilingScale))return {};
     
     // Rendererにリソースを設定
     meshRenderer->set_MeshResource(meshResource);
@@ -213,7 +215,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateSkybox(const CreateSkyboxIn
     auto skyRenderer = pObj->add_Component<SkyRenderer>();
 
     // リソースのセットアップ                                  ↓キューブにする
-    if (!meshResource->Setup(*info.pRenderer, info.ShaderType, UTILITY_MESH_TYPE::CUBE, info.MaterialData->pMaterialData, info.MatNum, false))return {};
+    if (!meshResource->Setup(*info.pRenderer, info.ShaderType, UTILITY_MESH_TYPE::CUBE, info.MaterialData->pMaterialData, info.MatNum, false, VEC2(1.0f,1.0f)))return {};
 
     // Rendererにリソースを設定
     skyRenderer->set_MeshResource(meshResource);
@@ -244,7 +246,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateDecal(const CreateDecalInfo
     auto decalRenderer = pObj->add_Component<DecalRenderer>();
 
     // リソースのセットアップ                                  ↓キューブにする
-    if (!meshResource->Setup(*info.pRenderer, info.ShaderType, UTILITY_MESH_TYPE::CUBE, info.MaterialData->pMaterialData, info.MatNum, false))return {};
+    if (!meshResource->Setup(*info.pRenderer, info.ShaderType, UTILITY_MESH_TYPE::CUBE, info.MaterialData->pMaterialData, info.MatNum, false, VEC2(1.0f,1.0f)))return {};
 
     // Rendererにリソースを設定
     decalRenderer->set_MeshResource(meshResource);

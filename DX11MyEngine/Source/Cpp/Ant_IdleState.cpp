@@ -5,6 +5,7 @@
 
 using namespace VECTOR3;
 using namespace VECTOR2;
+using namespace EnemyData;
 
 //*---------------------------------------------------------------------------------------
 //* @:Ant_IdleState Class 

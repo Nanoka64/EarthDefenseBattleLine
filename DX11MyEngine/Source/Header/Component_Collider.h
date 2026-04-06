@@ -15,11 +15,12 @@ enum class COLLIDER_TYPE
 enum class COLLISION_CATEGORY : unsigned
 {
 	NONE = 0,
-	PLAYER			= 1 << 0,
-	PLAYER_BULLET	= 1 << 1,
-	ENEMY			= 1 << 2,
-	ENEMY_BULLET	= 1 << 3,
-	BUILDING		= 1 << 4,
+	PLAYER				 = 1 << 0,	// ƒvƒŒƒCƒ„[
+	PLAYER_BULLET		 = 1 << 1,	// ƒvƒŒƒCƒ„[‚Ì’e
+	ENEMY				 = 1 << 2,	// “G
+	ENEMY_BULLET		 = 1 << 3,	// “G‚Ì’e
+	DESTRUCTION_BUILDING = 1 << 4,	// ”j‰ó‰Â”\‚ÈŒš•¨
+	BUILDING			 = 1 << 5,	// ”j‰ó•s‰Â”\‚ÈŒš•¨
 
 	EVERY = 0xFFFFFFFF	// ‘S‚Ä‚ÉÕ“Ë
 };

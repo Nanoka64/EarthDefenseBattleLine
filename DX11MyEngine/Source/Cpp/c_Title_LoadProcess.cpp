@@ -292,13 +292,13 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);// 破棄しない
         auto light = obj->add_Component<DirectionalLight>();
         light->set_LightColor(VEC3(1.0f, 1.0f, 1.0f));
-        light->set_Intensity(1.5f);
+        light->set_Intensity(3.2f);
         light->set_LightCameraTrackingObj(m_pCameraComp->get_OwnerObj().lock());
         light->Start(*m_pRenderer);
 
         obj->get_Transform().lock()->set_Pos(VEC3(0.0f, 1000.0f, -1000.0f));
         obj->get_Transform().lock()->set_Scale(VEC3(30.0, 30.0, 80.0));
-        obj->get_Transform().lock()->set_RotateToDeg(VEC3(50.0f, 150.0f, 0.0f));
+        obj->get_Transform().lock()->set_RotateToDeg(VEC3(30.0f, 150.0f, 0.0f));
     }
 
     ///* タイトル画面背景用スプライト1 */

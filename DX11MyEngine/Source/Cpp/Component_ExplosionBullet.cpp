@@ -176,7 +176,7 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     CollInData_Ray ray;
 	ray._point = crntPos;
 	ray._dir = newPos - crntPos;    // 前回の位置から新しい位置へのベクトル
-    unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING);
+    unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);
 	CollisionInfo hitInfo;
 
     if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
@@ -192,7 +192,7 @@ void ExplosionBullet::Update(RendererEngine &renderer)
         auto transform = owner->get_Transform().lock();
         VEC3 pos = transform->get_VEC3ToPos();
 
-        unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY);   // 敵のみ
+        unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);   // 敵と破壊可能な建物
 
         // 範囲内チェック
         auto targets = Master::m_pCollisionManager->CheckSphere(pos, m_Parameter._explosionRadius, mask);

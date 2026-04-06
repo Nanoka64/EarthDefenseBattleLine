@@ -15,6 +15,8 @@ using namespace GIGA_Engine;
 using namespace VECTOR3;
 using namespace VECTOR2;
 
+using namespace EnemyData;
+
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
 //* [引数]

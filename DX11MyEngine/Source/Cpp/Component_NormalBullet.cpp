@@ -191,7 +191,7 @@ void NormalBullet::Update(RendererEngine &renderer)
     CollInData_Ray ray;
     ray._point = crntPos;
 	ray._dir = newPos - crntPos;    // 前回の位置から新しい位置へのベクトル
-    unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING);
+    unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);
     CollisionInfo hitInfo;
 
     if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
@@ -203,17 +203,19 @@ void NormalBullet::Update(RendererEngine &renderer)
 
         auto hitObj = hitInfo.get_HitObject().lock();
         if (!hitObj) return;
+        COLLISION_CATEGORY hitCategory = hitInfo.get_HitCollider().lock()->get_CollisionCategory();
 
-        // 相手がHealthComponentを持っているか確認
+        // 相手がHealthComponentを持っているか確認（破壊可能な建物は壊せないように）
         auto health = hitObj->get_Component<Health>();
-        if (health)
+        if (health && hitCategory != COLLISION_CATEGORY::DESTRUCTION_BUILDING)
         {
             // 弾が保持しているダメージ値を渡す
             health->TakeDamage(m_Parameter._damage);
         }
 
+
         // 建物に当たったら即消えるようにして、その他は貫通数を減らす
-        if (hitInfo.get_HitCollider().lock()->get_CollisionCategory() == COLLISION_CATEGORY::BUILDING)
+        if (hitCategory == COLLISION_CATEGORY::BUILDING || hitCategory == COLLISION_CATEGORY::DESTRUCTION_BUILDING)
         {
             m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
         }

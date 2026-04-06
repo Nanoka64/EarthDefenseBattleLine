@@ -53,6 +53,10 @@ enum class SOUND_ID
     /* 爆発 */
     EXPLOSION01,
 
+    /* 建物 */
+    BUILDING_DESTRUCTION,
+    BUILDING_FALL,
+
 
     /* 兵士 */
     SOLDIER_R_JUMP_IN,       // ジャンプ - 開始
@@ -104,7 +108,7 @@ enum class BGM_ID
 
     // BGM
     BGM_TITLE_01,
-
+	BGM_GAME_01,
 
     NUM
 };

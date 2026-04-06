@@ -7,6 +7,7 @@
 #include "Ant_IdleState.h"
 #include "Ant_TrackingState.h"
 
+using namespace EnemyData;
 
 
 //*---------------------------------------------------------------------------------------

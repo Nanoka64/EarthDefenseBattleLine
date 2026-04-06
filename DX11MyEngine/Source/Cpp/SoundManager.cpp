@@ -271,6 +271,10 @@ bool SoundManager::InitXA2Sound(void)
 	Load_Wav("Resource/Sound/SE/Weapon/Explosion01.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::EXPLOSION01));
 	Load_Wav("Resource/Sound/SE/Weapon/GunChange_01.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::GUN_CHANGE01));
 
+	// 建物
+	Load_Wav("Resource/Sound/SE/Building/Destruction.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::BUILDING_DESTRUCTION));
+	Load_Wav("Resource/Sound/SE/Building/Fall.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::BUILDING_FALL));
+
 	// 兵士
 	Load_Wav("Resource/Sound/SE/Ranger/パンチの衣擦れ1.wav",SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SOLDIER_R_JUMP_IN));
 	Load_Wav("Resource/Sound/SE/Ranger/ジャンプの着地.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SOLDIER_R_JUMP_LAND));
@@ -282,6 +286,7 @@ bool SoundManager::InitXA2Sound(void)
 	
 	// BGM
 	Load_Wav("Resource/Sound/BGM/Flash_Shadow.wav", SOUND_TYPE::BGM, SOUND_ID_TO_INT(BGM_ID::BGM_TITLE_01));
+	Load_Wav("Resource/Sound/BGM/MusMus-BGM-170.wav", SOUND_TYPE::BGM, SOUND_ID_TO_INT(BGM_ID::BGM_GAME_01));
 
 	// ボイス
 	Load_Wav("Resource/Sound/Voice/Ranger/an000_01.wav",SOUND_TYPE::VOICE, SOUND_ID_TO_INT(VOICE_ID::SOLDIER_R_SHOUT_01));

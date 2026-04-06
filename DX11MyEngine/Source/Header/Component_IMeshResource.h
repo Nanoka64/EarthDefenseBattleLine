@@ -40,7 +40,7 @@ public:
 	IMeshResource(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
 	virtual~IMeshResource();
 
-	bool Setup(RendererEngine& renderer, SHADER_TYPE shaderType, UTILITY_MESH_TYPE type, std::shared_ptr<Material> materials, UINT materialNum, bool isNormalMap);	// ‰Šú‰»
+	bool Setup(RendererEngine& renderer, SHADER_TYPE shaderType, UTILITY_MESH_TYPE type, std::shared_ptr<Material> materials, UINT materialNum, bool isNormalMap, const VECTOR2::VEC2& _tilingScale);	// ‰Šú‰»
 
 
 	/// <summary>

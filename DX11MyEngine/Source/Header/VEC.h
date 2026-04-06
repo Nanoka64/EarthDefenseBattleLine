@@ -292,6 +292,7 @@ namespace VECTOR2
 		VEC2 operator+(const VEC2& vec)const { return { this->x + vec.x,this->y + vec.y}; };
 		VEC2 operator-(const VEC2& vec) const { return { this->x - vec.x,this->y - vec.y }; };
 		VEC2 operator*(float scl) const { return { this->x * scl,this->y * scl }; };
+		VEC2 operator*(const VEC2& vec) const { return { this->x * vec.x,this->y * vec.y}; };
 		VEC2 operator+() const { return *this; };
 		VEC2 operator-() const { return { -this->x, -this->y }; };
 		operator DirectX::XMFLOAT2()const { return DirectX::XMFLOAT2(x, y); }    // XMFLOAT2‚É“n‚·Û‚Ì•ÏŠ·
