@@ -17,13 +17,17 @@ namespace EnemyData
 	/// </summary>
 	enum ANT_STATE
 	{
-		ANT_STATE_IDLE,			// 待機
+		// 非アクティブ
+		ANT_STATE_PATROL_IDLE,	// 待機
+		ANT_STATE_PATROL_MOVE,	// 移動
+
+		// アクティブ
+		ANT_STATE_MOVE,			// 移動
 		ANT_STATE_TRACKING,		// 追従
 		ANT_STATE_ATTACK_BITE,	// 噛みつき攻撃
 		ANT_STATE_ATTACK_ACID,	// 酸攻撃
-		ANT_STATE_ESCAPE,		// 逃げる
-
-		ANT_STATE_NUM,
+		ANT_STATE_DAMAGED,		// ダメージ
+		ANT_STATE_DEAD,			// 死亡
 	};
 
 

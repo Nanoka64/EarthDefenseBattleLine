@@ -128,7 +128,7 @@ void GunWeapon::LateUpdate(RendererEngine& renderer)
 		ray._point = pos;
 		ray._dir = laserDir * m_pLineRendererComp.lock()->get_Length();
         
-		unsigned hitMask = UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::ENEMY);  // 建物と敵に当たるようにする
+		unsigned hitMask = UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING) | UINT_CAST(COLLISION_CATEGORY::ENEMY);  // 建物と敵に当たるようにする
         CollisionInfo hitInfo;
 		
         // レイキャストして当たった位置にレーザーポインタを置く

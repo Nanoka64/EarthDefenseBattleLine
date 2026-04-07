@@ -4,8 +4,7 @@
 #include "RendererEngine.h"
 
 // ƒAƒŠ
-#include "Ant_IdleState.h"
-#include "Ant_TrackingState.h"
+#include "Ant_StateHeader.h"
 
 using namespace EnemyData;
 

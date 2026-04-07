@@ -90,6 +90,8 @@ bool EffectManager::Setup(RendererEngine &renderer)
     LoadEffect(u"Resource/Effect/Explosion_Smoke_01.efkefc", "Explosion_Smoke_01");
     LoadEffect(u"Resource/Effect/Explosion_Plasma01.efkefc", "Explosion_Plasma_01");
     LoadEffect(u"Resource/Effect/Smoke_01.efkefc", "Smoke_01");
+    LoadEffect(u"Resource/Effect/Smoke_02.efkefc", "Smoke_02");
+    LoadEffect(u"Resource/Effect/Fragment.efkefc", "Fragment");
 
     return true;
 }
@@ -233,6 +235,7 @@ void EffectManager::StopEffect(int handle)
 void EffectManager::SetPositionEffect(int handle, float x, float y, float z)
 {
     m_EfkManager->SetLocation(handle, x, y, z);
+
 }
 
 // エフェクトの回転（ラジアン）を設定

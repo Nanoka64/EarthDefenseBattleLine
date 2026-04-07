@@ -504,8 +504,7 @@ std::vector<std::shared_ptr<Collider>> CollisionManager::CheckSphere(const VECTO
         }
          else if (col->get_ColliderType() == COLLIDER_TYPE::BOX) {
             auto boxCol = std::static_pointer_cast<BoxCollider>(col);
-            // ボックスの半分のサイズを半径として扱う
-            colRadius = boxCol->get_Size().Length() * 0.5;
+            colRadius = boxCol->get_Size().Length();
         }
          else {
             continue; // その他のコライダータイプはスキップ

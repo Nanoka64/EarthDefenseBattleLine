@@ -258,7 +258,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         collider->set_CollisionCategory(COLLISION_CATEGORY::PLAYER);
 
         // Õ“Ëƒ}ƒXƒN‚ÌÝ’è
-        collider->set_CollisionBitMask(UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING));
+        collider->set_CollisionBitMask(UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING));
 
         auto health = pPlayerObj->add_Component<Health>();
 

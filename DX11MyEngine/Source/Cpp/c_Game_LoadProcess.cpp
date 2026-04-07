@@ -284,8 +284,9 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
                 obj->add_Component<BuildingController>();
 
                 // 体力コンポーネントの追加
-                obj->add_Component<Health>();
-
+                auto health = obj->add_Component<Health>();
+				health->set_CrntHP(100.0f);
+				health->set_MaxHP(100.0f);
 
                 // コライダーの追加
                 auto collider = obj->add_Component<BoxCollider>();

@@ -130,7 +130,7 @@ void EnemyController::Start(RendererEngine& renderer)
 			//				 死亡音再生
 			// ****************************************************
 			//Master::m_pSoundManager->Play_RandPitch(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_DEAD), 300);
-			Master::m_pSoundManager->Play_3D(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_DEAD), pos, 1000.0f);
+			Master::m_pSoundManager->Play_3D(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_DEAD), pos, 500.0f);
 
             // 死亡エフェクト
 			int handle = Master::m_pEffectManager->PlayEffect("DeadExplosion");

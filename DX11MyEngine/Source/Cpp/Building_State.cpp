@@ -112,7 +112,12 @@ void Building_CllapseNowState::OnExit(BuildingController* pOwner)
 	//						エフェクト再生
 	//*****************************************************************************************
 	float scale = 10.0f;
-	int handle = Master::m_pEffectManager->PlayEffect("Smoke_01");
+	int handle = Master::m_pEffectManager->PlayEffect("Smoke_02");
+	Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y + m_SunkRateY, pos.z);
+	Master::m_pEffectManager->SetRotationEffect(handle, 0.0f, 0.0f, 0.0f);
+	Master::m_pEffectManager->SetScaleEffect(handle, scale, scale, scale);
+
+	handle = Master::m_pEffectManager->PlayEffect("Fragment");
 	Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y + m_SunkRateY, pos.z);
 	Master::m_pEffectManager->SetRotationEffect(handle, 0.0f, 0.0f, 0.0f);
 	Master::m_pEffectManager->SetScaleEffect(handle, scale, scale, scale);
@@ -241,6 +246,11 @@ int Building_FallState::Update(BuildingController* pOwner)
 		pos.y -= BUILDING_FALL_SPEED * deltaTime;
 
 		transform->set_Pos(pos);
+
+		if (pos.y < -100.0f)
+		{
+			return BUILDING_STATE::BUILDING_STATE_END;	// 終了ステートへ
+		}
 	}
 	return BUILDING_STATE::BUILDING_STATE_FALL;
 }
@@ -263,7 +273,7 @@ void Building_EndState::OnExit(BuildingController* pOwner)
 
 int Building_EndState::Update(BuildingController* pOwner)
 {
-	pOwner->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DELETE);
+	pOwner->get_OwnerObj().lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DELETE);
 
 	return BUILDING_STATE::BUILDING_STATE_END;
 }

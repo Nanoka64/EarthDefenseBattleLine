@@ -372,12 +372,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Building_State.cpp" />
     <ClCompile Include="Source\Cpp\Ant_IdleState.cpp" />
     <ClCompile Include="Source\Cpp\Ant_TrackingState.cpp" />
     <ClCompile Include="Source\Cpp\BitFlag.cpp" />
     <ClCompile Include="Source\Cpp\BlendManager.cpp" />
     <ClCompile Include="Source\Cpp\BuildingStateFactory.cpp" />
+    <ClCompile Include="Source\Cpp\Building_State.cpp" />
     <ClCompile Include="Source\Cpp\BulletManager.cpp" />
     <ClCompile Include="Source\Cpp\CollisionManager.cpp" />
     <ClCompile Include="Source\Cpp\Component_BoxCollider.cpp" />

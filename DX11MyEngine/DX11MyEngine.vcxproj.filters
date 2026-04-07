@@ -669,11 +669,11 @@
     <ClCompile Include="Source\Cpp\Component_BuildingController.cpp">
       <Filter>ソース ファイル\Game\Component\Building</Filter>
     </ClCompile>
-    <ClCompile Include="Building_State.cpp">
-      <Filter>ソース ファイル\Game\Component\Building\State_Building</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Cpp\BuildingStateFactory.cpp">
       <Filter>ソース ファイル\State\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Building_State.cpp">
+      <Filter>ソース ファイル\Game\Component\Building\State_Building</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

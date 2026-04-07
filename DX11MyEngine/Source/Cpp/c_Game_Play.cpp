@@ -13,9 +13,11 @@ using namespace SceneStateEnums;
 using namespace VECTOR3;
 using namespace VECTOR2;
 
-constexpr float MINIMAP_X = 1700.0f;    // ミニマップの中心X座標
-constexpr float MINIMAP_Y = 200.0f;     // ミニマップの中心X座標
-constexpr float MINIMAP_RADIUS = 150.0f;// ミニマップの半径
+constexpr float MINIMAP_X = 1750.0f;    // ミニマップの中心X座標
+constexpr float MINIMAP_Y = 150.0f;     // ミニマップの中心X座標
+constexpr float MINIMAP_RADIUS = 130.0f;// ミニマップの半径
+constexpr float MINIMAP_SIZE = 300.0f;  // ミニマップのサイズ
+constexpr float MINIMAP_ENEMY_ICON_SIZE = 10.0f; // ミニマップ上の敵アイコンのサイズ
 
 // 位置をミニマップ内の端に制限するユーティリティ
 void ClampToMinimap(int& x, int& y, int centerX, int centerY, float radius)
@@ -67,8 +69,8 @@ void c_Game_Play::OnEnter(SceneManager* pOwner)
     m_pPlayerHPBarSpriteObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
 
     // レーダー背景用スプライト **********************************************
-    rectData._size = VEC2(350.0f, 350.0f);
-    rectData._pos = VEC2(1700.0f, 200.0f);
+    rectData._size = VEC2(MINIMAP_SIZE, MINIMAP_SIZE);
+    rectData._pos = VEC2(MINIMAP_X, MINIMAP_Y);
     rectData._anchorMax = VEC2(0.0f, 0.0f);
     rectData._anchorMin = VEC2(0.0f, 0.0f);
 	rectData._pivot = VEC2(0.5f, 0.5f);         // ピボットを中心に設定
@@ -79,7 +81,7 @@ void c_Game_Play::OnEnter(SceneManager* pOwner)
     m_pRaderBackSpriteObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
 
     // レーダーに映す点用スプライト **********************************************
-    rectData._size = VEC2(10.0f, 10.0f);
+    rectData._size = VEC2(MINIMAP_ENEMY_ICON_SIZE, MINIMAP_ENEMY_ICON_SIZE);
     rectData._pos = VEC2(0.0f, 0.0f);
     rectData._anchorMax = VEC2(0.0f, 0.0f);
     rectData._anchorMin = VEC2(0.0f, 0.0f);
@@ -161,18 +163,6 @@ int c_Game_Play::Update(SceneManager *pOwner)
         Master::m_pDirectWriteManager->DrawFormatString("{:d}", VECTOR2::VEC2(160.0f, 185), "White_20_STD", INT_CAST(maxHP));
 
     }
-
-
-    //if (m_EnemyNum < m_pRaderEnemySpriteObjArray.size())
-    //{
-    //    int diff = m_pRaderEnemySpriteObjArray.size() - m_EnemyNum;
-
-    //    for (int i = 0; i < diff; i++)
-    //    {
-    //        m_pRaderEnemySpriteObjArray[(m_pRaderEnemySpriteObjArray.size() - 1) - i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // プールへ返す
-    //        m_pRaderEnemySpriteObjArray.pop_back();
-    //    }
-    //}
 
 	VEC3 playerPos = m_pPlayerObj.lock()->get_Transform().lock()->get_VEC3ToPos();
     float cameraAngleH = m_pRenderer->get_CameraComponent()->get_Angle_H();
