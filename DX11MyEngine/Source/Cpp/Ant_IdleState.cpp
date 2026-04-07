@@ -62,5 +62,5 @@ int Ant_IdleState::Update(class EnemyController* pOwner)
 		}
 	}
 
-	return ANT_STATE::ANT_STATE_IDLE;
+	return ANT_STATE::ANT_STATE_PATROL_IDLE;
 }

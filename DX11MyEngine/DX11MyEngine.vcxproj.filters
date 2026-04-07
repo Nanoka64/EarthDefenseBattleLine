@@ -965,16 +965,13 @@
     <ClInclude Include="Source\Header\Component_EnemyController.h">
       <Filter>ソース ファイル\Game\Component\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\Ant_IdleState.h">
-      <Filter>ソース ファイル\Game\Component\Enemy\State_Ant</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Header\SceneFactory.h">
       <Filter>ソース ファイル\State\Factory</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\EnemyStateFactory.h">
       <Filter>ソース ファイル\State\Factory</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\Ant_TrackingState.h">
+    <ClInclude Include="Source\Header\Ant_StateHeader.h">
       <Filter>ソース ファイル\Game\Component\Enemy\State_Ant</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\Component_DecalRenderer.h">

@@ -189,8 +189,7 @@
   <ItemGroup>
     <ClInclude Include="..\XML_Excel\XmlArrange.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Source\Header\Ant_IdleState.h" />
-    <ClInclude Include="Source\Header\Ant_TrackingState.h" />
+    <ClInclude Include="Source\Header\Ant_StateHeader.h" />
     <ClInclude Include="Source\Header\BitFlag.h" />
     <ClInclude Include="Source\Header\BlendManager.h" />
     <ClInclude Include="Source\Header\BuildingStateFactory.h" />

@@ -44,7 +44,7 @@ int Ant_TrackingState::Update(class EnemyController *pOwner)
 	// 目標が居なくなったら待機状態へ戻る
 	if (targetObj == nullptr || myObj == nullptr)
 	{
-		pOwner->ChangeState(ANT_STATE::ANT_STATE_IDLE);
+		pOwner->ChangeState(ANT_STATE::ANT_STATE_PATROL_IDLE);
 	}
 
 	auto targetTransform = targetObj->get_Transform().lock();
@@ -58,7 +58,7 @@ int Ant_TrackingState::Update(class EnemyController *pOwner)
 	// 距離が離れたら待機へ戻る
 	if (VEC3::Distance(myPos, targetPos) > 600.0f)
 	{
-		return ANT_STATE::ANT_STATE_IDLE;
+		return ANT_STATE::ANT_STATE_PATROL_MOVE;
 	}
 
 	// 移動ベクトルを渡す

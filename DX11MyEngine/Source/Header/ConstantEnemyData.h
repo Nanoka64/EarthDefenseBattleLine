@@ -20,6 +20,7 @@ namespace EnemyData
 		// 非アクティブ
 		ANT_STATE_PATROL_IDLE,	// 待機
 		ANT_STATE_PATROL_MOVE,	// 移動
+		
 
 		// アクティブ
 		ANT_STATE_MOVE,			// 移動

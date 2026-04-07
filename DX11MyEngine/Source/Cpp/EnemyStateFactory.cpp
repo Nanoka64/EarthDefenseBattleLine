@@ -67,6 +67,6 @@ void EnemyStateFactory::CreateAntState(StateMachine<class EnemyController>& _out
 	//pTitleScene->add_Child(c_TITLE::c_TITLE_LOAD_PROCESS, (c_LoadProcess));
 
 	//ステートマシンに登録
-	_out.RegisterState(ANT_STATE::ANT_STATE_IDLE, std::move(pIdle));
+	_out.RegisterState(ANT_STATE::ANT_STATE_PATROL_IDLE, std::move(pIdle));
 	_out.RegisterState(ANT_STATE::ANT_STATE_TRACKING, std::move(pTracking));
 }

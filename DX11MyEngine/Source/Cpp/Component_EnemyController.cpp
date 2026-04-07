@@ -179,7 +179,7 @@ void EnemyController::Start(RendererEngine& renderer)
 
 	// ステートの作成（TODO:外から種類を変えられるようにする）
 	EnemyStateFactory::Create(m_StateMachine, ENEMY_TYPE::ENEMY_TYPE_ANT_Normal, renderer);
-	m_StateMachine.SetCrntState(ANT_STATE::ANT_STATE_IDLE);
+	m_StateMachine.SetCrntState(ANT_STATE::ANT_STATE_PATROL_IDLE);
 
 }
 
