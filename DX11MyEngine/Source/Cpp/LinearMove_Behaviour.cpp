@@ -36,6 +36,5 @@ ResultMove LinearMove_Behaviour::MoveCalculate(float _deltaTime, const MoveParam
 	VECTOR3::VEC3 forward = _param._moveDirection;		// 前方向のベクトルを取得
 	float speed = _param._moveSpeed;
 	res._moveVelocity = forward * speed;	// 移動量を計算
-
 	return res;
 }

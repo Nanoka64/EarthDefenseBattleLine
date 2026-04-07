@@ -509,6 +509,35 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         Master::m_pCollisionManager->RegisterCollider(collider);
     }
 
+    /*  ビルボードの生成 */
+    {
+        // マテリアル取得
+        auto matPtrR = Master::m_pResourceManager->FindMaterial("Recovery_Billboard");
+        auto matPtrRP = Master::m_pResourceManager->FindMaterial("RecoveryPlus_Billboard");
+        auto matPtrW = Master::m_pResourceManager->FindMaterial("WeaponBox_Billboard");
+        auto matPtrA = Master::m_pResourceManager->FindMaterial("Armor_Billboard");
+
+        SetupMaterialInfo matInfo[1];
+        matInfo[0].Index = 0;
+        matInfo[0].pMaterialData = matPtrRP;
+
+        CreateBillboradInfo billboard;
+        billboard.pRenderer = m_pRenderer;
+        billboard.Type = BILLBOARD_USAGE_TYPE::SIMPLE;
+        billboard.ShaderType = SHADER_TYPE::FORWARD_UNLIT_STATIC;
+        billboard.IsActive = true;
+        billboard.MatNum = 1;
+        billboard.MaterialData = matInfo;
+        billboard.IsTransparent = true; // 透明度があり
+
+        VEC3 pos = VEC3(-120.0f, 1.0f, 100.0f);
+
+        auto obj = MeshFactory::CreateBillboard(billboard);
+        obj->get_Transform().lock()->set_Pos(pos);
+        obj->get_Transform().lock()->set_Scale(1.0f, 1.0f, 1.0f);
+        obj->set_Tag("Armor_Billboard");
+    }
+
     /* 武器のサイト用スプライト*/
     {
         CreateSpriteInfo sprite;

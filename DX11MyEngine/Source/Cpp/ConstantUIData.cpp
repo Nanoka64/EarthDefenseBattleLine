@@ -29,7 +29,7 @@ void UIData::SpriteUIData::SetSpriteData(SpriteRenderer &_out, const UIData::Spr
 {
 	// パスが空でない場合はテクスチャの読み込みをする 
     // 空なら、テクスチャは設定せずにカラーのみ設定する
-    if (_param._imagePath.empty() == false)
+    if (_param._imagePath.empty() == false && _param._shaderType != SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE)
     {
         // テクスチャの読み込み
         auto texture = Master::m_pResourceManager->LoadWIC_Texture(Tool::StringToWstring(_param._imagePath));

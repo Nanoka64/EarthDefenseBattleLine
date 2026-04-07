@@ -100,6 +100,8 @@ void c_Title_SoldierSelect::OnEnter(SceneManager *pOwner)
 		m_ItemInfoArray[i]._name = g_SoldierNames[i];
 	}
 
+
+	// 武器説明用のスプライトのオブジェクトとコンポーネントの取得と設定
 	UIData::RectTransformData rectData;
 	rectData._size = VEC2(1000.0f, 600.0f);
 	rectData._pos = VEC2(850.0f, 500.0f);
@@ -108,6 +110,7 @@ void c_Title_SoldierSelect::OnEnter(SceneManager *pOwner)
 	spriteData._imagePath = "Resource/Texture/Title/24675532.png";
 	spriteData._layerRank = 110;
 	m_pWeaponDescriptionbackSpriteObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
+
 
 	m_CrntSelectItem = 0;
 

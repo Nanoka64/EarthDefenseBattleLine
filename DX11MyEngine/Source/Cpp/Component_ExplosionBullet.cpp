@@ -100,6 +100,7 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             scale.y = m_Parameter._explosionRadius;
             scale.z = -m_Parameter._explosionRadius;
 
+
             auto obj = MeshFactory::CreateDecal(decal);
             obj->get_Component<DecalRenderer>()->Start(renderer);
             obj->get_Transform().lock()->set_Pos(pos);
