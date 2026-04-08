@@ -265,6 +265,9 @@
     <Filter Include="ソース ファイル\Game\Component\Building\State_Building">
       <UniqueIdentifier>{93638b94-306b-4f19-abe5-c8ad00379e96}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Game\Component\UI">
+      <UniqueIdentifier>{37f4d51c-0b8e-4a97-8c45-9314ff031625}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Cpp\SHADER.cpp">
@@ -674,6 +677,15 @@
     </ClCompile>
     <ClCompile Include="Source\Cpp\Building_State.cpp">
       <Filter>ソース ファイル\Game\Component\Building\State_Building</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_MiniMapRader.cpp">
+      <Filter>ソース ファイル\Game\Component\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_Faction.cpp">
+      <Filter>ソース ファイル\Game\Component\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_Player_HPBar.cpp">
+      <Filter>ソース ファイル\Game\Component\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1126,6 +1138,15 @@
     </ClInclude>
     <ClInclude Include="Source\Header\BuildingStateFactory.h">
       <Filter>ソース ファイル\State\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_MiniMapRader.h">
+      <Filter>ソース ファイル\Game\Component\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_Faction.h">
+      <Filter>ソース ファイル\Game\Component\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_Player_HPBar.h">
+      <Filter>ソース ファイル\Game\Component\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

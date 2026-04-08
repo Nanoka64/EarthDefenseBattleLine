@@ -26,6 +26,11 @@ using namespace VECTOR3;
 using namespace VECTOR4;
 using namespace GIGA_Engine;;
 
+constexpr float PLAYER_MAX_HP = 1000.0f;     // プレイヤーの最大HP
+constexpr int LAYER_RANK_CAMERA = 91;	    // カメラのレイヤーランク
+constexpr int LAYER_RANK_DIRLIGHT = 90;		// 平行ライトのレイヤーランク
+constexpr int LAYER_RANK_PLAYER = 90;		// プレイヤーのレイヤーランク
+
 
 //*---------------------------------------------------------------------------------------
 //* @:c_Title_LoadProcess Class 
@@ -57,7 +62,7 @@ void c_Title_LoadProcess::OnEnter(SceneManager *pOwner)
             assert(false);
         }
         obj->Init(*m_pRenderer);
-        obj->set_LayerRank(91);
+        obj->set_LayerRank(LAYER_RANK_CAMERA);
         obj->set_Tag("Camera");
         obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
         obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
@@ -71,25 +76,6 @@ void c_Title_LoadProcess::OnEnter(SceneManager *pOwner)
 
     // ライトにカメラのTransformを持たせる
     Master::m_pLightManager->set_CameraTransform(m_pCameraComp->get_OwnerObj().lock()->get_Transform());
-
-
- //   // ロード画面用用スプライト**********************************************
-	//CreateSpriteInfo sprite;
-	//sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Load.png");
-	//sprite.IsActive = true;
-	//sprite.ObjTag = "LoadScreen_Sp";
-	//sprite.pRenderer = m_pRenderer;
-	//sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-	//sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-	//sprite.Width = m_pRenderer->get_ScreenWidth();
-	//sprite.Height = m_pRenderer->get_ScreenHeight();
-	//sprite.IsActive = true;
-	//sprite.IsTransparent = true;
-	//auto obj = MeshFactory::CreateSprite(sprite);
-	//if (obj) {
-	//	obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
- //       m_pLoadBackSprite = obj->get_Component<SpriteRenderer>();
- //   }
 
     // ロード画面用用スプライトを作る **********************************************
 	float width = static_cast<float>(m_pRenderer->get_ScreenWidth());
@@ -201,7 +187,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         model.IsAnim = true;
         model.MatNum = 3;
         model.SetupMaterial = matInfo;
-        model.ObjLayer = 90;
+        model.ObjLayer = LAYER_RANK_PLAYER;
         model.Shadow_ShaderType = SHADER_TYPE::POST_SHADOWMAP;
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
         model.IsActive = false;
@@ -209,58 +195,25 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         pPlayerObj->get_Component<MyTransform>()->set_Scale(1.0f, 1.0f, 1.0f);
         pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
         pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(INT_CAST(PlayerData::PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE));
-
-        //// マテリアル取得
-        //auto matPtr = Master::m_pResourceManager->FindMaterial("PlayerModel");
-
-        //SetupMaterialInfo matInfo[1];
-        //matInfo[0].Index = 0;
-        //matInfo[0].pMaterialData = matPtr;
-
-        //CreateModelInfo model;
-        //model.pRenderer = m_pRenderer;
-        //model.Path = "Resource/Model/Player2/AL_Standard.fbx";
-        //model.ObjTag = "Player";
-        //model.IsAnim = true;
-        //model.MatNum = 1;
-        //model.SetupMaterial = matInfo;
-        //model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
-        //model.Shadow_ShaderType = SHADER_TYPE::POST_SHADOWMAP;
-        //model.ObjLayer = 90;
-        //pPlayerObj = MeshFactory::CreateModel(model);
-        //pPlayerObj->get_Component<MyTransform>()->set_Scale(0.1f, 0.1f, 0.1f);
-        //pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
-        //pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(0);
-
-        // 破棄しない
-        pPlayerObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
-
-        // 動的オブジェクト
-        pPlayerObj->set_State(OBJECT_STATE::DYNAMIC);
-
+        pPlayerObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);        // 破棄しない
+        pPlayerObj->set_State(OBJECT_STATE::DYNAMIC);        // 動的オブジェクト
         pPlayerObj->get_Transform().lock()->set_Pos(-900.0f, 0.0f, 900.0f);
-        //pPlayerObj->add_Component<PlayerController>(1);
-        //pPlayerObj->get_Transform().lock()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
 
-        // 軌跡
-        //auto trail = pPlayerObj->add_Component<TrailRenderer>();
-        //trail->set_MinVertexDistance(4.0f);
-        //trail->set_Width(5.0f);
-        //trail->set_EmissivePower(2.0f);
-        //trail->set_Color(VEC4(1.0f, 1.0f, 1.0f, 1.0f));
+        // 体力コンポーネントの追加
+        auto health = pPlayerObj->add_Component<Health>();
+		health->set_CrntHP(PLAYER_MAX_HP);
+        health->set_MaxHP(PLAYER_MAX_HP);
 
         // コライダーの追加
         auto collider = pPlayerObj->add_Component<BoxCollider>();
         collider->set_Size(VEC3(1.0f, 1.0f, 1.0f));
         collider->set_Center(VEC3(0.0f, 1.0f, 0.0f));
 
-        // カテゴリ
+        // コリジョンのカテゴリ
         collider->set_CollisionCategory(COLLISION_CATEGORY::PLAYER);
 
         // 衝突マスクの設定
         collider->set_CollisionBitMask(UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING));
-
-        auto health = pPlayerObj->add_Component<Health>();
 
         // コライダーの登録
         Master::m_pCollisionManager->RegisterCollider(collider);
@@ -290,6 +243,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         obj->set_Tag("DirLight");
         obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
         obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);// 破棄しない
+		obj->set_LayerRank(LAYER_RANK_DIRLIGHT);
         auto light = obj->add_Component<DirectionalLight>();
         light->set_LightColor(VEC3(1.0f, 1.0f, 1.0f));
         light->set_Intensity(3.2f);
@@ -300,91 +254,6 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         obj->get_Transform().lock()->set_Scale(VEC3(30.0, 30.0, 80.0));
         obj->get_Transform().lock()->set_RotateToDeg(VEC3(30.0f, 150.0f, 0.0f));
     }
-
-    ///* タイトル画面背景用スプライト1 */
-    //{
-    //    CreateSpriteInfo sprite;
-    //    sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/TitleBack.png");
-    //    sprite.ObjTag = "TitleBack_Sp";
-    //    sprite.pRenderer = m_pRenderer;
-    //    sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-    //    sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-    //    sprite.Width = m_pRenderer->get_ScreenWidth();
-    //    sprite.Height = m_pRenderer->get_ScreenHeight();
-    //    sprite.IsActive = true;
-    //    sprite.IsTransparent = true;
-    //    auto obj = MeshFactory::CreateSprite(sprite);
-    //    if (obj) {
-    //        obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
-    //    }
-    //}
-    ///* タイトル画面背景用スプライト2 */
-    //{
-    //    CreateSpriteInfo sprite;
-    //    sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/2221833.png");
-    //    sprite.ObjTag = "TitleBack_Sp2";
-    //    sprite.pRenderer = m_pRenderer;
-    //    sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-    //    sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-    //    sprite.Width = 2000.0f;
-    //    sprite.Height = 2300.0f;
-    //    sprite.IsActive = true;
-    //    sprite.IsTransparent = true;
-    //    auto obj = MeshFactory::CreateSprite(sprite);
-    //    if (obj) {
-    //        obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
-    //    }
-
-    //    // もう一つ作る
-    //    sprite.ObjTag = "TitleBack_Sp3";
-    //    obj = MeshFactory::CreateSprite(sprite);
-    //    if (obj) {
-    //        obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
-    //    }
-    //}
-    ///* タイトルロゴ用スプライト */
-    //{
-    //    CreateSpriteInfo sprite;
-    //    sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Title_logo.png");
-    //    sprite.ObjTag = "TitleLogo_Sp";
-    //    sprite.pRenderer = m_pRenderer;
-    //    sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-    //    sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-    //    sprite.Width = m_pRenderer->get_ScreenWidth();
-    //    sprite.Height = m_pRenderer->get_ScreenHeight();
-    //    sprite.IsActive = true;
-    //    sprite.IsTransparent = true;
-    //    auto obj = MeshFactory::CreateSprite(sprite);
-    //    if (obj) {
-    //        obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
-    //    }
-    //}
-
-    /* ボタンテスト用 */
-    //{
-    //    CreateSpriteInfo sprite;
-    //    sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Title/Line.png");
-    //    sprite.pRenderer = m_pRenderer;
-    //    sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-    //    sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
-    //    sprite.Width = 500.0f;
-    //    sprite.Height = 200.0f;
-    //    sprite.IsActive = true;
-    //    sprite.IsTransparent = true;
-    //    // 項目分生成
-    //    for (int i = 0; i < 4; i++)
-    //    {
-    //        sprite.ObjTag = "MenuItem_Button_" + std::to_string(i + 1);
-    //        auto obj = MeshFactory::CreateSprite(sprite);
-    //        obj->get_RectTransform().lock()->set_RectPosition(VEC2(960.0f, 500.0f));
-
-    //        // ボタンコンポーネントの追加
-    //        auto button = obj->add_Component<ButtonUI>();
-    //        button->set_Sprite(obj->get_Component<SpriteRenderer>());
-    //        button->set_Text("ボタン");
-    //        button->set_TextOffsetPos(VEC2(100.0f, 0.0f));
-    //    }
-    //}
 
 	// ロード画面用スプライトオフ
     m_pLoadBackObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);

@@ -6,6 +6,23 @@
 namespace UtilityData
 {
 	/// <summary>
+	/// ”h”´
+	/// </summary>
+	enum class FACTION
+	{
+		PLAYER,		// ƒvƒŒƒCƒ„[
+		ALLY,		// –¡•û
+		ENEMY,		// “G
+		NEUTRAL,	// ’†—§
+		VEHICLE,	// æ‚è•¨
+	};
+
+	struct FactionInfo
+	{
+		FACTION _faction;
+	};
+
+	/// <summary>
 	/// •º‰È
 	/// </summary>
 	enum class SOLDIER_TYPE

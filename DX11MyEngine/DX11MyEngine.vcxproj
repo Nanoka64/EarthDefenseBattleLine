@@ -215,6 +215,8 @@
       <SubType>
       </SubType>
     </ClInclude>
+    <ClInclude Include="Source\Header\Component_Faction.h" />
+    <ClInclude Include="Source\Header\Component_MiniMapRader.h" />
     <ClInclude Include="Source\Header\Component_NormalBullet.h" />
     <ClInclude Include="Source\Header\Component_Collider.h" />
     <ClInclude Include="Source\Header\Component_DecalRenderer.h">
@@ -233,6 +235,7 @@
     <ClInclude Include="Source\Header\Component_ModelMeshResource.h" />
     <ClInclude Include="Source\Header\Component_MoveLogic.h" />
     <ClInclude Include="Source\Header\Component_PlayerController.h" />
+    <ClInclude Include="Source\Header\Component_Player_HPBar.h" />
     <ClInclude Include="Source\Header\Component_RectTransform.h">
       <SubType>
       </SubType>
@@ -398,6 +401,8 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_Faction.cpp" />
+    <ClCompile Include="Source\Cpp\Component_MiniMapRader.cpp" />
     <ClCompile Include="Source\Cpp\Component_NormalBullet.cpp" />
     <ClCompile Include="Source\Cpp\Component_Collider.cpp" />
     <ClCompile Include="Source\Cpp\Component_DecalRenderer.cpp">
@@ -416,6 +421,7 @@
     <ClCompile Include="Source\Cpp\Component_ModelMeshResource.cpp" />
     <ClCompile Include="Source\Cpp\Component_MoveLogic.cpp" />
     <ClCompile Include="Source\Cpp\Component_PlayerController.cpp" />
+    <ClCompile Include="Source\Cpp\Component_Player_HPBar.cpp" />
     <ClCompile Include="Source\Cpp\Component_RectTransform.cpp">
       <SubType>
       </SubType>

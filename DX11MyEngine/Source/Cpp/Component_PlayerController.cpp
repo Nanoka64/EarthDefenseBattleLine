@@ -91,8 +91,8 @@ void PlayerController::Start(RendererEngine& renderer)
 
 	// HP管理コンポーネントの取得
 	m_pHealthComp = m_pOwner.lock()->get_Component<Health>();
-	m_pHealthComp.lock()->set_MaxHP(200.0f);
-	m_pHealthComp.lock()->set_CrntHP(200.0f);
+	//m_pHealthComp.lock()->set_MaxHP(200.0f);
+	//m_pHealthComp.lock()->set_CrntHP(200.0f);
 
 	// ジャンプ力の計算
 	// https://heron-no-suugaku.sakura.ne.jp/jump-implementation-math/#toc1

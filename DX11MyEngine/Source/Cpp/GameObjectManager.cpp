@@ -5,6 +5,7 @@
 #include "Master.h"
 #include "RendererEngine.h"
 #include "Component_RectTransform.h"
+#include "Component_Faction.h"
 #include  <algorithm>
 
 using namespace VECTOR3;
@@ -639,6 +640,49 @@ std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectListByTag(
         }
     }
 
+    return resList;
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:GameObjectManager Class 
+//*【?】指定派閥のオブジェクトをすべてリストにして取得
+///     ※ 透明/不透明両方
+//* 引数：1.派閥
+//* 返値：オブジェクトの参照ポインタリスト
+//*----------------------------------------------------------------------------------------
+std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectListByFaction(const UtilityData::FACTION& _faction)
+{
+    std::vector<std::shared_ptr<GameObject>> resList;
+    // 不透明3Dオブジェクト**********************
+    for (auto& obj : m_3DOpaqueList)
+    {
+        if (auto factionComp = obj->get_Component<Faction>())
+        {
+            if (factionComp->get_Faction() == _faction) {
+                resList.push_back(obj);
+            }
+        }
+    }
+    // 透明度のある3Dオブジェクト**********************
+    for (auto& obj : m_3DTranslucentList)
+    {
+        if (auto factionComp = obj->get_Component<Faction>())
+        {
+            if (factionComp->get_Faction() == _faction) {
+                resList.push_back(obj);
+            }
+        }
+    }
+    // 透明度のある2Dオブジェクト**********************
+    for (auto& obj : m_2DTranslucentList)
+    {
+        if (auto factionComp = obj->get_Component<Faction>())
+        {
+            if (factionComp->get_Faction() == _faction) {
+                resList.push_back(obj);
+            }
+        }
+    }
     return resList;
 }
 

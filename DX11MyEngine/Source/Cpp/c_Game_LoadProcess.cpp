@@ -28,6 +28,8 @@
 #include "Component_LineRenderer.h"
 #include "Component_WeaponController.h"
 #include "Component_BuildingController.h"
+#include "Component_MiniMapRader.h"
+#include "Component_Player_HPBar.h"
 
 using namespace SceneStateEnums;
 using namespace VECTOR4;
@@ -559,6 +561,28 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
         }
     }
+
+    /* 画面上のUIの生成 */
+    {
+		// ミニマップレーダー
+        {
+            auto obj = GIGA_Engine::Instantiate2D(std::make_shared<GameObject>(), true);
+            auto rader = obj->add_Component<MiniMapRader>();
+            obj->set_Tag("MiniMapRader");
+            obj->set_LayerRank(100);
+            obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+        }
+
+		// プレイヤーHPバー
+        {
+            auto obj = GIGA_Engine::Instantiate2D(std::make_shared<GameObject>(), true);
+            auto rader = obj->add_Component<Player_HPBar>();
+            obj->set_Tag("Player_HPBar");
+            obj->set_LayerRank(100);
+            obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+        }
+    }
+
 
     // プレイヤーオブジェクトの取得
     auto playerObj = Master::m_pGameObjectManager->get_ObjectByTag("Player");

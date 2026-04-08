@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "ConstantUtilityData.h"
 
 // ***************************************************************************************
 // ---------------------------------------------------------------------------------------
@@ -45,15 +46,26 @@ public:
 	void Alpha_2DObjectRenderPass(RendererEngine& renderer);// 透明度あり2Dオブジェクト描画パス
 	
 	/// <summary>
-	/// オブジェクトの内部的生成
+	///  3Dオブジェクトの内部的生成
 	/// </summary>
-	/// <param name=""></param>
-	/// <param name="pos"></param>
-	/// <param name="rot"></param>
-	/// <returns></returns>
+	/// <param name="pObj">オブジェクト</param>
+	/// <param name="isTransparent">透明度があるか</param>
+	/// <param name="pos">位置</param>
+	/// <param name="rot">回転</param>
+	/// <param name="parent">親</param>
+	/// <returns>オブジェクトの共有ポインタ</returns>
 	std::shared_ptr<GameObject>Internal_Instantiate3D(std::shared_ptr<GameObject> pObj, bool isTransparent, VECTOR3::VEC3 pos = { 0.f,0.f,0.f }, VECTOR3::VEC3 rot = { 0.f,0.f,0.f }, std::weak_ptr<MyTransform> parent = {});
+	
+	/// <summary>
+	///  2Dオブジェクトの内部的生成
+	/// </summary>
+	/// <param name="pObj">オブジェクト</param>
+	/// <param name="isTransparent">透明度があるか</param>
+	/// <param name="pos">位置</param>
+	/// <param name="rot">回転</param>
+	/// <param name="parent">親</param>
+	/// <returns>オブジェクトの共有ポインタ</returns>
 	std::shared_ptr<GameObject>Internal_Instantiate2D(std::shared_ptr<GameObject> pObj, bool isTransparent, VECTOR3::VEC3 pos = { 0.f,0.f,0.f }, VECTOR3::VEC3 rot = { 0.f,0.f,0.f }, std::weak_ptr<RectTransform> parent = {});
-
 
 	/// <summary>
 	/// リストからオブジェクトを削除
@@ -61,7 +73,6 @@ public:
 	/// </summary>
 	/// <param name="object"></param>
 	void remove_Object(std::shared_ptr<GameObject> object);
-
 
 	/// <summary>
 	/// リストからオブジェクトを削除　※タグ指定
@@ -88,6 +99,17 @@ public:
 	/// <returns></returns>
 	std::vector<std::shared_ptr<GameObject>>get_ObjectListByTag(const std::string &tag);
 
+	
+
+	/// <summary>
+	/// オブジェクトの派閥でリストを取得
+	/// ※ 2D&3D 透明/不透明両方
+	/// </summary>
+	/// <returns></returns>
+	std::vector<std::shared_ptr<GameObject>>get_ObjectListByFaction(const UtilityData::FACTION& _findFaction);
+
+
+
 	/// <summary>
 	/// 不透明オブジェクトリストを取得
 	/// </summary>
@@ -105,7 +127,6 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	std::vector<std::shared_ptr<GameObject>>get_2DTransparent_ObjectList() { return m_2DTranslucentList; };
-
 
 	/// <summary>
 	/// オブジェクト数取得

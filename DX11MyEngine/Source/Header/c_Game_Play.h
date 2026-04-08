@@ -18,11 +18,6 @@ private:
 	std::weak_ptr<class GameObject>m_pBomber[3];
 	std::weak_ptr<class GameObject>m_pPlayerObj;
 
-	/* スプライト */
-	class GameObject* m_pPlayerHPBarBackSpriteObj;	// プレイヤーのHPバー背景オブジェクト
-	class GameObject* m_pPlayerHPBarSpriteObj;		// プレイヤーのHPバーオブジェクト
-	class GameObject* m_pRaderBackSpriteObj;		// レーダー背景オブジェクト
-	std::vector<class GameObject*> m_pRaderEnemySpriteObjArray;   // レーダーに表示するオブジェクト
 
 public:
 	void OnEnter(SceneManager * pOwner) override;
