@@ -169,12 +169,6 @@
     <Filter Include="ソース ファイル\Game\Component\Character">
       <UniqueIdentifier>{c5b77df7-9a72-44d0-9b54-ab56bb2a353b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Game\Component\Enemy">
-      <UniqueIdentifier>{34f80822-c366-4a67-8237-38f26552564f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Game\Component\Enemy\State_Ant">
-      <UniqueIdentifier>{e6f22279-2d15-4337-8f78-ca333e4d7010}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\Game\Component\Player">
       <UniqueIdentifier>{f1d6915a-5824-41c8-bd1f-817eea48205c}</UniqueIdentifier>
     </Filter>
@@ -267,6 +261,12 @@
     </Filter>
     <Filter Include="ソース ファイル\Game\Component\UI">
       <UniqueIdentifier>{37f4d51c-0b8e-4a97-8c45-9314ff031625}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Component\Enemy">
+      <UniqueIdentifier>{34f80822-c366-4a67-8237-38f26552564f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Component\Enemy\State_Ant">
+      <UniqueIdentifier>{e6f22279-2d15-4337-8f78-ca333e4d7010}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

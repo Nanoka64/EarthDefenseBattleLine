@@ -135,7 +135,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>Source/Header;Source/Lib/DirectXTex;Source/Shader;Source/Lib/Imgui;Source/Lib/Imgui/backends;%(AdditionalIncludeDirectories);Source/Lib/Effekseer/Include/Effekseer;Source/Lib/Effekseer/Include/EffekseerRendererDX11;C:\Users\edama\Documents\GitHub\DX11_EDF_3DGame\DX11_3D_Game_Test\DX11MyEngine\Source\Lib\nlohmann;C:\Users\edama\Documents\GitHub\DX11_EDF_3DGame\DX11_3D_Game_Test\DX11MyEngine\Source\Lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source/Header;Source/Lib/DirectXTex;Source/Shader;Source/Lib/Imgui;Source/Lib/Imgui/backends;%(AdditionalIncludeDirectories);Source/Lib/Effekseer/Include/Effekseer;Source/Lib/Effekseer/Include/EffekseerRendererDX11;Source\Lib\nlohmann;Source\Lib</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -166,7 +166,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>Source/Header;Source/Lib/DirectXTex;Source/Lib/Imgui/backends;Source/Lib/Imgui;Source/Shader;%(AdditionalIncludeDirectories);Source/Lib/Effekseer/Include/Effekseer;Source/Lib/Effekseer/Include/EffekseerRendererDX11;C:\Users\edama\Documents\GitHub\DX11_EDF_3DGame\DX11_3D_Game_Test\DX11MyEngine\Source\Lib\nlohmann;C:\Users\edama\Documents\GitHub\DX11_EDF_3DGame\DX11_3D_Game_Test\DX11MyEngine\Source\Lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source/Header;Source/Lib/DirectXTex;Source/Lib/Imgui/backends;Source/Lib/Imgui;Source/Shader;%(AdditionalIncludeDirectories);Source/Lib/Effekseer/Include/Effekseer;Source/Lib/Effekseer/Include/EffekseerRendererDX11;Source\Lib\nlohmann;Source\Lib</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>

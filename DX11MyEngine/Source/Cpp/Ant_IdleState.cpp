@@ -18,7 +18,6 @@ void Ant_IdleState::OnEnter(class EnemyController* pOwner)
 	// 移動ベクトルは0
 	pOwner->set_MoveVelocity(VEC3());
 
-
 	pOwner->set_IsAnim(false);
 }
 
@@ -54,8 +53,8 @@ int Ant_IdleState::Update(class EnemyController* pOwner)
 
 			VEC3 myPos = myTransform->get_VEC3ToPos();	// 自分の位置
 
-			// 距離が200未満なら追従ステートへ
-			if (VEC3::Distance(myPos, targetPos) < 500.0f)
+			// 距離が20m未満なら追従ステートへ
+			if (VEC3::Distance(myPos, targetPos) < 60.0f)
 			{
 				return ANT_STATE::ANT_STATE_TRACKING;
 			}

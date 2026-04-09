@@ -7,6 +7,25 @@
 
 #define IS_ENABLE   // DirectWriteを使用しているとRenderDocが使用できないのでそういう時にこれを消す
 
+/// <summary>
+/// 水平方向のアライメント指定用の列挙型
+/// </summary>
+enum class H_ALIGNMENT
+{
+	LEADING = 0,   // 左寄せ
+	CENTER = 1,    // 中央寄せ
+	TRAILING = 2,  // 右寄せ
+};
+
+/// <summary>
+/// 垂直方向のアライメント指定用の列挙型
+/// </summary>
+enum class V_ALIGNMENT {
+    TOP,
+    CENTER,
+    BOTTOM
+};
+
 // =======================================================================================
 //
 // *---     DirectWriteManager Class         ---*
@@ -55,7 +74,12 @@ public:
     // フォントデータを設定
     HRESULT SetFontData(struct FONT_DATA *data);
 
-    // カラーの設定
+    /// <summary>
+    // 文字の色の設定
+	// ※これを呼ぶと次に描画する文字の色が変わる
+	//   DrawString系を呼んだ後、デフォルト（白）に戻さないと、その後の文字もその色になってしまうので注意！！
+    /// </summary>
+    /// <param name="col">色</param>
     void SetColor(const D2D1_COLOR_F& col);
 
     /// <summary>
@@ -66,9 +90,20 @@ public:
     /// <param name="formatTag">:文字の情報を格納した配列へのキー </param>
     /// <param name="options">:整形オプション</param>
     /// <param name="_isUnderLine">:下線を引くか</param>
-    void DrawString(std::string str, const VECTOR2::VEC2 &_pos, const std::string& formatTag, D2D1_DRAW_TEXT_OPTIONS options = D2D1_DRAW_TEXT_OPTIONS_NONE, bool _isUnderLine = true);
-    void DrawString(std::wstring str, const VECTOR2::VEC2 &_pos, const std::string& formatTag, D2D1_DRAW_TEXT_OPTIONS options = D2D1_DRAW_TEXT_OPTIONS_NONE, bool _isUnderLine = true);
+    void DrawString(std::string str, const VECTOR2::VEC2 &_pos, const std::string& formatTag, D2D1_DRAW_TEXT_OPTIONS options = D2D1_DRAW_TEXT_OPTIONS_NONE, bool _isUnderLine = true, DWRITE_TEXT_ALIGNMENT _alignment = DWRITE_TEXT_ALIGNMENT_LEADING);
+    void DrawString(std::wstring str, const VECTOR2::VEC2& _pos, const std::string& formatTag, D2D1_DRAW_TEXT_OPTIONS options = D2D1_DRAW_TEXT_OPTIONS_NONE, bool _isUnderLine = true, DWRITE_TEXT_ALIGNMENT _alignment = DWRITE_TEXT_ALIGNMENT_LEADING);
 
+
+    /// <summary>
+	/// アライメント指定の文字列の表示
+    /// </summary>
+    /// <param name="_str">文字</param>
+    /// <param name="_pos">位置（親の位置の左上）</param>
+    /// <param name="_formatTag">フォーマットタグ</param>
+    /// <param name="_hAlign">水平揃え</param>
+    /// <param name="_vAlign">垂直揃え</param>
+    /// <param name="_parentSize">親の大きさ</param>
+    void DrawStringToAligment(const std::string& _str, const VECTOR2::VEC2& _pos, const std::string& _formatTag, H_ALIGNMENT _hAlign, V_ALIGNMENT _vAligment, const VECTOR2::VEC2& _parentSize);
 
 
     /// <summary>

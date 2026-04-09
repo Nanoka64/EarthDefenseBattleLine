@@ -24,25 +24,7 @@ constexpr UINT MISSION_NUM = 1;	// ミッション数
 class c_Title_MissionSelect : public IState<SceneManager>
 {
 private:
-	/// <summary>
-	/// ミッション項目情報
-	/// 配列番号＋１をそのままミッションナンバーにする
-	/// </summary>
-	struct MissionItemInfo
-	{
-		VECTOR2::VEC2 _pos;
-		const char* _name;
-		bool _isHovered;	// マウスが上に乗っているか
-
-		MissionItemInfo() :
-			_pos(VECTOR2::VEC2()),
-			_name(),
-			_isHovered(false)
-		{
-		};
-	}m_ItemInfoArray[1];
-
-
+	UtilityData::MenuItemInfo m_ItemInfoArray[MISSION_NUM];	// メニュー項目の情報配列
 	SceneStateEnums:: c_TITLE m_NextState = SceneStateEnums::c_TITLE::c_TITLE_MAIN_MENU;
 	int m_PrevHoveredMIssionItem;	// 前にマウスが乗っていた項目（SE用）
 	bool m_IsInit;	// 既に初期化済みか

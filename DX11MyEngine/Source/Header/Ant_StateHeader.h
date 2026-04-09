@@ -15,8 +15,6 @@ class Ant_IdleState : public IState<class EnemyController>
 {
 private:
 
-
-
 public:
 	void OnEnter(class EnemyController* pOwner) override;
 	void OnExit(class EnemyController* pOwner)override;

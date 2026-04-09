@@ -56,9 +56,9 @@ int Ant_TrackingState::Update(class EnemyController *pOwner)
 	
 
 	// 距離が離れたら待機へ戻る
-	if (VEC3::Distance(myPos, targetPos) > 600.0f)
+	if (VEC3::Distance(myPos, targetPos) > 100.0f)
 	{
-		return ANT_STATE::ANT_STATE_PATROL_MOVE;
+		return ANT_STATE::ANT_STATE_PATROL_IDLE;
 	}
 
 	// 移動ベクトルを渡す

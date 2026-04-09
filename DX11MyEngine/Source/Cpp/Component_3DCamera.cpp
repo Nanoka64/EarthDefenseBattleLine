@@ -83,11 +83,12 @@ void Camera3D::LateUpdate(RendererEngine &renderer)
 	// マウスの移動量の差を取得する
 	LONG lX = Master::m_pInputManager->GetMousePosSlopeX();	
 	LONG lY = Master::m_pInputManager->GetMousePosSlopeY();
-	float semsitivity = 0.004f;
+	const float MOUSE_SCALE = 0.0001f;	// そのままでは大きすぎるため、スケーリングする（最大1.0になるように）
+	float sensitivity = Master::m_pDataManager->get_UserConfigData()._mouseSensitivity * MOUSE_SCALE;
 
 	// マウスの移動量を計算
-	m_Angle_H -= (float)lX * semsitivity;
-	m_Angle_V += (float)lY * semsitivity;
+	m_Angle_H -= (float)lX * sensitivity;
+	m_Angle_V += (float)lY * sensitivity;
 
 	if (m_Angle_V >= 1.5f)	// 下を向く
 	{

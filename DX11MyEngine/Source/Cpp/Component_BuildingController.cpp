@@ -6,7 +6,7 @@
 
 using namespace BuildingData;
 
-constexpr float BUILDING_MAX_HP = 200.0f;	// 建物の最大HP
+constexpr float BUILDING_MAX_HP = 600.0f;	// 建物の最大HP
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ

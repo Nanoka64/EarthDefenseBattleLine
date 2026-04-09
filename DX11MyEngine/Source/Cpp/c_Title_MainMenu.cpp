@@ -12,6 +12,7 @@ using namespace SceneStateEnums;
 using namespace VECTOR2;
 using namespace VECTOR3;
 using namespace VECTOR4;
+using namespace UtilityData;
 
 // メニュー項目の衝突判定用サイズ
 static const VECTOR2::VEC2 g_MenuItemSize = VECTOR2::VEC2(450.0f, 100.0f);

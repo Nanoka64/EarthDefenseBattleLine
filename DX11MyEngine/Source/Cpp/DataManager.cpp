@@ -19,6 +19,8 @@
 #include "MeshFactory.h"
 #include "InputFactory.h"
 
+constexpr float VOLUME_SCALE = 0.0001f;  // 音量のスケール（0.0f～1.0f）
+
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
 //*----------------------------------------------------------------------------------------
@@ -54,6 +56,16 @@ bool DataManager::Init(std::shared_ptr<RendererEngine>pRenderer)
 	// 初期武器
 	m_SelectWeaponID[0] = 0;
 	m_SelectWeaponID[1] = 1;
+
+	// ユーザー設定データの初期化
+	m_UserConfigData._BGMVolume = 30.0f;
+	m_UserConfigData._SEVolume = 50.0f;
+	m_UserConfigData._isInvertY = false;
+	m_UserConfigData._mouseSensitivity = 40.0f;
+	m_UserConfigData._isShadowEnabled = true;
+
+	Master::m_pSoundManager->set_Volume(SOUND_TYPE::BGM, m_UserConfigData._BGMVolume * VOLUME_SCALE);
+	Master::m_pSoundManager->set_Volume(SOUND_TYPE::SE, m_UserConfigData._SEVolume * VOLUME_SCALE);
 
 	return true;
 }

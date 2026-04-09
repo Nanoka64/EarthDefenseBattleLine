@@ -11,7 +11,7 @@
   "soundID": 0,
   "bulletType": "NORMAL",
   "bulletParam": {
-    "damage": 15.0,
+    "damage": 20.0,
     "damageDistAttenuationRate": 0.5,
     "speed": 200.0,
     "acceleration": 0.0,

@@ -6,13 +6,13 @@
 #include "SceneStateEnums.h"
 #include "GameObject.h"
 #include "InputFactory.h"
+#include "MeshFactory.h"
 #include "Component_3DCamera.h"
 #include "Component_PlayerController.h"
 #include "Component_SkinnedMeshAnimator.h"
 #include "Component_ModelMeshResource.h"
 #include "Component_ModelMeshRenderer.h"
 #include "Component_MeshRenderer.h"
-#include "MeshFactory.h"
 #include "Component_DirectionalLight.h"
 #include "Component_PointLight.h"
 #include "Component_SpriteRenderer.h"
@@ -234,9 +234,10 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         //model.MatNum = 1;
         //model.SetupMaterial = matInfo;
         //model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
+        //model.ObjLayer = 20;
         //auto obj = MeshFactory::CreateModel(model);
         //obj->get_Component<MyTransform>()->set_Scale(1.0f, 1.0f, 1.0f);
-        //obj->get_Component<MyTransform>()->set_Pos(-800.0f, 0.0f, 900.0f);
+        //obj->get_Component<MyTransform>()->set_Pos(-100.0f, 0.0f, 100.0f);
 
         //auto collider = obj->add_Component<BoxCollider>();
         //collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
@@ -287,8 +288,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
                 // 体力コンポーネントの追加
                 auto health = obj->add_Component<Health>();
-				health->set_CrntHP(100.0f);
-				health->set_MaxHP(100.0f);
+				health->set_CrntHP(600.0f);
+				health->set_MaxHP(600.0f);
 
                 // コライダーの追加
                 auto collider = obj->add_Component<BoxCollider>();
@@ -325,8 +326,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
         auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<MyTransform>()->set_Scale(0.5f, 0.5f, 0.5f);
-        obj->get_Component<MyTransform>()->set_Pos(0.0f, 2000.0f, 0.0f);
+        obj->get_Component<MyTransform>()->set_Scale(0.1f, 0.1f, 0.1f);
+        obj->get_Component<MyTransform>()->set_Pos(0.0f, 1000.0f, 0.0f);
         obj->get_Component<MyTransform>()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
     }
 
@@ -511,7 +512,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         Master::m_pCollisionManager->RegisterCollider(collider);
     }
 
-    /*  ビルボードの生成 */
+    /* ビルボードの生成 */
     {
         // マテリアル取得
         auto matPtrR = Master::m_pResourceManager->FindMaterial("Recovery_Billboard");

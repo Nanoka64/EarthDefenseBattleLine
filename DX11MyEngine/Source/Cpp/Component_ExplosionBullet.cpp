@@ -225,36 +225,7 @@ void ExplosionBullet::Update(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void ExplosionBullet::OnTriggerEnter(const class CollisionInfo &_other)
 {
-    //if (m_CollisionTask)
-    //{
-    //    m_CollisionTask(_other);
-    //}    
-    //
-    //if (m_pOwner.expired())return;
 
-    //auto owner = m_pOwner.lock();
-    //auto transform = owner->get_Transform().lock();
-    //VEC3 pos = transform->get_VEC3ToPos();
-
-    //unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY);   // 敵のみ
-    //
-    //// 範囲内チェック
-    //auto targets = Master::m_pCollisionManager->CheckSphere(pos, m_Parameter._explosionRadius, mask);
-
-    //// 範囲内の全員にダメージ
-    //for (auto& target : targets) {
-
-    //    if (auto obj = target->get_OwnerObj().lock())
-    //    {
-    //        if (auto health = obj->get_Component<Health>())
-    //        {
-    //            health->TakeDamage(m_Parameter._damage);
-    //        }
-    //    }
-    //}
-
-
-    //m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 }
 
 
@@ -275,10 +246,6 @@ void ExplosionBullet::Setup()
     m_PrevPos = m_StartPos;
 
     m_MoveDir = transform->get_Forward(); // 前方向ベクトル
-
-    //m_MoveDir.x += Tool::RandRange(-0.03f, 0.03f);
-    //m_MoveDir.y += Tool::RandRange(-0.03f, 0.03f);
-    //m_MoveDir.z += Tool::RandRange(-0.03f, 0.03f);
 
     m_MoveDir = m_MoveDir.Normalize();
 }

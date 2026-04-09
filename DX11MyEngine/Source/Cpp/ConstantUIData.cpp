@@ -13,7 +13,7 @@ void UIData::RectTransformData::SetRectTransformData(RectTransform &_out, const 
 {
     _out.set_RectPosition(_param._pos);
     _out.set_Size(_param._size.x, _param._size.y);
-    _out.set_RotateToDeg(_param._rotZ);
+    _out.set_RotateToDeg(0.0f, 0.0f, _param._rotZ);
     _out.set_AnchorMin(_param._anchorMin);
     _out.set_AnchorMax(_param._anchorMax);
     _out.set_Pivot(_param._pivot);

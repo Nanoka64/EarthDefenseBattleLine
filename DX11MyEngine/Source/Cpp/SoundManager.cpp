@@ -1315,6 +1315,36 @@ bool SoundManager::SerchResource(SOUND_TYPE _type, int _id, WaveResource *&_outR
 }
 
 //*---------------------------------------------------------------------------------------
+//*【?】指定サウンドタイプの音量を設定
+//*
+//* [引数]
+//* _type：サウンドの種類 (SE、BGM、ボイスなど)
+//* _vol : 音量（0.0f～1.0f）
+//* 
+//* [返値] 
+//* float : 音量 
+//*---------------------------------------------------------------------------------------
+void SoundManager::set_Volume(SOUND_TYPE _type, float _vol)
+{
+	switch (_type)
+	{
+	case SOUND_TYPE::SE:
+		m_SEVolume = _vol;
+		break;
+	case SOUND_TYPE::BGM:
+		m_BGMVolume = _vol;
+		break;
+	case SOUND_TYPE::VOICE:
+		m_VoiceVolume = _vol;
+		break;
+	default:
+		break;
+	}
+}
+
+
+
+//*---------------------------------------------------------------------------------------
 //*【?】指定サウンドタイプの音量を取得
 //*
 //* [引数]

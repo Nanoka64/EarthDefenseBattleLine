@@ -258,7 +258,7 @@ HRESULT DirectWriteManager::SetFontData(FONT_DATA *data)
 //       :使用するフォーマットキー
 //       :整形オプション
 //--------------------------------------------------------------------------------------
-void DirectWriteManager::DrawString(std::string _str, const VECTOR2::VEC2& _pos, const std::string &_formatTag,  D2D1_DRAW_TEXT_OPTIONS _options, bool _isUnderLine)
+void DirectWriteManager::DrawString(std::string _str, const VECTOR2::VEC2& _pos, const std::string &_formatTag, D2D1_DRAW_TEXT_OPTIONS _options, bool _isUnderLine, DWRITE_TEXT_ALIGNMENT _alignment)
 {
     HRESULT hr = S_OK;
 
@@ -284,6 +284,10 @@ void DirectWriteManager::DrawString(std::string _str, const VECTOR2::VEC2& _pos,
         pTextLayout.GetAddressOf()
     );
     CHECK_HRESULT_NO_BOOL(hr);
+
+	// テキストの配置設定
+    pTextLayout->SetTextAlignment(_alignment);
+
 
     // 下線
     if (_isUnderLine) {
@@ -318,7 +322,7 @@ void DirectWriteManager::DrawString(std::string _str, const VECTOR2::VEC2& _pos,
 //       :使用するフォーマットキー
 //       :整形オプション
 //--------------------------------------------------------------------------------------
-void DirectWriteManager::DrawString(std::wstring _wstr, const VECTOR2::VEC2& _pos, const std::string & _formatTag,  D2D1_DRAW_TEXT_OPTIONS _options, bool _isUnderLine)
+void DirectWriteManager::DrawString(std::wstring _wstr, const VECTOR2::VEC2& _pos, const std::string & _formatTag, D2D1_DRAW_TEXT_OPTIONS _options, bool _isUnderLine, DWRITE_TEXT_ALIGNMENT _alignment)
 {
     HRESULT hr = S_OK;
 
@@ -342,6 +346,9 @@ void DirectWriteManager::DrawString(std::wstring _wstr, const VECTOR2::VEC2& _po
         pTextLayout.GetAddressOf()
     );
     CHECK_HRESULT_NO_BOOL(hr);
+
+    // テキストの配置設定
+    pTextLayout->SetTextAlignment(_alignment);
     
 	// 下線
     if (_isUnderLine) {
@@ -367,4 +374,97 @@ void DirectWriteManager::DrawString(std::wstring _wstr, const VECTOR2::VEC2& _po
     );
 #endif
 }
+
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】アライメント指定をして文字列の描画
+//*
+//* [引数]
+//* _wstr : 描画する文字列 
+//* _pos : 位置（親の位置の左上）
+//* _formatTag : フォーマットタグ
+//* _hAlign : 水平アライメント（どこ揃えにするか）
+//* _vAligment : 垂直アライメント（どこ揃えにするか）
+//* _parentSize : 親のサイズ
+//*
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void DirectWriteManager::DrawStringToAligment(
+    const std::string& _str,
+    const VECTOR2::VEC2& _pos,
+    const std::string& _formatTag,
+    H_ALIGNMENT _hAlign,
+    V_ALIGNMENT _vAligment,
+    const VECTOR2::VEC2& _parentSize
+)
+{
+    HRESULT hr = S_OK;
+
+#ifndef IS_ENABLE
+    return;
+#else
+    Microsoft::WRL::ComPtr<IDWriteTextLayout> pTextLayout;  // テキスト情報
+
+    // ワイド文字に変換
+    // レンダーターゲットのサイズ取得
+    D2D1_SIZE_F RVSize = m_pRenderTarget->GetSize();
+
+    // ワイド文字に変換
+    std::wstring wstr = StringToWString(_str);
+
+    // テキストレイアウトの作成
+    hr = m_pWriteFactory->CreateTextLayout(
+        wstr.c_str(),
+        static_cast<UINT32>(wstr.size()),
+        m_pTextFormatMap[_formatTag].Get(),
+        _parentSize.x,
+        _parentSize.y,
+        pTextLayout.GetAddressOf()
+    );
+    CHECK_HRESULT_NO_BOOL(hr);
+
+    // ================================================================================
+	// 水平アライメントの変換
+    // ================================================================================
+    DWRITE_TEXT_ALIGNMENT hAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
+    switch (_hAlign)
+    {
+    case H_ALIGNMENT::LEADING:hAlign = DWRITE_TEXT_ALIGNMENT_LEADING; break;
+    case H_ALIGNMENT::CENTER:hAlign = DWRITE_TEXT_ALIGNMENT_CENTER; break;
+    case H_ALIGNMENT::TRAILING:hAlign = DWRITE_TEXT_ALIGNMENT_TRAILING; break;
+    }
+
+    // ================================================================================
+    // 垂直アライメントの変換
+    // ================================================================================
+    DWRITE_PARAGRAPH_ALIGNMENT vAlign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR;
+    switch (_vAligment)
+    {
+    case V_ALIGNMENT::TOP:    vAlign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR;   break;
+    case V_ALIGNMENT::CENTER: vAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER; break;
+    case V_ALIGNMENT::BOTTOM: vAlign = DWRITE_PARAGRAPH_ALIGNMENT_FAR;    break;
+    }
+
+    // テキストの配置設定
+    pTextLayout->SetTextAlignment(hAlign);
+    pTextLayout->SetParagraphAlignment(vAlign);
+
+    // 描画位置の確定
+    D2D1_POINT_2F pos = { 0,0 };
+    pos.x = _pos.x;
+    pos.y = _pos.y;
+
+    // 描画
+    m_pRenderTarget->DrawTextLayout(
+        pos,
+        pTextLayout.Get(),
+        m_pSolidBrush,
+        D2D1_DRAW_TEXT_OPTIONS_NONE
+    );
+#endif
+}
+
+
+
 

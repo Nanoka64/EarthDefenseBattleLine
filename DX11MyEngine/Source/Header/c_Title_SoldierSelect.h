@@ -26,10 +26,10 @@ enum class SOLDIER_TYPE
 class c_Title_SoldierSelect : public IState<SceneManager>
 {
 private:
+	SceneStateEnums::c_TITLE m_NextState = SceneStateEnums::c_TITLE::c_TITLE_MAIN_MENU;	// 次のステート
 	SOLDIER_TYPE m_CrntSelectedSoldierType;	// 現在選択している兵科
-	int m_CrntSelectItem;	// 選択されている項目
-	SceneStateEnums::c_TITLE m_NextState = SceneStateEnums::c_TITLE::c_TITLE_MAIN_MENU;
-	bool m_IsInit;	// 既に初期化済みか
+	int m_CrntSelectItem;					// 選択されている項目
+	bool m_IsInit;							// 既に初期化済みか
 
 	std::weak_ptr<class RectTransform> m_pMenuItemRectTransformArray[UINT_CAST(SOLDIER_TYPE::NUM)];
 	std::weak_ptr<class ButtonUI> m_pButtonArray[UINT_CAST(SOLDIER_TYPE::NUM)];	// ボタン用
@@ -38,23 +38,8 @@ private:
 	
 	int m_DecisionTextDrawCounter; // 装備決定時のテキストを表示するためのカウンター
 	int m_DecisionSoldierTypeIndex; // 決定した兵科のインデックス
-
-	/// <summary>
-	/// 項目情報
-	/// </summary>
-	struct ItemInfo
-	{
-		VECTOR2::VEC2 _pos;
-		const char* _name;
-		bool _isHovered;	// マウスが上に乗っているか
-
-		ItemInfo() :
-			_pos(VECTOR2::VEC2()),
-			_name(),
-			_isHovered(false)
-		{
-		};
-	}m_ItemInfoArray[UINT_CAST(SOLDIER_TYPE::NUM)];
+	
+	UtilityData::MenuItemInfo m_ItemInfoArray[UINT_CAST(SOLDIER_TYPE::NUM)];	// メニュー項目の情報の配列
 
 public:
 	void OnEnter(SceneManager *pOwner) override;
