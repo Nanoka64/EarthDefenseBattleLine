@@ -94,15 +94,15 @@ constexpr int DIRECTIONLIGHT_MAX_NUM	= 1;   // ディレクションライトの最大数
 
 
 /* 自作ヘッダ */
-#include "VERTEX.h"			// 頂点情報
-#include "SHADER.h"			// シェーダ情報
-#include "Window.h"			// ウインドウ情報
-#include "Helper.h"			// ヘルパー
-#include "MyStruct.h"		// 定数バッファ用構造体
-#include "Material.h"		// マテリアル
-#include "BitFlag.h"		// ビットフラグ関連
-#include "Master.h"			// シングルトン
-#include "StateMachine.h"	// ステートマシン
+#include "VERTEX.h"					// 頂点情報
+#include "SHADER.h"					// シェーダ情報
+#include "Window.h"					// ウインドウ情報
+#include "Helper.h"					// ヘルパー
+#include "ConstantBufferStructs.h"	// 定数バッファ用構造体
+#include "Material.h"				// マテリアル
+#include "BitFlag.h"				// ビットフラグ関連
+#include "Master.h"					// シングルトン
+#include "StateMachine.h"			// ステートマシン
 #include "EnemyStateFactory.h"	// ステートの作成
 
 //#include "ShaderManager.h"	// シェーダ管理

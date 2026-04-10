@@ -52,6 +52,12 @@ public:
 	bool get_IsDebugMode()const { return m_IsDebugMode; }			// デバッグ用エディタのフラグ取得
 	const UtilityData::UserConfigData& get_UserConfigData() const { return m_UserConfigData; }	// ユーザ設定データの取得
 
+	void set_BGMVolume(int _vol);				// BGM音量の設定
+	void set_SEVolume(int _vol);				// SE音量の設定
+	void set_MouseSensitivity(float _sens);		// マウス感度の設定
+	void set_IsInvertY(bool _isInvert);	// カメラのY反転の有無の設定
+	void set_IsShadowEnabled(bool _isEnable);	// シャドウの有無の設定
+
 	void set_Fov(float _fov);	// FOVの設定
 	float get_Fov();			// FOVの取得
 

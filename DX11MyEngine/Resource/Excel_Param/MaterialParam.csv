@@ -1,4 +1,5 @@
 タグ,Diff_R,Diff_G,Diff_B,Diff_A,Spec_R,Spec_G,Spec_B,Spec_A,スペキュラ強度,Emsv_R,Emsv_G,Emsv_B,エミッシブ,ディフューズマップ,ノーマルマップ,スペキュラマップ,ブレンドモード
+Default,1,0,1,1,1,1,1,1,100,0,0,0,0,-1,-1,-1,0
 PlayerModel,0.4,0.4,0.6,1,1,1,1,1,150,0,0,0,0,Resource/Texture/Wall_S050.jpg,Resource/Texture/DefaultN_Map.png,-1,0
 Soldier_body,1,1,1,1,1,1,1,1,50,0,0,0,0,Resource/Model/Ranger/Textures/Soldier_Body_diffuse.png,Resource/Model/Ranger/Textures/Soldier_Body_normal.png,Resource/Model/Ranger/Textures/Soldier_Body_specular.png,0
 Soldier_head,1,1,1,1,1,1,1,1,50,0,0,0,0,Resource/Model/Ranger/Textures/Soldier_head_diffuse.png,Resource/Model/Ranger/Textures/Soldier_head_normal.png,Resource/Model/Ranger/Textures/Soldier_head_specular.png,0
@@ -25,4 +26,4 @@ LaserPointBillboard,5,1,1,1,1,1,1,1,50,1,0,0,5,Resource/Texture/Particle/Particl
 PointLight,1,1,1,1,1,1,1,1,50,1,1,1,0.1,Resource/Texture/Wall_W040.jpg,Resource/Texture/Wall_W040_n.png,-1,0
 Decal_BulletHole,1,1,1,1,1,1,1,1,100,1,1,1,1,Resource/Texture/BulletHole.png,Resource/Texture/BulletHole_n.png,-1,0
 Decal_Ant_Splash,1,1,1,1,1,1,1,1,100,1,1,1,1.5,Resource/Texture/Acid.png,Resource/Texture/Acid_n.png,-1,0
-RocketLauncher,1,1,1,1,1,1,1,1,100,0,0,0,0,Resource/Model/Weapon/RocketLauncher/Simple rocket launcher Tex.png,-1,-1,0
+RocketLauncher,1,1,1,1,1,1,1,1,100,0,0,0,0,Resource/Model/Weapon/RocketLauncher/Simple rocket launcher Tex.png,Resource/Texture/DefaultN_Map.png,-1,0

@@ -58,6 +58,7 @@ private:
 	float m_CollapseTime;		 // “|‰ó‚É‚©‚©‚éŠÔ
 	float m_CollapseTargetAngle; // “|‚ê‚éŠp“x 
 	float m_SunkRateY;			 // YÀ•W‚ª‚Ç‚Ì‚­‚ç‚¢’¾‚ñ‚¾‚©
+	int m_FrameCounter;
 
 public:
 	void OnEnter(class BuildingController* pOwner) override;

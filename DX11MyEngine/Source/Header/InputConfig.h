@@ -6,6 +6,17 @@
 #define PAD_MAX 16      //パッドキーの最大数
 #define KEY_MAX 256     // キーの種類
 
+/// <summary>
+/// 入力タイプ
+/// </summary>
+enum class INPUT_FLAG_TYPE
+{
+    DOWN,       // 押された瞬間
+    UP,         // 離された瞬間
+    HOLD,       // 長押し
+    HOLD_REPEAT // 長押し（入力判定になるまでのフレーム指定用）
+};
+
 
 enum class INPUT_TYPE
 {

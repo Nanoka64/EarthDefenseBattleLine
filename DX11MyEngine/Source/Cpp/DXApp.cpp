@@ -2,7 +2,6 @@
 #include "DXApp.h"
 #include "Window.h"
 #include "Path.h"
-#include "MyStruct.h"
 #include "InputManager.h"
 #include "DirectWriteManager.h"
 #include "FontConfig.h"

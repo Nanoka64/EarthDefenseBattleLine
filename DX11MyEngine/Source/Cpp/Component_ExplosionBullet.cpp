@@ -84,7 +84,7 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             decal.IsNormalMap = false;
             decal.IsDynamic = true;
 
-            VEC3 hitNormal = _other.get_HitNormal();    // 衝突相手の法線
+            VEC3 hitNormal = -_other.get_HitNormal();    // 衝突相手の法線
 
             // 水平方向の向きを求める
             float angleY = atan2(hitNormal.x, hitNormal.z);
@@ -98,8 +98,7 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             VEC3 scale;
             scale.x = m_Parameter._explosionRadius;
             scale.y = m_Parameter._explosionRadius;
-            scale.z = -m_Parameter._explosionRadius;
-
+            scale.z = m_Parameter._explosionRadius;
 
             auto obj = MeshFactory::CreateDecal(decal);
             obj->get_Component<DecalRenderer>()->Start(renderer);
@@ -108,7 +107,7 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             obj->get_Transform().lock()->set_RotateToRad(angleX, angleY, angleZ);
             obj->set_Tag("BulletHole");
             auto timer = obj->add_Component<TimerDestruction>();
-            timer->set_LifeTime(10.0f);  // 生存時間
+            timer->set_LifeTime(DECAL_LIFE_TIME);  // 生存時間
 
             // エフェクト
             VEC3 effectRot = VEC3(abs(angleX - 0.05f), angleY, 0.0f);

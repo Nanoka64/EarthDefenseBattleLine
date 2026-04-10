@@ -137,6 +137,15 @@ namespace UtilityData
 		}
 
 		/// <summary>
+		/// 値を設定する
+		/// </summary>
+		/// <param name="val"></param>
+		void SetValue(std::variant<bool, int, float> val)
+		{
+			_value = val;
+		}
+
+		/// <summary>
 		/// 共用体の値を文字列として表示できるようにする
 		/// </summary>
 		/// <returns></returns>

@@ -12,6 +12,14 @@ using namespace VECTOR2;
 using namespace VECTOR3;
 using namespace VECTOR4;
 
+constexpr int MAX_BGM_VOLUME = 100;			// BGM音量の最大値
+constexpr int MIN_BGM_VOLUME = 0;			// BGM音量の最小値
+constexpr int MAX_SE_VOLUME = 100;			// SE音量の最大値
+constexpr int MIN_SE_VOLUME = 0;			// SE音量の最小値
+constexpr float MAX_MOUSE_SENSITIVITY = 100.0f;	// マウス感度の最大値
+constexpr float MIN_MOUSE_SENSITIVITY = 0.0f;	// マウス感度の最小値
+
+
 // 項目の衝突判定用サイズ
 static const VECTOR2::VEC2 g_ConfigItemSize = VECTOR2::VEC2(1000.0f, 70.0f);		// 項目のサイズ
 static const VECTOR2::VEC2 g_ConfigButtonSize = VECTOR2::VEC2(100.0f, 70.0f);		// ボタンのサイズ
@@ -29,7 +37,7 @@ static const VECTOR2::VEC2 g_ConfigItemPosArray[UINT_CAST(CONFIG_ITEM::NUM)] =
 	VEC2(400.0f,900.0f),
 };
 
-// ボタンの位置（項目の右側に配置）
+// ボタンの位置（項目名の右側に配置）
 static const float g_Button_OffsetPos_X = 600.0f;
 
 // ボタン同士の間の距離
@@ -43,7 +51,7 @@ static constexpr const char* g_ConfigItemNames[UINT_CAST(CONFIG_ITEM::NUM)] =
 	"BGM音量",
 	"SE音量",
 	"マウス感度",
-	"カメラのY反転",
+	"カメラの上下反転",
 	"シャドウの有無",
 };
 
@@ -52,11 +60,11 @@ static constexpr const char* g_ConfigItemNames[UINT_CAST(CONFIG_ITEM::NUM)] =
 /// </summary>
 static const ConfigMenuItemInfo g_DefaultConfigItemInfoArray[UINT_CAST(CONFIG_ITEM::NUM)] =
 {
-	ConfigMenuItemInfo({ 100.0f, 100.0f }, "BGM Volume",      CONFIG_ITEM::BGM_VOLUME,			VALUE_TYPE::INT,   30),
-	ConfigMenuItemInfo({ 100.0f, 150.0f }, "SE Volume",       CONFIG_ITEM::SE_VOLUME,			VALUE_TYPE::INT,   50),
-	ConfigMenuItemInfo({ 100.0f, 200.0f }, "Mouse Sensitivity",CONFIG_ITEM::MOUSE_SENSITIVITY,	VALUE_TYPE::FLOAT, 40.0f),
-	ConfigMenuItemInfo({ 100.0f, 250.0f }, "Invert Y Axis",   CONFIG_ITEM::INVERT_Y,			VALUE_TYPE::BOOL,  false),
-	ConfigMenuItemInfo({ 100.0f, 300.0f }, "Shadow Enable",   CONFIG_ITEM::SHADOW_ENABLED,      VALUE_TYPE::BOOL,  true)
+	ConfigMenuItemInfo({ 100.0f, 100.0f }, "", CONFIG_ITEM::BGM_VOLUME,			VALUE_TYPE::INT,   30),
+	ConfigMenuItemInfo({ 100.0f, 150.0f }, "", CONFIG_ITEM::SE_VOLUME,			VALUE_TYPE::INT,   50),
+	ConfigMenuItemInfo({ 100.0f, 200.0f }, "", CONFIG_ITEM::MOUSE_SENSITIVITY,	VALUE_TYPE::FLOAT, 40.0f),
+	ConfigMenuItemInfo({ 100.0f, 250.0f }, "", CONFIG_ITEM::INVERT_Y,			VALUE_TYPE::BOOL,  false),
+	ConfigMenuItemInfo({ 100.0f, 300.0f }, "", CONFIG_ITEM::SHADOW_ENABLED,     VALUE_TYPE::BOOL,  true)
 };
 
 
@@ -96,28 +104,29 @@ void c_Title_Config::OnEnter(SceneManager *pOwner)
 		//*****************************************************************************************
 		//						ボタン
 		//*****************************************************************************************
-		int buttonIndex = i * 2;	// ボタンのインデックス（1項目につき左右2つあるのでiに2を掛ける）
 
 		/* 左側 */
 		UIData::ButtonUIData buttonData;
 		buttonData._imagePath = "Resource/Texture/Title/TriangleCursor_L.png";
 		buttonData._layerRank = 111;
+		buttonData._repeatInputInterval = 5;	// ボタンを押し続けたときの連続入力の間隔
+		buttonData._inputWaitFrame = 10;		// ボタンを押してから次の入力を受け付けるまでのフレーム数
 		buttonData._tag = "AdjustmentButton" + std::to_string(i) + "_1";
 		buttonData._inputValidationState = UIData::STATE::PRESSED;
-		buttonData._onClicFunction = [this, i]() {; };
+		buttonData._onClicFunction = [this, i]() {this->ChangeConfigValue(static_cast<CONFIG_ITEM>(i), true); };	// クリックされたときに設定値を増やす関数を呼ぶ
 		rectTrans._size = g_ConfigButtonSize;
 		rectTrans._pos = g_ConfigItemPosArray[i];
 		rectTrans._pos.x += g_Button_OffsetPos_X;	// 項目の右側に配置するようX座標をずらす
-		m_pConfigAdjustmentButtonObj[buttonIndex] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
+		m_pConfigAdjustmentButtonObj[i][0] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
 
 		/* 右側 */
 		buttonData._imagePath = "Resource/Texture/Title/TriangleCursor_R.png";
 		buttonData._tag = "AdjustmentButton" + std::to_string(i) + "_2";
 		buttonData._inputValidationState = UIData::STATE::PRESSED;
-		buttonData._onClicFunction = [this, i]() {; };
+		buttonData._onClicFunction = [this, i]() {this->ChangeConfigValue(static_cast<CONFIG_ITEM>(i), false); };	// クリックされたときに設定値を増やす関数を呼ぶ
 		rectTrans._size = g_ConfigButtonSize;
 		rectTrans._pos.x += g_RangeBetweenButtons;	// ボタン同士の横方向の距離を空ける
-		m_pConfigAdjustmentButtonObj[buttonIndex + 1] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
+		m_pConfigAdjustmentButtonObj[i][1] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
 		
 		
 		//m_pButtonArray[i] = m_pConfigAdjustmentButtonObj[i]->get_Component<ButtonUI>();
@@ -156,18 +165,14 @@ void c_Title_Config::OnExit(SceneManager* pOwner)
 		if (m_pConfigMenuSpriteObjArray[i])
 		{
 			m_pConfigMenuSpriteObjArray[i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-		}	
-		
-		int buttonIndex = i * 2;	// ボタンのインデックス（1項目につき左右2つあるのでiに2を掛ける）
-
-		// ボタン
-		if (m_pConfigAdjustmentButtonObj[buttonIndex])
-		{
-			m_pConfigAdjustmentButtonObj[buttonIndex]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 		}
-		if (m_pConfigAdjustmentButtonObj[buttonIndex + 1])
-		{
-			m_pConfigAdjustmentButtonObj[buttonIndex + 1]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
+		// ボタン 左右
+		for (int j = 0; j < 2; j++) {
+			if (m_pConfigAdjustmentButtonObj[i][j])
+			{
+				m_pConfigAdjustmentButtonObj[i][j]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+			}
 		}
 	}
 
@@ -217,3 +222,88 @@ void c_Title_Config::Draw(SceneManager* pOwner)
 	}
 	Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(D2D1::ColorF::White));
 }
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】値の変更
+//*
+//* [引数]
+//* _item : 何の項目か
+//*_isLeftIndex : 左ボタンからの入力か（trueなら左、falseなら右）
+//* 
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void c_Title_Config::ChangeConfigValue(UtilityData::CONFIG_ITEM _item, bool _isLeftIndex)
+{
+	int index = INT_CAST(_item);
+	if (index < 0 || index >= INT_CAST(CONFIG_ITEM::NUM))
+	{
+		return;
+	}
+
+	switch (_item)
+	{
+	//=========================================================================================
+	//						BGM調整
+	//=========================================================================================
+	case UtilityData::CONFIG_ITEM::BGM_VOLUME:
+	{
+		int crntValue = std::get<int>(m_ItemInfoArray[index]._value);
+		crntValue += (_isLeftIndex ? -1 : 1);
+		crntValue = std::clamp(crntValue, MIN_BGM_VOLUME, MAX_BGM_VOLUME);	// クランプして範囲内に収める
+		m_ItemInfoArray[index].SetValue(crntValue);
+		Master::m_pDataManager->set_BGMVolume(crntValue);
+	}
+	break;
+	//=========================================================================================
+	//						SE調整
+	//=========================================================================================
+	case UtilityData::CONFIG_ITEM::SE_VOLUME:
+	{
+		int crntValue = std::get<int>(m_ItemInfoArray[index]._value);
+		crntValue += (_isLeftIndex ? -1 : 1);
+		crntValue = std::clamp(crntValue, MIN_SE_VOLUME, MAX_SE_VOLUME);		
+		m_ItemInfoArray[index].SetValue(crntValue);
+		Master::m_pDataManager->set_SEVolume(crntValue);
+	}
+	break;	
+	//=========================================================================================
+	//						マウス感度調整
+	//=========================================================================================
+	case UtilityData::CONFIG_ITEM::MOUSE_SENSITIVITY:
+	{
+		float crntValue = std::get<float>(m_ItemInfoArray[index]._value);
+		crntValue += (_isLeftIndex ? -0.5 : 0.5);
+		crntValue = std::clamp(crntValue, MIN_MOUSE_SENSITIVITY, MAX_MOUSE_SENSITIVITY);		
+		m_ItemInfoArray[index].SetValue(crntValue);
+		Master::m_pDataManager->set_MouseSensitivity(crntValue);
+	}
+	break;	
+	//=========================================================================================
+	//						Y反転の有無
+	//=========================================================================================
+	case UtilityData::CONFIG_ITEM::INVERT_Y:
+	{
+		bool crntValue = std::get<bool>(m_ItemInfoArray[index]._value);
+		crntValue = (_isLeftIndex ? false : true);
+		m_ItemInfoArray[index].SetValue(crntValue);
+		Master::m_pDataManager->set_IsInvertY(crntValue);
+	}
+	break;	
+	//=========================================================================================
+	//						シャドウの有無
+	//=========================================================================================
+	case UtilityData::CONFIG_ITEM::SHADOW_ENABLED:
+	{
+		bool crntValue = std::get<bool>(m_ItemInfoArray[index]._value);
+		crntValue = (_isLeftIndex ? false : true);
+		m_ItemInfoArray[index].SetValue(crntValue);
+		Master::m_pDataManager->set_IsShadowEnabled(crntValue);
+	}
+	break;
+	case UtilityData::CONFIG_ITEM::NUM:
+		break;
+	default:
+		break;
+	}
+};

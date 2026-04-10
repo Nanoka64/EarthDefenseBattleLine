@@ -3,7 +3,6 @@
 //--------------------------------------------------------------------------------------
 #include "pch.h"
 #include "RendererEngine.h"
-#include "MyStruct.h"
 #include "Path.h"
 #include "DX_RenderTarget.h"
 #include "BlendManager.h"

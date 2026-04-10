@@ -75,6 +75,7 @@ bool RenderPipeline::Setup(RendererEngine &renderer)
     m_ShadowData.baseShadowBias = 0.0005f;
     m_ShadowData.depthBiasClamp = 0.001f;
     m_ShadowData.slopeScaledBias = 0.1f;
+	m_ShadowData.isEnable = false;
 
     // 被写界深度の設定
     m_DofData.dof_MaxRange = DOF_MAX_RANGE;
@@ -121,12 +122,25 @@ void RenderPipeline::Execute(RendererEngine &renderer)
         DebugRenderTargetImGui();
     }
 
-    /* シャドウパス */
-    Shadow_PathRender(renderer);
+
+    // ライトの更新
+    Master::m_pLightManager->Update();
+
     // パス終了時にSRVを解除する
     ID3D11ShaderResourceView* nullSRVs[8] = { nullptr };
-    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
-    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
+
+	m_ShadowData.isEnable = Master::m_pDataManager->get_UserConfigData()._isShadowEnabled;
+    m_pDefferdLighting_Sprite->setToGPU_ExtendUserPS_CBuffer(renderer, 0, &m_ShadowData);
+	// シャドウが有効ならシャドウパスも実行
+    if (m_ShadowData.isEnable)
+    {
+        /* シャドウパス */
+        Shadow_PathRender(renderer);
+
+        renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
+        renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
+    }
+
 
     /* ジオメトリパス */
     Geometry_PathRender(renderer);
@@ -288,9 +302,6 @@ void RenderPipeline::Shadow_PathRender(RendererEngine &renderer)
     // 表カリング 影が浮いているような感じ（ピーターパン現象）を防ぐため
     // ※表カリングにすると影が白くなってしまうので一旦裏カリングに
     renderer.RegisterCullMode(CULL_MODE::BACK);     
-
-    // ライトの更新
-    Master::m_pLightManager->Update();
 
     // シャドウ用オブジェクト描画
     Master::m_pGameObjectManager->ObjectShadowRenderPass(renderer);

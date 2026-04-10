@@ -8,7 +8,7 @@ using namespace VECTOR3;
 using namespace BuildingData;
 
 constexpr float BUILDING_COLLAPSE_TIME_MIN = 2.0f;	// 倒壊にかかる時間の最小値
-constexpr float BUILDING_COLLAPSE_TIME_MAX = 4.0f;	// 倒壊にかかる時間の最大値
+constexpr float BUILDING_COLLAPSE_TIME_MAX = 5.0f;	// 倒壊にかかる時間の最大値
 
 constexpr float BUILDING_COLLAPSE_SPEED = 25.0f;	// 建物の倒壊スピード
 constexpr float BUILDING_COLLAPSE_END_TIME = 3.0f;	// 倒壊終了から落下までの時間
@@ -66,13 +66,23 @@ void Building_CllapseInState::OnEnter(BuildingController* pOwner)
 
 	//*****************************************************************************************
 	//						エフェクト再生
+	//					煙がブワッと出てくる感じ
 	//*****************************************************************************************
 	float scale = 10.0f;
-	int handle = Master::m_pEffectManager->PlayEffect("Explosion_Smoke_01");
-	Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y, pos.z);
-	Master::m_pEffectManager->SetRotationEffect(handle, 0.0f, 0.0f, 0.0f);
-	Master::m_pEffectManager->SetScaleEffect(handle, scale, scale, scale);
 
+	VEC3 rot;
+	for (int i = 0; i < 5; i++)
+	{
+		rot.x = Master::m_pRandomManager->GetFloatRandom(-M_PI, M_PI);
+		rot.y = Master::m_pRandomManager->GetFloatRandom(-M_PI, M_PI);
+		rot.z = Master::m_pRandomManager->GetFloatRandom(-M_PI, M_PI);
+
+		int handle = Master::m_pEffectManager->PlayEffect("Explosion_Smoke_02");
+		Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y, pos.z);
+		Master::m_pEffectManager->SetRotationEffect(handle, rot.x, rot.y, rot.z);
+		Master::m_pEffectManager->SetScaleEffect(handle, scale, scale, scale);
+	}
+	ownerObj->set_State(OBJECT_STATE::DYNAMIC);	// 動的オブジェクトに変更
 
 }
 
@@ -98,6 +108,7 @@ void Building_CllapseNowState::OnEnter(BuildingController* pOwner)
 
 	m_CrntCollapseTime = 0.0f;	// 現在の倒壊時間を初期化
 	m_SunkRateY = 0.0f;
+	m_FrameCounter = 0;
 
 	m_CollapseTargetAngle = Master::m_pRandomManager->GetFloatRandom(-0.3f, 0.3f);	// 目標角度を決める
 }
@@ -110,6 +121,7 @@ void Building_CllapseNowState::OnExit(BuildingController* pOwner)
 
 	//*****************************************************************************************
 	//						エフェクト再生
+	//				煙と破片と、ドデカい爆発が起きる感じ
 	//*****************************************************************************************
 	float scale = 10.0f;
 	int handle = Master::m_pEffectManager->PlayEffect("Smoke_02");
@@ -121,6 +133,13 @@ void Building_CllapseNowState::OnExit(BuildingController* pOwner)
 	Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y + m_SunkRateY, pos.z);
 	Master::m_pEffectManager->SetRotationEffect(handle, 0.0f, 0.0f, 0.0f);
 	Master::m_pEffectManager->SetScaleEffect(handle, scale, scale, scale);
+
+	VEC3 explosionRot = 0.0f;
+	VEC3 explosionScale = 5.0f;
+	handle = Master::m_pEffectManager->PlayEffect("Explosion_03");
+	Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y + m_SunkRateY, pos.z);
+	Master::m_pEffectManager->SetRotationEffect(handle, explosionRot.x, explosionRot.y, explosionRot.z);
+	Master::m_pEffectManager->SetScaleEffect(handle, explosionScale.x, explosionScale.y, explosionScale.z);
 }
 
 int Building_CllapseNowState::Update(BuildingController* pOwner)
@@ -154,8 +173,30 @@ int Building_CllapseNowState::Update(BuildingController* pOwner)
 
 		transform->set_Pos(pos);
 		transform->set_RotateToRad(rot);
-	}
 
+
+		m_FrameCounter++;
+
+		//*****************************************************************************************
+		//						エフェクト再生
+		//				崩れていく際に、炎が出ている感じにする
+		//*****************************************************************************************
+		if (m_FrameCounter % 20 == 0)
+		{
+			VEC3 explosionRot;
+			VEC3 explosionScale = 4.0f;
+			explosionRot.x = Master::m_pRandomManager->GetFloatRandom(-M_PI, M_PI);
+			explosionRot.y = Master::m_pRandomManager->GetFloatRandom(-M_PI, M_PI);
+			explosionRot.z = Master::m_pRandomManager->GetFloatRandom(-M_PI, M_PI);
+			float explosionPosY_Offset;
+			explosionPosY_Offset = Master::m_pRandomManager->GetFloatRandom(1.0f, 50.0f);
+			int handle = Master::m_pEffectManager->PlayEffect("Explosion_02");
+			Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y + explosionPosY_Offset, pos.z);
+			Master::m_pEffectManager->SetRotationEffect(handle, explosionRot.x, explosionRot.y, explosionRot.z);
+			Master::m_pEffectManager->SetScaleEffect(handle, explosionScale.x, explosionScale.y, explosionScale.z);
+		}
+
+	}
 
 	if(m_CollapseTime <= m_CrntCollapseTime )
 	{

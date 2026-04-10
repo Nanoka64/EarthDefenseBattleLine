@@ -13,7 +13,7 @@ using namespace VERTEX;
 //* 引数：なし
 //*----------------------------------------------------------------------------------------
 ModelMesh::ModelMesh():
-	m_pVertex(nullptr),
+	//m_pVertex(nullptr),
 	m_pIndices(nullptr),
 	m_VertexNum(0),
 	m_IndexNum(0),
@@ -46,10 +46,11 @@ ModelMesh::~ModelMesh()
 void ModelMesh::Draw(RendererEngine& render)
 {
 	auto pDeviceContext = render.get_DeviceContext();
-	uint32_t stride[1] = { sizeof(VERTEX_Skneed) };
+	uint32_t stride[1] = { m_VertexStride };
 	uint32_t offset[1] = { 0 };
 
-	pDeviceContext->UpdateSubresource(m_pVertexBuffer, 0, NULL, m_pVertex, 0, 0);
+	// 頂点情報変更しないなら要らない
+	//pDeviceContext->UpdateSubresource(m_pVertexBuffer, 0, NULL, m_pVertex, 0, 0);
 
 	// 頂点・インデックスバッファを設定
 	pDeviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, stride, offset);
@@ -73,7 +74,7 @@ void ModelMesh::Term()
 {
 	DestroyVertexBuffer();
 	DestroyIndexBuffer();
-	SAFE_DELETE_ARRAY(m_pVertex);
+	//SAFE_DELETE_ARRAY(m_pVertex);
 	m_VertexNum = 0;
 	SAFE_DELETE_ARRAY(m_pIndices);
 	m_IndexNum = 0;
@@ -96,44 +97,56 @@ bool ModelMesh:: Setup(RendererEngine& render, aiMesh* pMeshData)
 	aiColor4D oneColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// 頂点データ取得
-	m_VertexNum = pMeshData->mNumVertices;	// メッシュの頂点数取得
-	m_pVertex   = new VERTEX_Skneed[m_VertexNum];	// 取得した頂点数分、頂点データ作る mVerticesはm_VertexNum分存在する
-
-	// 頂点数分、データを格納
-	for (u_int vertexIdx = 0; vertexIdx < m_VertexNum; ++vertexIdx)
-	{
-		/* 
-		* サイト：https://qiita.com/kyooooooooma/items/c43dd8b96cc104cb6713
-		* ↓この辺から
-		* void AssimpLoader::LoadMesh(ModelMesh& dst, const aiMesh* src, bool inverseU, bool inverseV)
-		*/
-
-		/*********** 頂点情報の取得 ***********/
-		auto pos   = pMeshData->HasPositions()		? &(pMeshData->mVertices[vertexIdx]) : &zero3D;			// 頂点の座標を取得
-		auto norm  = pMeshData->HasNormals()		? &(pMeshData->mNormals[vertexIdx]) : &zero3D;			// 法線情報を取得
-		auto uv    = pMeshData->HasTextureCoords(0) ? &(pMeshData->mTextureCoords[0][vertexIdx]) : &zero3D; // HasTextureCoords : uv情報があればtrue、無ければfalseをかえす
-		auto color = pMeshData->HasVertexColors(0)  ? &(pMeshData->mColors[0][vertexIdx]) : &oneColor;		// カラー情報の取得
-		auto tan   = pMeshData->HasTangentsAndBitangents() ? &(pMeshData->mTangents[vertexIdx]) : &zero3D;
-		auto biN   = pMeshData->HasTangentsAndBitangents() ? &(pMeshData->mBitangents[vertexIdx]) : &zero3D;
-
-		m_pVertex[vertexIdx].pos	  = VEC3(pos->x, pos->y, pos->z);					// 取得した座標を設定
-		m_pVertex[vertexIdx].color	  = VEC4(color->r, color->g, color->b, color->a);	// カラー設定
-		m_pVertex[vertexIdx].normal	  = VEC3(norm->x, norm->y, norm->z);				// 法線情報を取得 
-		m_pVertex[vertexIdx].uv		  = VEC2(uv->x, uv->y);// UV情報を取得  (モデルデータとDirectXの座標系の違いでV軸を反転させないと上手く表示されない ※ロード時のフラグで解決) 
-		m_pVertex[vertexIdx].tangent  = VEC3(tan->x,tan->y,tan->z);
-		m_pVertex[vertexIdx].bitangent= VEC3(biN->x, biN->y, biN->z);
-
-
-		// --- ボーン情報の初期化 ---
-		for (int i = 0; i < 4; ++i) {
-			m_pVertex[vertexIdx].boneIDs[i] = -1;
-			m_pVertex[vertexIdx].boneWeights[i] = 0.0f;
-		}
-	}
-
-	// メッシュに含まれるボーン情報を頂点に関連付ける
+	m_VertexNum = pMeshData->mNumVertices;			// メッシュの頂点数取得
+	//m_pVertex   = new VERTEX_Skneed[m_VertexNum];	// 取得した頂点数分、頂点データ作る mVerticesはm_VertexNum分存在する
+	
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////
+	//
+	//						ボーンがある場合
+	// 
+	//////////////////////////////////////////////////////////////////////////////////////////
 	if (pMeshData->HasBones())
 	{
+		m_VertexStride = sizeof(VERTEX_Skneed);	// ボーン情報がある場合はスキニング頂点構造体のサイズをストライドにする
+		m_MeshType = MESH_TYPE::SKINNED;			
+
+		std::vector<VERTEX_Skneed> vertices(m_VertexNum);	// 取得した頂点数分、頂点データ作る mVerticesはm_VertexNum分存在する
+
+		// 頂点数分、データを格納
+		for (u_int vertexIdx = 0; vertexIdx < m_VertexNum; ++vertexIdx)
+		{
+			/*
+			* サイト：https://qiita.com/kyooooooooma/items/c43dd8b96cc104cb6713
+			* ↓この辺から
+			* void AssimpLoader::LoadMesh(ModelMesh& dst, const aiMesh* src, bool inverseU, bool inverseV)
+			*/
+
+			/*********** 頂点情報の取得 ***********/
+			auto pos = pMeshData->HasPositions() ? &(pMeshData->mVertices[vertexIdx]) : &zero3D;			// 頂点の座標を取得
+			auto norm = pMeshData->HasNormals() ? &(pMeshData->mNormals[vertexIdx]) : &zero3D;			// 法線情報を取得
+			auto uv = pMeshData->HasTextureCoords(0) ? &(pMeshData->mTextureCoords[0][vertexIdx]) : &zero3D; // HasTextureCoords : uv情報があればtrue、無ければfalseをかえす
+			auto color = pMeshData->HasVertexColors(0) ? &(pMeshData->mColors[0][vertexIdx]) : &oneColor;		// カラー情報の取得
+			auto tan = pMeshData->HasTangentsAndBitangents() ? &(pMeshData->mTangents[vertexIdx]) : &zero3D;
+			auto biN = pMeshData->HasTangentsAndBitangents() ? &(pMeshData->mBitangents[vertexIdx]) : &zero3D;
+
+			vertices[vertexIdx].pos = VEC3(pos->x, pos->y, pos->z);					// 取得した座標を設定
+			vertices[vertexIdx].color = VEC4(color->r, color->g, color->b, color->a);	// カラー設定
+			vertices[vertexIdx].normal = VEC3(norm->x, norm->y, norm->z);				// 法線情報を取得 
+			vertices[vertexIdx].uv = VEC2(uv->x, uv->y);// UV情報を取得  (モデルデータとDirectXの座標系の違いでV軸を反転させないと上手く表示されない ※ロード時のフラグで解決) 
+			vertices[vertexIdx].tangent = VEC3(tan->x, tan->y, tan->z);
+			vertices[vertexIdx].bitangent = VEC3(biN->x, biN->y, biN->z);
+
+
+			// --- ボーン情報の初期化 ---
+			for (int i = 0; i < 4; ++i) {
+				vertices[vertexIdx].boneIDs[i] = -1;
+				vertices[vertexIdx].boneWeights[i] = 0.0f;
+			}
+		}
+		
+		// メッシュに含まれるボーン情報を頂点に関連付ける
 		for (UINT boneIdx = 0; boneIdx < pMeshData->mNumBones; boneIdx++)
 		{
 			aiBone* bone = pMeshData->mBones[boneIdx];
@@ -142,17 +155,105 @@ bool ModelMesh:: Setup(RendererEngine& render, aiMesh* pMeshData)
 				UINT vtxId = bone->mWeights[weightIdx].mVertexId;	// ボーンの影響を受ける頂点インデックス
 				float weight = bone->mWeights[weightIdx].mWeight;	// ボーンウェイト
 
-				SetVertexBoneData(m_pVertex[vtxId], boneIdx, weight);	// 頂点へボーン情報をセット
+				SetVertexBoneData(vertices[vtxId], boneIdx, weight);	// 頂点へボーン情報をセット
 			}
+		}
+
+		// 頂点バッファの作成
+		if (CreateVertexBuffer(render, vertices.data(), m_VertexNum, m_VertexStride) == false)
+		{
+			MessageBox(NULL, "頂点バッファが作成できませんでした", "Error", MB_OK);
+			return false;
+		}
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////
+	//
+	//				タンジェントはあるけどボーン情報がない場合
+	// 
+	//////////////////////////////////////////////////////////////////////////////////////////
+	else if(pMeshData->HasTangentsAndBitangents())
+	{
+		// 
+		m_VertexStride = sizeof(VERTEX_Static_N); 
+		m_MeshType = MESH_TYPE::STATIC_N;
+
+		std::vector<VERTEX_Static_N> vertices(m_VertexNum);	// 取得した頂点数分、頂点データ作る mVerticesはm_VertexNum分存在する
+
+		// 頂点数分、データを格納
+		for (u_int vertexIdx = 0; vertexIdx < m_VertexNum; ++vertexIdx)
+		{
+			/*
+			* サイト：https://qiita.com/kyooooooooma/items/c43dd8b96cc104cb6713
+			* ↓この辺から
+			* void AssimpLoader::LoadMesh(ModelMesh& dst, const aiMesh* src, bool inverseU, bool inverseV)
+			*/
+
+			/*********** 頂点情報の取得 ***********/
+			auto pos = pMeshData->HasPositions() ? &(pMeshData->mVertices[vertexIdx]) : &zero3D;			// 頂点の座標を取得
+			auto norm = pMeshData->HasNormals() ? &(pMeshData->mNormals[vertexIdx]) : &zero3D;			// 法線情報を取得
+			auto uv = pMeshData->HasTextureCoords(0) ? &(pMeshData->mTextureCoords[0][vertexIdx]) : &zero3D; // HasTextureCoords : uv情報があればtrue、無ければfalseをかえす
+			auto color = pMeshData->HasVertexColors(0) ? &(pMeshData->mColors[0][vertexIdx]) : &oneColor;		// カラー情報の取得
+			auto tan = pMeshData->HasTangentsAndBitangents() ? &(pMeshData->mTangents[vertexIdx]) : &zero3D;
+			auto biN = pMeshData->HasTangentsAndBitangents() ? &(pMeshData->mBitangents[vertexIdx]) : &zero3D;
+
+			vertices[vertexIdx].pos = VEC3(pos->x, pos->y, pos->z);					// 取得した座標を設定
+			vertices[vertexIdx].color = VEC4(color->r, color->g, color->b, color->a);	// カラー設定
+			vertices[vertexIdx].normal = VEC3(norm->x, norm->y, norm->z);				// 法線情報を取得 
+			vertices[vertexIdx].uv = VEC2(uv->x, uv->y);// UV情報を取得  (モデルデータとDirectXの座標系の違いでV軸を反転させないと上手く表示されない ※ロード時のフラグで解決) 
+			vertices[vertexIdx].tangent = VEC3(tan->x, tan->y, tan->z);
+			vertices[vertexIdx].bitangent = VEC3(biN->x, biN->y, biN->z);
+		}
+
+		// 頂点バッファの作成
+		if (CreateVertexBuffer(render, vertices.data(), m_VertexNum, m_VertexStride) == false)
+		{
+			MessageBox(NULL, "頂点バッファが作成できませんでした", "Error", MB_OK);
+			return false;
+		}
+	}	
+	//////////////////////////////////////////////////////////////////////////////////////////
+	//
+	//						ボーン情報もタンジェントもない場合
+	// 
+	//////////////////////////////////////////////////////////////////////////////////////////
+	else
+	{
+		m_VertexStride = sizeof(VERTEX_Static);	
+		m_MeshType = MESH_TYPE::STATIC;
+
+		std::vector<VERTEX_Static> vertices(m_VertexNum);	// 取得した頂点数分、頂点データ作る mVerticesはm_VertexNum分存在する
+
+		// 頂点数分、データを格納
+		for (u_int vertexIdx = 0; vertexIdx < m_VertexNum; ++vertexIdx)
+		{
+			/*
+			* サイト：https://qiita.com/kyooooooooma/items/c43dd8b96cc104cb6713
+			* ↓この辺から
+			* void AssimpLoader::LoadMesh(ModelMesh& dst, const aiMesh* src, bool inverseU, bool inverseV)
+			*/
+
+			/*********** 頂点情報の取得 ***********/
+			auto pos = pMeshData->HasPositions() ? &(pMeshData->mVertices[vertexIdx]) : &zero3D;			// 頂点の座標を取得
+			auto norm = pMeshData->HasNormals() ? &(pMeshData->mNormals[vertexIdx]) : &zero3D;			// 法線情報を取得
+			auto uv = pMeshData->HasTextureCoords(0) ? &(pMeshData->mTextureCoords[0][vertexIdx]) : &zero3D; // HasTextureCoords : uv情報があればtrue、無ければfalseをかえす
+			auto color = pMeshData->HasVertexColors(0) ? &(pMeshData->mColors[0][vertexIdx]) : &oneColor;		// カラー情報の取得
+			auto tan = pMeshData->HasTangentsAndBitangents() ? &(pMeshData->mTangents[vertexIdx]) : &zero3D;
+			auto biN = pMeshData->HasTangentsAndBitangents() ? &(pMeshData->mBitangents[vertexIdx]) : &zero3D;
+
+			vertices[vertexIdx].pos = VEC3(pos->x, pos->y, pos->z);					// 取得した座標を設定
+			vertices[vertexIdx].color = VEC4(color->r, color->g, color->b, color->a);	// カラー設定
+			vertices[vertexIdx].normal = VEC3(norm->x, norm->y, norm->z);				// 法線情報を取得 
+			vertices[vertexIdx].uv = VEC2(uv->x, uv->y);// UV情報を取得  (モデルデータとDirectXの座標系の違いでV軸を反転させないと上手く表示されない ※ロード時のフラグで解決) 
+		}
+
+		// 頂点バッファの作成
+		if (CreateVertexBuffer(render, vertices.data(), m_VertexNum, m_VertexStride) == false)
+		{
+			MessageBox(NULL, "頂点バッファが作成できませんでした", "Error", MB_OK);
+			return false;
 		}
 	}
 
-	// 頂点バッファの作成
-	if (CreateVertexBuffer(render) == false)
-	{
-		MessageBox(NULL, "頂点バッファが作成できませんでした", "Error", MB_OK);
-		return false;
-	}
 
 	// 頂点インデックスデータ取得（TriangleList前提）
 	m_IndexNum = pMeshData->mNumFaces * 3;	// メッシュに含まれるプリミティブの数
@@ -224,38 +325,38 @@ void ModelMesh::SetVertexBoneData(VERTEX::VERTEX_Skneed& vertex, int boneId, flo
 //* 引数：2.頂点インデックス
 //* 返値：bool
 //*----------------------------------------------------------------------------------------
-void ModelMesh::set_Color(const VECTOR4::VEC4& color, int vtxIdx )
-{
-	// メッシュインデックスが指定されていなければ全てに適用
-	if (vtxIdx == -1){
-		// 頂点数分、データを格納
-		for (u_int vertexIdx = 0; vertexIdx < m_VertexNum; ++vertexIdx)
-		{
-			m_pVertex[vertexIdx].color = color;
-		}
-	}
-	else {	// 指定メッシュのカラー設定
-		m_pVertex[vtxIdx].color = color;
-	}
-}
-
-
-//*---------------------------------------------------------------------------------------
-//* @:ModelMesh Class 
-//*【?】頂点カラーの取得 頂点指定がなければ適当に０番目の頂点カラー返す
-// 
-//* 引数：1.頂点インデックス
-//* 返値：VEC4&
-//*----------------------------------------------------------------------------------------
-VEC4& ModelMesh::get_Color(int vtxIdx)const
-{
-	if (vtxIdx == -1)
-	{
-		return m_pVertex[0].color;
-	}
-
-	return m_pVertex[vtxIdx].color;
-}
+//void ModelMesh::set_Color(const VECTOR4::VEC4& color, int vtxIdx )
+//{
+//	//// メッシュインデックスが指定されていなければ全てに適用
+//	//if (vtxIdx == -1){
+//	//	// 頂点数分、データを格納
+//	//	for (u_int vertexIdx = 0; vertexIdx < m_VertexNum; ++vertexIdx)
+//	//	{
+//	//		m_pVertex[vertexIdx].color = color;
+//	//	}
+//	//}
+//	//else {	// 指定メッシュのカラー設定
+//	//	m_pVertex[vtxIdx].color = color;
+//	//}
+//}
+//
+//
+////*---------------------------------------------------------------------------------------
+////* @:ModelMesh Class 
+////*【?】頂点カラーの取得 頂点指定がなければ適当に０番目の頂点カラー返す
+//// 
+////* 引数：1.頂点インデックス
+////* 返値：VEC4&
+////*----------------------------------------------------------------------------------------
+//VEC4& ModelMesh::get_Color(int vtxIdx)const
+//{
+//	//if (vtxIdx == -1)
+//	//{
+//	//	return m_pVertex[0].color;
+//	//}
+//
+//	//return m_pVertex[vtxIdx].color;
+//}
 
 
 //*---------------------------------------------------------------------------------------
@@ -265,19 +366,19 @@ VEC4& ModelMesh::get_Color(int vtxIdx)const
 //* 引数：1.RendererEngine
 //* 返値：bool
 //*----------------------------------------------------------------------------------------
-bool ModelMesh::CreateVertexBuffer(RendererEngine& render)
+bool ModelMesh::CreateVertexBuffer(RendererEngine& render, const void* pVertexData, UINT vertexNum, UINT vertexStride)
 {
 	// リソース設定
 	D3D11_BUFFER_DESC desc;
 	ZeroMemory(&desc, sizeof(desc));
-	desc.Usage	   = D3D11_USAGE_DEFAULT;
-	desc.ByteWidth = sizeof(VERTEX_Skneed) * m_VertexNum;
+	desc.Usage	   = D3D11_USAGE_IMMUTABLE;
+	desc.ByteWidth = vertexStride * vertexNum;
 	desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 	// サブリソース設定
 	D3D11_SUBRESOURCE_DATA vertexSubData;
 	ZeroMemory(&vertexSubData, sizeof(vertexSubData));
-	vertexSubData.pSysMem = m_pVertex;
+	vertexSubData.pSysMem = pVertexData;
 
 	// 頂点バッファ作成
 	auto hr = render.get_Device()->CreateBuffer(

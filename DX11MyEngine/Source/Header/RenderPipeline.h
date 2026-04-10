@@ -48,23 +48,10 @@ private:
     std::shared_ptr<class SpriteRenderer> m_pFinalSceneToneMappingFilter_Sprite;
 
 
-    // 被写界深度情報
-    struct DoFInfo {
-        float dof_MaxRange; // ぼかしの最大距離
-        float dof_MinRange; // ぼかしの開始距離
-
-        float pad[2];
-    }m_DofData;
+    DoFInfo m_DofData;
 
     // シャドウバイアス情報
-    struct ShadowInfo
-    {
-        float baseShadowBias;
-        float slopeScaledBias;
-        float depthBiasClamp;
-
-        float pad1;
-    }m_ShadowData;
+    ShadowInfo m_ShadowData;
 
 
     // ビューポートの設定時にスムーズに渡す用

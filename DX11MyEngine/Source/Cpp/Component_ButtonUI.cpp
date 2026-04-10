@@ -23,7 +23,9 @@ ButtonUI::ButtonUI(std::weak_ptr<GameObject> pOwner, int updateRank)
 	m_IsInteractable(true),
 	m_Text("Button"),
 	m_TextOffsetPos(VEC2()),
-	m_InputSoundID(SOUND_ID_TO_INT(SOUND_ID::SYSTEM_DECISION01))
+	m_InputSoundID(SOUND_ID_TO_INT(SOUND_ID::SYSTEM_DECISION01)),
+	m_RepeatInputInterval(1),
+	m_InputWaitFrame(0)
 {
 	this->set_Tag("Button");
 }
@@ -95,7 +97,8 @@ void ButtonUI::Update(RendererEngine &renderer)
 		m_CrntState = UIData::STATE::HIGH_LIGHTED;	// ハイライト状態
 
 		// 左クリックまたは、決定キーで選択
-		if (GetMouseClick(MOUSE_BUTTON_STATE::LEFT) || GetInput(GAME_CONFIG::DECITION))
+		if (GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, m_RepeatInputInterval, m_RepeatInputInterval) ||
+			GetInput(GAME_CONFIG::DECITION))
 		{
 			m_CrntState = UIData::STATE::PRESSED;	// 押されている状態
 		}

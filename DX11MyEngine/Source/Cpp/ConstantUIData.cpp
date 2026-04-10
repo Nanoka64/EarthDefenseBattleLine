@@ -54,4 +54,6 @@ void UIData::ButtonUIData::SetButtonData(ButtonUI &_out, const UIData::ButtonUID
     _out.set_Text(_param._text);
     _out.set_TextOffsetPos(_param._textOffsetPos);
     _out.set_InputSoundID(_param._inputSoundID);
+    _out.set_RepeatInputInterval(_param._repeatInputInterval);
+    _out.set_InputWaitFrame(_param._inputWaitFrame);
 }

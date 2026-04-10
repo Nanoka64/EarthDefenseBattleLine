@@ -87,7 +87,10 @@ bool EffectManager::Setup(RendererEngine &renderer)
     LoadEffect(u"Resource/Effect/Simple_Sprite_BillBoard.efkefc", "DeadExplosion");
     LoadEffect(u"Resource/Effect/Simple_SpawnMethod1.efkefc", "Hit");
     LoadEffect(u"Resource/Effect/Explosion_01.efkefc", "Explosion_01");
+    LoadEffect(u"Resource/Effect/Explosion_02.efkefc", "Explosion_02");
+    LoadEffect(u"Resource/Effect/Explosion_03.efkefc", "Explosion_03");
     LoadEffect(u"Resource/Effect/Explosion_Smoke_01.efkefc", "Explosion_Smoke_01");
+    LoadEffect(u"Resource/Effect/Explosion_Smoke_02.efkefc", "Explosion_Smoke_02");
     LoadEffect(u"Resource/Effect/Explosion_Plasma01.efkefc", "Explosion_Plasma_01");
     LoadEffect(u"Resource/Effect/Smoke_01.efkefc", "Smoke_01");
     LoadEffect(u"Resource/Effect/Smoke_02.efkefc", "Smoke_02");

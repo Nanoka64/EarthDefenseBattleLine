@@ -163,3 +163,46 @@ float DataManager::get_Fov()
 
 	return 0.0f;
 }
+
+//*----------------------------------------------------------------------------------------
+//*Åy?ÅzBGMâπó ÇÃê›íË
+//*----------------------------------------------------------------------------------------
+void DataManager::set_BGMVolume(int _vol)
+{
+	m_UserConfigData._BGMVolume = _vol;
+	Master::m_pSoundManager->set_Volume(SOUND_TYPE::BGM, m_UserConfigData._BGMVolume * VOLUME_SCALE);
+}
+
+//*----------------------------------------------------------------------------------------
+//*Åy?ÅzSEâπó ÇÃê›íË
+//*----------------------------------------------------------------------------------------
+void DataManager::set_SEVolume(int _vol)
+{
+	m_UserConfigData._SEVolume = _vol;
+	Master::m_pSoundManager->set_Volume(SOUND_TYPE::SE, m_UserConfigData._SEVolume * VOLUME_SCALE);
+}
+
+
+//*----------------------------------------------------------------------------------------
+//*Åy?ÅzÉ}ÉEÉXä¥ìxÇÃê›íË
+//*----------------------------------------------------------------------------------------
+void DataManager::set_MouseSensitivity(float _sens)
+{
+	m_UserConfigData._mouseSensitivity = _sens;
+}
+
+//*----------------------------------------------------------------------------------------
+//*Åy?ÅzYîΩì]ÇÃê›íË
+//*----------------------------------------------------------------------------------------
+void DataManager::set_IsInvertY(bool _isInv)
+{
+	m_UserConfigData._isInvertY = _isInv;
+}
+
+//*----------------------------------------------------------------------------------------
+//*Åy?ÅzÉVÉÉÉhÉEÇÃóLñ≥ÇÃê›íË
+//*----------------------------------------------------------------------------------------
+void DataManager::set_IsShadowEnabled(bool _isShadow)
+{
+	m_UserConfigData._isShadowEnabled = _isShadow;
+}

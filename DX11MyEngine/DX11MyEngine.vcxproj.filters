@@ -731,7 +731,7 @@
     <ClInclude Include="Source\Header\VEC.h">
       <Filter>ソース ファイル\Tool\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\MyStruct.h">
+    <ClInclude Include="Source\Header\ConstantBufferStructs.h">
       <Filter>ソース ファイル\Tool\CBuff</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\Texture.h">

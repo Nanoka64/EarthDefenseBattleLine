@@ -30,6 +30,8 @@ private:
 	std::weak_ptr<SpriteRenderer> m_pSprite;		// スプライト
 	float m_FadeDuration;							// ステート間の色の遷移時間
 	int m_InputSoundID;								// 入力されたときのサウンドID
+	int m_InputWaitFrame;							// 入力後の待機時間カウンター
+	int m_RepeatInputInterval;						// 入力の連続判定の間隔
 	bool m_IsInteractable;							// 入力を受け付けるかどうか
 
 public:
@@ -121,5 +123,30 @@ public:
 	/// </summary>
 	/// <returns>サウンドID</returns>
 	int get_InputSoundID()const { return m_InputSoundID; }
+
+	/// <summary>
+	/// 入力の連続判定の間隔の設定
+	/// </summary>
+	/// <param name="_flag"></param>
+	void set_RepeatInputInterval(int _interval) { m_RepeatInputInterval = _interval; }
+
+	/// <summary>
+	/// 入力の連続判定の間隔の取得
+	/// </summary>
+	/// <returns></returns>
+	int get_RepeatInputInterval()const { return m_RepeatInputInterval; }
+
+
+	/// <summary>
+	/// 入力時、何フレーム待ってから次の入力を受け付けるかのカウンターの設定
+	/// </summary>
+	/// <param name="_flag"></param>
+	void set_InputWaitFrame(int _counter) { m_InputWaitFrame = _counter; }
+
+	/// <summary>
+	/// 入力時、何フレーム待ってから次の入力を受け付けるかのカウンターの取得
+	/// </summary>
+	/// <returns></returns>
+	int get_InputWaitCounter()const { return m_InputWaitFrame; }
 };
 

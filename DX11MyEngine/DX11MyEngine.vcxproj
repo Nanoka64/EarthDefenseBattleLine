@@ -317,7 +317,7 @@
     <ClInclude Include="Source\Header\Component_Light.h" />
     <ClInclude Include="Source\Header\MeshInfoFactory.h" />
     <ClInclude Include="Source\Header\ModelMesh.h" />
-    <ClInclude Include="Source\Header\MyStruct.h" />
+    <ClInclude Include="Source\Header\ConstantBufferStructs.h" />
     <ClInclude Include="Source\Header\GameObjectManager.h" />
     <ClInclude Include="Source\Header\Path.h" />
     <ClInclude Include="Source\Header\pch.h" />

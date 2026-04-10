@@ -143,66 +143,70 @@ float4 PSMain(PS_IN input) : SV_TARGET
     //************************************************************************
     // シャドウ
     //************************************************************************
-    float3 shadowColor = float3(0.0f,0.0f,0.0f);
     
-    float4 posInLVP = mul(worldPos, cb_DirLightData[0].LightViewProj);
-    
-    //posInLVP.xyz /= posInLVP.w;
-    
-    // ライトビュースクリーン空間（NDC）からUV空間に座標変換
-    // -1.0 ～ 1.0 を 0.0～1.0に
-    // 平行投影の場合は設定次第でw除算は要らないっぽい
-    
-    float2 shadowMapUV = posInLVP.xy;
-    shadowMapUV *= float2(0.5f, -0.5f);
-    shadowMapUV += 0.5f;
-    // ライトから見た深度値を計算
-    float zInLVP = posInLVP.z;
-    float shadowFactor = 1.0f;
-    
-    // バイアス参考サイト https://project-asura.com/articles/d3d11/d3d11_008.html
-    // 最大深度傾斜を求める.
-    float maxDepthSlope = max(abs(ddx(zInLVP)), abs(ddy(zInLVP)));
-    float bias = cb_BaseShadowBias; // 固定バイアス
-    float slopeScaledBias = cb_SlopeScaledBias;  // 深度傾斜
-    float depthBiasClamp = cb_DepthBiasClamp;    // バイアスクランプ値
-    float shadowBias = bias + slopeScaledBias * maxDepthSlope;
-    shadowBias = min(shadowBias, depthBiasClamp);   // クランプ
-    
-    // シャドウマップから値をサンプリング
-    float2 shadow = g_tShadowMapTexture.Sample(g_sShadowSampler, shadowMapUV).rg;
-    
-    //if (zInLVP > shadow.r && zInLVP <= 1.0f)
+    // シャドウの有効/無効
+    if (cb_EnableShadow == true)
     {
-        //チェビシェフの不等式を利用して光が当たる確率を求める
-        float depth_sq = shadow.r * shadow.r;
-        
-        // 分散具合を求める
-        // 分散が大きいほど、varianceも大きくなる
-        float variance = min(max(shadow.g - depth_sq, 0.0000001f), 1.0f);
-        
-        // このピクセルのライトから見た深度値とシャドウマップの平均の深度値との差を求める
-        float md = zInLVP - shadow.r;
-        
-        // 光が届く確率を求める
-        float lit_Factor = variance / (variance + md * md);
-        
-        //（UV 0.0～1.0）の端でフェードさせる
-        // 端から指定範囲の領域で滑らかに影を薄くする
-        // 今は端から30%ぐらいのところからフェードさせている
-        float2 edge = smoothstep(0.0, 0.3, shadowMapUV) * smoothstep(1.0, 0.7, shadowMapUV);
-        float vignette = edge.x * edge.y;
-        
-        // 範囲外ではvignetteが0になるので、1.0で明るくなる
-        lit_Factor = lerp(1.0f, lit_Factor, vignette);
-        
-        // 現在のカラーより暗く
-        shadowColor = finalCol.xyz * 0.3f;
-        
-        // 通常カラーとシャドウカラーで線形補間
-        finalCol.xyz = lerp(shadowColor, finalCol.xyz, lit_Factor);
-    }
+        float3 shadowColor = float3(0.0f, 0.0f, 0.0f);
     
+        float4 posInLVP = mul(worldPos, cb_DirLightData[0].LightViewProj);
+    
+        //posInLVP.xyz /= posInLVP.w;
+    
+        // ライトビュースクリーン空間（NDC）からUV空間に座標変換
+        // -1.0 ～ 1.0 を 0.0～1.0に
+        // 平行投影の場合は設定次第でw除算は要らないっぽい
+    
+        float2 shadowMapUV = posInLVP.xy;
+        shadowMapUV *= float2(0.5f, -0.5f);
+        shadowMapUV += 0.5f;
+        // ライトから見た深度値を計算
+        float zInLVP = posInLVP.z;
+        float shadowFactor = 1.0f;
+    
+        // バイアス参考サイト https://project-asura.com/articles/d3d11/d3d11_008.html
+        // 最大深度傾斜を求める.
+        //float maxDepthSlope = max(abs(ddx(zInLVP)), abs(ddy(zInLVP)));
+        //float bias = cb_BaseShadowBias; // 固定バイアス
+        //float slopeScaledBias = cb_SlopeScaledBias; // 深度傾斜
+        //float depthBiasClamp = cb_DepthBiasClamp; // バイアスクランプ値
+        //float shadowBias = bias + slopeScaledBias * maxDepthSlope;
+        //shadowBias = min(shadowBias, depthBiasClamp); // クランプ
+
+        // シャドウマップから値をサンプリング
+        float2 shadow = g_tShadowMapTexture.Sample(g_sShadowSampler, shadowMapUV).rg;
+    
+        //if (zInLVP > shadow.r && zInLVP <= 1.0f)
+        {
+            //チェビシェフの不等式を利用して光が当たる確率を求める
+            float depth_sq = shadow.r * shadow.r;
+        
+            // 分散具合を求める
+            // 分散が大きいほど、varianceも大きくなる
+            float variance = min(max(shadow.g - depth_sq, 0.0000001f), 1.0f);
+        
+            // このピクセルのライトから見た深度値とシャドウマップの平均の深度値との差を求める
+            float md = zInLVP - shadow.r;
+        
+            // 光が届く確率を求める
+            float lit_Factor = variance / (variance + md * md);
+        
+            //（UV 0.0～1.0）の端でフェードさせる
+            // 端から指定範囲の領域で滑らかに影を薄くする
+            // 今は端から30%ぐらいのところからフェードさせている
+            float2 edge = smoothstep(0.0, 0.3, shadowMapUV) * smoothstep(1.0, 0.7, shadowMapUV);
+            float vignette = edge.x * edge.y;
+        
+            // 範囲外ではvignetteが0になるので、1.0で明るくなる
+            lit_Factor = lerp(1.0f, lit_Factor, vignette);
+        
+            // 現在のカラーより暗く
+            shadowColor = finalCol.xyz * 0.3f;
+        
+            // 通常カラーとシャドウカラーで線形補間
+            finalCol.xyz = lerp(shadowColor, finalCol.xyz, lit_Factor);
+        }
+    }
     // シャドウマップの範囲内か
     //if (shadowMapUV.x > 0.0f && shadowMapUV.x < 1.0f &&
     //shadowMapUV.y > 0.0f && shadowMapUV.y < 1.0f)

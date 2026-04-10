@@ -79,7 +79,7 @@ void ModelMeshRenderer::Draw(RendererEngine &renderer)
     CB_MATERIAL_SET *CB_MatSet      = modelData->GetConstantBufferMaterialDataSet();
     CB_TRANSFORM_SET *CB_TransSet   = modelData->GetConstantBufferTransformSet();
     UINT vertexNum                  = pMeshes->get_VertexNum();
-    VERTEX_Skneed* vertices         = pMeshes->get_Vertices();
+    //VERTEX_Skneed* vertices         = pMeshes->get_Vertices();
     SHADER_TYPE shaderType          = modelData->get_ShaderType();
     SHADER_TYPE shadowShaderType    = modelData->get_ShadowShaderType();
 
@@ -179,7 +179,9 @@ void ModelMeshRenderer::Draw(RendererEngine &renderer)
     }
     // シャドウパス **********************************************************
     else if (renderer.get_CrntRenderPass() == RENDER_PASS::SHADOW) {
-        if (pScene->HasAnimations()){
+
+        // スキニングメッシュかどうか
+		if (pScene->mMeshes[0]->HasBones()) {  
             Master::m_pShaderManager->DeviceToSetShader(SHADER_TYPE::POST_SHADOWMAP_SKINNED);
         }
         else{
