@@ -22,8 +22,15 @@ void Gun_FireState::OnEnter(GunWeapon* pOwner)
 {
 	pOwner->get_WeaponFlags().EnableFlag(WEAPON_STATUS::FIRE);
 
-    // 発射
-    pOwner->Shoot(*m_pRenderer);
+	// 1秒あたりの発射回数から発射間隔を計算
+	m_FireInterval = 1.0f / pOwner->get_GunWeaponParameter()->_fireRate;
+
+	if (m_ShootTimer >= m_FireInterval)
+	{
+		// 発射
+		pOwner->Shoot(*m_pRenderer);
+		m_ShootTimer = 0.0f;	// タイマーリセット
+	}
 }
 
 //*---------------------------------------------------------------------------------------
@@ -35,6 +42,8 @@ void Gun_FireState::OnEnter(GunWeapon* pOwner)
 void Gun_FireState::OnExit(GunWeapon* pOwner)
 {
 	pOwner->get_WeaponFlags().DisableFlag(WEAPON_STATUS::FIRE);
+
+	//m_ShootTimer = 0.0f;	// タイマーリセット
 }
 
 //*---------------------------------------------------------------------------------------
@@ -46,6 +55,7 @@ void Gun_FireState::OnExit(GunWeapon* pOwner)
 int Gun_FireState::Update(GunWeapon* pOwner)
 {
     if (pOwner->get_IsStopFire())return GUN_STATE::GUN_STATE_IDLE;
+	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 
     auto player = Master::m_pGameObjectManager->get_ObjectByTag("Player");
     if (player->get_Component<PlayerController>()->get_AnimID() == PlayerData::PLAYER_RANGER_ANIM_ID::RUNING_DIVE_ROLL)return GUN_STATE::GUN_STATE_IDLE;
@@ -53,21 +63,30 @@ int Gun_FireState::Update(GunWeapon* pOwner)
 	const auto& weapon_param = pOwner->get_GunWeaponParameter();
 	int ammoRemaining = pOwner->get_AmmoRemaining();
 
-	// 左クリックで発射
-	if (GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, weapon_param->_fireRate, weapon_param->_fireRate))
+	m_ShootTimer += deltaTime;	// タイマー更新
+
+	// 左クリックで発射続ける
+	if (GetMouseClick(MOUSE_BUTTON_STATE::LEFT))
 	{
-		pOwner->Shoot(*m_pRenderer);
-	}
-	// リロード
-	else if (GetInputDown(GAME_CONFIG::WEAPON_RELOAD) || ammoRemaining <= 0)
-	{
-		return GUN_STATE::GUN_STATE_RELOADING;
+		if (m_ShootTimer >= m_FireInterval)
+		{
+			pOwner->Shoot(*m_pRenderer);
+			m_ShootTimer = 0.0f;	// タイマーリセット
+		}
 	}
 	// 何もなし
 	else
 	{
 		return GUN_STATE::GUN_STATE_IDLE;
 	}
+
+	// リロード
+	if (GetInputDown(GAME_CONFIG::WEAPON_RELOAD) || ammoRemaining <= 0)
+	{
+		m_ShootTimer = 9999.0f;	// タイマーを大きくして、リロード後は直ぐ発射できるようにする
+		return GUN_STATE::GUN_STATE_RELOADING;
+	}
+
 
 	return GUN_STATE::GUN_STATE_FIRE;
 }

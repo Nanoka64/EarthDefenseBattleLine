@@ -19,7 +19,7 @@
 #include "MeshFactory.h"
 #include "InputFactory.h"
 
-constexpr float VOLUME_SCALE = 0.0001f;  // 音量のスケール（0.0f～1.0f）
+constexpr float VOLUME_SCALE = 0.01f;  // 音量のスケール（0.0f～1.0f）
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ

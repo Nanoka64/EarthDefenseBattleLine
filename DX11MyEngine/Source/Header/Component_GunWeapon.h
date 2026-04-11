@@ -17,10 +17,12 @@ private:
 	std::weak_ptr<class LineRenderer> m_pLineRendererComp;	// レーザー用のライン
 	std::weak_ptr<class PointLight> m_pFlashPointLight;		// 発射時のフラッシュ用
 	//WeaponData::GunWeaponData m_WeaponParameter;
+	float m_Range;	// 射程距離
+	int m_AmmoRemaining;	// 残弾数
 	bool m_IsNowZoom;		// ズーム中かどうか
 	bool m_IsStopFire;		// 発射止める
-	int m_AmmoRemaining;	// 残弾数
 	StateMachine<GunWeapon>m_StateMachine;
+
 public:
 	GunWeapon( std::weak_ptr<GameObject> pOwner, int updateRank = 100);
 	~GunWeapon();

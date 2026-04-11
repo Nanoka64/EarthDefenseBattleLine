@@ -87,12 +87,12 @@ void NormalBullet::Start(RendererEngine& renderer)
             VEC3 hitNormal = _other.get_HitNormal();    // 衝突相手の法線
 
             // 水平方向の向きを求める
-            float angleY = atan2(hitNormal.x, hitNormal.z);
+            float yaw = atan2(hitNormal.x, hitNormal.z);
             // 水平成分の長さ
             float xzLen = sqrtf(hitNormal.x * hitNormal.x + hitNormal.z * hitNormal.z);
             // 垂直方向の角度を求める
             // 法線の逆を向かせたいのでマイナスを付ける
-            float angleX = atan2(-hitNormal.y, xzLen);
+            float pitch = atan2(-hitNormal.y, xzLen);
 
             // 当たった方向に伸ばそうとしたけど上手くいかなかった
             {
@@ -130,13 +130,13 @@ void NormalBullet::Start(RendererEngine& renderer)
             obj->get_Component<DecalRenderer>()->Start(renderer);
             obj->get_Transform().lock()->set_Pos(pos);
             obj->get_Transform().lock()->set_Scale(scale);
-            obj->get_Transform().lock()->set_RotateToRad(angleX, angleY, angleZ);
+            obj->get_Transform().lock()->set_RotateToRad(pitch, yaw, angleZ);
             obj->set_Tag("BulletHole");
             auto timer = obj->add_Component<TimerDestruction>();
             timer->set_LifeTime(DECAL_LIFE_TIME);  // 生存時間
 
             // エフェクト
-            VEC3 effectRot = VEC3(abs(angleX - 0.05f), angleY, 0.0f);
+            VEC3 effectRot = VEC3(pitch, yaw, 0.0f);
             int spark_handle = Master::m_pEffectManager->PlayEffect("Spark");   // 火花
             int smoke_handle = Master::m_pEffectManager->PlayEffect("Smoke");   // 煙
             

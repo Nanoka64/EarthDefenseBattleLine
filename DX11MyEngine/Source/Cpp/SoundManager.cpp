@@ -376,6 +376,10 @@ bool SoundManager::Update(RendererEngine &renderer)
     m_Listener.Velocity.y = 0.0f;
     m_Listener.Velocity.z = 0.0f;
 
+	// BGMの音量を更新
+	if (m_BGM_SoundSlot._pSourceVoice) {
+		m_BGM_SoundSlot._pSourceVoice->SetVolume(m_BGMVolume);
+	}
 
 	// ############################################################################
     //							3Dサウンドの更新

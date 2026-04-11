@@ -264,7 +264,7 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 
 		// 各種計算・変換
 		std::wstring laserSightStr = weaponData->_isLaserSight ? L"装備" : L"---";
-		float fireRatePerSec = (weaponData->_fireRate > 0.0f) ? (60.0f / weaponData->_fireRate) : 0.0f;
+		float fireRatePerSec = weaponData->_fireRate ;
 		std::wstring damageStr = FormatFloat((baseBulletData._damage));
 		damageStr = (weaponData->_bulletSimultaneousNum > 1) ? damageStr + L" x " + std::to_wstring(weaponData->_bulletSimultaneousNum) : damageStr; // 同時発射数が1より多い場合はダメージに「x N」を追加
 
@@ -276,7 +276,7 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 			L"　・ダメージ:" + damageStr +
 			L"\n" +
 			L"　・リロード:" + FormatFloat(weaponData->_reloadTime) + L"秒" +
-			L"　・射程:" + FormatFloat(baseBulletData._range / 10.0f) + L"m" +
+			L"　・射程:" + FormatFloat(baseBulletData._range) + L"m" +
 			L"　・弾速:" + FormatFloat(baseBulletData._speed) +
 			L"\n" +
 			L"　・精度:" + FormatFloat(weaponData->_accuracy,2) + // ※ここを「S/A/B...」等に変換する関数を噛ませると綺麗です
@@ -287,7 +287,12 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 			extraInfoStr; // ★ 爆発弾の時だけここに「爆発半径」が足される
 
 		// 6. パラメータの描画
-		Master::m_pDirectWriteManager->DrawString(detailStr, VEC2(950.0f, startY + 50.0f), "White_20_STD", D2D1_DRAW_TEXT_OPTIONS_NONE, false);
+		Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(0.3f, 0.5f, 1.0f));	// 水色文字
+		Master::m_pDirectWriteManager->SetOutLine(2.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
+		Master::m_pDirectWriteManager->DrawStringToAligment(detailStr, VEC2(950.0f, startY + 50.0f), "White_20_STD", H_ALIGNMENT::LEADING, V_ALIGNMENT::TOP, VEC2(1000.0f, 600.0f));
+		Master::m_pDirectWriteManager->SetOutLine(0.0f);
+
+		Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(D2D1::ColorF::White));	
 		};
 
 	// 描画の実行（現在選択中の武器）
@@ -304,7 +309,10 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 		std::string decisionText = g_SoldierNames[m_DecisionSoldierTypeIndex];
 		float textY = m_ItemInfoArray[m_DecisionSoldierTypeIndex]._pos.y;
 		float textX = m_ItemInfoArray[m_DecisionSoldierTypeIndex]._pos.x - 150.0f;
+
+		Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(D2D1::ColorF::Yellow));	// 黄色文字
 		Master::m_pDirectWriteManager->DrawString("[" + decisionText + "]" + "を装備しました", VEC2(textX, textY), "White_30_STD");
+		Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(D2D1::ColorF::White));
 
 		m_DecisionTextDrawCounter--;
 	}

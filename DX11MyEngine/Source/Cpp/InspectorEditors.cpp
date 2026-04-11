@@ -281,11 +281,11 @@ void PointLightEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pObj)
         Master::m_pDebugger->DG_Separator();    // ‹æØ‚èü
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"‹­‚³"));
         Master::m_pDebugger->DG_SameLine();
-        Master::m_pDebugger->DG_SliderFloat("##Insensity", 1, &intensity, 0.0f, 100.0f);
+        Master::m_pDebugger->DG_DragFloat("##Insensity", 1, &intensity, 0.5f, 0.0f, 100.0f);
 
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"”ÍˆÍ"));
         Master::m_pDebugger->DG_SameLine();
-        Master::m_pDebugger->DG_SliderFloat("##Range", 1, &range, 0.0f, 10000.0f);
+        Master::m_pDebugger->DG_DragFloat("##Range", 1, &range, 0.5f, 0.0f, 1000.0f);
 
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ƒJƒ‰["));
         Master::m_pDebugger->DG_SameLine();

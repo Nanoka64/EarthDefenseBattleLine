@@ -47,12 +47,22 @@ private:
     //IDWriteTextLayout    *m_pTextLayout;        // テキストの形式    ※ローカル変数にした
     ID2D1RenderTarget    *m_pRenderTarget;      // 描画先
     ID2D1SolidColorBrush *m_pSolidBrush;        // 塗りつぶしに使う
+    ID2D1SolidColorBrush *m_pOutLineSolidBrush; // 塗りつぶしに使う 
     IDXGISurface         *m_pSurfaceBackBuffer; // 描画APIとのやり取りに使う 描画先として使える
+
+	float m_OutLineSize; // アウトラインのサイズ
 
     //struct FONT_DATA *m_pFontData; // フォントデータ 
 
     // テキストデータ
     std::map<std::string, Microsoft::WRL::ComPtr<IDWriteTextFormat>> m_pTextFormatMap;    
+
+	/// <summary>
+	/// アウトラインの描画
+	/// </summary>
+	/// <param name="_pos">位置</param>
+	/// <param name="_pTextLayout">テキストレイアウトポインタの参照</param>
+	void DrawOutLine(const D2D1_POINT_2F& _pos, const Microsoft::WRL::ComPtr<IDWriteTextLayout> &_pTextLayout);
 
 public:
     DirectWriteManager();
@@ -82,6 +92,13 @@ public:
     /// <param name="col">色</param>
     void SetColor(const D2D1_COLOR_F& col);
 
+	/// <summary>
+	/// アウトラインの設定
+	/// </summary>
+	/// <param name="_size">アウトラインのサイズ</param>
+	/// <param name="_col">アウトラインの色</param>
+	void SetOutLine(float _size, const D2D1_COLOR_F& _col = D2D1::ColorF(0.0f, 0.0f, 0.0f));
+
     /// <summary>
     /// 文字列の表示
     /// </summary>
@@ -104,6 +121,7 @@ public:
     /// <param name="_vAlign">垂直揃え</param>
     /// <param name="_parentSize">親の大きさ</param>
     void DrawStringToAligment(const std::string& _str, const VECTOR2::VEC2& _pos, const std::string& _formatTag, H_ALIGNMENT _hAlign, V_ALIGNMENT _vAligment, const VECTOR2::VEC2& _parentSize);
+    void DrawStringToAligment(const std::wstring& _wstr, const VECTOR2::VEC2& _pos, const std::string& _formatTag, H_ALIGNMENT _hAlign, V_ALIGNMENT _vAligment, const VECTOR2::VEC2& _parentSize);
 
 
     /// <summary>

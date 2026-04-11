@@ -31,10 +31,14 @@ constexpr int NUM_MAX__EXPLOSION_BULLET     = 100;
 // 爆発ライト
 constexpr int NUM_DEFAULT__EXPLOSION_LIG_BULLET = 25;
 constexpr int NUM_MAX__EXPLOSION_LIG_BULLET     = 50;
+constexpr float LIGHT_RADIUS_FACTOR = 5.0f; // 爆発範囲に掛ける、補正値
+
 
 // 誘導弾 =====================================================================
 constexpr int NUM_DEFAULT__HORMING_BULLET   = 50;
 constexpr int NUM_MAX__HORMING_BULLET       = 100;
+
+
 
 using namespace BulletData;
 using namespace GIGA_Engine;
@@ -109,6 +113,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             //*****************************************************************************************
             auto light = obj->add_Component<PointLight>();                          // ポイントライト
             auto lightController = obj->add_Component<ExplosionLightController>();  // ポイントライトの制御
+            lightController->Start(renderer);
 
             light->set_Intensity(0.0f);
             light->set_LightColor(VEC3(1.0f, 1.0f, 1.0f));
@@ -147,8 +152,8 @@ bool BulletManager::Init(RendererEngine &renderer)
             //collider->set_IsEnable(false); 
 
             // 軌跡データをクリア
-            auto trail = obj->get_Component<TrailRenderer>();
-            trail->clear_TrailInfoList();
+            //auto trail = obj->get_Component<TrailRenderer>();
+            //trail->clear_TrailInfoList();
         },
         // 生成時に実行 ******************************************************************************************
         [&renderer]()->GameObject *
@@ -188,12 +193,12 @@ bool BulletManager::Init(RendererEngine &renderer)
             moveComp->ChangeBehaviour(MOVE_BEHAVIOUR_TYPE::LINEAR);
 
             // 軌跡
-            auto trail = obj->add_Component<TrailRenderer>();
-            trail->set_Width(1.0f);
-            trail->set_MinVertexDistance(0.5f);
-            trail->set_DrawTime(1.0f);
-            trail->set_EmissivePower(5.0f);
-            trail->set_Color(VECTOR4::VEC4(0.0f, 1.0f, 0.0f, 1.0f));
+            //auto trail = obj->add_Component<TrailRenderer>();
+            //trail->set_Width(1.0f);
+            //trail->set_MinVertexDistance(0.5f);
+            //trail->set_DrawTime(1.0f);
+            //trail->set_EmissivePower(5.0f);
+            //trail->set_Color(VECTOR4::VEC4(0.0f, 1.0f, 0.0f, 1.0f));
 
             //// コライダーの追加
             //auto collider = obj->add_Component<BoxCollider>();
@@ -232,6 +237,15 @@ bool BulletManager::Init(RendererEngine &renderer)
         {          
             // アクティブに
             obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE); 
+            auto bulletComp = obj->get_Component<ExplosionBullet>();
+
+            auto trail = obj->get_Component<TrailRenderer>();
+            trail->set_Width(0.1f);
+            trail->set_MinVertexDistance(1.0f);
+            trail->set_DrawTime(30.0f);
+            trail->set_EmissivePower(10.0f);
+            trail->set_Color(VECTOR4::VEC4(1.0f, 1.0f, 0.0f, 1.0f));
+            trail->set_PosRandVec(VEC3(0.5f));
 
             //// コライダーの使用をオンに
             //auto collider = obj->get_Component<BoxCollider>();
@@ -244,6 +258,8 @@ bool BulletManager::Init(RendererEngine &renderer)
             float explosionRadius = bulletComp->get_Parameter()._explosionRadius;   // 爆発半径を取得
             bulletComp->Reset();
 
+
+
             //// コライダーの使用をオフに
             //auto collider = obj->get_Component<BoxCollider>();
             //collider->set_IsEnable(false);
@@ -253,7 +269,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             trail->clear_TrailInfoList();
 
             auto transform = obj->get_Transform().lock();
-            transform->get_VEC3ToPos();
+            VEC3 pos = transform->get_VEC3ToPos();
             transform->get_VEC3ToScale();
 
             //*****************************************************************************************
@@ -266,10 +282,10 @@ bool BulletManager::Init(RendererEngine &renderer)
             }
 
             auto ligController = lightObj->get_Component<ExplosionLightController>();
-            lightObj->get_Transform().lock()->set_Pos(transform->get_VEC3ToPos());
+            lightObj->get_Transform().lock()->set_Pos(pos);
 
             ExplosionLightData expLigData;
-            expLigData._explosionLightRadius = explosionRadius;
+            expLigData._explosionLightRadius = explosionRadius * LIGHT_RADIUS_FACTOR;
             expLigData._normalRadius = transform->get_VEC3ToScale().x;  // 一旦、xスケールを元に
             expLigData._explosionDuration = 6.0f;
             ligController->set_Parameter(expLigData);
@@ -318,7 +334,7 @@ bool BulletManager::Init(RendererEngine &renderer)
 
             // 軌跡コンポーネントの追加
             auto trail = obj->add_Component<TrailRenderer>();
-            trail->set_Width(0.07f);
+            trail->set_Width(0.1f);
             trail->set_MinVertexDistance(1.0f);
             trail->set_DrawTime(30.0f);
             trail->set_EmissivePower(10.0f);

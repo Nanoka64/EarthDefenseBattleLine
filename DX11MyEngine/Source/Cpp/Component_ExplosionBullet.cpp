@@ -84,7 +84,7 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             decal.IsNormalMap = false;
             decal.IsDynamic = true;
 
-            VEC3 hitNormal = -_other.get_HitNormal();    // 衝突相手の法線
+            VEC3 hitNormal = _other.get_HitNormal();    // 衝突相手の法線
 
             // 水平方向の向きを求める
             float angleY = atan2(hitNormal.x, hitNormal.z);
@@ -181,6 +181,10 @@ void ExplosionBullet::Update(RendererEngine &renderer)
 
     if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
     {
+        auto owner = m_pOwner.lock();
+        auto transform = owner->get_Transform().lock();
+        transform->set_Pos(crntPos);     // 前の位置に合わせる
+
         if (m_CollisionTask)
         {
             m_CollisionTask(hitInfo);
@@ -188,8 +192,6 @@ void ExplosionBullet::Update(RendererEngine &renderer)
 
         if (m_pOwner.expired())return;
 
-        auto owner = m_pOwner.lock();
-        auto transform = owner->get_Transform().lock();
         VEC3 pos = transform->get_VEC3ToPos();
 
         unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);   // 敵と破壊可能な建物

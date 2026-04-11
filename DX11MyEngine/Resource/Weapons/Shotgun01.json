@@ -15,7 +15,7 @@
     "damageDistAttenuationRate": 0.5,
     "speed": 200.0,
     "acceleration": 0.0,
-    "range": 30.0,
+    "range": 70.0,
     "penetrationsCount": 3,
     "collisionSize": 0.0,
     "gravityScale": 0.0

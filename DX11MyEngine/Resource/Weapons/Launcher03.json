@@ -3,8 +3,8 @@
   "name": "サンダーカノンTA-DZ",
   "bulletMaxNum": 1,
   "bulletSimultaneousNum": 1,
-  "fireRate": 60.0,
-  "reloadTime": 2.5,
+  "fireRate": 1.0,
+  "reloadTime": 10.0,
   "accuracy": 0.001,
   "zoomLength": 2.1,
   "isLaserSight": true,
@@ -13,14 +13,14 @@
   "bulletParam": {
     "damage": 1000.0,
     "damageDistAttenuationRate": 0.5,
-    "speed": 20.0,
+    "speed": 50.0,
     "acceleration": 0.0,
     "range": 2000.0,
     "penetrationsCount": 0,
     "collisionSize": 0.0,
     "gravityScale": 0.0,
     "explosionRadius": 100.0,
-    "explosionEffectHandleTag": "Explosion_01",
+    "explosionEffectHandleTag": "Explosion_03",
     "isSmoke" : true
   }
 }

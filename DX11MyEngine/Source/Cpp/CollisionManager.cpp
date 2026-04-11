@@ -707,12 +707,11 @@ bool CollisionManager::HitCheck_BoxVsSphere(const CollInData_AABB &_box, const C
 bool CollisionManager::HitCheck_SphereVsSphere(const CollInData_Sphere& _src, const CollInData_Sphere& _dst)
 {
     VECTOR3::VEC3 result;
-    result = _dst._pos - _src._pos;
+    float dist = VEC3::DistanceSq(_src._pos, _dst._pos);
 
-    float length = result.LengthSq();
     float r = _src._radius + _dst._radius;
 
-    if ((r * r) > length)
+    if ((r * r) > dist)
     {
         return true;
     }
@@ -824,7 +823,9 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
 
     t_Min = tx_Min;
     t_Max = tx_Max;
-    hitNnormal = (dir.x < 0.0f) ? VEC3(-1.0f, 0.0f, 0.0f) : VEC3(1.0f, 0.0f, 0.0f);
+
+	// 方向がマイナスということは、正の方向から入ってきているので、衝突した面の法線は正のX軸方向
+    hitNnormal = (dir.x < 0.0f) ? VEC3(1.0f, 0.0f, 0.0f) : VEC3(-1.0f, 0.0f, 0.0f);
 
 
 
@@ -869,7 +870,7 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
     // Y軸の方が進入が遅い（Y軸の面から箱に入った）
     if (t_Min < ty_Min) {
         t_Min = ty_Min;
-		hitNnormal = (dir.y < 0.0f) ? VEC3(0.0f, -1.0f, 0.0f) : VEC3(0.0f, 1.0f, 0.0f);
+		hitNnormal = (dir.y < 0.0f) ? VEC3(0.0f, 1.0f, 0.0f) : VEC3(0.0f, -1.0f, 0.0f);
     }
 
     if (t_Max > ty_Max)t_Max = ty_Max;
@@ -915,7 +916,7 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
     // X軸とY軸の領域が被っていない
     if (t_Min < tz_Min) {
         t_Min = tz_Min;
-		hitNnormal = (dir.z < 0.0f) ? VEC3(0.0f, 0.0f, -1.0f) : VEC3(0.0f, 0.0f, 1.0f);
+		hitNnormal = (dir.z < 0.0f) ? VEC3(0.0f, 0.0f, 1.0f) : VEC3(0.0f, 0.0f, -1.0f);
     }
     if (t_Max > tz_Max)t_Max = tz_Max;
 

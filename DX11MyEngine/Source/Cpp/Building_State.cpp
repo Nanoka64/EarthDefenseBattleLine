@@ -181,7 +181,7 @@ int Building_CllapseNowState::Update(BuildingController* pOwner)
 		//						エフェクト再生
 		//				崩れていく際に、炎が出ている感じにする
 		//*****************************************************************************************
-		if (m_FrameCounter % 20 == 0)
+		if (m_FrameCounter % 30 == 0)
 		{
 			VEC3 explosionRot;
 			VEC3 explosionScale = 4.0f;
@@ -195,7 +195,6 @@ int Building_CllapseNowState::Update(BuildingController* pOwner)
 			Master::m_pEffectManager->SetRotationEffect(handle, explosionRot.x, explosionRot.y, explosionRot.z);
 			Master::m_pEffectManager->SetScaleEffect(handle, explosionScale.x, explosionScale.y, explosionScale.z);
 		}
-
 	}
 
 	if(m_CollapseTime <= m_CrntCollapseTime )

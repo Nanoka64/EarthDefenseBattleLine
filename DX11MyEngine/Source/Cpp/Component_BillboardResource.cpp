@@ -16,14 +16,14 @@ using namespace GIGA_Engine;
 //*----------------------------------------------------------------------------------------
 BillboardResource::BillboardResource(std::weak_ptr<GameObject> pOwner, int updateRank) :IComponent(pOwner, updateRank),
 m_pCBTransformSet(nullptr),
-m_pCBMaterialDataSet(nullptr)
+m_pCBMaterialDataSet(nullptr),
+m_FixedAxisBitFlag()
 {
 	this->set_Tag("BillboardResource");
 
-	// TODO:ビットフラグ、関数内で演算が効かない問題を直す
-	BitFlag::SetFlag((unsigned)FIXED_AXIS_BITFLAG_X, (unsigned&)m_FixedAxisBitFlag);
-	BitFlag::SetFlag((unsigned)FIXED_AXIS_BITFLAG_Y, (unsigned&)m_FixedAxisBitFlag);
-	BitFlag::SetFlag((unsigned)FIXED_AXIS_BITFLAG_Z, (unsigned&)m_FixedAxisBitFlag);
+	//BitFlag::SetFlag((unsigned)FIXED_AXIS_BITFLAG_X, (unsigned&)m_FixedAxisBitFlag);
+	//BitFlag::SetFlag((unsigned)FIXED_AXIS_BITFLAG_Y, (unsigned&)m_FixedAxisBitFlag);
+	//BitFlag::SetFlag((unsigned)FIXED_AXIS_BITFLAG_Z, (unsigned&)m_FixedAxisBitFlag);
 
 }
 

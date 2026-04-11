@@ -2,6 +2,7 @@
 #include "Component_ExplosionLightController.h"
 #include "Component_PointLight.h"
 #include "RendererEngine.h"
+#include "DebugMesh.h"
 
 using namespace VECTOR3;
 
@@ -42,6 +43,14 @@ void ExplosionLightController::Start(RendererEngine &renderer)
 	// ここで参照ポインタを取ってしまう
 	// 念のため、Setup関数の方に移してもいいかも
 	m_pPointLight = m_pOwner.lock()->get_Component<PointLight>();
+
+	m_pBoxMesh = std::make_unique<DebugMesh>();
+	bool res = m_pBoxMesh->Setup(renderer, DEBUG_MESHS_TYPE::CUBE);
+	if (res == false)
+	{
+		assert(false);
+		MessageBox(NULL, "デバッグ用メッシュの生成ができませんでした", "Collider", MB_OK);
+	}
 }
 
 
@@ -73,7 +82,7 @@ void ExplosionLightController::Update(RendererEngine &renderer)
 	float range = (m_Parameter._explosionLightRadius) * (1.0f - easeOut);
 
 	auto pPointLight = m_pPointLight.lock();
-	pPointLight->set_Intensity(50.0f * (1.0f - easeOut));
+	pPointLight->set_Intensity(40.0f * (1.0f - easeOut));
 	pPointLight->set_Range(range);
 	pPointLight->set_LightColor(VEC3(0.8f, 0.4f, 0.1f));
 
@@ -89,7 +98,22 @@ void ExplosionLightController::Update(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void ExplosionLightController::Draw(RendererEngine &renderer)
 {
+	auto pContext = renderer.get_DeviceContext();
+	XMMATRIX localMat = XMMatrixIdentity();
 
+	auto transform = m_pOwner.lock()->get_Transform().lock();
+	VEC3 ownerPos = transform->get_VEC3ToPos();
+
+	XMVECTOR scl = VEC3(m_pPointLight.lock()->get_Range());
+	XMVECTOR pos = ownerPos; // 中心位置のオフセットを足す
+
+	XMMATRIX mtxS = XMMatrixScalingFromVector(scl);
+	XMMATRIX mtxT = XMMatrixTranslationFromVector(pos);
+
+	localMat = transform->get_ExcludingRotWorldMtx(mtxS, mtxT);
+
+	// メッシュ表示
+	m_pBoxMesh->Draw(renderer, localMat);
 }
 
 

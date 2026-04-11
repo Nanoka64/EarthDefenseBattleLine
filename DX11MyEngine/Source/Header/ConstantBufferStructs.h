@@ -83,7 +83,7 @@ struct CB_PROJECTION_SET
 //=========================================================================================
 struct CB_BONES_DATA
 {
-    DirectX::XMFLOAT4X4 BonesMatrices[128];   // 最大8本のボーンに対応 シェーダ側と同じに
+    DirectX::XMFLOAT4X4 BonesMatrices[128];   
 };
 
 struct CB_BONES_DATA_SET
@@ -179,7 +179,7 @@ struct CB_POINT_LIGHT
 /// </summary>
 struct CB_POINT_LIGHT_SET
 {
-    CB_POINT_LIGHT Data[POINTLIGHT_MAX_NUM]{}; // 500個
+    CB_POINT_LIGHT Data[POINTLIGHT_MAX_NUM]{}; // 50個
     ID3D11Buffer* pBuff = nullptr;
 };
 

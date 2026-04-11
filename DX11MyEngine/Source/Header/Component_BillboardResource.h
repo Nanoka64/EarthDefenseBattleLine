@@ -6,7 +6,7 @@
 /// <summary>
 /// 固定軸指定ビットフラグ
 /// </summary>
-enum FIXED_AXIS_BITFLAG : unsigned char
+enum FIXED_AXIS_BITFLAG : unsigned 
 {
 	FIXED_AXIS_BITFLAG_X = 1 << 0,
 	FIXED_AXIS_BITFLAG_Y = 1 << 1,

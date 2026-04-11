@@ -310,7 +310,7 @@ void RenderPipeline::Shadow_PathRender(RendererEngine &renderer)
     renderer.ReleaseRenderTargetSetNull();
 
     // シャドウマップへブラーを掛ける
-    m_pShadowGaussianBlur->ExcuteOnGPU(renderer, 0.5f);
+    m_pShadowGaussianBlur->ExcuteOnGPU(renderer, 0.1f);
 }
 
 
@@ -769,8 +769,8 @@ bool RenderPipeline::CreateRenderTargets(RendererEngine &renderer)
     result = m_pShadowMap_RT->Create(
         renderer,
         // 影の品質は何も対策しなければ解像度依存
-        4092,       
-        4092,
+        4096,       
+        4096,
         1,
         1,
         // ・Rにライトから見た深度値 ・Gにライトから見た深度値の二乗をいれる

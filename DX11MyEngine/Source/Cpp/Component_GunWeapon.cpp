@@ -36,7 +36,8 @@ GunWeapon::GunWeapon(std::weak_ptr<GameObject> pOwner, int updateRank)
     m_StateMachine(this),
     m_IsNowZoom(false),
     m_IsStopFire(false),
-    m_AmmoRemaining(0)
+    m_AmmoRemaining(0),
+    m_Range(0.0f)
 {
     this->set_Tag("GunWeapon");
 }
@@ -112,23 +113,27 @@ void GunWeapon::LateUpdate(RendererEngine& renderer)
         XMVECTOR forward = worldMtx.r[2];  // Z
         //forward *= -1;  // プレイヤーが-Z前になってしまっているので
 
+		auto laserLineRenderer = m_pLineRendererComp.lock();
+
+        laserLineRenderer->get_OwnerObj().lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
         // レーザーサイトの始点と方向
-        m_pLineRendererComp.lock()->set_Dir(VEC3::FromXMVECTOR(XMVector3Normalize(forward)));
-        m_pLineRendererComp.lock()->set_StartPos(pos);
+        laserLineRenderer->set_Dir(VEC3::FromXMVECTOR(XMVector3Normalize(forward)));
+        laserLineRenderer->set_StartPos(pos);
 
         // レーザーポインタ
         auto laserPoint = Master::m_pGameObjectManager->get_ObjectByTag("LaserPointBillboard");
         laserPoint->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 
-        VEC3 laserDir = m_pLineRendererComp.lock()->get_Dir();
+        VEC3 laserDir = laserLineRenderer->get_Dir();
 		VEC3 laserPointPos = VEC3(10000.0f); // 何処にもあたってない場合、とりあえず遠くに置いておく
         
 		// レイの情報を作る
         CollInData_Ray ray;
 		ray._point = pos;
-		ray._dir = laserDir * m_pLineRendererComp.lock()->get_Length();
-        
-		unsigned hitMask = UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING) | UINT_CAST(COLLISION_CATEGORY::ENEMY);  // 建物と敵に当たるようにする
+		ray._dir = laserDir * m_Range;
+
+        unsigned hitMask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);
         CollisionInfo hitInfo;
 		
         // レイキャストして当たった位置にレーザーポインタを置く
@@ -227,6 +232,12 @@ bool GunWeapon::Setup(const WeaponData::BaseWeaponData* _pWeaponData)
 
     m_AmmoRemaining = gunParam->_bulletMaxNum;
 
+    // 射程距離を取得
+    std::visit([&](auto param) {
+        m_Range = param._range;
+        },
+        gunParam->_bulletParam);
+
     return true;
 }
 
@@ -245,6 +256,12 @@ void GunWeapon::SwicthReset()
 
     auto laserPoint = Master::m_pGameObjectManager->get_ObjectByTag("LaserPointBillboard");
     laserPoint->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
+    // レーザーサイトオフ
+    if (auto laserLineRenderer = m_pLineRendererComp.lock())
+    {
+        //laserLineRenderer->get_OwnerObj().lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+    }
 }
 
 
@@ -319,9 +336,9 @@ void GunWeapon::Shoot(RendererEngine& renderer)
 
     if (!m_pFlashPointLight.expired()) {
         // フラッシュ
-        m_pFlashPointLight.lock()->set_Range(3.0f);
-        m_pFlashPointLight.lock()->set_Intensity(5.5f);
-        m_pFlashPointLight.lock()->set_LightColor(VEC3(1.0f, 1.0f, 1.0f));
+        m_pFlashPointLight.lock()->set_Range(5.0f);
+        m_pFlashPointLight.lock()->set_Intensity(8.0f);
+        m_pFlashPointLight.lock()->set_LightColor(VEC3(1.0f, 0.8f, 0.0f));
     }
 
     // 弾数減らす

@@ -56,7 +56,7 @@ namespace BulletData
     {
         float _explosionRadius = 0.0f;             // 爆発の半径
         std::string _explosionEffectHandleTag;     // 爆発エフェクトのハンドル
-		bool _isSmoke = true;                     // 煙を出すかどうか
+		bool _isSmoke = true;                      // 煙を出すかどうか
 
         /// <summary>
         /// リセット
