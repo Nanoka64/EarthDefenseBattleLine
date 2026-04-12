@@ -20,14 +20,16 @@
 class DataManager
 {
 private:
-	float m_ScreenWidth;
-	float m_ScreenHeight;
+	UINT m_ScreenWidth;
+	UINT m_ScreenHeight;
 	float m_DefaultFov;	// デフォルトのFOV
 	bool m_IsDebugMode;
 	std::shared_ptr<class RendererEngine> m_pRenderer;// 描画エンジンのポインタ
 	int m_SelectWeaponID[2];	// 武器選択で選択した武器のID 一時的にここに置く
 	UtilityData::UserConfigData m_UserConfigData;	// ユーザ設定データ
 
+	bool m_IsCameraControl;	// カメラ制御の有無
+	bool m_IsUseWeapon;		// 武器を使用するか
 
 public:
 	DataManager();
@@ -40,17 +42,21 @@ public:
 	bool SettingsData_MissionLoad(RendererEngine& renderer, UINT _missionNumber);			// ミッション開始時
 	bool SettingsData_MissionTermination(RendererEngine& renderer, UINT _missionNumber);	// ミッション終了時
 
-	void set_ScreenWidth(float _w) { m_ScreenWidth = _w; };			// スクリーンの横幅を設定（基本的にRendererEngine以外からは設定しない）
-	void set_ScreenHeight(float _h) { m_ScreenHeight = _h; };		// スクリーンの縦幅を設定（基本的にRendererEngine以外からは設定しない）
+	void set_ScreenWidth(UINT _w) { m_ScreenWidth = _w; };			// スクリーンの横幅を設定（基本的にRendererEngine以外からは設定しない）
+	void set_ScreenHeight(UINT _h) { m_ScreenHeight = _h; };		// スクリーンの縦幅を設定（基本的にRendererEngine以外からは設定しない）
 	void set_DefaultFov(float _f) { m_DefaultFov = _f; }			// デフォルトFOVの設定
 	void set_IdDebugMode(bool flag) { m_IsDebugMode = flag; }		// デバッグ用エディタのフラグ設定
 	void set_UserConfigData(const UtilityData::UserConfigData &_data) { m_UserConfigData = _data; }	// ユーザ設定データの設定
+	void set_IsCameraControl(bool _isControl) { m_IsCameraControl = _isControl; }	// カメラ制御の有無の設定
+	void set_IsUseWeapon(bool _isUse) { m_IsUseWeapon = _isUse; }	// 武器使用の有無の設定
 
-	float get_ScreenWidth() const { return m_ScreenWidth; };		// スクリーンの横幅を取得
-	float get_ScreenHeight() const { return m_ScreenHeight; }		// スクリーンの縦幅を取得
+	UINT get_ScreenWidth() const { return m_ScreenWidth; };		// スクリーンの横幅を取得
+	UINT get_ScreenHeight() const { return m_ScreenHeight; }		// スクリーンの縦幅を取得
 	float get_DefaultFov()const { return m_DefaultFov; }			// デフォルトFOVを取得
 	bool get_IsDebugMode()const { return m_IsDebugMode; }			// デバッグ用エディタのフラグ取得
 	const UtilityData::UserConfigData& get_UserConfigData() const { return m_UserConfigData; }	// ユーザ設定データの取得
+	bool get_IsCameraControl()const { return m_IsCameraControl; }	// カメラ制御の有無の取得
+	bool get_IsUseWeapon()const { return m_IsUseWeapon; }	// 武器使用の有無の取得
 
 	void set_BGMVolume(int _vol);				// BGM音量の設定
 	void set_SEVolume(int _vol);				// SE音量の設定

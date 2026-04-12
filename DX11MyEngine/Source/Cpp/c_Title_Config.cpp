@@ -273,7 +273,7 @@ void c_Title_Config::ChangeConfigValue(UtilityData::CONFIG_ITEM _item, bool _isL
 	case UtilityData::CONFIG_ITEM::MOUSE_SENSITIVITY:
 	{
 		float crntValue = std::get<float>(m_ItemInfoArray[index]._value);
-		crntValue += (_isLeftIndex ? -0.5 : 0.5);
+		crntValue += (_isLeftIndex ? -0.5f : 0.5f);
 		crntValue = std::clamp(crntValue, MIN_MOUSE_SENSITIVITY, MAX_MOUSE_SENSITIVITY);		
 		m_ItemInfoArray[index].SetValue(crntValue);
 		Master::m_pDataManager->set_MouseSensitivity(crntValue);

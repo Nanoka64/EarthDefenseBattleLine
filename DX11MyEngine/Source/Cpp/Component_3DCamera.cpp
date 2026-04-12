@@ -77,11 +77,45 @@ void Camera3D::Start(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void Camera3D::LateUpdate(RendererEngine &renderer)
 {
-	// 操作フラグがオフなら操作できない
-	if (m_IsControl == false)return;
+	m_IsControl = Master::m_pDataManager->get_IsCameraControl();
 
+	// 操作フラグがオフなら操作できない
+	if (m_IsControl)
+	{
+		CamraControl(renderer);
+	}
+
+
+	if (m_pFocusObject.expired())
+	{
+		return;
+	}
+
+	VEC3 focusObjPos = m_pFocusObject.lock()->get_Transform().lock()->get_VEC3ToPos();
+	focusObjPos += m_FocusOffset;
+
+	// 注視点を設定
+	//m_FocusPoint = VEC3::Lerp(m_FocusPoint, focusObjPos, CAMERA_MOVE_FACTOR);	// ガタガタする
+	m_FocusPoint = focusObjPos;
+
+	// 方向ベクトルを作る
+	VEC3 lookDir;
+	lookDir.x = m_PosOffset.x * cosf(m_Angle_V) * cosf(m_Angle_H);
+	lookDir.y = m_PosOffset.y * sinf(m_Angle_V);
+	lookDir.z = m_PosOffset.z * cosf(m_Angle_V) * sinf(m_Angle_H);
+
+	m_CameraPos = lookDir + m_FocusPoint;
+    m_LookDir = lookDir;
+
+	// カメラの位置
+	m_pOwner.lock()->get_Transform().lock()->set_Pos(m_CameraPos);
+}
+
+
+void Camera3D::CamraControl(RendererEngine& renderer)
+{
 	// マウスの移動量の差を取得する
-	LONG lX = Master::m_pInputManager->GetMousePosSlopeX();	
+	LONG lX = Master::m_pInputManager->GetMousePosSlopeX();
 	LONG lY = Master::m_pInputManager->GetMousePosSlopeY();
 	const float MOUSE_SCALE = 0.0001f;	// そのままでは大きすぎるため、スケーリングする（最大1.0になるように）
 	float sensitivity = Master::m_pDataManager->get_UserConfigData()._mouseSensitivity * MOUSE_SCALE;
@@ -136,30 +170,6 @@ void Camera3D::LateUpdate(RendererEngine &renderer)
 			m_Angle_H += 6.28f;
 		}
 	}
-
-	if (m_pFocusObject.expired())
-	{
-		return;
-	}
-
-	VEC3 focusObjPos = m_pFocusObject.lock()->get_Transform().lock()->get_VEC3ToPos();
-	focusObjPos += m_FocusOffset;
-
-	// 注視点を設定
-	//m_FocusPoint = VEC3::Lerp(m_FocusPoint, focusObjPos, CAMERA_MOVE_FACTOR);	// ガタガタする
-	m_FocusPoint = focusObjPos;
-
-	// 方向ベクトルを作る
-	VEC3 lookDir;
-	lookDir.x = m_PosOffset.x * cosf(m_Angle_V) * cosf(m_Angle_H);
-	lookDir.y = m_PosOffset.y * sinf(m_Angle_V);
-	lookDir.z = m_PosOffset.z * cosf(m_Angle_V) * sinf(m_Angle_H);
-
-	m_CameraPos = lookDir + m_FocusPoint;
-    m_LookDir = lookDir;
-
-	// カメラの位置
-	m_pOwner.lock()->get_Transform().lock()->set_Pos(m_CameraPos);
 }
 
 

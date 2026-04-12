@@ -242,7 +242,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             auto trail = obj->get_Component<TrailRenderer>();
             trail->set_Width(0.1f);
             trail->set_MinVertexDistance(1.0f);
-            trail->set_DrawTime(30.0f);
+            trail->set_DrawTime(30);
             trail->set_EmissivePower(10.0f);
             trail->set_Color(VECTOR4::VEC4(1.0f, 1.0f, 0.0f, 1.0f));
             trail->set_PosRandVec(VEC3(0.5f));
@@ -336,7 +336,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             auto trail = obj->add_Component<TrailRenderer>();
             trail->set_Width(0.1f);
             trail->set_MinVertexDistance(1.0f);
-            trail->set_DrawTime(30.0f);
+            trail->set_DrawTime(30);
             trail->set_EmissivePower(10.0f);
             trail->set_Color(VECTOR4::VEC4(1.0f, 1.0f, 0.0f, 1.0f));
             trail->set_PosRandVec(VEC3(0.5f));

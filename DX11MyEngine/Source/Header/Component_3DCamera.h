@@ -38,6 +38,7 @@ public:
 
 	void LateUpdate(RendererEngine &renderer)override;
 
+	void CamraControl(RendererEngine& renderer);	// カメラ操作
 	
 	bool get_IsControl()const { return m_IsControl; }	// 操作フラグの取得
 	void set_IsControl(bool _f) { m_IsControl = _f; }	// 操作フラグの設定

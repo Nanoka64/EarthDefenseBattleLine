@@ -8,7 +8,7 @@
 #include "Component_3DCamera.h"
 
 using namespace VECTOR3;
-constexpr int DEF_RANGE = 100.0f;
+constexpr float DEF_RANGE = 100.0f;
 
 
 //*---------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ void PointLight::Update(RendererEngine &renderer)
     // バッファの更新
     pointData.Pos               = pos;
 	pointData.Range	            = m_Range;
-    pointData.SpecularColor     = VECTOR3::VEC3(1,0,0);
+    pointData.SpecularColor     = VECTOR3::VEC3(1.0f);
     pointData.SpecularIntensity = 1.0f;
     pointData.DiffuseColor      = m_LightColor;
 	pointData.DiffuseIntensity  = m_Intensity;

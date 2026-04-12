@@ -60,6 +60,8 @@ public:
 	float get_Height()const { return m_CalculatedHeight; }
 
 	void set_Size(float _width, float _height);
+	void set_Size(const VECTOR2::VEC2& _size);
+
 	void UpdateUILocalMatrix();
 
 	/// <summary>

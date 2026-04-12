@@ -20,6 +20,7 @@
 using namespace GIGA_Engine;
 using namespace Input;
 using namespace VECTOR3;
+using namespace VECTOR2;
 using namespace BulletData;
 using namespace WeaponData;
 
@@ -274,6 +275,11 @@ void GunWeapon::SwicthReset()
 //*----------------------------------------------------------------------------------------
 void GunWeapon::Shoot(RendererEngine& renderer)
 {
+	// 武器使用の有無の設定がオフなら発射しない
+    if (!Master::m_pDataManager->get_IsUseWeapon()) {
+        return;
+    }
+
     float c_AngleH = renderer.get_CameraComponent()->get_Angle_H();
     float c_AngleV = renderer.get_CameraComponent()->get_Angle_V();
 
@@ -343,4 +349,21 @@ void GunWeapon::Shoot(RendererEngine& renderer)
 
     // 弾数減らす
     m_AmmoRemaining--;
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】UI表示に必要な武器データを取得する
+//*
+//* [引数] なし
+//* [返値] 
+//* UI表示用武器データ 
+//*----------------------------------------------------------------------------------------
+WeaponUIData GunWeapon::get_WeaponUIData()const
+{
+    WeaponUIData uiData;
+    uiData._name = get_GunWeaponParameter()->_name;
+    uiData._ammoMaxNum = get_GunWeaponParameter()->_bulletMaxNum;
+    uiData._ammoRemaining = m_AmmoRemaining;
+
+    return uiData;
 }

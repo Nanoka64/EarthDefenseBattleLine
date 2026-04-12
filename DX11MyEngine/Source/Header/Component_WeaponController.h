@@ -21,6 +21,12 @@ private:
     int m_CrntWeaponSlotIndex;  // 現在の武器スロットのインデックス
     int m_MaxSlot;              // 武器の最大スロット
     int m_WeaponChangeIntervalCounter; // 武器の切り替え間隔用のカウンタ
+
+
+    std::vector<class GameObject*> m_pBulletGageSpriteObjArray; // 弾ゲージスプライト
+    std::vector<class GameObject*> m_pWeaponSpriteObjArray; // 武器
+
+
 public:
     WeaponController(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
     ~WeaponController();

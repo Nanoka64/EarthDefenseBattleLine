@@ -25,10 +25,12 @@ constexpr float VOLUME_SCALE = 0.01f;  // 音量のスケール（0.0f～1.0f）
 //*【?】コンストラクタ
 //*----------------------------------------------------------------------------------------
 DataManager::DataManager():
-m_ScreenWidth(0.0f),
-m_ScreenHeight(0.0f),
+m_ScreenWidth(0),
+m_ScreenHeight(0),
 m_DefaultFov(0.0f),
 m_IsDebugMode(true),
+m_IsUseWeapon(true),
+m_IsCameraControl(true),
 m_pRenderer(nullptr),
 m_SelectWeaponID()
 {
@@ -58,8 +60,8 @@ bool DataManager::Init(std::shared_ptr<RendererEngine>pRenderer)
 	m_SelectWeaponID[1] = 1;
 
 	// ユーザー設定データの初期化
-	m_UserConfigData._BGMVolume = 30.0f;
-	m_UserConfigData._SEVolume = 50.0f;
+	m_UserConfigData._BGMVolume = 30;
+	m_UserConfigData._SEVolume = 50;
 	m_UserConfigData._isInvertY = false;
 	m_UserConfigData._mouseSensitivity = 40.0f;
 	m_UserConfigData._isShadowEnabled = true;

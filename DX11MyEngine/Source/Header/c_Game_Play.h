@@ -18,7 +18,6 @@ private:
 	std::weak_ptr<class GameObject>m_pBomber[3];
 	std::weak_ptr<class GameObject>m_pPlayerObj;
 
-
 public:
 	void OnEnter(SceneManager * pOwner) override;
 	void OnExit(SceneManager* pOwner)override;

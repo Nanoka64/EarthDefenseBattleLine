@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "Component_3DCamera.h"
 
+using namespace Tool;
 using namespace VECTOR3;
 using namespace VECTOR2;
 
@@ -102,8 +103,8 @@ void MiniMapRader::Update(RendererEngine& renderer)
     float cameraAngleH = renderer.get_CameraComponent()->get_Angle_H();
 
     // カメラの水平回転角度に基づいて、サインとコサインを計算（ずれてしまうので0.7で補正）
-    float cameraH_s = sinf(-cameraAngleH - M_PI_2);
-    float cameraH_c = cosf(-cameraAngleH - M_PI_2);
+    float cameraH_s = sinf(-cameraAngleH - G_PI_2_F);
+    float cameraH_c = cosf(-cameraAngleH - G_PI_2_F);
 
     // レーダーの敵の位置更新
     for (int i = 0; i < antList.size(); i++)
@@ -125,7 +126,7 @@ void MiniMapRader::Update(RendererEngine& renderer)
         // 位置をミニマップの円内に収める
         ClampToMinimap(enemyMapX, enemyMapY, static_cast<int>(MINIMAP_X), static_cast<int>(MINIMAP_Y), MINIMAP_RADIUS);
 
-        m_pRaderEnemySpriteObjArray[i]->get_RectTransform().lock()->set_RectPosition(VEC2(enemyMapX, enemyMapY));
+        m_pRaderEnemySpriteObjArray[i]->get_RectTransform().lock()->set_RectPosition(VEC2(FLOAT_CAST(enemyMapX), FLOAT_CAST(enemyMapY)));
     }
 }
 

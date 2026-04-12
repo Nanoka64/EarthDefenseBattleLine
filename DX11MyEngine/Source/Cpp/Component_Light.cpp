@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Component_Light.h"
 
-constexpr int DEF_INTENSITY = 1.0f;
-constexpr int DEF_COLOR[3] = { 1.0f,1.0f,1.0f };
+constexpr float DEF_INTENSITY = 1.0f;
+constexpr float DEF_COLOR[3] = { 1.0f,1.0f,1.0f };
 
 //*---------------------------------------------------------------------------------------
 //* @:Light Class 

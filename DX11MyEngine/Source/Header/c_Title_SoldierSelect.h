@@ -34,7 +34,7 @@ private:
 	std::weak_ptr<class RectTransform> m_pMenuItemRectTransformArray[UINT_CAST(SOLDIER_TYPE::NUM)];
 	std::weak_ptr<class ButtonUI> m_pButtonArray[UINT_CAST(SOLDIER_TYPE::NUM)];	// ボタン用
 	class GameObject* m_pButtonsObjArray[UINT_CAST(SOLDIER_TYPE::NUM)];			// ボタンオブジェクトの配列
-	class GameObject* m_pWeaponDescriptionbackSpriteObj;	//  武器説明用のスプライトオブジェクト
+	class GameObject* m_pWeaponDescriptionBackSpriteObj;	//  武器説明用のスプライトオブジェクト
 	
 	int m_DecisionTextDrawCounter; // 装備決定時のテキストを表示するためのカウンター
 	int m_DecisionSoldierTypeIndex; // 決定した兵科のインデックス

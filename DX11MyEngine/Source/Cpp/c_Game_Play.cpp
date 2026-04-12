@@ -24,6 +24,7 @@ void c_Game_Play::OnEnter(SceneManager* pOwner)
 {
     m_pPlayerObj = Master::m_pGameObjectManager->get_ObjectByTag("Player");
 
+
     // ****************************************************
     //				ƒQ[ƒ€BGM‚ÌÄ¶
     // ****************************************************
@@ -62,7 +63,7 @@ int c_Game_Play::Update(SceneManager *pOwner)
     }
     
     auto antList = Master::m_pGameObjectManager->get_ObjectListByTag("Ant");
-    m_EnemyNum = antList.size();
+    m_EnemyNum = INT_CAST(antList.size());
     // “G‚ª‹‚È‚­‚È‚Á‚½‚çƒŠƒUƒ‹ƒg‚Ö
     if (m_EnemyNum == 0)
     {

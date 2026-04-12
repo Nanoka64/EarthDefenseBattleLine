@@ -6,6 +6,18 @@
 /// </summary>
 namespace WeaponData
 {
+
+    /// <summary>
+    /// UI表示用の武器データ
+    /// </summary>
+    struct WeaponUIData
+    {
+        std::wstring _name;             // 武器名
+        int _ammoMaxNum = 0;          // 弾数( 0なら弾を持たない武器 )
+        int _ammoRemaining = 0;        // 現在の弾数
+    };
+
+
     /// <summary>
     /// ベースとなる武器データ
     /// </summary>

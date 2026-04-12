@@ -14,7 +14,7 @@ using namespace VERTEX;
 TrailRenderer::TrailRenderer(std::weak_ptr<GameObject> pOwner, int updateRank) 
 	: IComponent(pOwner, updateRank),
 	m_MinVertexDistance(10.0f),
-	m_DrawTime(60.0f),
+	m_DrawTime(60),
 	m_Width(10.0f),
 	m_CrntTrailPos(VEC3()),
 	m_pCBMaterialDataSet(nullptr),

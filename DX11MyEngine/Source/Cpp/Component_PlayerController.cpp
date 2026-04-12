@@ -295,7 +295,7 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 		{
 			m_IsJump = false;
 			m_JumpVelocity = 0.0f;
-			m_pMyTransformComp.lock()->set_Pos(VEC3(0.0f, 30.0f, 0.0f));
+			m_pMyTransformComp.lock()->set_Pos(VEC3(0.0f, 100.0f, 0.0f));
 			return;
 		}
 	}
@@ -498,7 +498,7 @@ void PlayerController::ContinuousAngle(const VECTOR3::VEC3 &_crntRot)
 	float angle_V = m_pCameraComp.lock()->get_Angle_V();	// 垂直アングル取得
 
 	POINT mousePos = Master::m_pInputManager->GetMousePos();
-	float targetAngleY = (angle_H + 1.57) * -1;
+	float targetAngleY = (angle_H + 1.57f) * -1.0f;
 
 	// 目標とするクォータニオン
 	XMVECTOR targetRotQ = XMQuaternionRotationRollPitchYaw(0.0f, targetAngleY, 0.0f);

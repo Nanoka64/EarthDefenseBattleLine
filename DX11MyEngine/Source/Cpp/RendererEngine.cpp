@@ -1090,7 +1090,7 @@ void RendererEngine::RegisterRenderTarget(ID3D11RenderTargetView* pRtv, ID3D11De
 void RendererEngine::RegisterRenderTargetAndViewPort(class DX_RenderTarget* pRT)
 {
     // ビューポートの設定
-    this->set_ViewPort(0, 0, pRT->get_Width(), pRT->get_Height());
+    this->set_ViewPort(0.0f, 0.0f, FLOAT_CAST(pRT->get_Width()), FLOAT_CAST(pRT->get_Height()));
 
     // 深度ビューあり
     if (pRT->HasDepthStencilBuffer()) {

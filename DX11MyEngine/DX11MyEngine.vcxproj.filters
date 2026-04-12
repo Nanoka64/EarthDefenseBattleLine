@@ -178,9 +178,6 @@
     <Filter Include="ソース ファイル\Tool\Debug">
       <UniqueIdentifier>{72429b56-0b56-4e59-a717-5c1b61c0dade}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Tool\Resource">
-      <UniqueIdentifier>{7d1e8573-a9e4-4491-bdc8-c43e7e5697bd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\BaseComponent">
       <UniqueIdentifier>{3b7d2d54-5de9-4946-863e-76d7b31b612a}</UniqueIdentifier>
     </Filter>
@@ -267,6 +264,9 @@
     </Filter>
     <Filter Include="ソース ファイル\Game\Component\Enemy\State_Ant">
       <UniqueIdentifier>{e6f22279-2d15-4337-8f78-ca333e4d7010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Tool\Resource">
+      <UniqueIdentifier>{7d1e8573-a9e4-4491-bdc8-c43e7e5697bd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

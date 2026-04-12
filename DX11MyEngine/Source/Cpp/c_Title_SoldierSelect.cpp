@@ -11,6 +11,7 @@
 using namespace Tool;
 using namespace VECTOR2;
 using namespace VECTOR3;
+using namespace VECTOR4;
 
 // 項目の衝突判定用サイズ
 static const VECTOR2::VEC2 g_ItemSize = VECTOR2::VEC2(500.0f, 140.0f);
@@ -101,15 +102,17 @@ void c_Title_SoldierSelect::OnEnter(SceneManager *pOwner)
 	}
 
 
-	// 武器説明用のスプライトのオブジェクトとコンポーネントの取得と設定
+	// 武器説明背景のスプライトのオブジェクトとコンポーネントの取得と設定
 	UIData::RectTransformData rectData;
-	rectData._size = VEC2(1000.0f, 600.0f);
+	rectData._size = VEC2(1000.0f, 570.0f);
 	rectData._pos = VEC2(850.0f, 500.0f);
 	UIData::SpriteUIData spriteData;
 	spriteData._tag = "WeaponDescriptionbackSprite";
+	spriteData._color = VEC4(0.7f, 0.7f, 0.7f, 1.0f);
+	//spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
 	spriteData._imagePath = "Resource/Texture/Title/24675532.png";
 	spriteData._layerRank = 110;
-	m_pWeaponDescriptionbackSpriteObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
+	m_pWeaponDescriptionBackSpriteObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
 
 
 	m_CrntSelectItem = 0;
@@ -132,7 +135,7 @@ void c_Title_SoldierSelect::OnExit(SceneManager *pOwner)
 		m_pButtonsObjArray[i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	}
 
-	m_pWeaponDescriptionbackSpriteObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+	m_pWeaponDescriptionBackSpriteObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 }
 
 
@@ -264,6 +267,7 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 
 		// 各種計算・変換
 		std::wstring laserSightStr = weaponData->_isLaserSight ? L"装備" : L"---";
+		std::wstring zoomStr = weaponData->_zoomLength > 1.0f ? FormatFloat(weaponData->_zoomLength) : L"---";
 		float fireRatePerSec = weaponData->_fireRate ;
 		std::wstring damageStr = FormatFloat((baseBulletData._damage));
 		damageStr = (weaponData->_bulletSimultaneousNum > 1) ? damageStr + L" x " + std::to_wstring(weaponData->_bulletSimultaneousNum) : damageStr; // 同時発射数が1より多い場合はダメージに「x N」を追加
@@ -277,17 +281,17 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 			L"\n" +
 			L"　・リロード:" + FormatFloat(weaponData->_reloadTime) + L"秒" +
 			L"　・射程:" + FormatFloat(baseBulletData._range) + L"m" +
-			L"　・弾速:" + FormatFloat(baseBulletData._speed) +
+			L"　・弾速（m/sec）:" + FormatFloat(baseBulletData._speed)  + 
 			L"\n" +
 			L"　・精度:" + FormatFloat(weaponData->_accuracy,2) + // ※ここを「S/A/B...」等に変換する関数を噛ませると綺麗です
-			L"　・ズーム（倍）:" + FormatFloat(weaponData->_zoomLength) +
+			L"　・ズーム（倍）:" + zoomStr +
 			L"　・レーザーサイト:" + laserSightStr +
 			L"\n" + 
 			L"　・敵貫通可能数:" + std::to_wstring(baseBulletData._penetrationsCount) +
 			extraInfoStr; // ★ 爆発弾の時だけここに「爆発半径」が足される
 
 		// 6. パラメータの描画
-		Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(0.3f, 0.5f, 1.0f));	// 水色文字
+		Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(0.0f, 1.0f, 1.0f));	// 水色文字
 		Master::m_pDirectWriteManager->SetOutLine(2.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
 		Master::m_pDirectWriteManager->DrawStringToAligment(detailStr, VEC2(950.0f, startY + 50.0f), "White_20_STD", H_ALIGNMENT::LEADING, V_ALIGNMENT::TOP, VEC2(1000.0f, 600.0f));
 		Master::m_pDirectWriteManager->SetOutLine(0.0f);

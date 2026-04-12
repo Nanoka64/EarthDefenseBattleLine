@@ -34,4 +34,6 @@ public:
 
 	virtual bool Setup(const WeaponData::BaseWeaponData* _pWeaponData) = 0;
 	virtual void SwicthReset() = 0;	// 武器切り替え時のリセット
+
+	virtual WeaponData::WeaponUIData get_WeaponUIData() const = 0;	// UIの表示に必要な武器データ（派生先で具体的に記述）
 };

@@ -284,7 +284,7 @@ float3 HemisphereLightCalc(float3 _norm)
 float3 GetNorm(float4 _normMap, float3 _tan, float3 _biNorm, float3 _localNorm)
 {
     // 今のままだと0～1の値になっているので、-1～1に変換
-    _normMap = (_normMap - 0.5f) * 2.0f;
+    _normMap = _normMap * 2.0f - 1.0f;
     
     // タンジェントスペースの法線をワールドスペースに変換
     return normalize(

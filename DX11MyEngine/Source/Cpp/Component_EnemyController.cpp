@@ -113,7 +113,7 @@ void EnemyController::Start(RendererEngine& renderer)
 			obj->get_Component<DecalRenderer>()->Start(renderer);
 			obj->get_Transform().lock()->set_Pos(pos);
 			obj->get_Transform().lock()->set_Scale(scale);
-			obj->get_Transform().lock()->set_RotateToRad(1.57, Tool::RandRange(0.0f, 6.14f), 0.0f);
+			obj->get_Transform().lock()->set_RotateToRad(1.57f, Tool::RandRange(0.0f, 6.14f), 0.0f);
 			obj->set_Tag("Ant_Splash");
 			auto timer = obj->add_Component<TimerDestruction>();
 			timer->set_LifeTime(8.0f);  // ¶‘¶ŠÔ
@@ -168,7 +168,7 @@ void EnemyController::Start(RendererEngine& renderer)
 			obj->get_Component<DecalRenderer>()->Start(renderer);
 			obj->get_Transform().lock()->set_Pos(pos);
 			obj->get_Transform().lock()->set_Scale(scale);
-			obj->get_Transform().lock()->set_RotateToRad(1.57, 0.0f, 0.0f);
+			obj->get_Transform().lock()->set_RotateToRad(1.57f, 0.0f, 0.0f);
 			obj->set_Tag("Ant_Splash");
 			auto timer = obj->add_Component<TimerDestruction>();
 			timer->set_LifeTime(15.0f);  // ¶‘¶ŠÔ
@@ -338,4 +338,6 @@ std::shared_ptr<MyTransform> EnemyController::get_TargetTransform() const
 	{
 		return m_pTarget->get_Transform().lock();
 	}
+
+	return nullptr;
 }

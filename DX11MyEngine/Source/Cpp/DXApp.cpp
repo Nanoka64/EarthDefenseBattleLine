@@ -429,6 +429,24 @@ int DXApp::MainLoop()
                 //Master::m_pDebugger->EndDebugWindow(); 
                 //
 
+				// デバッグキー：F1でカメラコントロールモードのオンオフ切り替え
+                if (GetInputDown(GAME_CONFIG::F1))
+                {
+					bool isCameraControlMode = Master::m_pDataManager->get_IsCameraControl();
+
+                    isCameraControlMode ? Master::m_pDataManager->set_IsCameraControl(false) :
+						Master::m_pDataManager->set_IsCameraControl(true);
+                }
+
+				// デバッグキー：F2で武器使用のオンオフ切り替え
+                if (GetInputDown(GAME_CONFIG::F2))
+                {
+					bool isUseWeapon = Master::m_pDataManager->get_IsUseWeapon();
+
+                    isUseWeapon ? Master::m_pDataManager->set_IsUseWeapon(false) :
+						Master::m_pDataManager->set_IsUseWeapon(true);
+                }
+
                 // ImGui関連
                 AppEditDrawImGui();
 
@@ -557,6 +575,18 @@ void DXApp::AppEditDrawImGui()
     {
         Master::m_pDataManager->set_IdDebugMode(m_IsEditMode);
     }
+
+	bool isCameraControl = Master::m_pDataManager->get_IsCameraControl();
+    if (Master::m_pDebugger->DG_CheckBox(U8ToChar(u8"視点操作の有効/無効（F1キーで切り替え）"), &isCameraControl))
+    {
+        Master::m_pDataManager->set_IsCameraControl(isCameraControl);
+    }
+
+	bool isUseWeapon = Master::m_pDataManager->get_IsUseWeapon();
+    if (Master::m_pDebugger->DG_CheckBox(U8ToChar(u8"武器使用の有効/無効（F2キーで切り替え）"), &isUseWeapon))
+    {
+        Master::m_pDataManager->set_IsUseWeapon(isUseWeapon);
+    }
     Master::m_pDebugger->EndDebugWindow();
 
 }
@@ -624,7 +654,7 @@ HRESULT DXApp::InitWindow(HINSTANCE hInstance, int nCmdShow)
     // windowの作成
     // Create window
     m_hInst = hInstance;
-    RECT rc = { WND_RECT_LEFT, WND_RECT_TOP,  m_Width, m_Height };      // 矩形を設定する
+    RECT rc = { WND_RECT_LEFT, WND_RECT_TOP,  static_cast<LONG>(m_Width), static_cast<LONG>(m_Height) };      // 矩形を設定する
     int res = AdjustWindowRect(&rc, dwStyle, FALSE);   // ウインドウの形を整える
 
     m_hWnd = CreateWindowW(

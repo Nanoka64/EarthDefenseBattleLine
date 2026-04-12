@@ -6,6 +6,7 @@
 using namespace VECTOR2;
 using namespace VECTOR3;
 using namespace BuildingData;
+using namespace Tool;
 
 constexpr float BUILDING_COLLAPSE_TIME_MIN = 2.0f;	// ì|âÛÇ…Ç©Ç©ÇÈéûä‘ÇÃç≈è¨íl
 constexpr float BUILDING_COLLAPSE_TIME_MAX = 5.0f;	// ì|âÛÇ…Ç©Ç©ÇÈéûä‘ÇÃç≈ëÂíl
@@ -73,9 +74,9 @@ void Building_CllapseInState::OnEnter(BuildingController* pOwner)
 	VEC3 rot;
 	for (int i = 0; i < 5; i++)
 	{
-		rot.x = Master::m_pRandomManager->GetFloatRandom(-M_PI, M_PI);
-		rot.y = Master::m_pRandomManager->GetFloatRandom(-M_PI, M_PI);
-		rot.z = Master::m_pRandomManager->GetFloatRandom(-M_PI, M_PI);
+		rot.x = Master::m_pRandomManager->GetFloatRandom(-G_PI_F, G_PI_F);
+		rot.y = Master::m_pRandomManager->GetFloatRandom(-G_PI_F, G_PI_F);
+		rot.z = Master::m_pRandomManager->GetFloatRandom(-G_PI_F, G_PI_F);
 
 		int handle = Master::m_pEffectManager->PlayEffect("Explosion_Smoke_02");
 		Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y, pos.z);
@@ -185,9 +186,9 @@ int Building_CllapseNowState::Update(BuildingController* pOwner)
 		{
 			VEC3 explosionRot;
 			VEC3 explosionScale = 4.0f;
-			explosionRot.x = Master::m_pRandomManager->GetFloatRandom(-M_PI, M_PI);
-			explosionRot.y = Master::m_pRandomManager->GetFloatRandom(-M_PI, M_PI);
-			explosionRot.z = Master::m_pRandomManager->GetFloatRandom(-M_PI, M_PI);
+			explosionRot.x = Master::m_pRandomManager->GetFloatRandom(-G_PI_F, G_PI_F);
+			explosionRot.y = Master::m_pRandomManager->GetFloatRandom(-G_PI_F, G_PI_F);
+			explosionRot.z = Master::m_pRandomManager->GetFloatRandom(-G_PI_F, G_PI_F);
 			float explosionPosY_Offset;
 			explosionPosY_Offset = Master::m_pRandomManager->GetFloatRandom(1.0f, 50.0f);
 			int handle = Master::m_pEffectManager->PlayEffect("Explosion_02");

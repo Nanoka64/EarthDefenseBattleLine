@@ -104,8 +104,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         mesh.ObjTag = "Canonn";
 
         sphireObj = MeshFactory::CreateUtilityMesh(mesh);
-        sphireObj->get_Transform().lock()->set_Scale(10.0f, 10.0f, 10.0f);
-        sphireObj->get_Transform().lock()->set_Pos(0.0f, 1000.0f, 0.0f);
+        sphireObj->get_Transform().lock()->set_Scale(1.0f, 1.0f, 1.0f);
+        sphireObj->get_Transform().lock()->set_Pos(-150.0f, 1.0f, 100.0f);
         sphireObj->get_Transform().lock()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
 
         auto light = sphireObj->add_Component<PointLight>();
@@ -160,8 +160,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
             // コライダーの追加
             auto collider = obj->add_Component<BoxCollider>();
-            collider->set_Size(VEC3(1.0f, 1.0f, 1.0f));
-            collider->set_Center(VEC3(0.0f, 1.0f, 0.0f));
+            collider->set_Size(VEC3(2.0f, 2.0f, 2.0f));
+            collider->set_Center(VEC3(0.0f, 2.0f, 0.0f));
             // 衝突カテゴリ
             collider->set_CollisionCategory(COLLISION_CATEGORY::ENEMY);
 
@@ -327,7 +327,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
         auto obj = MeshFactory::CreateModel(model);
         obj->get_Component<MyTransform>()->set_Scale(0.1f, 0.1f, 0.1f);
-        obj->get_Component<MyTransform>()->set_Pos(0.0f, 1000.0f, 0.0f);
+        obj->get_Component<MyTransform>()->set_Pos(0.0f, 500.0f, 0.0f);
         obj->get_Component<MyTransform>()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
     }
 
@@ -387,7 +387,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 		mesh.TilingScale = VEC2(10.0f, 10.0f);
 
         auto obj = MeshFactory::CreateUtilityMesh(mesh);
-        obj->get_Transform().lock()->set_Scale(200.0f, 10.0f, 200.0f);
+        obj->get_Transform().lock()->set_Scale(200.0f, 1.0f, 200.0f);
         obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
         obj->get_Transform().lock()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
 
@@ -766,6 +766,8 @@ int c_Game_LoadProcess::Update(SceneManager *pOwner)
 {
 	if (m_IsLoad)
 	{
+        Master::m_pInputManager->StopInput(5);	// 入力を少しの間受け付けないようにする（シーン遷移の瞬間に入力されるのを防止）
+
 		return c_GAME::c_GAME_PLAY;
 	}
 

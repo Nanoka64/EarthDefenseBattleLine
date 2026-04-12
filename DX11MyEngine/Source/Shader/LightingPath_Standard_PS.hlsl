@@ -134,8 +134,8 @@ float4 PSMain(PS_IN input) : SV_TARGET
     // 平行光源のみシャドウの影響を受けるので、一旦別で保持
     float3 dirDiffuse = dirLig.Diffuse + limLig;
     float3 dirSpecular = dirLig.Specular;
-    float3 diffuse = +pointLig.Diffuse + dirDiffuse + hemiLig;
-    float3 specular = +pointLig.Specular + dirSpecular;
+    float3 diffuse = pointLig.Diffuse + dirDiffuse + hemiLig;
+    float3 specular = pointLig.Specular + dirSpecular;
     
     // 最終色 (アルベド * 光度 + スペキュラ) + エミッシブ
     finalCol.xyz = (albedoTex.xyz * diffuse + specular) + emissiveColor;
@@ -205,6 +205,7 @@ float4 PSMain(PS_IN input) : SV_TARGET
         
             // 通常カラーとシャドウカラーで線形補間
             finalCol.xyz = lerp(shadowColor, finalCol.xyz, lit_Factor);
+
         }
     }
     // シャドウマップの範囲内か

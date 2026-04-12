@@ -33,7 +33,7 @@ namespace BulletData
         float _speed = 0.0f;                        // 弾の速度
         float _acceleration = 0.0f;                 // 弾の加速度
         float _range = 0.0f;                        // 弾の射程距離
-        int _penetrationsCount = 0.0f;              // 貫通可能回数
+        int _penetrationsCount = 0;                 // 貫通可能回数
         float _collisionSize = 0.0f;                // 衝突判定の半径
         float _gravityScale = 0.0f;                 // 重力の影響を受けるかどうか（0.0fなら受けない）
 

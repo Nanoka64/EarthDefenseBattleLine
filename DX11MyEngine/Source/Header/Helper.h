@@ -9,6 +9,10 @@ namespace Tool
 #define _USE_MATH_DEFINES
 #include <math.h>	
 
+	constexpr float G_PI_F   = static_cast<float>(M_PI);	    // 円周率 
+	constexpr float G_PI_2_F = static_cast<float>(M_PI_2);	// 円周率の半分
+	constexpr float G_PI_4_F = static_cast<float>(M_PI_4);	// 円周率の四分の一
+
     /* デグリーからラジアンに変換 */
     inline float DegToRad(float deg) { return deg * (static_cast<float>(M_PI) / 180.0f); }
 
@@ -168,7 +172,7 @@ namespace Tool
 
             // (t-1) を計算
             float t1 = t - 1.0f;
-            return 1.0f + c3 * pow(t1, 3) + c1 * pow(t1, 2);
+            return 1.0f + c3 * FLOAT_CAST(pow(t1, 3)) + c1 * FLOAT_CAST(pow(t1, 2));
         }
     }
 
@@ -436,13 +440,13 @@ namespace Tool
             tan.x = f * (Delta_UV2.y * E1.x - Delta_UV1.y * E2.x);
             tan.y = f * (Delta_UV2.y * E1.y - Delta_UV1.y * E2.y);
             tan.z = f * (Delta_UV2.y * E1.z - Delta_UV1.y * E2.z);
-            tan = tan.Normalize();
+            //tan = tan.Normalize();
 
             // 副接線
             biTan.x = f * (-Delta_UV2.x * E1.x + Delta_UV1.x * E2.x);
             biTan.y = f * (-Delta_UV2.x * E1.y + Delta_UV1.x * E2.y);
             biTan.z = f * (-Delta_UV2.x * E1.z + Delta_UV1.x * E2.z);
-            biTan = biTan.Normalize();
+            //biTan = biTan.Normalize();
 
             vertices[i0].tangent += tan;
             vertices[i0].bitangent += biTan;            

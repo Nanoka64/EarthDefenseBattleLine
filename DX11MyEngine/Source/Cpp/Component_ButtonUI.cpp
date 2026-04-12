@@ -92,7 +92,7 @@ void ButtonUI::Update(RendererEngine &renderer)
 	colData._max = pos + size;
 
 	// マウスとボタンの判定
-	if (Master::m_pCollisionManager->HitCheck2D_BoxVsPoint(colData, VEC2(mousePos.x, mousePos.y)))
+	if (Master::m_pCollisionManager->HitCheck2D_BoxVsPoint(colData, VEC2(FLOAT_CAST(mousePos.x), FLOAT_CAST(mousePos.y))))
 	{
 		m_CrntState = UIData::STATE::HIGH_LIGHTED;	// ハイライト状態
 

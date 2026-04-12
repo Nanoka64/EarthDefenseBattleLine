@@ -49,8 +49,6 @@ VS_OUTPUT VSMain(VS_INPUT input)
     float2 uv = input.UV;
     float4 color = input.Color;
     
-    norm = normalize(mul(norm, (float3x3) cb_Transform));
-    
     pos = mul(pos, cb_Transform);   // ワールド変換（ワールド空間）
     //output.WPos = pos;
     pos = mul(pos, cb_View);        // ビュー変換（ビュー空間）
@@ -61,12 +59,12 @@ VS_OUTPUT VSMain(VS_INPUT input)
     input.UV = (input.UV + cb_OffsetUV);
     
     output.Pos = pos;               // 画面空間の頂点座標
-    output.Normal = norm.xyz;       // 法線
     output.UV = input.UV;           // テクスチャ座標
     output.Color = color;
     
-    // 接ベクトルと従ベクトルをワールド空間に変換する
-    output.Tan = normalize(mul(input.Tan, (float3x3) cb_Transform));
+    // 法線、接ベクトルと従ベクトルをワールド空間に変換する
+    output.Normal = normalize(mul(norm, (float3x3) cb_Transform)); // 法線
+    output.Tan    = normalize(mul(input.Tan, (float3x3) cb_Transform));
     output.BiNorm = normalize(mul(input.BiNorm, (float3x3) cb_Transform));
     
     return output;

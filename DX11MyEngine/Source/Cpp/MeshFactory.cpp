@@ -104,6 +104,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateUtilityMesh(const CreateUti
     pObj->Init(*info.pRenderer);
     pObj->set_Tag(info.ObjTag.c_str());
     pObj->set_IsShadow(true);   // シャドウをする
+    pObj->set_LayerRank(info.ObjLayer);  // 更新レイヤーの設定
 
 
     // オブジェクトの状態をアクティブにする

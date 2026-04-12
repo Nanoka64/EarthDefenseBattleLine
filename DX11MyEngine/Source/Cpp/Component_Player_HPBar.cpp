@@ -57,7 +57,7 @@ void Player_HPBar::Start(RendererEngine& renderer)
     rectData._anchorMax = VEC2(0.0f, 0.0f);
     rectData._anchorMin = VEC2(0.0f, 0.0f);
     spriteData._tag = "HPBar_Back";
-    spriteData._imagePath = "Resource/Texture/UI/HPBar.png";
+    spriteData._imagePath = "Resource/Texture/UI/HPBar_Ver2.png";
     spriteData._layerRank = 101;
     m_pPlayerHPBarBackSpriteObj = Master::m_pUIManager->GetSprite(renderer, rectData, spriteData);
 
@@ -69,7 +69,7 @@ void Player_HPBar::Start(RendererEngine& renderer)
     spriteData._tag = "HPBar";
     spriteData._layerRank = 100;
     spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;    // テクスチャなし
-    spriteData._color = VECTOR4::VEC4(0.0f, 0.8f, 0.0f, 1.0f);
+    spriteData._color = VECTOR4::VEC4(0.0f, 1.0f, 1.0f, 1.0f);
     m_pPlayerHPBarSpriteObj = Master::m_pUIManager->GetSprite(renderer, rectData, spriteData);
 }
 

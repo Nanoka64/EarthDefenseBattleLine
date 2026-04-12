@@ -13,7 +13,7 @@ using namespace VERTEX;
 //*----------------------------------------------------------------------------------------
 LineRenderer::LineRenderer(std::weak_ptr<GameObject> pOwner, int updateRank)
 	: IComponent(pOwner, updateRank),
-	m_DrawTime(60.0f),
+	m_DrawTime(60),
 	m_Width(1.0f),
 	m_Length(1000.0f),
 	m_Dir(VEC3()),

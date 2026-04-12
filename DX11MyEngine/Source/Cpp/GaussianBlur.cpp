@@ -90,11 +90,11 @@ void GaussianBlur::ExcuteOnGPU(RendererEngine& renderer, float blurPow)
     // 水平ブラー
     // 
     // ************************************************************************
-    UINT vpWidth = static_cast<float>(m_pTexture.lock()->get_Width()) / 2.0f;
-    UINT vpHeight = static_cast<float>(m_pTexture.lock()->get_Height());
+    UINT vpWidth = UINT_CAST(m_pTexture.lock()->get_Width()) / 2;
+    UINT vpHeight = UINT_CAST(m_pTexture.lock()->get_Height());
     
     // ビューポートの設定
-    renderer.set_ViewPort(0, 0, vpWidth, vpHeight);
+    renderer.set_ViewPort(0, 0, FLOAT_CAST(vpWidth), FLOAT_CAST(vpHeight));
 
     // 水平ブラー用レンダリングターゲットに変更
     renderer.RegisterRenderTarget(m_pHorizontalBlur->get_RTV(), nullptr);
@@ -112,11 +112,12 @@ void GaussianBlur::ExcuteOnGPU(RendererEngine& renderer, float blurPow)
     // 垂直ブラー
     // 
     // ************************************************************************
-    vpWidth = static_cast<float>(m_pTexture.lock()->get_Width()) / 2.0f;
-    vpHeight = static_cast<float>(m_pTexture.lock()->get_Height()) / 2.0f;
+    vpWidth = UINT_CAST(m_pTexture.lock()->get_Width()) / 2;
+    vpHeight = UINT_CAST(m_pTexture.lock()->get_Height()) / 2;
      
     // ビューポートの設定
-    renderer.set_ViewPort(0, 0, vpWidth, vpHeight);
+    renderer.set_ViewPort(0, 0, FLOAT_CAST(vpWidth), FLOAT_CAST(vpHeight));
+
     // 垂直ブラー用レンダリングターゲットに変更
     renderer.RegisterRenderTarget(m_pVerticalBlur->get_RTV(), nullptr);
     renderer.ClearRenderTargetView(m_pVerticalBlur);
@@ -191,8 +192,8 @@ bool GaussianBlur::InitSprites(RendererEngine& renderer)
     horizontalBlurSprite.PSConstBufferNum = 1;
     horizontalBlurSprite.IsActive = false;
     horizontalBlurSprite.ObjTag = "HorizontalBlurSprite" + std::to_string(m_Id);
-    horizontalBlurSprite.Width = screenW;      // サイズの変更はRTだけでいい
-    horizontalBlurSprite.Height = screenH;
+    horizontalBlurSprite.Width = FLOAT_CAST(screenW);      // サイズの変更はRTだけでいい
+    horizontalBlurSprite.Height = FLOAT_CAST(screenH);
     horizontalBlurSprite.pTextureMap[0] = m_pTexture;
     horizontalBlurSprite.Type = SPRITE_USAGE_TYPE::RENDER_TARGET;
     horizontalBlurSprite.ShaderType = SHADER_TYPE::POST_GAUSSIAN_BLUR_HORIZONTAL;
@@ -211,8 +212,8 @@ bool GaussianBlur::InitSprites(RendererEngine& renderer)
     verticalBlurSprite.PSConstBufferNum = 1;
     verticalBlurSprite.IsActive = false;
     verticalBlurSprite.ObjTag = "VerticalBlurSprite" + std::to_string(m_Id);
-    verticalBlurSprite.Width = screenW;
-    verticalBlurSprite.Height = screenH;
+    verticalBlurSprite.Width = FLOAT_CAST(screenW); 
+    verticalBlurSprite.Height = FLOAT_CAST(screenH);
     verticalBlurSprite.pTextureMap[0] = Master::m_pResourceManager->Convert_SRVToTexture("RT_HorizontalBlur" + std::to_string(m_Id), m_pHorizontalBlur->get_SRV_ComPtr());
     verticalBlurSprite.Type = SPRITE_USAGE_TYPE::RENDER_TARGET;
     verticalBlurSprite.ShaderType = SHADER_TYPE::POST_GAUSSIAN_BLUR_VERTICAL;

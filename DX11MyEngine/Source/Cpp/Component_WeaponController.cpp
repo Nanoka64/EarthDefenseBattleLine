@@ -8,6 +8,38 @@ using namespace VECTOR2;
 
 constexpr int WEAPON_CHANGE_INTERVAL = 10;	// 武器の切り替え間隔
 
+
+/* ----- 弾ゲージスプライト ----- */
+// 前
+const VEC2 g_BulletGageSpriteCenterPos  = VEC2(1420.0f, 800.0f);
+const VEC2 g_BulletGageSpriteCenterSize = VEC2(420.0f, 200.0f);
+
+// 後ろ
+const VEC2 g_BulletGageSpriteBackPos    = VEC2(1620.0f, 700.0f);
+const VEC2 g_BulletGageSpriteBackSize   = VEC2(210.0f, 100.0f);
+
+
+
+/* ----- 武器スプライト ----- */
+// 前
+const VEC2 g_WeaponSpriteCenterPos  = VEC2(1220.0f, 830.0f);
+const VEC2 g_WeaponSpriteCenterSize = VEC2(200.0f, 120.0f);
+
+// 後ろs
+const VEC2 g_WeaponSpriteBackPos    = VEC2(1520.0f, 715.0f);
+const VEC2 g_WeaponSpriteBackSize   = VEC2(100.0f, 60.0f);
+
+
+/* 武器のパラメータ文字の位置 */
+const VEC2 g_WeaponParamStr_ParentBoxCenterSize = VEC2(800.0f, 50.0f);
+const VEC2 g_WeaponParamStr_ParentBoxBackSize = VEC2(400.0f, 50.0f);
+
+const VEC2 g_WeaponNameParamStrCenterPos = VEC2(970.0f, 810.0f);
+const VEC2 g_WeaponAmmoParamStrCenterPos = VEC2(970.0f, 870.0f);
+const VEC2 g_WeaponNameParamStrBackPos = VEC2(1400.0f, 690.0f);
+const VEC2 g_WeaponAmmoParamStrBackPos = VEC2(1400.0f, 720.0f);
+
+
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
 //*----------------------------------------------------------------------------------------
@@ -45,6 +77,42 @@ bool WeaponController::Setup(RendererEngine& renderer, int _maxSlot)
 	
 	// 最大数分メモリ確保
 	m_WeaponArray.reserve(m_MaxSlot);
+
+	UIData::RectTransformData rectData;
+	UIData::SpriteUIData spriteData;
+
+	// 弾のゲージ背景スプライトを作る **********************************************
+	rectData._pos = g_BulletGageSpriteCenterPos;
+	rectData._size = g_BulletGageSpriteCenterSize;
+	rectData._anchorMax = VEC2(0.0f, 0.0f);
+	rectData._anchorMin = VEC2(0.0f, 0.0f);
+	spriteData._tag = "WeaponGage_1";
+	spriteData._imagePath = "Resource/Texture/UI/BulletGage.png";
+	spriteData._layerRank = 101;
+	m_pBulletGageSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
+
+	// 後ろ
+	spriteData._tag = "WeaponGage_2";
+	rectData._pos = g_BulletGageSpriteBackPos;
+	rectData._size = g_BulletGageSpriteBackSize;
+	m_pBulletGageSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
+
+
+	// 武器のスプライトを作る **********************************************
+	rectData._pos  = g_WeaponSpriteCenterPos;
+	rectData._size = g_WeaponSpriteCenterSize;
+	spriteData._tag = "GunIcon_AR_01";
+	spriteData._imagePath = "Resource/Texture/UI/GunIcon_AR_01.png";	// TODO:武器のパラメータから使用する画像を指定できるようにする
+	spriteData._layerRank = 101;
+	m_pWeaponSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
+
+	// 後ろ
+	spriteData._imagePath = "Resource/Texture/UI/GunIcon_RL_01.png";
+	spriteData._tag = "GunIcon_RL_01";
+	rectData._pos = g_WeaponSpriteBackPos;
+	rectData._size = g_WeaponSpriteBackSize;
+	m_pWeaponSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
+
 
 	return true;
 }
@@ -99,14 +167,32 @@ void WeaponController::Update(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void WeaponController::Draw(RendererEngine& renderer)
 {
-	int ammoMax = 0, ammoRemaining = 0;	
-	m_WeaponArray[m_CrntWeaponSlotIndex];
+	for (int i = 0; i < m_MaxSlot; i++)
+	{
+		VEC2 weaponPos = g_WeaponNameParamStrBackPos;
+		VEC2 ammoPos = g_WeaponAmmoParamStrBackPos;
+		VEC2 parentSize = g_WeaponParamStr_ParentBoxBackSize;
+		std::string formatTag = "White_15_STD";
 
+		// 現在、装備している武器は前の位置へ
+		if (i == m_CrntWeaponSlotIndex)	{
+			weaponPos = g_WeaponNameParamStrCenterPos;
+			ammoPos = g_WeaponAmmoParamStrCenterPos;
+			formatTag = "White_30_STD";
+			parentSize = g_WeaponParamStr_ParentBoxCenterSize;
+		}
 
-	//Master::m_pDirectWriteManager->DrawFormatString("残りの敵数：{:d}", VECTOR2::VEC2(0, 540), "White_40_STD", m_EnemyNum);
-	//Master::m_pDirectWriteManager->DrawFormatString("残りの敵数：{:d}", VECTOR2::VEC2(0, 540), "White_40_STD", m_EnemyNum);
-	//Master::m_pDirectWriteManager->DrawFormatString("残りの敵数：{:d}", VECTOR2::VEC2(0, 540), "White_40_STD", m_EnemyNum);
+		int maxAmmo = m_WeaponArray[i]->get_WeaponUIData()._ammoMaxNum;
+		int remainingAmmo = m_WeaponArray[i]->get_WeaponUIData()._ammoRemaining;
+		std::wstring weaponName = m_WeaponArray[i]->get_WeaponUIData()._name;
+		std::string ammoStr = std::to_string(remainingAmmo) + " / " + std::to_string(maxAmmo);
 
+		/* 武器名 */
+		Master::m_pDirectWriteManager->DrawStringToAligment(weaponName, weaponPos, formatTag, H_ALIGNMENT::TRAILING, V_ALIGNMENT::CENTER, parentSize);
+
+		/* 残弾数 */
+		Master::m_pDirectWriteManager->DrawStringToAligment(ammoStr, ammoPos, formatTag, H_ALIGNMENT::TRAILING, V_ALIGNMENT::CENTER, parentSize);
+	}
 }
 
 
@@ -120,7 +206,6 @@ bool WeaponController::get_IsCrntWeaponReloading()
 {
 	return m_WeaponArray[m_CrntWeaponSlotIndex]->get_WeaponFlags().GetFlag(WEAPON_STATUS::RELODING);
 }
-
 
 //*---------------------------------------------------------------------------------------
 //*【?】武器の切り替え
@@ -151,10 +236,37 @@ void WeaponController::SwitchWeapon(int _index)
 	// 現在の武器を非表示に
 	m_WeaponArray[m_CrntWeaponSlotIndex]->get_OwnerObj().lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 
+	/* --------------------------------------------------------------
+	*  現在の武器背景のスプライトを後ろに
+	*/
+	auto gageRectTrans = m_pBulletGageSpriteObjArray[m_CrntWeaponSlotIndex]->get_RectTransform().lock();
+	gageRectTrans->set_RectPosition(g_BulletGageSpriteBackPos);
+	gageRectTrans->set_Size(g_BulletGageSpriteBackSize);
+
+	auto weaponRectTrans = m_pWeaponSpriteObjArray[m_CrntWeaponSlotIndex]->get_RectTransform().lock();
+	weaponRectTrans->set_RectPosition(g_WeaponSpriteBackPos);
+	weaponRectTrans->set_Size(g_WeaponSpriteBackSize);
+
+
 	// 新しい武器を表示
 	m_CrntWeaponSlotIndex = _index;
 	m_WeaponArray[m_CrntWeaponSlotIndex]->get_OwnerObj().lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 
+
+	/* --------------------------------------------------------------
+	*  新しい武器背景のスプライトを前へ
+	*/
+	gageRectTrans = m_pBulletGageSpriteObjArray[m_CrntWeaponSlotIndex]->get_RectTransform().lock();
+	gageRectTrans->set_RectPosition(g_BulletGageSpriteCenterPos);
+	gageRectTrans->set_Size(g_BulletGageSpriteCenterSize);
+
+	weaponRectTrans = m_pWeaponSpriteObjArray[m_CrntWeaponSlotIndex]->get_RectTransform().lock();
+	weaponRectTrans->set_RectPosition(g_WeaponSpriteCenterPos);
+	weaponRectTrans->set_Size(g_WeaponSpriteCenterSize);
+
+
+
+	// 武器切り替えカウンタの設定
 	m_WeaponChangeIntervalCounter = WEAPON_CHANGE_INTERVAL;
 }
 
@@ -223,6 +335,14 @@ void WeaponController::StartingWeapon(int _slot)
 }
 
 void WeaponController::ClearWeapon()
-{ 
+{
+	for (int i = 0; i < m_MaxSlot; i++)
+	{
+		m_pBulletGageSpriteObjArray[i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+		m_pWeaponSpriteObjArray[i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+	}
+
+	m_pBulletGageSpriteObjArray.clear();
+	m_pWeaponSpriteObjArray.clear();
 	m_WeaponArray.clear(); 
 }

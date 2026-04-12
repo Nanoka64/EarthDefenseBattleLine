@@ -44,6 +44,8 @@ public:
 	void set_IsStopFire(bool _flag) { m_IsStopFire = _flag; }						// UŒ‚’†~ƒtƒ‰ƒO‚Ìİ’è
 	int get_AmmoRemaining()const { return m_AmmoRemaining; }						// c’e”‚Ìæ“¾
 	void set_AmmoRemaining(int _ammo) { m_AmmoRemaining = _ammo; }					// c’e”‚Ìİ’è
+
+	WeaponData::WeaponUIData get_WeaponUIData()const override;
 };
 
 

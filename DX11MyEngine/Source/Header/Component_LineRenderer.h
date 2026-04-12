@@ -42,8 +42,8 @@ public:
 
 	void set_Width(const float _w) { m_Width = _w; };		// 幅の設定
 	float get_Width()const { return m_Width; };				// 幅の取得
-	void set_DrawTime(const float _t) { m_DrawTime = _t; }	// 表示時間の設定
-	float get_DrawTime()const { return m_DrawTime; }		// 表示時間の取得
+	void set_DrawTime(const int _t) { m_DrawTime = _t; }	// 表示時間の設定
+	int get_DrawTime()const { return m_DrawTime; }			// 表示時間の取得
 	void set_Length(const float _l) { m_Length = _l; }		// 長さ設定
 	float get_Length()const { return m_Length; }			// 長さ取得
 	void set_Dir(const VECTOR3::VEC3& _v) { m_Dir = _v; }				// 方向設定

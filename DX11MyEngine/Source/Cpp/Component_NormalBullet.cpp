@@ -196,6 +196,11 @@ void NormalBullet::Update(RendererEngine &renderer)
 
     if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
     {
+        auto owner = m_pOwner.lock();
+        auto transform = owner->get_Transform().lock();
+        transform->set_Pos(hitInfo.get_HitPoint());     // Õ“ËˆÊ’u‚É‡‚í‚¹‚é
+
+
         if (m_CollisionTask)
         {
             m_CollisionTask(hitInfo);

@@ -34,13 +34,13 @@ private:
     {
         MOUSE_BUTTON_STATE _mouse;
         //KEY_STATE _key;
-        int _key;
+		std::vector<int> _keys; // 複数のキーを同時に管理するためにvectorに変更
         GAMEPAD_STATE _pad;
 
         //int _count = 0;
 
         ConfigInfo() :
-            _key(-1),
+            _keys(),
             _mouse(MOUSE_BUTTON_STATE::NONE),
             _pad(GAMEPAD_STATE::NONE)
         {
@@ -52,7 +52,7 @@ private:
     //std::unordered_map<enum class CONFIG_INPUT,  int> m_CrntKeyState;       // 現在押されているキーの状態
     //std::unordered_map<enum class CONFIG_INPUT,  int> m_ConfigKeyMap;       // コンフィグ管理用
 
-    std::unordered_map<enum class SYSTEM_CONFIG, ConfigInfo> m_SystemConfigKeyMap;  // システム用コンフィグ管理
+    //std::unordered_map<enum class SYSTEM_CONFIG, ConfigInfo> m_SystemConfigKeyMap;  // システム用コンフィグ管理
 
     std::unordered_map<enum class GAME_CONFIG, ConfigInfo> m_GameConfigMap;         // ゲームシーン用コンフィグ管理
     std::unordered_map<enum class GAME_CONFIG, int>m_CrntGameConfigCountersMap;

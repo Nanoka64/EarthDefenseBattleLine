@@ -113,7 +113,7 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             VEC3 effectRot = VEC3(abs(angleX - 0.05f), angleY, 0.0f);
             int exp_handle = Master::m_pEffectManager->PlayEffect(m_Parameter._explosionEffectHandleTag);   // ”š”­
 
-            float expSize = m_Parameter._explosionRadius * 0.15;   // ”š”­”¼Œa
+            float expSize = m_Parameter._explosionRadius * 0.15f;   // ”š”­”¼Œa
             VEC3 expRot = VEC3(
                 Master::m_pRandomManager->GetFloatRandom(0.0f, 3.14f), 
                 Master::m_pRandomManager->GetFloatRandom(0.0f, 3.14f), 
@@ -183,7 +183,8 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     {
         auto owner = m_pOwner.lock();
         auto transform = owner->get_Transform().lock();
-        transform->set_Pos(crntPos);     // ‘O‚ÌˆÊ’u‚É‡‚í‚¹‚é
+        transform->set_Pos(crntPos);     // Õ“ËˆÊ’u‚É‡‚í‚¹‚é
+
 
         if (m_CollisionTask)
         {
