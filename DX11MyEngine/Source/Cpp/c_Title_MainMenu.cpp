@@ -240,6 +240,8 @@ void c_Title_MainMenu::Draw(SceneManager* pOwner)
 		m_pMenuItemRectTransformArray[static_cast<int>(item._type)].lock()->set_Size(g_MenuItemSize.x,g_MenuItemSize.y);
 	}
 
+	Master::m_pDirectWriteManager->SetOutLine(3.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
 	Master::m_pDirectWriteManager->DrawString("™ƒƒCƒ“ƒƒjƒ…[", VECTOR2::VEC2(40.0f, 500.0f), "White_40_STD");
+	Master::m_pDirectWriteManager->SetOutLine(0.0f);
 
 }

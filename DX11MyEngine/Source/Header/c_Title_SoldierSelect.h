@@ -46,5 +46,18 @@ public:
 	void OnExit(SceneManager *pOwner)override;
 	int Update(SceneManager *pOwner)override;
 	void Draw(SceneManager *pOwner)override;
+
+private:
+
+	/// <summary>
+	/// パラメータの描画
+	/// </summary>
+	/// <param name="_label">ラベル名（ダメージ:とか連射速度:にあたるもの）</param>
+	/// <param name="_value">値</param>
+	/// <param name="_pos">位置</param>
+	void DrawParam(const std::wstring& _label, const std::wstring& _value, const VECTOR2::VEC2& _pos);
+
+
+	void DrawWeaponInfo(const WeaponData::GunWeaponData* weaponData, int weaponIndex, float startX, float startY);
 };
 

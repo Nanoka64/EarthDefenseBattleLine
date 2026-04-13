@@ -9,7 +9,7 @@ namespace Tool
 #define _USE_MATH_DEFINES
 #include <math.h>	
 
-	constexpr float G_PI_F   = static_cast<float>(M_PI);	    // 円周率 
+	constexpr float G_PI_F   = static_cast<float>(M_PI);	// 円周率 
 	constexpr float G_PI_2_F = static_cast<float>(M_PI_2);	// 円周率の半分
 	constexpr float G_PI_4_F = static_cast<float>(M_PI_4);	// 円周率の四分の一
 
@@ -30,6 +30,90 @@ namespace Tool
         float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
         return _min + r * (_max - _min);
     }
+
+
+    //-----------------------------------------
+    /*      イージング関数    */
+    // In : 加速
+    // Out : 減速
+    //-----------------------------------------
+    namespace Easing
+    {
+        // --------------------------------------
+        //                  加速 
+        // --------------------------------------
+
+        // 軽い加速
+        inline float EaseInQuad(float _t) {
+            return _t * _t;
+        }
+
+        // 強い加速
+        inline float EaseInCubic(float _t) {
+            return _t * _t * _t;
+        }
+
+        // かなり強い加速
+        inline float EaseInQuart(float _t) {
+            return _t * _t * _t * _t;
+        }
+
+        // 超強い加速
+        inline float EaseInQuint(float _t) {
+            return _t * _t * _t * _t * _t;
+        }
+
+        // 自然な加速
+        inline float EaseInSine(float _t) {
+            return 1.0f - cosf((_t * DirectX::XM_PI) / 2.0f);
+        }
+
+
+        // --------------------------------------
+        //                  減速
+        // --------------------------------------
+
+        // ヒュッ...シュタッって感じ
+        // 2乗
+        inline float EaseOutQuad(float _t) {
+            float invT = 1.0f - _t;
+            return 1.0f - (invT * invT);
+        }
+
+        // 3乗
+        inline float EaseOutCubic(float _t) {
+            float invT = 1.0f - _t;
+            return 1.0f - (invT * invT * invT);
+        }
+
+        // 4乗
+        inline float EaseOutQuart(float _t) {
+            float invT = 1.0f - _t;
+            return 1.0f - (invT * invT * invT * invT);
+        }
+
+        // 5乗
+        inline float EaseOutQuint(float _t) {
+            float invT = 1.0f - _t;
+            return 1.0f - (invT * invT * invT * invT * invT);
+        }
+
+
+        // --------------------------------------
+        //          ばねみたいなやつ
+        // --------------------------------------
+
+        // 行って戻る
+        inline float EaseOutBack(float t) {
+            const float c1 = 1.70158f;
+            const float c3 = c1 + 1.0f;
+
+            // (t-1) を計算
+            float t1 = t - 1.0f;
+            return 1.0f + c3 * FLOAT_CAST(pow(t1, 3)) + c1 * FLOAT_CAST(pow(t1, 2));
+        }
+    }
+
 
     //-----------------------------------------
     /*      シェイカー構造体    */
@@ -78,6 +162,70 @@ namespace Tool
     };
 
     //-----------------------------------------
+    /*       3Dベクトル用シェイカー    */
+    //-----------------------------------------
+    struct VEC3_Shaker
+    {
+        float _shakeTimer;               // 継続時間
+        float _shakeDuration;           // 継続時間
+        VECTOR3::VEC3 _shaleStrength;   // 揺れの強さ
+        VECTOR3::VEC3 _shakeOffset;     // シェイクによる揺れベクトル
+
+
+        VEC3_Shaker() : 
+            _shakeTimer(0.0f),
+            _shakeDuration(0.0f),
+            _shaleStrength(VECTOR3::VEC3(0.0f)),
+            _shakeOffset(VECTOR3::VEC3(0.0f))
+        {
+        };
+
+        /// <summary>
+        /// シェイク開始
+        /// </summary>
+        /// <param name="duration">シェイクの持続時間</param>
+        /// <param name="strength">シェイクの強さ</param>
+        void Start(float duration, const VECTOR3::VEC3& strength)
+        {
+            _shakeDuration = duration;
+            _shaleStrength = strength;
+            _shakeTimer = 0.0f;
+        }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="_deltaTime">デルタタイム</param>
+        void Update(float _deltaTime)
+        {
+            if (_shakeTimer < _shakeDuration){
+
+                float t = _shakeTimer / _shakeDuration;
+                float easeOut = 1.0f - Tool::Easing::EaseOutQuad(t);  // イージングで段々弱まるように
+
+                // 新しい揺れオフセットを生成
+                _shakeOffset.x =  (RandRange(-1.0f,1.0f) * _shaleStrength.x) * easeOut;
+                _shakeOffset.y =  (RandRange(-1.0f,1.0f) * _shaleStrength.y) * easeOut;
+                _shakeOffset.z =  (RandRange(-1.0f,1.0f) * _shaleStrength.z) * easeOut;
+
+                _shakeTimer += _deltaTime;
+            }
+            // 終了
+            else{
+                _shakeOffset = VECTOR3::VEC3(0.0f);
+                _shakeDuration = 0.0f;
+                _shakeTimer = 0.0f;
+            }
+        }
+
+        // シェイクしたベクトルと引数のベクトルを足して返す
+        VECTOR3::VEC3 Apply(const VECTOR3::VEC3& originalPos)const
+        {
+            return originalPos + _shakeOffset;
+        }
+    };
+
+    //-----------------------------------------
     /*      線形補間関数    */
     //-----------------------------------------
     inline float Lerp(float start, float end, float t)
@@ -93,88 +241,6 @@ namespace Tool
         };
     }
 
-
-    //-----------------------------------------
-    /*      イージング関数    */
-    // In : 加速
-    // Out : 減速
-    //-----------------------------------------
-    namespace Easing
-    {
-        // --------------------------------------
-        //                  加速 
-        // --------------------------------------
-         
-        // 軽い加速
-        inline float EaseInQuad(float _t) {
-            return _t * _t;
-        }
-
-        // 強い加速
-        inline float EaseInCubic(float _t) {
-            return _t * _t * _t;
-        }
-
-        // かなり強い加速
-        inline float EaseInQuart(float _t) {
-            return _t * _t * _t * _t;
-        }
-
-        // 超強い加速
-        inline float EaseInQuint(float _t) {
-            return _t * _t * _t * _t * _t;
-        }
-
-        // 自然な加速
-        inline float EaseInSine(float _t) {
-            return 1.0f - cosf((_t * DirectX::XM_PI) / 2.0f);
-        }
-
-
-        // --------------------------------------
-        //                  減速
-        // --------------------------------------
-        
-        // ヒュッ...シュタッって感じ
-        // 2乗
-        inline float EaseOutQuad(float _t){
-            float invT = 1.0f - _t;
-            return 1.0f - (invT * invT);
-        }
-
-        // 3乗
-        inline float EaseOutCubic(float _t) {
-            float invT = 1.0f - _t;
-            return 1.0f - (invT * invT * invT);
-        }
-
-        // 4乗
-        inline float EaseOutQuart(float _t){
-            float invT = 1.0f - _t;
-            return 1.0f - (invT * invT * invT * invT);
-        }
-
-        // 5乗
-        inline float EaseOutQuint(float _t){
-            float invT = 1.0f - _t;
-            return 1.0f - (invT * invT * invT * invT * invT);
-        }
-
-
-        // --------------------------------------
-        //          ばねみたいなやつ
-        // --------------------------------------
-
-        // 行って戻る
-        inline float EaseOutBack(float t) {
-            const float c1 = 1.70158f;
-            const float c3 = c1 + 1.0f;
-
-            // (t-1) を計算
-            float t1 = t - 1.0f;
-            return 1.0f + c3 * FLOAT_CAST(pow(t1, 3)) + c1 * FLOAT_CAST(pow(t1, 2));
-        }
-    }
 
     //-----------------------------------------
     /*      UV    */

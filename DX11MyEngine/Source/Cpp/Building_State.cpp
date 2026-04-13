@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Building_State.h"
+#include "RendererEngine.h"
+#include "Component_3DCamera.h"
 #include "Component_BuildingController.h"
 #include "Component_BoxCollider.h"
 
@@ -8,15 +10,21 @@ using namespace VECTOR3;
 using namespace BuildingData;
 using namespace Tool;
 
+/* 倒壊パラメータ */
 constexpr float BUILDING_COLLAPSE_TIME_MIN = 2.0f;	// 倒壊にかかる時間の最小値
 constexpr float BUILDING_COLLAPSE_TIME_MAX = 5.0f;	// 倒壊にかかる時間の最大値
-
 constexpr float BUILDING_COLLAPSE_SPEED = 25.0f;	// 建物の倒壊スピード
 constexpr float BUILDING_COLLAPSE_END_TIME = 3.0f;	// 倒壊終了から落下までの時間
 constexpr float BUILDING_FALL_SPEED = 20.0f;		// 建物の落下スピード
 
+/* サウンド */
 constexpr float BUILDING_DESTRUCTION_SOUND_RADIUS = 500.0f;	// 破壊時の音の聞こえる範囲
 constexpr float BUILDING_FALL_SOUND_RADIUS = 500.0f;		// 落下時の音の聞こえる範囲
+
+/* カメラシェイク */
+constexpr float SHAKE_DURATION = 3.0f;		// 持続時間
+constexpr float SHAKE_LENGTH = 0.3f;		// 強さ
+constexpr float SHAKE_MAX_RANGE = 300.0f;	// 揺れが影響する最大距離
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -119,6 +127,14 @@ void Building_CllapseNowState::OnExit(BuildingController* pOwner)
 	auto transform = pOwner->get_OwnerObj().lock()->get_Transform().lock();
 
 	VEC3 pos = transform->get_VEC3ToPos();
+
+	// ****************************************************
+	//				 カメラシェイク
+	// ****************************************************
+	m_pRenderer->get_CameraComponent()->DistanceDecay(SHAKE_DURATION, VEC3(SHAKE_LENGTH), pos, SHAKE_MAX_RANGE);
+
+
+
 
 	//*****************************************************************************************
 	//						エフェクト再生

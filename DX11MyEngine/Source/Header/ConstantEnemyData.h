@@ -28,6 +28,8 @@ namespace EnemyData
 		ANT_STATE_ATTACK_BITE,	// Šš‚Ý‚Â‚«UŒ‚
 		ANT_STATE_ATTACK_ACID,	// Ž_UŒ‚
 		ANT_STATE_DAMAGED,		// ƒ_ƒ[ƒW
+		ANT_STATE_BLOWN_AWAY,	// ”š”­‚É‚æ‚é‚«”ò‚Ñ
+		ANT_STATE_FALLING,		// —Ž‰º’†
 		ANT_STATE_DEAD,			// Ž€–S
 	};
 

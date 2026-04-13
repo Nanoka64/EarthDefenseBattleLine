@@ -30,6 +30,7 @@
 #include "Component_BuildingController.h"
 #include "Component_MiniMapRader.h"
 #include "Component_Player_HPBar.h"
+#include "Component_MoveLogic.h"
 
 using namespace SceneStateEnums;
 using namespace VECTOR4;
@@ -145,6 +146,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             // エネミーコントローラーと体力管理を追加
             obj->add_Component<EnemyController>();
             obj->add_Component<Health>();
+            obj->add_Component<MoveLogic>();
+
 
             VEC3 pos = VEC3();
             pos.x = Tool::RandRange(-50.0, 50.0);

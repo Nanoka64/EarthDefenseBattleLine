@@ -25,6 +25,8 @@ private:
 	float m_DefaultFov;	// デフォルトのFOV
 	bool m_IsDebugMode;
 	std::shared_ptr<class RendererEngine> m_pRenderer;// 描画エンジンのポインタ
+	//std::weak_ptr<class Camera3D> m_pCameraComponent;
+	
 	int m_SelectWeaponID[2];	// 武器選択で選択した武器のID 一時的にここに置く
 	UtilityData::UserConfigData m_UserConfigData;	// ユーザ設定データ
 

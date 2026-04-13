@@ -115,13 +115,12 @@ bool RenderPipeline::Setup(RendererEngine &renderer)
 //* [返値]
 //* なし 
 //*----------------------------------------------------------------------------------------
-void RenderPipeline::Execute(RendererEngine &renderer)
+void RenderPipeline::Execute(RendererEngine& renderer)
 {
     if (Master::m_pDataManager->get_IsDebugMode()) {
         // レンダーターゲットデバッグ表示
         DebugRenderTargetImGui();
     }
-
 
     // ライトの更新
     Master::m_pLightManager->Update();
@@ -129,9 +128,9 @@ void RenderPipeline::Execute(RendererEngine &renderer)
     // パス終了時にSRVを解除する
     ID3D11ShaderResourceView* nullSRVs[8] = { nullptr };
 
-	m_ShadowData.isEnable = Master::m_pDataManager->get_UserConfigData()._isShadowEnabled;
+    m_ShadowData.isEnable = Master::m_pDataManager->get_UserConfigData()._isShadowEnabled;
     m_pDefferdLighting_Sprite->setToGPU_ExtendUserPS_CBuffer(renderer, 0, &m_ShadowData);
-	// シャドウが有効ならシャドウパスも実行
+    // シャドウが有効ならシャドウパスも実行
     if (m_ShadowData.isEnable)
     {
         /* シャドウパス */
@@ -140,7 +139,6 @@ void RenderPipeline::Execute(RendererEngine &renderer)
         renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
         renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
     }
-
 
     /* ジオメトリパス */
     Geometry_PathRender(renderer);
@@ -159,7 +157,7 @@ void RenderPipeline::Execute(RendererEngine &renderer)
 
     /* フォワードパス */
     Forward_PathRender(renderer);
- 
+
     /* ポストエフェクトパス */
     PostEffect_PathRender(renderer);
 
@@ -281,6 +279,26 @@ void RenderPipeline::Release()
     SAFE_DELETE(m_pSceneFinal_RT);
     SAFE_DELETE(m_pLuminance_RT);
     SAFE_DELETE(m_pShadowMap_RT);
+
+    m_pShadowGaussianBlur->Term();
+    m_pDoF_GaussianBlur->Term();
+    m_pBloomGaussianBlur->Term();
+    SAFE_DELETE(m_pShadowGaussianBlur);
+    SAFE_DELETE(m_pDoF_GaussianBlur);
+    SAFE_DELETE(m_pBloomGaussianBlur);
+
+
+    m_pAlbed_Sprite.reset();
+    m_pNormal_Sprite.reset();
+    m_pSpecular_Sprite.reset();
+    m_pEmissive_Sprite.reset();
+    m_pDepth_Sprite.reset();
+    m_pDefferdLighting_Sprite.reset();
+    m_pLuminance_Sprite.reset();
+    m_pBloom_Sprite.reset();
+    m_pDoF_Sprite.reset();
+    m_pFinalSceneToneMappingFilter_Sprite.reset();
+
 }
 
 //*---------------------------------------------------------------------------------------

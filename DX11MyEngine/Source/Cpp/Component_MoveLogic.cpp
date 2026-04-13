@@ -2,6 +2,7 @@
 #include "Component_MoveLogic.h"
 #include "IMoveBehaviour.h"
 #include "LinearMove_Behaviour.h"
+#include "HormingMove_Behaviour.h"
 #include "GameObject.h"
 
 using namespace GIGA_Engine;
@@ -70,6 +71,7 @@ void MoveLogic::Calculate(const MoveParam& _param)
 
             // ”½‰f
             pTransform->set_Pos(newPos);
+            pTransform->set_RotationQuaternion(res._RotQ);
         }
     }
 }
@@ -90,6 +92,7 @@ void MoveLogic::Register(MOVE_BEHAVIOUR_TYPE _type)
         m_pMoveBehaviourMap[_type] = std::make_unique<LinearMove_Behaviour>();
         break;
     case MOVE_BEHAVIOUR_TYPE::HOMING:
+        m_pMoveBehaviourMap[_type] = std::make_unique<HormingMove_Behaviour>();
         break;
     default:
         break;

@@ -29,10 +29,10 @@ struct MoveParam
 struct ResultMove
 {
     VECTOR3::VEC3 _moveVelocity;    // 移動ベクトル
-    VECTOR3::VEC3 _rotateVelocity;  // 回転ベクトル
+    DirectX::XMVECTOR _RotQ;        // クオータニオン
     ResultMove() :
         _moveVelocity(VECTOR3::VEC3()),
-        _rotateVelocity(VECTOR3::VEC3())
+        _RotQ(DirectX::XMQuaternionIdentity())
     {
     }
 };

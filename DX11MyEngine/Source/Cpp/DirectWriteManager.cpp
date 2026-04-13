@@ -250,11 +250,19 @@ void DirectWriteManager::SetColor(const D2D1_COLOR_F& col)
     return;
 #else
 
-    // 使用する色の指定
-    HRESULT hr = m_pRenderTarget->CreateSolidColorBrush(col, &m_pSolidBrush);
-    if (FAILED(hr)) {
-        assert(false);
+    if (m_pOutLineSolidBrush == nullptr)
+    {
+        HRESULT hr = m_pRenderTarget->CreateSolidColorBrush(col, &m_pSolidBrush);
+        if (FAILED(hr)) {
+            assert(false);
+            return;
+        }
     }
+    else
+    {
+        m_pSolidBrush->SetColor(col);
+    }
+
 #endif
 }
 
@@ -273,12 +281,19 @@ void DirectWriteManager::SetOutLine(float _size, const D2D1_COLOR_F& col)
 #ifndef IS_ENABLE
     return;
 #else
-    // 使用する色の指定
-    HRESULT hr = m_pRenderTarget->CreateSolidColorBrush(col, &m_pOutLineSolidBrush);
-    if (FAILED(hr)) {
-        assert(false);
-	}
-
+    // まだブラシが作成されていない場合のみ、新しく作成する
+    if (m_pOutLineSolidBrush == nullptr)
+    {
+        HRESULT hr = m_pRenderTarget->CreateSolidColorBrush(col, &m_pOutLineSolidBrush);
+        if (FAILED(hr)) {
+            assert(false);
+            return;
+        }
+    }
+    else
+    {
+        m_pOutLineSolidBrush->SetColor(col);
+    }
 	m_OutLineSize = _size;
 
 #endif

@@ -15,18 +15,19 @@
 class EnemyController :  public IComponent
 {
 private:
-	std::shared_ptr<class Health>m_pHealthComp;	// 体力管理コンポーネント
-	std::shared_ptr<class SkinnedMeshAnimator> m_pAnimatorComp;	// アニメータコンポーネント
-	std::shared_ptr<class Collider> m_pColliderComp;	// コライダーコンポーネント
-	bool m_IsDead;
+	std::weak_ptr<class Health>m_pHealthComp;	// 体力管理コンポーネント
+	std::weak_ptr<class SkinnedMeshAnimator> m_pAnimatorComp;	// アニメータコンポーネント
+	std::weak_ptr<class Collider> m_pColliderComp;	// コライダーコンポーネント
+	std::weak_ptr<class MoveLogic> m_pMoveLogicComp;	// 移動コンポーネント
+	std::weak_ptr<GameObject> m_pTarget;	// 攻撃目標
 	StateMachine<EnemyController> m_StateMachine;
 
 	VECTOR3::VEC3 m_MoveVelocity;	// 移動
-	bool m_IsAnim;					// アニメーション中かどうか
 	int m_CrntAnimID;				// 現在のアニメーション番号
 	float m_MoveSpeed;				// 移動速度
-	std::shared_ptr<GameObject> m_pTarget;	// 攻撃目標
-	int m_StateTimer;	// ステート時間
+	int m_StateTimer;				// ステート時間
+	bool m_IsDead;
+	bool m_IsAnim;					// アニメーション中かどうか
 
 
 public:
@@ -67,7 +68,7 @@ public:
 	void set_IsAnim(bool _flag) { m_IsAnim = _flag; }
 
 	/* 攻撃目標 */
-	std::shared_ptr<GameObject> get_Target() const { return m_pTarget; }
+	std::weak_ptr<GameObject> get_Target() const { return m_pTarget; }
 	void set_Target(std::shared_ptr<GameObject> _pObj) { m_pTarget = _pObj; }
 
 	/* 攻撃目標のトランスフォームを取得 */

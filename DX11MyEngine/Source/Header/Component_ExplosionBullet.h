@@ -27,4 +27,5 @@ public:
 	BulletData::ExplosionBulletData get_Parameter()const { return m_Parameter; }					// ƒpƒ‰ƒ[ƒ^‚Ìæ“¾
 	void Reset()override;
 	void Setup()override;
+
 };

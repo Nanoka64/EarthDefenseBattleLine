@@ -768,9 +768,6 @@ bool RendererEngine::CreateRendererPipeline(RENDER_PIPELINE_STATE type)
 {
     switch (type)
     {
-    case RENDER_PIPELINE_STATE::NONE:
-        return false;
-        break;
     case RENDER_PIPELINE_STATE::DEFAULT:
         // レンダーパイプラインの作成
         m_pRendererPipeline = new RenderPipeline();

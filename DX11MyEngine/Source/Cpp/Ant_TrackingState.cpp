@@ -38,7 +38,7 @@ void Ant_TrackingState::OnExit(class EnemyController *pOwner)
 //*----------------------------------------------------------------------------------------
 int Ant_TrackingState::Update(class EnemyController *pOwner)
 {
-	auto targetObj = pOwner->get_Target();
+	auto targetObj = pOwner->get_Target().lock();
 	auto myObj = pOwner->get_OwnerObj().lock();
 
 	// –Ú•W‚ª‹‚È‚­‚È‚Á‚½‚ç‘Ò‹@ó‘Ô‚Ö–ß‚é

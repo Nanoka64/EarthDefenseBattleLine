@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "Component_SkinnedMeshAnimator.h"
 #include "Component_DecalRenderer.h"
+#include "Component_MoveLogic.h"
 #include "Component_TimerDestruction.h"
 #include "Component_Collider.h"
 #include "Component_BoxCollider.h"
@@ -53,18 +54,23 @@ EnemyController::~EnemyController()
 //*----------------------------------------------------------------------------------------
 void EnemyController::Start(RendererEngine& renderer)
 {
+	auto ownerObj = m_pOwner.lock();;
+
     // アニメーションコンポーネントの取得
-    m_pAnimatorComp = m_pOwner.lock()->get_Component<SkinnedMeshAnimator>();
+    m_pAnimatorComp = ownerObj->get_Component<SkinnedMeshAnimator>();
 
 	// コライダーの取得
-	m_pColliderComp = m_pOwner.lock()->get_Component<BoxCollider>();
+	m_pColliderComp = ownerObj->get_Component<BoxCollider>();
+
+	// 移動コンポーネントの取得
+	m_pMoveLogicComp = ownerObj->get_Component<MoveLogic>();
 
 	// HP管理コンポーネントの取得
 	m_pHealthComp = m_pOwner.lock()->get_Component<Health>();
-	m_pHealthComp->set_MaxHP(200.0f);
-	m_pHealthComp->set_CrntHP(200.0f);
+	m_pHealthComp.lock()->set_MaxHP(200.0f);
+	m_pHealthComp.lock()->set_CrntHP(200.0f);
 	// 被弾時のコールバック
-	m_pHealthComp->RegisterOnDamage(
+	m_pHealthComp.lock()->RegisterOnDamage(
 		[this, &renderer](float _damage)
 		{
 			auto transform = m_pOwner.lock()->get_Transform().lock();
@@ -120,7 +126,7 @@ void EnemyController::Start(RendererEngine& renderer)
 		}
 	);
 	// 死亡時のコールバック
-	m_pHealthComp->RegisterOnDead(
+	m_pHealthComp.lock()->RegisterOnDead(
 		[this, &renderer]
 		{
 			auto transform = m_pOwner.lock()->get_Transform().lock();
@@ -175,12 +181,15 @@ void EnemyController::Start(RendererEngine& renderer)
 		}
 	);
 
-	m_MoveSpeed = 1.5f;
+	m_MoveSpeed = 7.5f;
 
 	// ステートの作成（TODO:外から種類を変えられるようにする）
 	EnemyStateFactory::Create(m_StateMachine, ENEMY_TYPE::ENEMY_TYPE_ANT_Normal, renderer);
 	m_StateMachine.SetCrntState(ANT_STATE::ANT_STATE_PATROL_IDLE);
 
+	m_pMoveLogicComp.lock()->Register(MOVE_BEHAVIOUR_TYPE::HOMING);
+	m_pMoveLogicComp.lock()->Register(MOVE_BEHAVIOUR_TYPE::LINEAR);
+	m_pMoveLogicComp.lock()->ChangeBehaviour(MOVE_BEHAVIOUR_TYPE::HOMING);
 }
 
 
@@ -195,7 +204,7 @@ void EnemyController::Update(RendererEngine& renderer)
 {
 	if (m_IsDead)
 	{
-		m_pColliderComp->set_IsEnable(false);	// コライダーの判定をオフに
+		m_pColliderComp.lock()->set_IsEnable(false);	// コライダーの判定をオフに
 		m_pOwner.lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DELETE);
 	}
 
@@ -208,42 +217,38 @@ void EnemyController::Update(RendererEngine& renderer)
 	// ステートの実行
 	m_StateMachine.Update();
 
-	m_pAnimatorComp->set_IsAnim(m_IsAnim);
+	m_pAnimatorComp.lock()->set_IsAnim(m_IsAnim);
 
 	m_StateTimer++;
 
 
 	// 移動処理（今後移動コンポーネント等にまとめる）
+
+	MoveParam movePram;
+	movePram._moveSpeed = m_MoveSpeed;
+	movePram._turnSpeed = 0.1f;
+	movePram._targetPos = target->get_Transform().lock()->get_VEC3ToPos();
+	auto move = m_pMoveLogicComp.lock();
+	move->Calculate(movePram);
+
 	auto myTransform = m_pOwner.lock()->get_Transform().lock();
-	VEC3 crntPos = myTransform->get_VEC3ToPos();
-	VEC3 crntRot = myTransform->get_VEC3ToRotateToRad();
-
-	VEC3 newPos = crntPos + m_MoveVelocity * deltaTime;
-
-	newPos.y = crntPos.y;	// Yは変えない
-
-	if (newPos.y < 0.0f)
-	{
-		newPos.y = 0.0f;
-	}
-
+	VEC3 newPos = myTransform->get_VEC3ToPos();
+	newPos.y = 0.0f;
 	myTransform->set_Pos(newPos);
 
-	//目標の方向ベクトルから角度値を算出c
-	float targetAngleY = atan2(m_MoveVelocity.x, m_MoveVelocity.z);
+	////目標の方向ベクトルから角度値を算出c
+	//float targetAngleY = atan2(m_MoveVelocity.x, m_MoveVelocity.z);
 
-	// 目標とするクォータニオン
-	XMVECTOR targetRotQ = XMQuaternionRotationRollPitchYaw(0.0f, targetAngleY, 0.0f);
+	//// 目標とするクォータニオン
+	//XMVECTOR targetRotQ = XMQuaternionRotationRollPitchYaw(0.0f, targetAngleY, 0.0f);
 
-	XMVECTOR crntRotQ = myTransform->get_RotationQuaternion();
+	//XMVECTOR crntRotQ = myTransform->get_RotationQuaternion();
 
-	// クォータニオンの球面線形補間
-	// 普通の線形補間だと、値が飛んでしまうためクォータニオンの場合は球面線形補間を使う
-	XMVECTOR newRotQ = XMQuaternionSlerp(crntRotQ, targetRotQ, 0.1f);
+	//// クォータニオンの球面線形補間
+	//// 普通の線形補間だと、値が飛んでしまうためクォータニオンの場合は球面線形補間を使う
+	//XMVECTOR newRotQ = XMQuaternionSlerp(crntRotQ, targetRotQ, 0.1f);
 
-	myTransform->set_RotationQuaternion(newRotQ);
-
-
+	//myTransform->set_RotationQuaternion(newRotQ);
 }
 
 
@@ -315,14 +320,16 @@ void EnemyController::ChangeAnimation(const int _newId)
 		return;
 	}
 
+	auto animComp = m_pAnimatorComp.lock();
+
 	// ひとつ前のアニメーションIDセット
-	m_pAnimatorComp->set_PrevAnimIndex(static_cast<int>(m_CrntAnimID));
+	animComp->set_PrevAnimIndex(static_cast<int>(m_CrntAnimID));
 
 	m_CrntAnimID = _newId;
 
 	// 現在のアニメーションIDセット
-	m_pAnimatorComp->set_AnimIndex(static_cast<int>(_newId));
-	m_pAnimatorComp->set_AnimTime(0.0f);
+	animComp->set_AnimIndex(static_cast<int>(_newId));
+	animComp->set_AnimTime(0.0f);
 }
 
 //*---------------------------------------------------------------------------------------
@@ -334,9 +341,9 @@ void EnemyController::ChangeAnimation(const int _newId)
 //*----------------------------------------------------------------------------------------
 std::shared_ptr<MyTransform> EnemyController::get_TargetTransform() const
 {
-	if (m_pTarget)
+	if (m_pTarget.lock())
 	{
-		return m_pTarget->get_Transform().lock();
+		return m_pTarget.lock()->get_Transform().lock();
 	}
 
 	return nullptr;

@@ -51,7 +51,7 @@ static constexpr const char* g_SoldierNames[UINT_CAST(SOLDIER_TYPE::NUM)] =
 static const char* g_WeaponDescriptions[UINT_CAST(SOLDIER_TYPE::NUM)] =
 {
 	"・バランスの取れた兵装\n特にクセもなく、初心者におすすめだ。",
-	"・連射性能に優れた兵装\n攻撃力は低めだが、とにかく撃ちまくって数で圧倒しろ！",
+	"・連射性能に優れた兵装\n威力は低めだが、弾数、連射性能に優れているぞ。",
 	"・中/遠距離に特化した兵装\n連射性能は抑え目だが、中距離以上からの射撃に長けているぞ。",
 	"・高火力兵装\n扱いは難しいが、火力は群を抜いて高い。まさにロマン砲！",
 };
@@ -136,6 +136,8 @@ void c_Title_SoldierSelect::OnExit(SceneManager *pOwner)
 	}
 
 	m_pWeaponDescriptionBackSpriteObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
+	m_DecisionTextDrawCounter = 0;
 }
 
 
@@ -241,71 +243,18 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 		i++;
 	}
 
-	auto DrawWeaponInfo = [](const WeaponData::GunWeaponData* weaponData, int weaponIndex, float startY) {
-		if (!weaponData) return;
-
-		// 基底データ（全弾種共通のパラメータ）の取得
-		const auto& baseBulletData = std::visit([](const auto& arg) -> const BulletData::NormalBulletData& {
-			return arg;
-			}, weaponData->_bulletParam);
-
-		// 弾種ごとの固有パラメータを取得して文字列化
-		std::wstring extraInfoStr = L"";
-		std::visit([&extraInfoStr](const auto& arg) {
-			using T = std::decay_t<decltype(arg)>; // 型を推論
-
-			// 爆発弾の場合のみ、爆発半径の文字列を追加する
-			if constexpr (std::is_same_v<T, BulletData::ExplosionBulletData>) {
-				extraInfoStr = L"　・爆発半径:" + FormatFloat(arg._explosionRadius, 1) + L"m";
-			}
-			// 将来的にショットガン（散弾）などの型が増えたら、ここに else if constexpr を足すだけで対応可能
-			}, weaponData->_bulletParam);
-
-		// 武器名の描画
-		std::wstring weaponInfoStr = L"武器" + std::to_wstring(weaponIndex) + L":" + weaponData->_name;
-		Master::m_pDirectWriteManager->DrawString(weaponInfoStr, VEC2(950.0f, startY), "White_30_STD");
-
-		// 各種計算・変換
-		std::wstring laserSightStr = weaponData->_isLaserSight ? L"装備" : L"---";
-		std::wstring zoomStr = weaponData->_zoomLength > 1.0f ? FormatFloat(weaponData->_zoomLength) : L"---";
-		float fireRatePerSec = weaponData->_fireRate ;
-		std::wstring damageStr = FormatFloat((baseBulletData._damage));
-		damageStr = (weaponData->_bulletSimultaneousNum > 1) ? damageStr + L" x " + std::to_wstring(weaponData->_bulletSimultaneousNum) : damageStr; // 同時発射数が1より多い場合はダメージに「x N」を追加
-
-
-		// 情報テキストの構築（追加パラメータ extraInfoStr を結合）
-		std::wstring detailStr =
-			L"　・弾数:" + std::to_wstring(weaponData->_bulletMaxNum) +
-			L"　・連射速度（発/sec）:" + FormatFloat(fireRatePerSec) +
-			L"　・ダメージ:" + damageStr +
-			L"\n" +
-			L"　・リロード:" + FormatFloat(weaponData->_reloadTime) + L"秒" +
-			L"　・射程:" + FormatFloat(baseBulletData._range) + L"m" +
-			L"　・弾速（m/sec）:" + FormatFloat(baseBulletData._speed)  + 
-			L"\n" +
-			L"　・精度:" + FormatFloat(weaponData->_accuracy,2) + // ※ここを「S/A/B...」等に変換する関数を噛ませると綺麗です
-			L"　・ズーム（倍）:" + zoomStr +
-			L"　・レーザーサイト:" + laserSightStr +
-			L"\n" + 
-			L"　・敵貫通可能数:" + std::to_wstring(baseBulletData._penetrationsCount) +
-			extraInfoStr; // ★ 爆発弾の時だけここに「爆発半径」が足される
-
-		// 6. パラメータの描画
-		Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(0.0f, 1.0f, 1.0f));	// 水色文字
-		Master::m_pDirectWriteManager->SetOutLine(2.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
-		Master::m_pDirectWriteManager->DrawStringToAligment(detailStr, VEC2(950.0f, startY + 50.0f), "White_20_STD", H_ALIGNMENT::LEADING, V_ALIGNMENT::TOP, VEC2(1000.0f, 600.0f));
-		Master::m_pDirectWriteManager->SetOutLine(0.0f);
-
-		Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(D2D1::ColorF::White));	
-		};
 
 	// 描画の実行（現在選択中の武器）
 	auto weaponData_1 = static_cast<const WeaponData::GunWeaponData*>(Master::m_pWeaponDataManager->FindWeaponData(m_CrntSelectItem * 2));
 	auto weaponData_2 = static_cast<const WeaponData::GunWeaponData*>(Master::m_pWeaponDataManager->FindWeaponData(m_CrntSelectItem * 2 + 1));
-	Master::m_pDirectWriteManager->DrawString(g_WeaponDescriptions[m_CrntSelectItem], VEC2(950.0f, 550.0f), "White_20_STD");
 
-	DrawWeaponInfo(weaponData_1, 1, 620.0f);
-	DrawWeaponInfo(weaponData_2, 2, 800.0f);
+	// 兵装の説明
+	Master::m_pDirectWriteManager->SetOutLine(2.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
+	Master::m_pDirectWriteManager->DrawString(g_WeaponDescriptions[m_CrntSelectItem], VEC2(950.0f, 550.0f), "White_20_STD");
+	Master::m_pDirectWriteManager->SetOutLine(0.0f);
+
+	DrawWeaponInfo(weaponData_1, 1,990.0f, 620.0f);
+	DrawWeaponInfo(weaponData_2, 2,990.0f, 800.0f);
 
 
 	// 装備を決定したときのテキスト表示 ************************************************************************
@@ -323,4 +272,139 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 
 	Master::m_pDirectWriteManager->DrawString("☆兵装選択", VECTOR2::VEC2(40.0f, 500.0f), "White_40_STD");
 
+}
+
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】武器パラメータの描画
+//* TODO:ここら辺はAIに噛ませているので、要確認
+//*
+//* [引数]
+//* *weaponData : データ
+//* weaponIndex : 武器インデックス
+//* startX : 位置
+//* startY : 位置
+//*
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void c_Title_SoldierSelect::DrawWeaponInfo(const WeaponData::GunWeaponData* weaponData, int weaponIndex, float startX, float startY)
+{
+	if (!weaponData) return;
+
+	// 基底データ（全弾種共通のパラメータ）の取得
+	const auto& baseBulletData = std::visit([](const auto& arg) -> const BulletData::NormalBulletData& {
+		return arg;
+		}, weaponData->_bulletParam);
+
+	/* 各パラメータの変換 */
+	std::wstring laserSightStr = weaponData->_isLaserSight ? L"装備" : L"----";																		// レーザーサイト
+	std::wstring zoomStr = weaponData->_zoomLength > 1.0f ? FormatFloat(weaponData->_zoomLength) + L"倍" : L"----";									// ズーム
+	std::wstring fireRateStr = FormatFloat(weaponData->_fireRate) + L"発／秒";																		// 連射速度
+	std::wstring speedStr = L"秒速" + FormatFloat(baseBulletData._speed) + L"m";																	// 弾速
+	std::wstring penetrationsStr = baseBulletData._penetrationsCount > 0 ? std::to_wstring(baseBulletData._penetrationsCount) + L"回" : L"なし";	// 貫通可能回数
+	std::wstring reloadTimeStr = FormatFloat(weaponData->_reloadTime) + L"秒";																		// リロード時間
+	std::wstring rangeStr = FormatFloat(baseBulletData._range) + L"m";																				// 射程距離
+	std::wstring accuracyStr;																				// 精度
+
+	if (weaponData->_accuracy <= 0.01f)accuracyStr = L"S";
+	else if (weaponData->_accuracy <= 0.015f)accuracyStr = L"A+";
+	else if (weaponData->_accuracy <= 0.02f)accuracyStr = L"A";
+	else if (weaponData->_accuracy <= 0.025f)accuracyStr = L"B+";
+	else if (weaponData->_accuracy <= 0.03f)accuracyStr = L"B";
+	else if (weaponData->_accuracy <= 0.035f)accuracyStr = L"C";
+	else if (weaponData->_accuracy <= 0.04f)accuracyStr = L"D";
+	else if (weaponData->_accuracy <= 0.05f)accuracyStr = L"E";
+	else accuracyStr = L"F";
+	
+	// 同時発射数が1より多い場合はダメージに「x N」を追加
+	std::wstring damageStr = FormatFloat((baseBulletData._damage));
+	damageStr = (weaponData->_bulletSimultaneousNum > 1) ? damageStr + L" x " + std::to_wstring(weaponData->_bulletSimultaneousNum) : damageStr;
+
+	// 弾種ごとの固有パラメータを取得して文字列化
+	std::wstring extraLabelStr = L"";	// ラベル
+	std::wstring extraValueStr = L"";	// 値
+	std::visit([&extraLabelStr, &extraValueStr](const auto& arg) {
+		using T = std::decay_t<decltype(arg)>; // 型を推論
+
+		// 爆発弾の場合のみ、爆発半径の文字列を追加する
+		if constexpr (std::is_same_v<T, BulletData::ExplosionBulletData>) {
+			extraLabelStr = L"爆発半径：";
+			extraValueStr = FormatFloat(arg._explosionRadius, 1) + L"m";
+		}
+		// 将来的にショットガン（散弾）などの型が増えたら、ここに else if constexpr を足すだけで対応可能
+		}, weaponData->_bulletParam);
+
+
+	float currentY = startY + 50.0f;
+	float col1X = startX;				// 1列目のX
+	float col2X = startX + 300.0f;		// 2列目のX
+	//float col3X = startX + 600.0f;		// 3列目のX
+	float lineHeight = 20.0f;
+	VEC2 pos = VEC2();
+
+	// 武器名の描画
+	Master::m_pDirectWriteManager->SetOutLine(2.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
+	std::wstring weaponInfoStr = L"武器" + std::to_wstring(weaponIndex) + L":" + weaponData->_name;
+	Master::m_pDirectWriteManager->DrawString(weaponInfoStr, VEC2(startX, startY), "White_30_STD");
+	Master::m_pDirectWriteManager->SetOutLine(0.0f);
+
+	// 左側の列
+	pos.x = col1X;
+	pos.y = currentY;
+	this->DrawParam(L"弾数：", std::to_wstring(weaponData->_bulletMaxNum), pos);
+	pos.y += lineHeight;
+	this->DrawParam(L"連射速度：", fireRateStr , pos);
+	pos.y += lineHeight;
+	this->DrawParam(L"ダメージ：", damageStr, pos);
+	pos.y += lineHeight;
+	this->DrawParam(L"リロード時間：", reloadTimeStr, pos);
+	pos.y += lineHeight;
+	this->DrawParam(L"有効射程距離：", rangeStr, pos);
+
+
+	// 右側の列
+	pos.x = col2X;
+	pos.y = currentY;
+	this->DrawParam(L"弾速：", speedStr , pos);
+	pos.y += lineHeight;
+	this->DrawParam(L"精度：", accuracyStr, pos);
+	pos.y += lineHeight;
+	this->DrawParam(L"ズーム：", zoomStr, pos);
+	pos.y += lineHeight;
+	this->DrawParam(L"レーザーサイト：", laserSightStr, pos);
+	pos.y += lineHeight;
+	this->DrawParam(L"敵貫通可能回数：", penetrationsStr, pos);
+	pos.y += lineHeight;
+	this->DrawParam(extraLabelStr, extraValueStr, pos);
+
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】パラメータの描画
+//*
+//* [引数]
+//* &_label : ラベル名
+//* &_value : 値
+//* &_pos : 位置
+//*
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void c_Title_SoldierSelect::DrawParam(const std::wstring& _label, const std::wstring& _value, const VECTOR2::VEC2& _pos)
+{
+	const float PARENT_BOX_SIZE_X = 300.0f;
+	const float PARENT_BOX_SIZE_Y = 50.0f;
+
+	// ラベル名
+	Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(1.0f, 1.0f, 1.0f));	// 白
+	Master::m_pDirectWriteManager->SetOutLine(2.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
+	// 右揃えなので、X位置はボックスの半分を引いたもの
+	Master::m_pDirectWriteManager->DrawStringToAligment(_label, VEC2(_pos.x - (PARENT_BOX_SIZE_X * 0.5f),_pos.y), "White_20_STD", H_ALIGNMENT::TRAILING, V_ALIGNMENT::TOP, VEC2(PARENT_BOX_SIZE_X, PARENT_BOX_SIZE_Y));
+
+	// 値
+	Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(0.0f, 1.0f, 1.0f));	// 水色
+	Master::m_pDirectWriteManager->DrawString(_value, VEC2(_pos.x + 150.0f, _pos.y), "White_20_STD", D2D1_DRAW_TEXT_OPTIONS_NONE, false);
+	Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(1.0f, 1.0f, 1.0f));	// 白
+
+	Master::m_pDirectWriteManager->SetOutLine(0.0f);
 }

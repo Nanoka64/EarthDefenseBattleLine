@@ -32,7 +32,8 @@ m_Angle_V(0.f),
 m_Fov(45.0f),
 m_NearClipDist(1.0f),
 m_FarClipDist(2000.0f),
-m_IsControl(true)
+m_IsControl(true),
+m_Shaker()
 {
 	this->set_Tag("Camera3D"); 
 	m_PosOffset.x = CAMERA_POS_OFFSET;
@@ -79,6 +80,8 @@ void Camera3D::LateUpdate(RendererEngine &renderer)
 {
 	m_IsControl = Master::m_pDataManager->get_IsCameraControl();
 
+	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
+
 	// 操作フラグがオフなら操作できない
 	if (m_IsControl)
 	{
@@ -104,7 +107,15 @@ void Camera3D::LateUpdate(RendererEngine &renderer)
 	lookDir.y = m_PosOffset.y * sinf(m_Angle_V);
 	lookDir.z = m_PosOffset.z * cosf(m_Angle_V) * sinf(m_Angle_H);
 
+
+	// シェイクの更新
+	m_Shaker.Update(deltaTime);
+
 	m_CameraPos = lookDir + m_FocusPoint;
+
+	// シェイクの適用
+	m_CameraPos = m_Shaker.Apply(m_CameraPos);
+
     m_LookDir = lookDir;
 
 	// カメラの位置
@@ -194,6 +205,48 @@ XMMATRIX Camera3D::get_ViewMatrix()const
 
 	return viewMat;
 }
+
+//*---------------------------------------------------------------------------------------
+//*【?】カメラシェイクの開始
+//*
+//* [引数]
+//* _duration : 持続時間
+//* &_strength : 強さ
+//*
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void Camera3D::RequestShake(float _duration, const VECTOR3::VEC3& _strength)
+{
+	m_Shaker.Start(_duration, _strength);
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】カメラシェイクの開始 
+//*     距離減衰ver 
+//*
+//* [引数]
+//* _duration : 持続時間
+//* &_strength : 強さ
+//* &_shakePos : シェイクを発生させる位置
+//* &maxRadius : シェイクを及ぼす最大距離
+//*
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void Camera3D::DistanceDecay(float _duration, const VECTOR3::VEC3& _strength, const VECTOR3::VEC3& _shakePos, float _maxRange)
+{
+	float dist = VEC3::DistanceSq(m_CameraPos, _shakePos); // スタートからの移動距離
+
+	if (_maxRange * _maxRange > dist)
+	{
+		float t = dist / (_maxRange * _maxRange);	// 0.0 ～ 1.0
+		float factor = 1.0f - t;    // そのままでは、最大（端）で1.0になってしまい、離れるほど大きくなってしまうので
+		VEC3 length = _strength * factor;
+
+		m_Shaker.Start(_duration, length);
+	}
+
+}
+
 
 void Camera3D::set_UpVec(const VECTOR3::VEC3& upVec)
 {

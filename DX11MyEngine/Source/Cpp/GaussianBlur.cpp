@@ -132,6 +132,8 @@ void GaussianBlur::ExcuteOnGPU(RendererEngine& renderer, float blurPow)
 
 void GaussianBlur::Term()
 {
+    m_pHorizontalBlurSprite.reset();
+    m_pVerticalBlurSprite.reset();
     SAFE_DELETE(m_pHorizontalBlur);
     SAFE_DELETE(m_pVerticalBlur);
 }

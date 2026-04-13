@@ -268,6 +268,9 @@
     <Filter Include="ソース ファイル\Tool\Resource">
       <UniqueIdentifier>{7d1e8573-a9e4-4491-bdc8-c43e7e5697bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\BaseComponent\Move\Behaviour">
+      <UniqueIdentifier>{89d84ff6-264b-4b4e-81d7-3f3ca4a98823}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Cpp\SHADER.cpp">
@@ -564,13 +567,7 @@
     <ClCompile Include="Source\Cpp\ObjectPool.cpp">
       <Filter>ソース ファイル\Obj</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Cpp\IMoveBehaviour.cpp">
-      <Filter>ソース ファイル\BaseComponent\Move</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Cpp\Component_MoveLogic.cpp">
-      <Filter>ソース ファイル\BaseComponent\Move</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Cpp\LinearMove_Behaviour.cpp">
       <Filter>ソース ファイル\BaseComponent\Move</Filter>
     </ClCompile>
     <ClCompile Include="..\XML_Excel\XmlArrange.cpp">
@@ -686,6 +683,15 @@
     </ClCompile>
     <ClCompile Include="Source\Cpp\Component_Player_HPBar.cpp">
       <Filter>ソース ファイル\Game\Component\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\IMoveBehaviour.cpp">
+      <Filter>ソース ファイル\BaseComponent\Move\Behaviour</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\LinearMove_Behaviour.cpp">
+      <Filter>ソース ファイル\BaseComponent\Move\Behaviour</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\HormingMove_Behaviour.cpp">
+      <Filter>ソース ファイル\BaseComponent\Move\Behaviour</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1010,13 +1016,7 @@
     <ClInclude Include="Source\Header\ObjectPool.h">
       <Filter>ソース ファイル\Obj</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\IMoveBehaviour.h">
-      <Filter>ソース ファイル\BaseComponent\Move</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Header\Component_MoveLogic.h">
-      <Filter>ソース ファイル\BaseComponent\Move</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\LinearMove_Behaviour.h">
       <Filter>ソース ファイル\BaseComponent\Move</Filter>
     </ClInclude>
     <ClInclude Include="..\XML_Excel\XmlArrange.h">
@@ -1147,6 +1147,15 @@
     </ClInclude>
     <ClInclude Include="Source\Header\Component_Player_HPBar.h">
       <Filter>ソース ファイル\Game\Component\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\IMoveBehaviour.h">
+      <Filter>ソース ファイル\BaseComponent\Move\Behaviour</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\LinearMove_Behaviour.h">
+      <Filter>ソース ファイル\BaseComponent\Move\Behaviour</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\HormingMove_Behaviour.h">
+      <Filter>ソース ファイル\BaseComponent\Move\Behaviour</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

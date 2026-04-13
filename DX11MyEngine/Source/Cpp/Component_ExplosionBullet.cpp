@@ -1,10 +1,11 @@
-#include "pch.h"
+#include "pch.h" 
 #include "Component_ExplosionBullet.h"
 #include "Component_MoveLogic.h"
 #include "Component_TimerDestruction.h"
 #include "Component_DecalRenderer.h"
 #include "Component_SphereCollider.h"
 #include "Component_Health.h"
+#include "Component_3DCamera.h"
 #include "RendererEngine.h"
 
 #include "GameObject.h"
@@ -14,8 +15,11 @@
 #include "ResourceManager.h"
 
 constexpr float DECAL_SIZE_FACTOR        = 100.0f;   // デカールの大きさの補正値
-constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 2.0f;    // デカールの奥行に加算する補正値
+constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 2.0f;     // デカールの奥行に加算する補正値
 constexpr float DECAL_LIFE_TIME = 10.0f;             // デカールの生存時間
+constexpr float SHAKE_MAX_RANGE_EXPLOSION_SCALE_FACTOR = 15.0f;  // カメラシェイク時、シェイクの最大距離を求める際に掛ける補正値
+constexpr float SHAKE_LENGTH_SCALE_FACTOR = 0.01f;               // カメラシェイク時、シェイクの大きさを求める際に掛ける補正値
+constexpr float SHAKEDURATION = 1.0f;                           // カメラシェイクの持続時間
 using namespace VECTOR3;
 
 //*---------------------------------------------------------------------------------------
@@ -57,9 +61,17 @@ void ExplosionBullet::Start(RendererEngine& renderer)
     m_CollisionTask =
         [this, &renderer](const class CollisionInfo& _other)
         {
-
             auto transform = m_pOwner.lock()->get_Transform().lock();
             VEC3 pos = transform->get_VEC3ToPos();
+            
+            // ****************************************************
+            //				 カメラシェイク
+            // ****************************************************
+            float maxRange = m_Parameter._explosionRadius * SHAKE_MAX_RANGE_EXPLOSION_SCALE_FACTOR;
+            float shaleLength = m_Parameter._explosionRadius * SHAKE_LENGTH_SCALE_FACTOR;
+            renderer.get_CameraComponent()->DistanceDecay(SHAKEDURATION, VEC3(shaleLength), pos, maxRange);
+
+
 
             // ****************************************************
             //				 爆発音再生

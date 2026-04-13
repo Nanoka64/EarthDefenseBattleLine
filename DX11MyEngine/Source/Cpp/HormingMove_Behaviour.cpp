@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "LinearMove_Behaviour.h"
+#include "HormingMove_Behaviour.h"
+
 
 using namespace VECTOR3;
 using namespace VECTOR2;
@@ -8,7 +9,7 @@ using namespace DirectX;
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
 //*----------------------------------------------------------------------------------------
-LinearMove_Behaviour::LinearMove_Behaviour()
+HormingMove_Behaviour::HormingMove_Behaviour()
 {
 
 }
@@ -16,39 +17,44 @@ LinearMove_Behaviour::LinearMove_Behaviour()
 //*---------------------------------------------------------------------------------------
 //*【?】デストラクタ
 //*----------------------------------------------------------------------------------------
-LinearMove_Behaviour::~LinearMove_Behaviour()
+HormingMove_Behaviour::~HormingMove_Behaviour()
 {
 
 }
 
 //*---------------------------------------------------------------------------------------
-//*【?】直線移動を行う
+//*【?】ホーミング移動を行う
 //*
 //* [引数]
 //* _deltaTime  : デルタタイム
-//* &_param     : 移動に必要なパラメータをまとめた構造体（この移動では方向と速度のみ使う）
+//* &_param     : 移動に必要なパラメータをまとめた構造体
 //* &_transform : トランスフォームの参照（constなのでsetではなく、行列など必要なパラメータがあるときなどに）
 //*
 //* [返値]
 //* VEC3 : 移動ベクトル
 //*----------------------------------------------------------------------------------------
-ResultMove LinearMove_Behaviour::MoveCalculate(float _deltaTime, const MoveParam& _param, const MyTransform& _transform)
+ResultMove HormingMove_Behaviour::MoveCalculate(float _deltaTime, const MoveParam& _param, const MyTransform& _transform)
 {
 	ResultMove res;
 
-	// 直線移動の計算
-	VEC3 forward = _param._moveDirection;		// 前方向のベクトルを取得
-	float targetAngleY = atan2f(forward.x, forward.z);
+	VEC3 crntPos = _transform.get_VEC3ToPos();
+	VEC3 crntRot = _transform.get_VEC3ToRotateToRad();
+	VEC3 targetDir = (_param._targetPos - crntPos).Normalize();		// 目標の方向
+	VEC3 moveVelocity = targetDir * _param._moveSpeed;				// 目標への移動ベクトル
+
+	//目標の方向ベクトルから角度値を算出c
+	float targetAngleY = atan2(targetDir.x, targetDir.z);
 
 	// 目標とするクォータニオン
 	XMVECTOR targetRotQ = XMQuaternionRotationRollPitchYaw(0.0f, targetAngleY, 0.0f);
+
 	XMVECTOR crntRotQ = _transform.get_RotationQuaternion();
+
 	// クォータニオンの球面線形補間
 	// 普通の線形補間だと、値が飛んでしまうためクォータニオンの場合は球面線形補間を使う
 	XMVECTOR newRotQ = XMQuaternionSlerp(crntRotQ, targetRotQ, _param._turnSpeed);
 
-	float speed = _param._moveSpeed;
-	res._moveVelocity = forward * speed;	// 移動量を計算
+	res._moveVelocity = moveVelocity;
 	res._RotQ = newRotQ;
 	return res;
 }

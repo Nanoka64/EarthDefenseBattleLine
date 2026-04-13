@@ -135,7 +135,9 @@ void ButtonUI::Draw(RendererEngine &renderer)
 {
 	auto transform = m_pMyTransform.lock();
 	VEC2 pos = transform->get_RectPosition();
+	Master::m_pDirectWriteManager->SetOutLine(2.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
 	Master::m_pDirectWriteManager->DrawString(m_Text, pos + m_TextOffsetPos, "White_40_STD");
+	Master::m_pDirectWriteManager->SetOutLine(0.0f);
 
 	if (!m_pSprite.expired())
 	{

@@ -40,7 +40,7 @@ void Ant_IdleState::OnExit(class EnemyController* pOwner)
 //*----------------------------------------------------------------------------------------
 int Ant_IdleState::Update(class EnemyController* pOwner)
 {
-	auto target = pOwner->get_Target();	// 目標オブジェクト
+	auto target = pOwner->get_Target().lock();	// 目標オブジェクト
 	if (target)
 	{
 		auto targetTransform = target->get_Transform().lock();
