@@ -15,13 +15,15 @@ struct MoveParam
     float _moveSpeed;               // 移動速度
     float _acceleration;            // 加速度
 	float _turnSpeed;               // 回転速度 
+    float _gravity;                 // 重力
 
     MoveParam() : 
         _moveDirection(VECTOR3::VEC3()),
         _targetPos(VECTOR3::VEC3()),
         _acceleration(0.0f),
         _turnSpeed(0.0f),
-        _moveSpeed(0.0f)
+        _moveSpeed(0.0f),
+        _gravity(0.0f)
     {
     }
 };

@@ -400,7 +400,7 @@ void RenderPipeline::Decal_PathRender(RendererEngine &renderer)
     Master::m_pBlendManager->DeviceToSetBlendState(BLEND_MODE::ALPHA);
 
     // ƒfƒJ[ƒ‹•`‰æ
-    auto decal = Master::m_pGameObjectManager->get_ObjectListByTag("BulletHole");
+    auto decal = Master::m_pGameObjectManager->get_ObjectsByTag("BulletHole");
     if (!decal.empty()) {
         for (auto& hole : decal) {
             hole->get_Component<DecalRenderer>()->Draw(renderer);
@@ -408,7 +408,7 @@ void RenderPipeline::Decal_PathRender(RendererEngine &renderer)
         }
     }
     decal.clear();
-    decal = Master::m_pGameObjectManager->get_ObjectListByTag("Ant_Splash");
+    decal = Master::m_pGameObjectManager->get_ObjectsByTag("Ant_Splash");
     if (!decal.empty()) {
         for (auto& hole : decal) {
             hole->get_Component<DecalRenderer>()->Draw(renderer);

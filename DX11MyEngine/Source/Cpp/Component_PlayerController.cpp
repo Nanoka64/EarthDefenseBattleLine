@@ -444,7 +444,6 @@ void PlayerController::OnCollisionEnter(const class CollisionInfo &other)
 	VEC3 normal = other.get_HitNormal();
 
 	// 法線のY成分が一定以上（例：0.7f以上で約45度以下の坂）なら床とみなす
-	// 反転された法線が来る仕様なら normal.y < -0.7f になる可能性があります。
 	if (normal.y < -0.7f)
 	{
 		m_IsGrounded = true;

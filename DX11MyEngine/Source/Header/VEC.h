@@ -164,6 +164,57 @@ namespace VECTOR3
 		static VEC3 Reflect(const VEC3& inVec, const VEC3& normal) {
 			return inVec - normal * (2.0f * Dot(inVec, normal));
 		}
+
+		/// <summary>
+		/// 二つの座標が指定の距離内に入ったか
+		/// </summary>
+		/// <param name="_posA">座標A</param>
+		/// <param name="_posB">座標B</param>
+		/// <param name="range">範囲</param>
+		/// <returns>入ったかどうか</returns>
+		static bool TargetInTheRange(const VEC3& _posA, const VEC3& _posB, float _range)
+		{
+			float dist = DistanceSq(_posA, _posB);
+
+			// 一定距離以上近づいたら
+			if (dist < _range * _range)
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// 指定距離内でなおかつ、自分の視界に入ったかどうか
+		/// </summary>
+		/// <param name="_myPos">自分の座標</param>
+		/// <param name="_targetPos">目標の座標</param>
+		/// <param name="_myDir">自分の方向</param>
+		/// <param name="_degAng">視界</param>
+		/// <param name="_range">距離</param>
+		/// <returns>入ったかどうか</returns>
+		static bool TargetInTheSight(VEC3 _myPos, VEC3 _targetPos,VEC3 _myDir, float _degAng, float _range)
+		{
+			VEC3 vDist = _targetPos - _myPos;		// ターゲットへの差分
+			VEC3 targetDir = vDist.Normalize();     // 方向
+
+			// 視界計算
+			// 自分の向きと内積を計算する
+			float dot = Dot(_myDir, targetDir);
+			float deg = acos(dot) * 180.0f / 3.14159265;
+
+			// 一定距離近づいたら
+			if (TargetInTheRange(_myPos, _targetPos, _range))
+			{
+				// 視界範囲に入ったら
+				if (deg <= _degAng)
+				{
+					return true;
+				}
+			}
+			return false;;
+		}
 	};
 }
 

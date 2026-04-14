@@ -37,7 +37,9 @@ ResultMove LinearMove_Behaviour::MoveCalculate(float _deltaTime, const MoveParam
 	ResultMove res;
 
 	// 直線移動の計算
-	VEC3 forward = _param._moveDirection;		// 前方向のベクトルを取得
+	VEC3 velocity = _param._moveDirection;
+
+	VEC3 forward = velocity;		// 前方向のベクトルを取得
 	float targetAngleY = atan2f(forward.x, forward.z);
 
 	// 目標とするクォータニオン

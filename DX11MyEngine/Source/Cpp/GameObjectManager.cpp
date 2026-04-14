@@ -609,7 +609,7 @@ std::shared_ptr<GameObject> GameObjectManager::get_ObjectByTag(const std::string
 //* 引数：1.タグ
 //* 返値：オブジェクトの参照ポインタリスト
 //*----------------------------------------------------------------------------------------
-std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectListByTag(const std::string &tag)
+std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectsByTag(const std::string &tag)
 {
     std::vector<std::shared_ptr<GameObject>> resList;
 
@@ -642,6 +642,79 @@ std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectListByTag(
 
     return resList;
 }
+
+//*---------------------------------------------------------------------------------------
+//* @:GameObjectManager Class 
+//*【?】指定タグのオブジェクトを読み取り専用で取得する
+//*     shared_ptrから生ポインタを取得
+//*     ※ 透明/不透明両方
+//* 
+//* 引数：1.タグ
+//* 返値：オブジェクト読み取り専用ポインタ
+//*----------------------------------------------------------------------------------------
+const GameObject* GameObjectManager::get_ObjectByTagConst(const std::string& _tag)
+{
+    // 不透明3Dオブジェクト**********************
+    for (auto& obj : m_3DOpaqueList) {
+        if (obj->get_Tag() == _tag) return obj.get(); // 
+    }
+
+    // 透明度のある3Dオブジェクト**********************
+    for (auto& obj : m_3DTranslucentList) {
+        if (obj->get_Tag() == _tag) return obj.get();
+    }
+
+    // 透明度のある2Dオブジェクト**********************
+    for (auto& obj : m_2DTranslucentList) {
+        if (obj->get_Tag() == _tag) return obj.get();
+    }
+
+    return nullptr; // 見つからない場合
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:GameObjectManager Class 
+//*【?】指定タグのオブジェクトvectorを読み取り専用で取得する
+//*     shared_ptrから生ポインタを取得
+//*     ※ 透明/不透明両方
+//* 
+//* 引数：1.タグ
+//* 返値：オブジェクト読み取り専用ポインタ
+//*----------------------------------------------------------------------------------------
+const std::vector<const GameObject*>  GameObjectManager::get_ObjectsByTagConst(const std::string& _tag)
+{
+    std::vector<const GameObject*>objects;
+
+    // 不透明3Dオブジェクト**********************
+    for (auto& obj : m_3DOpaqueList)
+    {
+        if (obj->get_Tag() == _tag)
+        {
+            objects.push_back(obj.get());
+        }
+    }
+
+    // 透明度のある3Dオブジェクト**********************
+    for (auto& obj : m_3DTranslucentList)
+    {
+        if (obj->get_Tag() == _tag)
+        {
+            objects.push_back(obj.get());
+        }
+    }
+
+    // 透明度のある2Dオブジェクト**********************
+    for (auto& obj : m_2DTranslucentList)
+    {
+        if (obj->get_Tag() == _tag)
+        {
+            objects.push_back(obj.get());
+        }
+    }
+
+    return objects;
+}
+
 
 //*---------------------------------------------------------------------------------------
 //* @:GameObjectManager Class 

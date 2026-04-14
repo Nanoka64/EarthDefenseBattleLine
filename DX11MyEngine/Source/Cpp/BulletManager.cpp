@@ -14,6 +14,7 @@
 
 using namespace VECTOR3;
 using namespace VECTOR2;
+using namespace UtilityData;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -240,12 +241,6 @@ bool BulletManager::Init(RendererEngine &renderer)
             auto bulletComp = obj->get_Component<ExplosionBullet>();
 
             auto trail = obj->get_Component<TrailRenderer>();
-            trail->set_Width(0.1f);
-            trail->set_MinVertexDistance(1.0f);
-            trail->set_DrawTime(30);
-            trail->set_EmissivePower(10.0f);
-            trail->set_Color(VECTOR4::VEC4(1.0f, 1.0f, 0.0f, 1.0f));
-            trail->set_PosRandVec(VEC3(0.5f));
 
             //// コライダーの使用をオンに
             //auto collider = obj->get_Component<BoxCollider>();
@@ -334,7 +329,7 @@ bool BulletManager::Init(RendererEngine &renderer)
 
             // 軌跡コンポーネントの追加
             auto trail = obj->add_Component<TrailRenderer>();
-            trail->set_Width(0.1f);
+            trail->set_Width(0.3f);
             trail->set_MinVertexDistance(1.0f);
             trail->set_DrawTime(30);
             trail->set_EmissivePower(10.0f);
@@ -609,8 +604,6 @@ void BulletManager::Shot(RendererEngine &renderer, const BulletTransformData &_t
 
     // 更新リストに登録
     m_ExtractedBulletMap[BULLET_TYPE::EXPLOSION].push_back(bulletObj);
-
-
 }
 
 //*---------------------------------------------------------------------------------------

@@ -97,7 +97,7 @@ void MiniMapRader::Start(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void MiniMapRader::Update(RendererEngine& renderer)
 {
-    auto antList = Master::m_pGameObjectManager->get_ObjectListByTag("Ant");
+    auto antList = Master::m_pGameObjectManager->get_ObjectsByTag("Ant");
 
     VEC3 playerPos = m_pPlayerObj.lock()->get_Transform().lock()->get_VEC3ToPos();
     float cameraAngleH = renderer.get_CameraComponent()->get_Angle_H();

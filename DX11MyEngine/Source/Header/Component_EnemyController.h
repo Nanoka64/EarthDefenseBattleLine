@@ -1,5 +1,6 @@
 #pragma once
 #include "IComponent.h"
+#include "ConstantUtilityData.h"
 
 // ***************************************************************************************
 // ---------------------------------------------------------------------------------------
@@ -19,22 +20,25 @@ private:
 	std::weak_ptr<class SkinnedMeshAnimator> m_pAnimatorComp;	// アニメータコンポーネント
 	std::weak_ptr<class Collider> m_pColliderComp;	// コライダーコンポーネント
 	std::weak_ptr<class MoveLogic> m_pMoveLogicComp;	// 移動コンポーネント
-	std::weak_ptr<GameObject> m_pTarget;	// 攻撃目標
+	const GameObject* m_pTarget;	// 攻撃目標
 	StateMachine<EnemyController> m_StateMachine;
 
 	VECTOR3::VEC3 m_MoveVelocity;	// 移動
+	VECTOR3::VEC3 m_StartPos;		// 開始位置
 	int m_CrntAnimID;				// 現在のアニメーション番号
 	float m_MoveSpeed;				// 移動速度
-	int m_StateTimer;				// ステート時間
+	float m_StateTimer;				// ステート時間
+	float m_Gravity;				// 重力
+	float m_GravityVelocity;		// 地面方向に掛かるベロシティ
 	bool m_IsDead;
 	bool m_IsAnim;					// アニメーション中かどうか
-
-
+	bool m_IsGrounded;				// 接地しているか
 public:
 	EnemyController(std::weak_ptr<GameObject> pOwner, int updateRank);
 	~EnemyController();
 
 	void Start(RendererEngine& renderer) override;	// 初期化
+	void LateUpdate(RendererEngine& renderer) override;	// 更新
 	void Update(RendererEngine& renderer) override;	// 更新
 	void Draw(RendererEngine& renderer) override;	// 描画
 	void OnCollisionEnter(const class CollisionInfo &_other)override;
@@ -60,7 +64,7 @@ public:
 	void set_MoveSpeed(float _spd) { m_MoveSpeed = _spd; }
 
 	/* 移動ベクトル */
-	VECTOR3::VEC3 get_MoveVelocity() const { return m_MoveVelocity; }
+	const VECTOR3::VEC3 &get_MoveVelocity() { return m_MoveVelocity; }
 	void set_MoveVelocity(const VECTOR3::VEC3 &_vel) { m_MoveVelocity = _vel; }
 
 	/* アニメーションの再生させるかどうか */
@@ -68,14 +72,25 @@ public:
 	void set_IsAnim(bool _flag) { m_IsAnim = _flag; }
 
 	/* 攻撃目標 */
-	std::weak_ptr<GameObject> get_Target() const { return m_pTarget; }
-	void set_Target(std::shared_ptr<GameObject> _pObj) { m_pTarget = _pObj; }
+	const GameObject* get_Target() const { return m_pTarget; }
+	//void set_Target(std::shared_ptr<GameObject> _pObj) { m_pTarget = _pObj; }
 
 	/* 攻撃目標のトランスフォームを取得 */
 	std::shared_ptr<class MyTransform> get_TargetTransform() const;
 
 	/* ステート時間 */
-	int get_StateTimer()const { return m_StateTimer; }
+	float get_StateTimer()const { return m_StateTimer; }
+	void clear_StateTimer() { m_StateTimer = 0.0f; }	
+
+
+	/* 移動ロジックの切り替え */
+	void set_MoveLogicState(UtilityData::MOVE_BEHAVIOUR_TYPE _moveType);
+
+	/* 移動コンポーネントを取得する */
+	std::weak_ptr<class MoveLogic> get_MoveLogicComponent() { return m_pMoveLogicComp; };
+
+	/* 開始時の位置を取得する*/
+	const VECTOR3::VEC3 &get_StartPos() { return m_StartPos; }
 
 };
 

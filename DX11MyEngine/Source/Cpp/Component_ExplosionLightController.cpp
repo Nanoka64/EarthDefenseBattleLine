@@ -44,13 +44,13 @@ void ExplosionLightController::Start(RendererEngine &renderer)
 	// 念のため、Setup関数の方に移してもいいかも
 	m_pPointLight = m_pOwner.lock()->get_Component<PointLight>();
 
-	m_pBoxMesh = std::make_unique<DebugMesh>();
-	bool res = m_pBoxMesh->Setup(renderer, DEBUG_MESHS_TYPE::CUBE);
-	if (res == false)
-	{
-		assert(false);
-		MessageBox(NULL, "デバッグ用メッシュの生成ができませんでした", "Collider", MB_OK);
-	}
+	//m_pBoxMesh = std::make_unique<DebugMesh>();
+	//bool res = m_pBoxMesh->Setup(renderer, DEBUG_MESHS_TYPE::CUBE);
+	//if (res == false)
+	//{
+	//	assert(false);
+	//	MessageBox(NULL, "デバッグ用メッシュの生成ができませんでした", "Collider", MB_OK);
+	//}
 }
 
 
@@ -98,22 +98,22 @@ void ExplosionLightController::Update(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void ExplosionLightController::Draw(RendererEngine &renderer)
 {
-	auto pContext = renderer.get_DeviceContext();
-	XMMATRIX localMat = XMMatrixIdentity();
+	//auto pContext = renderer.get_DeviceContext();
+	//XMMATRIX localMat = XMMatrixIdentity();
 
-	auto transform = m_pOwner.lock()->get_Transform().lock();
-	VEC3 ownerPos = transform->get_VEC3ToPos();
+	//auto transform = m_pOwner.lock()->get_Transform().lock();
+	//VEC3 ownerPos = transform->get_VEC3ToPos();
 
-	XMVECTOR scl = VEC3(m_pPointLight.lock()->get_Range());
-	XMVECTOR pos = ownerPos; // 中心位置のオフセットを足す
+	//XMVECTOR scl = VEC3(m_pPointLight.lock()->get_Range());
+	//XMVECTOR pos = ownerPos; // 中心位置のオフセットを足す
 
-	XMMATRIX mtxS = XMMatrixScalingFromVector(scl);
-	XMMATRIX mtxT = XMMatrixTranslationFromVector(pos);
+	//XMMATRIX mtxS = XMMatrixScalingFromVector(scl);
+	//XMMATRIX mtxT = XMMatrixTranslationFromVector(pos);
 
-	localMat = transform->get_ExcludingRotWorldMtx(mtxS, mtxT);
+	//localMat = transform->get_ExcludingRotWorldMtx(mtxS, mtxT);
 
-	// メッシュ表示
-	m_pBoxMesh->Draw(renderer, localMat);
+	//// メッシュ表示
+	//m_pBoxMesh->Draw(renderer, localMat);
 }
 
 

@@ -188,4 +188,18 @@ namespace UtilityData
 	};
 
 
+	/// <summary>
+	/// 移動挙動の種類
+	/// </summary>
+	enum class MOVE_BEHAVIOUR_TYPE : unsigned char
+	{
+		NONE,
+
+		LINEAR,     // 直線移動
+		HOMING,     // ホーミング移動
+	};
+
+
+
+
 };

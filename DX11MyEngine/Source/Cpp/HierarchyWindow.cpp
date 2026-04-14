@@ -48,9 +48,9 @@ void HierarchyWindow::Update(RendererEngine &renderer)
     using namespace Tool;
 
     std::shared_ptr<GameObject> selectedObject = nullptr;   // 選択されたオブジェクトのポインタ
-    std::vector<std::shared_ptr<GameObject>> opawueObjects3D = Master::m_pGameObjectManager->get_3DOpaque_ObjectList();
-    std::vector<std::shared_ptr<GameObject>> transparentObjects3D = Master::m_pGameObjectManager->get_3DTransparent_ObjectList();
-    std::vector<std::shared_ptr<GameObject>> transparentObjects2D = Master::m_pGameObjectManager->get_2DTransparent_ObjectList();
+    std::vector<std::shared_ptr<GameObject>> opawueObjects3D = Master::m_pGameObjectManager->get_3DOpaque_Objects();
+    std::vector<std::shared_ptr<GameObject>> transparentObjects3D = Master::m_pGameObjectManager->get_3DTransparent_Objects();
+    std::vector<std::shared_ptr<GameObject>> transparentObjects2D = Master::m_pGameObjectManager->get_2DTransparent_Objects();
     
     std::vector<std::shared_ptr<GameObject>> objects;
 

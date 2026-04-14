@@ -12,6 +12,14 @@ namespace EnemyData
 		ENEMY_TYPE_NUM,
 	};
 
+
+	/*
+	* 
+	* PT : 巡回中
+	* AT : 戦闘態勢
+	* 
+	*/
+
 	/// <summary>
 	/// アリのステート
 	/// </summary>
@@ -23,15 +31,13 @@ namespace EnemyData
 		
 
 		// アクティブ
-		ANT_STATE_MOVE,			// 移動
-		ANT_STATE_TRACKING,		// 追従
-		ANT_STATE_ATTACK_BITE,	// 噛みつき攻撃
-		ANT_STATE_ATTACK_ACID,	// 酸攻撃
-		ANT_STATE_DAMAGED,		// ダメージ
-		ANT_STATE_BLOWN_AWAY,	// 爆発による吹き飛び
-		ANT_STATE_FALLING,		// 落下中
-		ANT_STATE_DEAD,			// 死亡
+		ANT_STATE_ACTIVE_MOVE,			// 移動
+		ANT_STATE_ACTIVE_TRACKING,		// 追従
+		ANT_STATE_ACTIVE_ATTACK_BITE,	// 噛みつき攻撃
+		ANT_STATE_ACTIVE_ATTACK_ACID,	// 酸攻撃
+		ANT_STATE_ACTIVE_DAMAGED,		// ダメージ
+		ANT_STATE_ACTIVE_BLOWN_AWAY,	// 爆発による吹き飛び
+		ANT_STATE_ACTIVE_FALLING,		// 落下中
+		ANT_STATE_ACTIVE_DEAD,			// 死亡
 	};
-
-
 }

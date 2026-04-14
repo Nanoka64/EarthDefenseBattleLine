@@ -62,7 +62,7 @@ int c_Game_Play::Update(SceneManager *pOwner)
         pOwner->OnSceneClose();
     }
     
-    auto antList = Master::m_pGameObjectManager->get_ObjectListByTag("Ant");
+    auto antList = Master::m_pGameObjectManager->get_ObjectsByTag("Ant");
     m_EnemyNum = INT_CAST(antList.size());
     // “G‚ª‹‚È‚­‚È‚Á‚½‚çƒŠƒUƒ‹ƒg‚Ö
     if (m_EnemyNum == 0)

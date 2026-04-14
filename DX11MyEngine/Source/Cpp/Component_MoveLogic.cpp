@@ -7,6 +7,7 @@
 
 using namespace GIGA_Engine;
 using namespace VECTOR3;
+using namespace UtilityData;
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
@@ -16,7 +17,8 @@ using namespace VECTOR3;
 //*----------------------------------------------------------------------------------------
 MoveLogic::MoveLogic(std::weak_ptr<GameObject> pOwner, int updateRank)
     :IComponent(pOwner, updateRank),
-    m_pMoveBehaviour(nullptr)
+    m_pMoveBehaviour(nullptr),
+    m_GravityVelocity(0.0f)
 {
     this->set_Tag("MoveLogic");
 }
@@ -68,6 +70,19 @@ void MoveLogic::Calculate(const MoveParam& _param)
             // 移動ベクトルと回転ベクトルをもとに、新しい位置と回転を計算する
             VEC3 crntPos = pTransform->get_VEC3ToPos();
             VEC3 newPos = crntPos + (res._moveVelocity * deltaTime);
+
+            // 重力があるなら、重力処理を行う
+            if (_param._gravity > 0.0f)
+            {
+                m_GravityVelocity -= _param._gravity * deltaTime;
+
+                newPos.y += m_GravityVelocity * deltaTime;
+                if (newPos.y < 0.0f)
+                {
+                    newPos.y = 0.0f;
+                    m_GravityVelocity = 0.0f;
+                }
+            }
 
             // 反映
             pTransform->set_Pos(newPos);

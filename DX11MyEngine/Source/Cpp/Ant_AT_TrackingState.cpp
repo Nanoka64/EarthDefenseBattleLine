@@ -1,0 +1,104 @@
+#include "pch.h"
+#include "Ant_StateHeader.h"
+#include "Component_EnemyController.h"
+#include "Component_MoveLogic.h"
+#include "GameObject.h"
+
+using namespace VECTOR3;
+using namespace VECTOR2;
+using namespace EnemyData;
+using namespace UtilityData;
+
+
+//*---------------------------------------------------------------------------------------
+//* @:Ant_AT_TrackingState Class 
+//*【?】開始
+//* 引数：1.EnemyController
+//* 返値：void
+//*----------------------------------------------------------------------------------------
+void Ant_AT_TrackingState::OnEnter(class EnemyController *pOwner)
+{
+	pOwner->set_IsAnim(true);
+	pOwner->set_MoveSpeed(12.0f);
+
+	// 追従
+	pOwner->set_MoveLogicState(MOVE_BEHAVIOUR_TYPE::HOMING);
+
+	// 追跡時間
+	m_TrackingDuration = Master::m_pRandomManager->GetFloatRandom(TRACKING_TIME_MIN, TRACKING_TIME_MAX);
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:Ant_AT_TrackingState Class 
+//*【?】終了
+//* 引数：1.EnemyController
+//* 返値：void
+//*----------------------------------------------------------------------------------------
+void Ant_AT_TrackingState::OnExit(class EnemyController *pOwner)
+{
+	pOwner->clear_StateTimer();
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:Ant_AT_TrackingState Class 
+//*【?】更新
+//* 引数：1.EnemyController
+//* 返値：void
+//*----------------------------------------------------------------------------------------
+int Ant_AT_TrackingState::Update(class EnemyController *pOwner)
+{
+	auto targetObj = pOwner->get_Target();
+	auto myObj = pOwner->get_OwnerObj().lock();
+
+	// 目標が居なくなったら待機状態へ戻る
+	if (targetObj == nullptr || myObj == nullptr)
+	{
+		pOwner->ChangeState(ANT_STATE::ANT_STATE_PATROL_IDLE);
+	}
+	else
+	{
+		//=========================================================================================
+		//
+		//						追従期間を終えたら、アクティブ時の移動ステートへ
+		//
+		//=========================================================================================
+		if (pOwner->get_StateTimer() > m_TrackingDuration)
+		{
+			return ANT_STATE::ANT_STATE_ACTIVE_MOVE;
+		}
+
+		auto targetTransform = targetObj->get_Transform().lock();
+		auto myTransform = myObj->get_Transform().lock();
+
+		/* 追いかけ移動を行う */
+		VEC3 targetPos = targetTransform->get_VEC3ToPos();	// 目標位置
+		VEC3 myPos = myTransform->get_VEC3ToPos();			// 自分の位置
+		VEC3 targetDir = (targetPos - myPos).Normalize();	// 目標方向
+
+
+		// 親の移動コンポーネントを使い、移動処理を行う
+		MoveParam movePram;
+		movePram._moveSpeed = pOwner->get_MoveSpeed();
+		movePram._turnSpeed = 0.1f;
+		movePram._targetPos = targetPos;
+		auto move = pOwner->get_MoveLogicComponent().lock();
+		move->Calculate(movePram);
+
+		
+		//=========================================================================================
+		//
+		//						距離が離れたら待機ステートへ戻る
+		//
+		//=========================================================================================
+		if (VEC3::Distance(myPos, targetPos) < 10.0f)
+		{
+			return ANT_STATE::ANT_STATE_ACTIVE_ATTACK_ACID;
+		}
+
+		// 移動ベクトルを渡す
+		pOwner->set_MoveVelocity(targetDir * pOwner->get_MoveSpeed());
+	}
+
+	return ANT_STATE::ANT_STATE_ACTIVE_TRACKING;
+}
+

@@ -163,10 +163,12 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     VEC3 crntPos = transform->get_VEC3ToPos();
     auto moveComp = m_pOwner.lock()->get_Component<MoveLogic>();
     float moveDistance = VEC3::Distance(crntPos, m_PrevPos);
+    float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 
     MoveParam param;
     param._moveDirection = m_MoveDir;// ※マイナスにしているのはプレイヤーの方向がおかしいせい（後で直す）
     param._moveSpeed = m_Parameter._speed;
+    param._gravity = m_Parameter._gravityScale;
 
     // 前回の位置として保持
     m_PrevPos = crntPos;  

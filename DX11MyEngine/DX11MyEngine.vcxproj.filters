@@ -271,6 +271,12 @@
     <Filter Include="ソース ファイル\BaseComponent\Move\Behaviour">
       <UniqueIdentifier>{89d84ff6-264b-4b4e-81d7-3f3ca4a98823}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Game\Component\Enemy\State_Ant\Active">
+      <UniqueIdentifier>{937c8d4c-69cb-4bf1-a82d-3d0f82d2afe2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Component\Enemy\State_Ant\Patrol">
+      <UniqueIdentifier>{0735c5e9-e9fb-479a-8392-3720bdef1e41}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Cpp\SHADER.cpp">
@@ -534,17 +540,11 @@
     <ClCompile Include="Source\Cpp\Component_EnemyController.cpp">
       <Filter>ソース ファイル\Game\Component\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Cpp\Ant_IdleState.cpp">
-      <Filter>ソース ファイル\Game\Component\Enemy\State_Ant</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Cpp\SceneFactory.cpp">
       <Filter>ソース ファイル\State\Factory</Filter>
     </ClCompile>
     <ClCompile Include="Source\Cpp\EnemyStateFactory.cpp">
       <Filter>ソース ファイル\State\Factory</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Cpp\Ant_TrackingState.cpp">
-      <Filter>ソース ファイル\Game\Component\Enemy\State_Ant</Filter>
     </ClCompile>
     <ClCompile Include="Source\Cpp\Component_DecalRenderer.cpp">
       <Filter>ソース ファイル\BaseComponent\Mesh\UtilityMesh</Filter>
@@ -692,6 +692,21 @@
     </ClCompile>
     <ClCompile Include="Source\Cpp\HormingMove_Behaviour.cpp">
       <Filter>ソース ファイル\BaseComponent\Move\Behaviour</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Ant_AT_AttackAcid.cpp">
+      <Filter>ソース ファイル\Game\Component\Enemy\State_Ant\Active</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Ant_AT_MoveState.cpp">
+      <Filter>ソース ファイル\Game\Component\Enemy\State_Ant\Active</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Ant_AT_TrackingState.cpp">
+      <Filter>ソース ファイル\Game\Component\Enemy\State_Ant\Active</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Ant_PT_IdleState.cpp">
+      <Filter>ソース ファイル\Game\Component\Enemy\State_Ant\Patrol</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Ant_PT_MoveState.cpp">
+      <Filter>ソース ファイル\Game\Component\Enemy\State_Ant\Patrol</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

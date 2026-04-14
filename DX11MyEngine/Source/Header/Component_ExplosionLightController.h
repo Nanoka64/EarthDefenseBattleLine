@@ -31,7 +31,7 @@ private:
 	ExplosionLightData m_Parameter;
 	float m_Timer;
 	std::weak_ptr<class PointLight> m_pPointLight;
-	std::unique_ptr<class DebugMesh> m_pBoxMesh;	// デバッグ用メッシュ
+	//std::unique_ptr<class DebugMesh> m_pBoxMesh;	// デバッグ用メッシュ
 
 public:
 	ExplosionLightController(std::weak_ptr<GameObject> pOwner, int updateRank = 100);

@@ -12,11 +12,13 @@
 #include "CollisionInfo.h"
 #include "MeshFactory.h"
 #include "ResourceManager.h"
+
+
 using namespace GIGA_Engine;
 using namespace VECTOR3;
 using namespace VECTOR2;
-
 using namespace EnemyData;
+using namespace UtilityData;
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
@@ -29,10 +31,13 @@ EnemyController::EnemyController(std::weak_ptr<GameObject> pOwner, int updateRan
     m_IsDead(false),
 	m_StateMachine(this),
 	m_IsAnim(false),
+	m_IsGrounded(false),
 	m_CrntAnimID(-1),
 	m_MoveSpeed(0.0f),
 	m_MoveVelocity(VECTOR3::VEC3()),
-	m_StateTimer(0)
+	m_StateTimer(0),
+	m_pTarget(nullptr),
+	m_Gravity(18.0f)
 {
     this->set_Tag("EnemyController");
 }
@@ -80,7 +85,7 @@ void EnemyController::Start(RendererEngine& renderer)
 			rot.y = Tool::RandRange(-3.14f, 3.14f);
 			rot.z = Tool::RandRange(-3.14f, 3.14f);
 
-			ChangeState(ANT_STATE::ANT_STATE_TRACKING);
+			ChangeState(ANT_STATE::ANT_STATE_ACTIVE_TRACKING);
 
 			// ****************************************************
 			//				 被弾音再生
@@ -181,7 +186,8 @@ void EnemyController::Start(RendererEngine& renderer)
 		}
 	);
 
-	m_MoveSpeed = 7.5f;
+	// 開始時の座標を入れる
+	m_StartPos = m_pOwner.lock()->get_Transform().lock()->get_VEC3ToPos();
 
 	// ステートの作成（TODO:外から種類を変えられるようにする）
 	EnemyStateFactory::Create(m_StateMachine, ENEMY_TYPE::ENEMY_TYPE_ANT_Normal, renderer);
@@ -189,7 +195,7 @@ void EnemyController::Start(RendererEngine& renderer)
 
 	m_pMoveLogicComp.lock()->Register(MOVE_BEHAVIOUR_TYPE::HOMING);
 	m_pMoveLogicComp.lock()->Register(MOVE_BEHAVIOUR_TYPE::LINEAR);
-	m_pMoveLogicComp.lock()->ChangeBehaviour(MOVE_BEHAVIOUR_TYPE::HOMING);
+	m_pMoveLogicComp.lock()->ChangeBehaviour(MOVE_BEHAVIOUR_TYPE::LINEAR);
 }
 
 
@@ -202,39 +208,58 @@ void EnemyController::Start(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void EnemyController::Update(RendererEngine& renderer)
 {
+	m_IsGrounded = false;
+}
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】遅延更新
+//*
+//* [引数]
+//* &renderer : 描画エンジンの参照
+//* [返値]なし
+//*----------------------------------------------------------------------------------------
+void EnemyController::LateUpdate(RendererEngine& renderer)
+{
 	if (m_IsDead)
 	{
 		m_pColliderComp.lock()->set_IsEnable(false);	// コライダーの判定をオフに
 		m_pOwner.lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DELETE);
 	}
-
 	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 
-
-	auto target = Master::m_pGameObjectManager->get_ObjectByTag("Player");
+	auto target = Master::m_pGameObjectManager->get_ObjectByTagConst("Player");
 	m_pTarget = target;
+
+	m_pAnimatorComp.lock()->set_IsAnim(m_IsAnim);
+	m_StateTimer += deltaTime;	// タイマー進める
 
 	// ステートの実行
 	m_StateMachine.Update();
 
-	m_pAnimatorComp.lock()->set_IsAnim(m_IsAnim);
 
-	m_StateTimer++;
-
-
-	// 移動処理（今後移動コンポーネント等にまとめる）
-
-	MoveParam movePram;
-	movePram._moveSpeed = m_MoveSpeed;
-	movePram._turnSpeed = 0.1f;
-	movePram._targetPos = target->get_Transform().lock()->get_VEC3ToPos();
-	auto move = m_pMoveLogicComp.lock();
-	move->Calculate(movePram);
-
+	// ステート内で移動処理が実行されるので、移動後の値が取れる
 	auto myTransform = m_pOwner.lock()->get_Transform().lock();
 	VEC3 newPos = myTransform->get_VEC3ToPos();
 	newPos.y = 0.0f;
+
+
+	//if(m_IsGrounded == false)
+	//{
+	//	// 空中にいる場合は重力をかけ続ける
+	//	m_GravityVelocity -= m_Gravity * deltaTime;
+
+	//	// 世界の裏側に落下した場合
+	//	if (newPos.y < -100.0f)
+	//	{
+	//		m_GravityVelocity = 0.0f;
+	//		myTransform->set_Pos(VEC3(0.0f, 100.0f, 0.0f));
+	//	}
+	//}
+	//newPos.y += m_GravityVelocity;
+
 	myTransform->set_Pos(newPos);
+
 
 	////目標の方向ベクトルから角度値を算出c
 	//float targetAngleY = atan2(m_MoveVelocity.x, m_MoveVelocity.z);
@@ -277,6 +302,18 @@ void EnemyController::OnCollisionEnter(const class CollisionInfo& _other)
 	if (_other.get_HitObject().lock()->get_Tag() == "Player")
 	{
 		_other.get_HitObject().lock()->get_Component<Health>()->TakeDamage(0.1f);
+	}
+
+	VEC3 normal = _other.get_HitNormal();
+
+	// 法線のY成分が一定以上（例：0.7f以上で約45度以下の坂）なら床とみなす
+	if (normal.y < -0.7f)
+	{
+		// めり込み防止のため、下方向への速度（重力による落下速度）をリセット
+		if (m_GravityVelocity < 0.0f) {
+			m_GravityVelocity = 0.0f;
+		}
+		m_IsGrounded = true;
 	}
 
 	//// 通常弾
@@ -341,10 +378,22 @@ void EnemyController::ChangeAnimation(const int _newId)
 //*----------------------------------------------------------------------------------------
 std::shared_ptr<MyTransform> EnemyController::get_TargetTransform() const
 {
-	if (m_pTarget.lock())
+	if (m_pTarget)
 	{
-		return m_pTarget.lock()->get_Transform().lock();
+		return m_pTarget->get_Transform().lock();
 	}
 
 	return nullptr;
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】移動ロジックの切り替え
+//*
+//* [引数]
+//*  _moveType : 移動タイプ
+//* [返値]なし
+//*----------------------------------------------------------------------------------------
+void EnemyController::set_MoveLogicState(UtilityData::MOVE_BEHAVIOUR_TYPE _moveType)
+{
+	m_pMoveLogicComp.lock()->ChangeBehaviour(_moveType);
 }

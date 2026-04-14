@@ -25,6 +25,7 @@ public:
 
 	int GetIntRandom(int _min, int _max);
 	float GetFloatRandom(float _min, float _max);
+    VECTOR3::VEC3& GetVEC3Random(const VECTOR3::VEC3& _min, const VECTOR3::VEC3& _max);
 
 private:
 	// ÉRÉsÅ[ã÷é~
