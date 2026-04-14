@@ -9,6 +9,7 @@
 using namespace VECTOR3;
 using namespace VECTOR2;
 using namespace UtilityData;
+using namespace DirectX;
 using namespace EnemyData;
 
 //*---------------------------------------------------------------------------------------
@@ -31,7 +32,7 @@ void Ant_PT_MoveState::OnEnter(class EnemyController* pOwner)
 
 	// 移動方向
 	m_MoveDir = Master::m_pRandomManager->GetVEC3Random(DIR_RAND_MIN, DIR_RAND_MAX);
-
+	m_MoveDir.y = 0.0f;
 
 
 	m_IsDirChange = false;
@@ -90,6 +91,7 @@ int Ant_PT_MoveState::Update(class EnemyController* pOwner)
 		{
 			m_IsDirChange = true;
 			m_MoveDir = Master::m_pRandomManager->GetVEC3Random(DIR_RAND_MIN, DIR_RAND_MAX);
+			m_MoveDir.y = 0.0f;
 		}
 
 		/* 移動範囲外に出ていたら、反射させる */
@@ -97,23 +99,6 @@ int Ant_PT_MoveState::Update(class EnemyController* pOwner)
 			VEC3 boundaryNorm = startPos - myPos;
 			m_MoveDir = VEC3::Reflect(m_MoveDir, boundaryNorm.Normalize());
 		}
-
-		// 壁のぼり
-		//int collisionMask = UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);
-		//CollisionInfo hitInfo;
-		//CollInData_Ray rayData;
-		//rayData._point = myPos;
-		//rayData._dir = m_MoveDir * 2.0f;
-		//if (Master::m_pCollisionManager->CheckRaycast(rayData, collisionMask, &hitInfo))
-		//{
-		//	VEC3 hitNorm = hitInfo.get_HitNormal();
-		//	VEC3 hitPoint = hitInfo.get_HitPoint();
-		//	VEC3 right = VEC3::Cross(m_MoveDir, hitNorm);
-		//	VEC3 forward = VEC3::Cross(right, hitNorm);
-		//	//DirectX::XMVECTOR newRot = DirectX::XMQuaternionRotationRollPitchYaw();
-		//	float dist = VEC3::DistanceSq(myPos, hitPoint);
-		//	myTransform->set_RotateToRad(dist, 0.0f, 0.0f);
-		//}
 
 		/* 親の移動コンポーネントを使い、移動処理を行う */
 		// 方向を変えて、移動させる
@@ -123,6 +108,48 @@ int Ant_PT_MoveState::Update(class EnemyController* pOwner)
 		movePram._moveDirection = m_MoveDir;
 		auto move = pOwner->get_MoveLogicComponent().lock();
 		move->Calculate(movePram);
+
+
+		// 壁のぼり
+		//VEC3 myForward = myTransform->get_Forward();
+
+		//// 前方トレース
+		//int collisionMask = UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);
+		//CollisionInfo hitInfo;
+		//CollInData_Ray frontTraceRay;
+		//frontTraceRay._point = myPos;
+		//frontTraceRay._dir = myForward * 10.0f;
+		//// 地面トレース
+		//CollInData_Ray groundTraceRay;
+		//groundTraceRay._point = myPos;
+		//groundTraceRay._dir = (myTransform->get_Up() * -1.0f) * 5.0f;	// 上方向を反転
+		//if (Master::m_pCollisionManager->CheckRaycast(frontTraceRay, collisionMask, &hitInfo))
+		//{
+		//	VEC3 hitNorm = hitInfo.get_HitNormal();	// 衝突した面の法線を上ベクトルにする
+		//	VEC3 hitPoint = hitInfo.get_HitPoint();
+		//	VEC3 forward = myForward;
+		//	float dot = VEC3::Dot(forward, hitNorm);
+		//	forward = forward - (hitNorm * dot);
+		//	forward = forward.Normalize();
+
+		//	VEC3 right = VEC3::Cross(hitNorm, forward).Normalize();
+		//	forward = VEC3::Cross(right, hitNorm).Normalize();
+		//	XMMATRIX mat = XMMatrixIdentity();
+		//	mat.r[0] = right;    // X軸
+		//	mat.r[1] = hitNorm;  // Y軸
+		//	mat.r[2] = forward;  // Z軸 
+
+		//	// クォータニオンへ変換
+		//	XMVECTOR targetQuat = XMQuaternionRotationMatrix(mat);
+
+		//	auto rotQ = myTransform->get_RotationQuaternion();
+		//	rotQ = XMQuaternionSlerp(rotQ, targetQuat, 0.5f);
+		//	rotQ = XMQuaternionNormalize(rotQ);
+		//	myTransform->set_RotationQuaternion(rotQ);
+
+		//	m_MoveDir = myTransform->get_Forward();
+		//}
+
 
 		VEC3 newPos = myTransform->get_VEC3ToPos();
 

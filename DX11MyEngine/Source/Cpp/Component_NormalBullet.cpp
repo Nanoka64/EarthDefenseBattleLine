@@ -16,6 +16,7 @@
 #include "Component_Collider.h"
 
 using namespace GIGA_Engine;
+using namespace UtilityData;
 using namespace Input;
 using namespace VECTOR3;
 
@@ -63,7 +64,39 @@ void NormalBullet::Start(RendererEngine& renderer)
     m_CollisionTask =
         [this, &renderer](const class CollisionInfo& _other)
         {
+            //*****************************************************************************************
+            //						衝突した際の処理
+            //*****************************************************************************************
+            auto hitObj = _other.get_HitObject().lock();
+            if (!hitObj) return;
+            COLLISION_CATEGORY hitCategory = _other.get_HitCollider().lock()->get_CollisionCategory();
 
+            // 相手がHealthComponentを持っているか確認（破壊可能な建物は壊せないように）
+            auto health = hitObj->get_Component<Health>();
+            if (health && hitCategory != COLLISION_CATEGORY::DESTRUCTION_BUILDING)
+            {
+                // 弾が保持しているダメージ値を渡す
+                health->TakeDamage(m_Parameter._damage);
+            }
+
+            // 建物に当たったら即消えるようにして、その他は貫通数を減らす
+            if (hitCategory == COLLISION_CATEGORY::BUILDING || hitCategory == COLLISION_CATEGORY::DESTRUCTION_BUILDING)
+            {
+                m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
+            }
+            else
+            {
+                m_CrntPenetrationCount++; // 貫通数を増やす
+
+                if (m_CrntPenetrationCount >= m_Parameter._penetrationsCount)
+                {
+                    m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
+                }
+            }
+
+            //*****************************************************************************************
+            //						デカールの生成
+            //*****************************************************************************************
             auto matPtr = Master::m_pResourceManager->FindMaterial("Decal_BulletHole");
 
             SetupMaterialInfo matInfo[1];
@@ -135,7 +168,9 @@ void NormalBullet::Start(RendererEngine& renderer)
             auto timer = obj->add_Component<TimerDestruction>();
             timer->set_LifeTime(DECAL_LIFE_TIME);  // 生存時間
 
-            // エフェクト
+            //*****************************************************************************************
+            //						エフェクトの再生
+            //*****************************************************************************************
             VEC3 effectRot = VEC3(pitch, yaw, 0.0f);
             int spark_handle = Master::m_pEffectManager->PlayEffect("Spark");   // 火花
             int smoke_handle = Master::m_pEffectManager->PlayEffect("Smoke");   // 煙
@@ -191,7 +226,7 @@ void NormalBullet::Update(RendererEngine &renderer)
     CollInData_Ray ray;
     ray._point = crntPos;
 	ray._dir = newPos - crntPos;    // 前回の位置から新しい位置へのベクトル
-    unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);
+    unsigned mask = m_Parameter._collisionMask;
     CollisionInfo hitInfo;
 
     if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
@@ -200,39 +235,12 @@ void NormalBullet::Update(RendererEngine &renderer)
         auto transform = owner->get_Transform().lock();
         transform->set_Pos(hitInfo.get_HitPoint());     // 衝突位置に合わせる
 
-
+        // 衝突時の処理
         if (m_CollisionTask)
         {
             m_CollisionTask(hitInfo);
         }
 
-        auto hitObj = hitInfo.get_HitObject().lock();
-        if (!hitObj) return;
-        COLLISION_CATEGORY hitCategory = hitInfo.get_HitCollider().lock()->get_CollisionCategory();
-
-        // 相手がHealthComponentを持っているか確認（破壊可能な建物は壊せないように）
-        auto health = hitObj->get_Component<Health>();
-        if (health && hitCategory != COLLISION_CATEGORY::DESTRUCTION_BUILDING)
-        {
-            // 弾が保持しているダメージ値を渡す
-            health->TakeDamage(m_Parameter._damage);
-        }
-
-
-        // 建物に当たったら即消えるようにして、その他は貫通数を減らす
-        if (hitCategory == COLLISION_CATEGORY::BUILDING || hitCategory == COLLISION_CATEGORY::DESTRUCTION_BUILDING)
-        {
-            m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
-        }
-        else
-        {
-            m_CrntPenetrationCount++; // 貫通数を増やす
-
-            if (m_CrntPenetrationCount >= m_Parameter._penetrationsCount)
-            {
-                m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
-            }
-        }
     }
 }
 

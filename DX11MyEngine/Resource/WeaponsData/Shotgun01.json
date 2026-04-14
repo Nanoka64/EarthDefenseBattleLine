@@ -18,6 +18,7 @@
     "range": 70.0,
     "penetrationsCount": 3,
     "collisionSize": 0.0,
-    "gravityScale": 0.0
+    "gravityScale": 0.0,
+    "collisionMask": ["ENEMY", "BUILDING", "DESTRUCTION_BUILDING"]
   }
 }

@@ -24,6 +24,42 @@ namespace UtilityData
 	};
 
 
+	enum class COLLIDER_TYPE
+	{
+		NONE,
+		BOX,
+		SPHERE,
+		RAY,
+	};
+
+	/// <summary>
+	/// 衝突判定のビット分け
+	/// </summary>
+	enum class COLLISION_CATEGORY : unsigned
+	{
+		NONE					= 0,
+		PLAYER					= 1 << 0,	// プレイヤー
+		PLAYER_BULLET			= 1 << 1,	// プレイヤーの弾
+		ENEMY					= 1 << 2,	// 敵
+		ENEMY_BULLET			= 1 << 3,	// 敵の弾
+		DESTRUCTION_BUILDING	= 1 << 4,	// 破壊可能な建物
+		BUILDING				= 1 << 5,	// 破壊不可能な建物
+
+		EVERY = 0xFFFFFFFF	// 全てに衝突
+	};
+
+	// 文字列をEnumに変換するマップ
+	static std::map<std::string, COLLISION_CATEGORY> g_CollisionCategoryMap = {
+		{"PLAYER",				 COLLISION_CATEGORY::PLAYER},
+		{"PLAYER_BULLET",		 COLLISION_CATEGORY::PLAYER_BULLET},
+		{"ENEMY",				 COLLISION_CATEGORY::ENEMY},
+		{"ENEMY_BULLET",		 COLLISION_CATEGORY::ENEMY_BULLET},
+		{"DESTRUCTION_BUILDING", COLLISION_CATEGORY::DESTRUCTION_BUILDING},
+		{"BUILDING",			 COLLISION_CATEGORY::BUILDING},
+		{"EVERY",				 COLLISION_CATEGORY::EVERY},
+	};
+
+
 	/// <summary>
 	/// タイトル項目
 	/// </summary>

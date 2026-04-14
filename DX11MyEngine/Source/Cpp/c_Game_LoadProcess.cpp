@@ -32,6 +32,7 @@
 #include "Component_Player_HPBar.h"
 #include "Component_MoveLogic.h"
 
+using namespace UtilityData;
 using namespace SceneStateEnums;
 using namespace VECTOR4;
 using namespace VECTOR3;
@@ -642,8 +643,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             auto line = obj->add_Component<LineRenderer>();
             line->set_Color(VEC4(1.0f, 0.0f, 0.0f, 1.0f));
             line->set_Emissive(3.0f);
-            line->set_Width(0.1f);
-            line->set_Length(100.0f);
+            line->set_Width(0.01f);
+            line->set_Length(20.0f);
 
             // プレイヤーを親に設定
             obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
@@ -686,8 +687,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             auto line = obj->add_Component<LineRenderer>();
             line->set_Color(VEC4(1.0f, 0.0f, 0.0f, 1.0f));
             line->set_Emissive(3.0f);
-            line->set_Width(0.1f);
-            line->set_Length(100.0f);
+            line->set_Width(0.01f);
+            line->set_Length(20.0f);
 
             // プレイヤーを親に設定
             obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());

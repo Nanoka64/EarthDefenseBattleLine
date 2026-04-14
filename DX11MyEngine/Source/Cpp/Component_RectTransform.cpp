@@ -161,7 +161,7 @@ void RectTransform::UpdateUILocalMatrix()
     // 移動（親のピボットからの相対位置）
     XMMATRIX transMtx = XMMatrixTranslation(localPosX, localPosY, 0.0f);
 
-    // ローカル行列の合成（Offset -> Scale -> Rotation -> Translation）
+    // ローカル行列の合成（Offset * Scale * Rotation * Translation）
     XMMATRIX localMatrix = offsetMtx * scaleMtx * rotMtx * transMtx;
 
     //ワールド行列の計算（親のワールド行列と掛け合わせる）

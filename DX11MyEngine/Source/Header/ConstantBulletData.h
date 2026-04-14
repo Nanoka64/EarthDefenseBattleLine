@@ -23,6 +23,17 @@ namespace BulletData
         NUM,
     };
 
+
+    /// <summary>
+    /// 弾のトランスフォーム情報
+    /// </summary>
+    struct BulletTransformData {
+        VECTOR3::VEC3 _pos;
+        VECTOR3::VEC3 _rotRad;
+        DirectX::XMVECTOR _rotQ;
+        VECTOR3::VEC3 _scale;
+    };
+
     /// <summary>
     /// 通常弾のデータ（全ての武器で必須項目のため、他のデータはこれを継承する）
     /// </summary>
@@ -36,7 +47,8 @@ namespace BulletData
         int _penetrationsCount = 0;                 // 貫通可能回数
         float _collisionSize = 0.0f;                // 衝突判定の半径
         float _gravityScale = 0.0f;                 // 重力の影響を受けるかどうか（0.0fなら受けない）
-        //int _collisionMask = -1;                  // どのオブジェクトと衝突するか 
+
+        unsigned int _collisionMask = 0;            // どのオブジェクトと衝突するか（COLLISION_CATEGORY）
 
         /// <summary>
         /// リセット

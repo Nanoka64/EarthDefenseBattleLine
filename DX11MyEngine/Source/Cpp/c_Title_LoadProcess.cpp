@@ -21,6 +21,7 @@
 #include "InputFactory.h"
 
 using namespace SceneStateEnums;
+using namespace UtilityData;
 using namespace VECTOR2;
 using namespace VECTOR3;
 using namespace VECTOR4;

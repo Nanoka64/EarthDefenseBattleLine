@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "RendererEngine.h"
 #include "DebugMesh.h"
+using namespace UtilityData;
 using namespace GIGA_Engine;
 using namespace VECTOR3;
 

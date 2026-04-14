@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 
 using namespace WeaponData;
+using namespace UtilityData;
 using namespace BulletData;
 
 //*---------------------------------------------------------------------------------------
@@ -38,48 +39,57 @@ bool WeaponDataManager::Init()
     GunWeaponData gunData;
 
     // スタンダード ************************************************************************************
-    if (LoadGunWeaponData("Resource/Weapons/AssultRifle01.json", gunData) == false){
+    if (LoadGunWeaponData("Resource/WeaponsData/AssultRifle01.json", gunData) == false){
         assert(false);
     }
     m_AllWeaponsDataMap[0] = std::make_unique<GunWeaponData>(gunData);
 
-    if (LoadGunWeaponData("Resource/Weapons/Launcher01.json", gunData) == false){
+    if (LoadGunWeaponData("Resource/WeaponsData/Launcher01.json", gunData) == false){
         assert(false);
     }
     m_AllWeaponsDataMap[1] = std::make_unique<GunWeaponData>(gunData);
     
     // ラピッド ************************************************************************************
-    if (LoadGunWeaponData("Resource/Weapons/AssultRifle03.json", gunData) == false){
+    if (LoadGunWeaponData("Resource/WeaponsData/AssultRifle03.json", gunData) == false){
         assert(false);
     }
     m_AllWeaponsDataMap[2] = std::make_unique<GunWeaponData>(gunData);
     
-    if (LoadGunWeaponData("Resource/Weapons/Launcher02.json", gunData) == false){
+    if (LoadGunWeaponData("Resource/WeaponsData/Launcher02.json", gunData) == false){
         assert(false);
     }
     m_AllWeaponsDataMap[3] = std::make_unique<GunWeaponData>(gunData);
 
     // スカウト ************************************************************************************
-    if (LoadGunWeaponData("Resource/Weapons/AssultRifle02.json", gunData) == false) {
+    if (LoadGunWeaponData("Resource/WeaponsData/AssultRifle02.json", gunData) == false) {
         assert(false);
     }
     m_AllWeaponsDataMap[4] = std::make_unique<GunWeaponData>(gunData);
 
-    if (LoadGunWeaponData("Resource/Weapons/Sniper01.json", gunData) == false) {
+    if (LoadGunWeaponData("Resource/WeaponsData/Sniper01.json", gunData) == false) {
         assert(false);
     }
     m_AllWeaponsDataMap[5] = std::make_unique<GunWeaponData>(gunData);
      
     // ヘビー ************************************************************************************
-    if (LoadGunWeaponData("Resource/Weapons/Shotgun01.json", gunData) == false) {
+    if (LoadGunWeaponData("Resource/WeaponsData/Shotgun01.json", gunData) == false) {
         assert(false);
     }
     m_AllWeaponsDataMap[6] = std::make_unique<GunWeaponData>(gunData);
 
-    if (LoadGunWeaponData("Resource/Weapons/Launcher03.json", gunData) == false) {
+    if (LoadGunWeaponData("Resource/WeaponsData/Launcher03.json", gunData) == false) {
         assert(false);
     }
     m_AllWeaponsDataMap[7] = std::make_unique<GunWeaponData>(gunData);
+
+
+    if (LoadGunWeaponData("Resource/EnemysData/AntAcid01.json", gunData) == false) {
+        assert(false);
+    }
+    m_EnemyWeaponsDataMap[0] = std::make_unique<GunWeaponData>(gunData);
+
+
+
 
 
     return true;
@@ -106,6 +116,41 @@ const WeaponData::BaseWeaponData* WeaponDataManager::FindWeaponData(int _id)cons
     // 見つからなかった場合はnullptr
     return nullptr;
 }
+
+//*---------------------------------------------------------------------------------------
+//*【?】指定IDの敵の武器データを検索・取得する
+//*
+//* [引数] 武器ID
+//*
+//* [返値]
+//* 読み取り専用武器データ
+//* nullptr:見つからなかった 
+//*----------------------------------------------------------------------------------------
+const WeaponData::BaseWeaponData* WeaponDataManager::FindEnemysWeaponData(int _id)const
+{
+    auto it = m_EnemyWeaponsDataMap.find(_id);
+    if (it != m_EnemyWeaponsDataMap.end())
+    {
+        // unique_ptr の中身の生ポインタ（const）を返す
+        return it->second.get();
+    }
+
+    // 見つからなかった場合はnullptr
+    return nullptr;
+}
+
+
+// 文字列をEnumに変換するマップ
+static std::map<std::string, COLLISION_CATEGORY> CollisionCategoryMap = {
+    {"PLAYER",				 COLLISION_CATEGORY::PLAYER},
+    {"PLAYER_BULLET",		 COLLISION_CATEGORY::PLAYER_BULLET},
+    {"ENEMY",				 COLLISION_CATEGORY::ENEMY},
+    {"ENEMY_BULLET",		 COLLISION_CATEGORY::ENEMY_BULLET},
+    {"DESTRUCTION_BUILDING", COLLISION_CATEGORY::DESTRUCTION_BUILDING},
+    {"BUILDING",			 COLLISION_CATEGORY::BUILDING},
+    {"EVERY",				 COLLISION_CATEGORY::EVERY},
+};
+
 
 //*---------------------------------------------------------------------------------------
 //*【?】武器のデータ読み込み（json）
@@ -159,6 +204,13 @@ bool WeaponDataManager::LoadGunWeaponData(const std::string& _filepath, WeaponDa
         normalData._collisionSize = paramJson.value("collisionSize", 0.0f);
         normalData._gravityScale = paramJson.value("gravityScale", 0.0f);
 
+        if (paramJson.contains("collisionMask") && paramJson["collisionMask"].is_array()) {
+            // 衝突マスク（配列を回してOR演算）
+            for (const auto& maskStr : paramJson["collisionMask"]) {
+                normalData._collisionMask |= UINT_CAST(g_CollisionCategoryMap[maskStr.get<std::string>()]);
+            }
+        }
+
         // variantに代入
         _outData._bulletParam = normalData;
     }
@@ -175,6 +227,13 @@ bool WeaponDataManager::LoadGunWeaponData(const std::string& _filepath, WeaponDa
         expData._penetrationsCount = paramJson.value("penetrationsCount", 0.0f);
         expData._collisionSize = paramJson.value("collisionSize", 0.0f);
         expData._gravityScale = paramJson.value("gravityScale", 0.0f);
+
+        if (paramJson.contains("collisionMask") && paramJson["collisionMask"].is_array()) {
+            // 衝突マスク（配列を回してOR演算）
+            for (const auto& maskStr : paramJson["collisionMask"]) {
+                expData._collisionMask |= UINT_CAST(g_CollisionCategoryMap[maskStr.get<std::string>()]);
+            }
+        }
 
         // 派生クラス独自のパラメータを読み込み
         expData._explosionRadius = paramJson.value("explosionRadius", 0.0f);

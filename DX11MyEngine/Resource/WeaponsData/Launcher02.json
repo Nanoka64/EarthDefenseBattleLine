@@ -19,6 +19,7 @@
     "penetrationsCount": 0,
     "collisionSize": 0.0,
     "gravityScale": 0.0,
+    "collisionMask": ["ENEMY", "BUILDING", "DESTRUCTION_BUILDING"],
     "explosionRadius": 10.0,
     "explosionEffectHandleTag": "Explosion_Plasma_01",
     "isSmoke" : false

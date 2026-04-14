@@ -20,6 +20,8 @@ constexpr float DECAL_LIFE_TIME = 10.0f;             // デカールの生存時間
 constexpr float SHAKE_MAX_RANGE_EXPLOSION_SCALE_FACTOR = 15.0f;  // カメラシェイク時、シェイクの最大距離を求める際に掛ける補正値
 constexpr float SHAKE_LENGTH_SCALE_FACTOR = 0.01f;               // カメラシェイク時、シェイクの大きさを求める際に掛ける補正値
 constexpr float SHAKEDURATION = 1.0f;                           // カメラシェイクの持続時間
+
+using namespace UtilityData;
 using namespace VECTOR3;
 
 //*---------------------------------------------------------------------------------------
@@ -186,11 +188,11 @@ void ExplosionBullet::Update(RendererEngine &renderer)
         m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
     }
 
-	// レイキャストで衝突判定（コライダーの衝突処理をこっちに移動）
+	// レイキャストで衝突判定
     CollInData_Ray ray;
 	ray._point = crntPos;
 	ray._dir = newPos - crntPos;    // 前回の位置から新しい位置へのベクトル
-    unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);
+    unsigned mask = m_Parameter._collisionMask;
 	CollisionInfo hitInfo;
 
     if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))

@@ -23,6 +23,7 @@ using namespace VECTOR3;
 using namespace VECTOR2;
 using namespace BulletData;
 using namespace WeaponData;
+using namespace UtilityData;
 
 constexpr float LASER_POINTER_SCALE = 0.25f;	// レーザーポインタの大きさ
 
@@ -174,17 +175,18 @@ void GunWeapon::LateUpdate(RendererEngine& renderer)
         renderer.get_CameraComponent()->set_Fov(zoomFov);
     }
 
-    const auto& baseBulletData = std::visit([](const auto& arg) -> const BulletData::NormalBulletData& {
-        return arg;
-        }, gunParam->_bulletParam);
 
-    Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"武器情報"));
-    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"名前：%s"), Tool::WStringToString(gunParam->_name).c_str());
-    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"弾数：%d / %d"), m_AmmoRemaining, gunParam->_bulletMaxNum);
-    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"ダメージ：%.2f"), baseBulletData._damage);
-    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"リロード時間：%.2f"), gunParam->_reloadTime);
-    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"ズーム倍率：%.2f"), gunParam->_zoomLength);
-    Master::m_pDebugger->EndDebugWindow();
+    /* 武器情報 */
+    //const auto& baseBulletData = std::visit([](const auto& arg) -> const BulletData::NormalBulletData& {
+    //    return arg;
+    //    }, gunParam->_bulletParam);
+    //Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"武器情報"));
+    //Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"名前：%s"), Tool::WStringToString(gunParam->_name).c_str());
+    //Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"弾数：%d / %d"), m_AmmoRemaining, gunParam->_bulletMaxNum);
+    //Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"ダメージ：%.2f"), baseBulletData._damage);
+    //Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"リロード時間：%.2f"), gunParam->_reloadTime);
+    //Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"ズーム倍率：%.2f"), gunParam->_zoomLength);
+    //Master::m_pDebugger->EndDebugWindow();
 
     // ステート更新
     m_StateMachine.Update();

@@ -2,12 +2,15 @@
 #include "Component_EnemyController.h"
 #include "Ant_StateHeader.h"
 #include "Component_MoveLogic.h"
+#include "ConstantWeaponData.h"
 #include "GameObject.h"
 
 using namespace VECTOR3;
 using namespace VECTOR2;
 using namespace UtilityData;
 using namespace EnemyData;
+using namespace BulletData;
+using namespace DirectX;
 
 //*---------------------------------------------------------------------------------------
 //* @:Ant_AT_AttackAcidState Class 
@@ -75,17 +78,46 @@ int Ant_AT_AttackAcidState::Update(class EnemyController* pOwner)
 		/* 硬直時間を終えたら、攻撃 */
 		if (pOwner->get_StateTimer() > m_PreAttackStunDuration)
 		{
+			auto data = static_cast<const WeaponData::GunWeaponData*>(Master::m_pWeaponDataManager->FindEnemysWeaponData(0));
+			data->_bulletParam;
+			
+			// トランスフォームパラメータ
+			BULLET_TYPE type = data->_bulletType;
+
+			
 			// 攻撃処理
-			BulletData::NormalBulletData bullet;
-			BulletTransformData bulletTrans;
-			bulletTrans._pos = targetPos;
-			bulletTrans._scale = 0.01f;
-			bulletTrans._rotQ = myTransform->get_RotationQuaternion();
-			bullet._speed = 20.0f;
-			bullet._range = 100.0f;
-			Master::m_pBulletManager->Shot(*m_pRenderer, bulletTrans, bullet);
+			for (int i = 0; i < data->_bulletSimultaneousNum; i++)
+			{
+				// 弾のバラつき
+				float accuracy = data->_accuracy;
+				VEC3 accuracyRot;
+				accuracyRot.x += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
+				accuracyRot.y += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
+				accuracyRot.z += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
+
+				XMVECTOR rotQuat = myTransform->get_RotationQuaternion();
+
+				// バラつきクォータニオン
+				XMVECTOR spreadQuat = XMQuaternionRotationRollPitchYaw(accuracyRot.x, accuracyRot.y, accuracyRot.z);
+
+				// 最終的なクォータニオン作成
+				XMVECTOR finalRotQuat = XMQuaternionMultiply(rotQuat, spreadQuat);
+				finalRotQuat = XMQuaternionNormalize(finalRotQuat); // 念のため正規化
+
+				// 弾のトランスフォーム
+				BulletTransformData bulletTrans;
+				bulletTrans._pos = myPos;
+				bulletTrans._scale = 10.0f;
+				bulletTrans._rotQ = finalRotQuat;
+				bulletTrans._pos.y += 3.0f;
 
 
+				// 弾データを共用体で持っているので、弾タイプにあったパラメータを入れるようにする
+				std::visit([&](auto& param) {
+					Master::m_pBulletManager->Shot(*m_pRenderer, bulletTrans, param);
+					}, data->_bulletParam);
+
+			}
 			//=========================================================================================
 			//
 			//						攻撃が終了したら、移動ステートへ

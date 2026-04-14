@@ -14,15 +14,6 @@ struct CreateBulletInfo
 
 };
 
-/// <summary>
-/// 弾のトランスフォーム情報
-/// </summary>
-struct BulletTransformData {
-    VECTOR3::VEC3 _pos;
-    VECTOR3::VEC3 _rotRad;
-    DirectX::XMVECTOR _rotQ;
-    VECTOR3::VEC3 _scale;
-};
 
 class GameObject;
 
@@ -74,9 +65,9 @@ public:
     /// <param name="pBullet"></param>
     void RegisterBullet(BulletData::BULLET_TYPE _bulletType, std::shared_ptr<GameObject> pBullet);
 
-    void Shot(RendererEngine &renderer, const BulletTransformData& _transformData, const BulletData::NormalBulletData &_param);
-    void Shot(RendererEngine &renderer, const BulletTransformData& _transformData, const BulletData::ExplosionBulletData &_param);
-    void Shot(RendererEngine &renderer, const BulletTransformData& _transformData, const BulletData::HormingExplosionBulletData &_param);
+    void Shot(RendererEngine &renderer, const BulletData::BulletTransformData& _transformData, const BulletData::NormalBulletData &_param);
+    void Shot(RendererEngine &renderer, const BulletData::BulletTransformData& _transformData, const BulletData::ExplosionBulletData &_param);
+    void Shot(RendererEngine &renderer, const BulletData::BulletTransformData& _transformData, const BulletData::HormingExplosionBulletData &_param);
 
 private:
     // コピー禁止

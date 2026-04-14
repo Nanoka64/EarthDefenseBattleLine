@@ -7,6 +7,7 @@
 #include "Component_Transform.h"
 #include "GameObject.h"
 
+using namespace UtilityData;
 using namespace VECTOR3;
 
 CollisionManager::CollisionManager()
