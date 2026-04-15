@@ -282,6 +282,7 @@ bool SoundManager::InitXA2Sound(void)
 	// “G
 	Load_Wav("Resource/Sound/SE/Enemy/DSGNImpt_Impact Smear Short 04_RSCPC_HV.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_HIT01));
 	Load_Wav("Resource/Sound/SE/Enemy/DSGNImpt_Impact High Spark 04_RSCPC_HV.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_DEAD));
+	Load_Wav("Resource/Sound/SE/Enemy/DSGNImpt_Impact Smear Short 06_RSCPC_HV.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_ACID_SHOOT));
 	
 	
 	// BGM

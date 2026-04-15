@@ -78,12 +78,15 @@ int Ant_AT_AttackAcidState::Update(class EnemyController* pOwner)
 		/* 硬直時間を終えたら、攻撃 */
 		if (pOwner->get_StateTimer() > m_PreAttackStunDuration)
 		{
+
+			// ****************************************************
+			//				 酸発射音再生
+			// ****************************************************
+			Master::m_pSoundManager->Play_3D(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_ACID_SHOOT), myPos, SOUND_RADIUS);
+
 			auto data = static_cast<const WeaponData::GunWeaponData*>(Master::m_pWeaponDataManager->FindEnemysWeaponData(0));
 			data->_bulletParam;
 			
-			// トランスフォームパラメータ
-			BULLET_TYPE type = data->_bulletType;
-
 			XMVECTOR rotQuat = myTransform->get_RotationQuaternion();
 
 			// 前方を向く回転行列（LookTo）
@@ -115,7 +118,7 @@ int Ant_AT_AttackAcidState::Update(class EnemyController* pOwner)
 				bulletTrans._pos = myPos;
 				bulletTrans._scale = 1.0;
 				bulletTrans._rotQ = finalRotQuat;
-				bulletTrans._pos.y += 3.0f;
+				bulletTrans._pos.y += 3.0f;		// そのままだと、地面に当たってしまうので少し上の方から発射する
 
 
 				// 弾データを共用体で持っているので、弾タイプにあったパラメータを入れるようにする

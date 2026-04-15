@@ -16,11 +16,14 @@
 class EnemyController :  public IComponent
 {
 private:
-	std::weak_ptr<class Health>m_pHealthComp;	// 体力管理コンポーネント
+	const float SOUND_HIT_RADIUS = 600.0f;				// 被弾音が聞こえる範囲
+	const float SOUND_DEAD_RADIUS = 600.0f;				// 死亡音が聞こえる範囲
+
+	std::weak_ptr<class Health>m_pHealthComp;					// 体力管理コンポーネント
 	std::weak_ptr<class SkinnedMeshAnimator> m_pAnimatorComp;	// アニメータコンポーネント
-	std::weak_ptr<class Collider> m_pColliderComp;	// コライダーコンポーネント
-	std::weak_ptr<class MoveLogic> m_pMoveLogicComp;	// 移動コンポーネント
-	const GameObject* m_pTarget;	// 攻撃目標
+	std::weak_ptr<class Collider> m_pColliderComp;				// コライダーコンポーネント
+	std::weak_ptr<class MoveLogic> m_pMoveLogicComp;			// 移動コンポーネント
+	const GameObject* m_pTarget;								// 攻撃目標
 	StateMachine<EnemyController> m_StateMachine;
 
 	VECTOR3::VEC3 m_MoveVelocity;	// 移動
@@ -33,6 +36,7 @@ private:
 	bool m_IsDead;
 	bool m_IsAnim;					// アニメーション中かどうか
 	bool m_IsGrounded;				// 接地しているか
+
 public:
 	EnemyController(std::weak_ptr<GameObject> pOwner, int updateRank);
 	~EnemyController();

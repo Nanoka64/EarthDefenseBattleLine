@@ -158,6 +158,8 @@ void RenderPipeline::Execute(RendererEngine& renderer)
     /* フォワードパス */
     Forward_PathRender(renderer);
 
+
+
     /* ポストエフェクトパス */
     PostEffect_PathRender(renderer);
 
@@ -460,7 +462,7 @@ void RenderPipeline::Lighting_PathRender(RendererEngine &renderer)
 
 
 //*---------------------------------------------------------------------------------------
-//*【?】フォワードパス
+//*【?】スカイボックス描画パス
 //*
 //* [引数]
 //* renderer : 描画エンジンの参照
@@ -497,11 +499,21 @@ void RenderPipeline::Forward_PathRender(RendererEngine &renderer)
     // スカイボックス深度ステンシル設定解除
     renderer.RegisterDepthStencilState(NULL, 0);
 
-    //
-    //※ ここからフォワードのはずだったけど、ポストエフェクトが変な風にかかってしまうので
-    //   フレームバッファへのコピーの前にした。
-    //
-    
+
+    // ************************************************************************
+    // 
+    // ここからフォワードオブジェクトの描画
+    // 
+    // ************************************************************************
+
+    renderer.RegisterCullMode(CULL_MODE::BACK);   
+
+    /*
+    * エフェクシアの描画もここでする！！
+    */
+    Master::m_pEffectManager->DrawEffect();
+    Master::m_pGameObjectManager->Alpha_ObjectRenderPass(renderer);
+
 
     // デフォルトの深度ステンシル設定に戻す
     renderer.RegisterDefaultDepthStencilState(0);
@@ -606,6 +618,7 @@ void RenderPipeline::PostEffect_PathRender(RendererEngine &renderer)
 
 //*---------------------------------------------------------------------------------------
 //*【?】フレームバッファにコピーするパス
+//*     2Dオブジェクトの描画もここでしてしまう 
 //*
 //* [引数]
 //* renderer : 描画エンジンの参照
@@ -613,34 +626,16 @@ void RenderPipeline::PostEffect_PathRender(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void RenderPipeline::CopyToFrameBuffer_PathRender(RendererEngine &renderer)
 {
-
-    // ************************************************************************
-    // 
-    // ここからフォワードオブジェクトの描画
-    // 
-    // ************************************************************************
-
     // 深度はGバッファ作成時のもの
-    renderer.RegisterRenderTarget(m_pSceneFinal_RT->get_RTV(), m_pDepth_RT->get_DSV());
+    renderer.RegisterRenderTarget(m_pSceneFinal_RT->get_RTV(), nullptr);
     renderer.RegisterCullMode(CULL_MODE::BACK);
 
-
-    /*
-    * エフェクシアの描画もここでする！！
-    */
-    Master::m_pEffectManager->DrawEffect();
-
-    // 透明度アリオブジェクト（UIも）の描画
-    Master::m_pGameObjectManager->Alpha_ObjectRenderPass(renderer);
+    // 2Dオブジェクトの描画
     Master::m_pGameObjectManager->Alpha_2DObjectRenderPass(renderer);
-
-
-
 
     // レンダリングターゲット解除
     renderer.ReleaseRenderTargetSetNull();
     
-
     // レンダリングターゲットをフレームバッファに変更
     renderer.ChangeRenderTargetFrameBuffer();
 

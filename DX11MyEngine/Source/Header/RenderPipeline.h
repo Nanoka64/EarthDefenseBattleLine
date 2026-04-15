@@ -86,7 +86,7 @@ private:
     void Geometry_PathRender(RendererEngine &renderer);          // G-Buffer
     void Decal_PathRender(RendererEngine &renderer);             // デカール
     void Lighting_PathRender(RendererEngine &renderer);          // ディファードライティング
-    void Forward_PathRender(RendererEngine &renderer);           // フォワード
+    void Forward_PathRender(RendererEngine &renderer);            // スカイボックス
     void PostEffect_PathRender(RendererEngine &renderer);        // ポストエフェクト
     void CopyToFrameBuffer_PathRender(RendererEngine &renderer); // フレームバッファへ描画＆トーンマッピング
 

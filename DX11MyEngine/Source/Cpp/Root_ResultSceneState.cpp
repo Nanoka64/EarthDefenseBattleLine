@@ -6,6 +6,9 @@
 #include "Component_WeaponController.h"
 #include "InputFactory.h"
 
+using namespace VECTOR2;
+using namespace VECTOR3;
+using namespace VECTOR4;
 using namespace SceneStateEnums;
 using namespace Tool::UV;
 
@@ -19,6 +22,20 @@ using namespace Tool::UV;
 void Root_ResultSceneState::OnEnter(SceneManager *pOwner)
 {
 	this->SetInitChildState(pOwner, c_RESULT::c_GETITEM_CHECK);
+
+	// ワイプ用スプライトを作る **********************************************
+	UIData::RectTransformData rectData;
+	UIData::SpriteUIData spriteData;
+	rectData._size = VEC2(1280.0f, 256.0f);
+	rectData._pivot = VEC2(0.5f, 0.5f);
+	rectData._anchorMax = VEC2(0.5f, 0.5f);
+	rectData._anchorMin = VEC2(0.5f, 0.5f);
+	rectData._pos = VEC2(0.0f, 0.0f);
+	spriteData._tag = "ClearedTextSprite";
+	spriteData._imagePath = "Resource/Texture/UI/MissionCleared.png";
+	spriteData._layerRank = 999;
+	spriteData._color = VEC4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pClearedTextSpriteObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
 }
 
 
@@ -40,6 +57,9 @@ void Root_ResultSceneState::OnExit(SceneManager *pOwner)
 	Master::m_pGameObjectManager->clear_NotIsDontDestroyObject();
 
 	Master::m_pEffectManager->StopAllEffects();	// 全てのエフェクトを停止する
+
+	// スプライトをプールへ返す
+	m_pClearedTextSpriteObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 }
 
 

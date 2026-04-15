@@ -13,6 +13,7 @@
 class Root_ResultSceneState : public CompositeState<SceneManager>
 {
 private:
+	class GameObject* m_pClearedTextSpriteObj;
 
 public:
 	void OnEnter(SceneManager *pOwner) override;

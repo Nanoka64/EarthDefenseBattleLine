@@ -397,6 +397,12 @@ namespace VECTOR2
 			this->y = 0.0f;
 		}
 
+		// üŒ`•âŠÔ
+		static VEC2 Lerp(const VEC2& a, const VEC2& b, float t) {
+			return a + (b - a) * t;
+		};
+
+
 		// ’·‚³
 		float Length()   const { return std::sqrt(this->x * this->x + this->y * this->y); }
 		float LengthSq() const { return this->x * this->x + this->y * this->y; };

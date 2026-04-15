@@ -66,6 +66,7 @@ enum class SOUND_ID
     /* 敵 */
     ENEMY_ANT_HIT01,        // アリ被弾 
     ENEMY_ANT_DEAD,         // アリやられる
+    ENEMY_ANT_ACID_SHOOT,   // 酸射出
 
     
     /* システム */
