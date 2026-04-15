@@ -327,12 +327,11 @@ void GunWeapon::Shoot(RendererEngine& renderer)
         XMVECTOR finalRotQuat = XMQuaternionMultiply(rotQuat, spreadQuat);
         finalRotQuat = XMQuaternionNormalize(finalRotQuat); // 念のため正規化
 
-
         // トランスフォームパラメータ
         BulletTransformData bulletTransform;
         bulletTransform._pos = pos;
         bulletTransform._rotQ = finalRotQuat;
-        bulletTransform._scale = VEC3(1.0f, 1.0f, 1.0f);
+        bulletTransform._scale; ;
 
         BULLET_TYPE type = gunParam->_bulletType;
 

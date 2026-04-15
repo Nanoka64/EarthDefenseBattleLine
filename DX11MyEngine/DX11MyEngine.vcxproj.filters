@@ -708,6 +708,12 @@
     <ClCompile Include="Source\Cpp\Ant_PT_MoveState.cpp">
       <Filter>ソース ファイル\Game\Component\Enemy\State_Ant\Patrol</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Cpp\Ant_AT_DeadState.cpp">
+      <Filter>ソース ファイル\Game\Component\Enemy\State_Ant\Active</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Ant_CommonStateProcess.cpp">
+      <Filter>ソース ファイル\Game\Component\Enemy\State_Ant</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Header\SHADER.h">

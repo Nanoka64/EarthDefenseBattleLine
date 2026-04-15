@@ -51,41 +51,13 @@ BillboardResource::~BillboardResource()
 	}
 }
 
+
 // ----------------------------------------------------------------------------------------------------------------------
-//       * IPolyResource Class - テクスチャマップ設定 Setup後に呼ぶ *
+//       * IPolyResource Class - マテリアルを設定 *
 // ----------------------------------------------------------------------------------------------------------------------
-bool BillboardResource::set_TextureMap(TEXTURE_MAP mapType, UINT matIndex, const std::wstring& path)
+void BillboardResource::set_Material(std::shared_ptr<Material> pMaterial)
 {
-	// テクスチャ読み込み
-	auto texture = Master::m_pResourceManager->LoadWIC_Texture(path);
-	if (texture == nullptr) {
-		return false;
-	}
-
-	// 範囲外アクセスチェック
-	if (m_pMeshData->NumMaterial <= matIndex) {
-		return false;
-	}
-
-	// 対応したマップにテクスチャを入れる
-	switch (mapType)
-	{
-	case TEXTURE_MAP_NONE:
-		break;
-	case TEXTURE_MAP_DIFFUSE:
-		m_pMeshData->pMaterials.lock()->m_DiffuseMap.Texture = texture;
-		break;				   
-	case TEXTURE_MAP_NORMAL:   
-		m_pMeshData->pMaterials.lock()->m_NormalMap.Texture = texture;
-		break;				   
-	case TEXTURE_MAP_SPECULAR: 
-		m_pMeshData->pMaterials.lock()->m_SpecularMap.Texture = texture;
-		break;
-	default:
-		break;
-	}
-
-	return true;
+	m_pMeshData->pMaterials = pMaterial;
 }
 
 

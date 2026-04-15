@@ -26,6 +26,9 @@ void Ant_AT_TrackingState::OnEnter(class EnemyController *pOwner)
 
 	// 追跡時間
 	m_TrackingDuration = Master::m_pRandomManager->GetFloatRandom(TRACKING_TIME_MIN, TRACKING_TIME_MAX);
+
+	// 攻撃可能距離
+	m_AttackPossibleRange = Master::m_pRandomManager->GetFloatRandom(ATTACK_POSSIBLE_RANGE_MIN, ATTACK_POSSIBLE_RANGE_MAX);
 }
 
 //*---------------------------------------------------------------------------------------
@@ -57,6 +60,13 @@ int Ant_AT_TrackingState::Update(class EnemyController *pOwner)
 	}
 	else
 	{
+		// 共通処理
+		int commonRes = Ant_CommonStateProcess::CommonProcess(pOwner);
+		if (commonRes != -1)
+		{
+			return commonRes;
+		}
+
 		//=========================================================================================
 		//
 		//						追従期間を終えたら、アクティブ時の移動ステートへ
@@ -87,10 +97,10 @@ int Ant_AT_TrackingState::Update(class EnemyController *pOwner)
 		
 		//=========================================================================================
 		//
-		//						距離が離れたら待機ステートへ戻る
+		//						攻撃可能距離になったら、酸攻撃ステートへ
 		//
 		//=========================================================================================
-		if (VEC3::Distance(myPos, targetPos) < 10.0f)
+		if (VEC3::Distance(myPos, targetPos) < m_AttackPossibleRange)
 		{
 			return ANT_STATE::ANT_STATE_ACTIVE_ATTACK_ACID;
 		}

@@ -84,7 +84,14 @@ int Ant_AT_AttackAcidState::Update(class EnemyController* pOwner)
 			// トランスフォームパラメータ
 			BULLET_TYPE type = data->_bulletType;
 
-			
+			XMVECTOR rotQuat = myTransform->get_RotationQuaternion();
+
+			// 前方を向く回転行列（LookTo）
+			XMMATRIX lookAtRotationMatrix = XMMatrixLookToLH(XMVectorZero(), targetDir, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+
+			// 行列からクォータニオンへ変換
+			XMVECTOR targetQuat = XMQuaternionRotationMatrix(XMMatrixTranspose(lookAtRotationMatrix));
+
 			// 攻撃処理
 			for (int i = 0; i < data->_bulletSimultaneousNum; i++)
 			{
@@ -95,19 +102,18 @@ int Ant_AT_AttackAcidState::Update(class EnemyController* pOwner)
 				accuracyRot.y += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
 				accuracyRot.z += Master::m_pRandomManager->GetFloatRandom(-accuracy, accuracy);
 
-				XMVECTOR rotQuat = myTransform->get_RotationQuaternion();
 
 				// バラつきクォータニオン
 				XMVECTOR spreadQuat = XMQuaternionRotationRollPitchYaw(accuracyRot.x, accuracyRot.y, accuracyRot.z);
 
 				// 最終的なクォータニオン作成
-				XMVECTOR finalRotQuat = XMQuaternionMultiply(rotQuat, spreadQuat);
+				XMVECTOR finalRotQuat = XMQuaternionMultiply(targetQuat, spreadQuat);
 				finalRotQuat = XMQuaternionNormalize(finalRotQuat); // 念のため正規化
 
 				// 弾のトランスフォーム
 				BulletTransformData bulletTrans;
 				bulletTrans._pos = myPos;
-				bulletTrans._scale = 10.0f;
+				bulletTrans._scale = 1.0;
 				bulletTrans._rotQ = finalRotQuat;
 				bulletTrans._pos.y += 3.0f;
 
@@ -125,7 +131,6 @@ int Ant_AT_AttackAcidState::Update(class EnemyController* pOwner)
 			//=========================================================================================
 			return ANT_STATE::ANT_STATE_ACTIVE_MOVE;
 		}
-
 	}
 
 	return ANT_STATE::ANT_STATE_ACTIVE_ATTACK_ACID;

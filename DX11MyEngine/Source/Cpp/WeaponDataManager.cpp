@@ -195,20 +195,28 @@ bool WeaponDataManager::LoadGunWeaponData(const std::string& _filepath, WeaponDa
         _outData._bulletType = BULLET_TYPE::NORMAL;
 
         NormalBulletData normalData;
-        normalData._damage = paramJson.value("damage", 0.0f);
-        normalData._damageDistAttenuationRate = paramJson.value("damageDistAttenuationRate", 0.0f);
-        normalData._speed = paramJson.value("speed", 0.0f);
-        normalData._acceleration = paramJson.value("acceleration", 0.0f);
-        normalData._range = paramJson.value("range", 0.0f);
-        normalData._penetrationsCount = paramJson.value("penetrationsCount", 0.0f);
-        normalData._collisionSize = paramJson.value("collisionSize", 0.0f);
-        normalData._gravityScale = paramJson.value("gravityScale", 0.0f);
+        normalData._damage = paramJson.value("damage", 0.0f);                                       // ダメージ値
+        normalData._damageDistAttenuationRate = paramJson.value("damageDistAttenuationRate", 0.0f); // ダメージ減衰
+        normalData._speed = paramJson.value("speed", 0.0f);                                         // 速度
+        normalData._acceleration = paramJson.value("acceleration", 0.0f);                           // 加速度
+        normalData._range = paramJson.value("range", 0.0f);                                         // 射程
+        normalData._penetrationsCount = paramJson.value("penetrationsCount", 0.0f);                 // 貫通可能回数
+        normalData._collisionSize = paramJson.value("collisionSize", 0.0f);                         // 当たり判定
+        normalData._gravityScale = paramJson.value("gravityScale", 0.0f);                           // 重力
 
-        if (paramJson.contains("collisionMask") && paramJson["collisionMask"].is_array()) {
+        if (paramJson.contains("collisionMask") && paramJson["collisionMask"].is_array()) {         // 衝突マスク
             // 衝突マスク（配列を回してOR演算）
             for (const auto& maskStr : paramJson["collisionMask"]) {
                 normalData._collisionMask |= UINT_CAST(g_CollisionCategoryMap[maskStr.get<std::string>()]);
             }
+        }
+        normalData._bulletMaterialTag = paramJson.value("bulletMaterialTag", "");                   // 弾そのもののマテリアル
+        normalData._decalMaterialTag = paramJson.value("decalMaterialTag", "");                     // デカールに使うマテリアル
+
+        if (paramJson["scale"].is_array()){                                                         // 大きさ
+            normalData._scale.x = paramJson["scale"][0].get<float>();
+            normalData._scale.y = paramJson["scale"][1].get<float>();
+            normalData._scale.z = paramJson["scale"][2].get<float>();
         }
 
         // variantに代入
@@ -235,10 +243,19 @@ bool WeaponDataManager::LoadGunWeaponData(const std::string& _filepath, WeaponDa
             }
         }
 
+        expData._bulletMaterialTag = paramJson.value("bulletMaterialTag", "");                   // 弾そのもののマテリアル
+        expData._decalMaterialTag = paramJson.value("decalMaterialTag", "");
+
+        if (paramJson["scale"].is_array()) {                                                         // 大きさ
+            expData._scale.x = paramJson["scale"][0].get<float>();
+            expData._scale.y = paramJson["scale"][1].get<float>();
+            expData._scale.z = paramJson["scale"][2].get<float>();
+        }
+
         // 派生クラス独自のパラメータを読み込み
-        expData._explosionRadius = paramJson.value("explosionRadius", 0.0f);
-        expData._explosionEffectHandleTag = paramJson.value("explosionEffectHandleTag", "");
-        expData._isSmoke = paramJson.value("isSmoke", false);
+        expData._explosionRadius = paramJson.value("explosionRadius", 0.0f);                        // 爆発半径
+        expData._explosionEffectHandleTag = paramJson.value("explosionEffectHandleTag", "");        // 爆発エフェクトタグ
+        expData._isSmoke = paramJson.value("isSmoke", false);                                       // 煙が出るか
 
         // variantに代入
         _outData._bulletParam = expData;

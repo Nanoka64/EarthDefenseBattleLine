@@ -19,6 +19,7 @@ namespace BulletData
         HORMING,        // 誘導系（ミサイルランチャーとか）
         LASER,          // レーザー系（直線）
         FLAME,          // 火炎系
+        ACID,           // 酸
 
         NUM,
     };
@@ -31,7 +32,7 @@ namespace BulletData
         VECTOR3::VEC3 _pos;
         VECTOR3::VEC3 _rotRad;
         DirectX::XMVECTOR _rotQ;
-        VECTOR3::VEC3 _scale;
+        VECTOR3::VEC3 _scale;       // 弾のデータに持たせてしまったので必要ないかも？（Shot関数内で取り出し）
     };
 
     /// <summary>
@@ -49,6 +50,9 @@ namespace BulletData
         float _gravityScale = 0.0f;                 // 重力の影響を受けるかどうか（0.0fなら受けない）
 
         unsigned int _collisionMask = 0;            // どのオブジェクトと衝突するか（COLLISION_CATEGORY）
+        std::string _bulletMaterialTag;             // 使用するマテリアルのタグ（TODO:ビルボードと3Dモデルで分ける必要あるかも）
+        std::string _decalMaterialTag;              // 衝突時に作成するデカールのタグ
+        VECTOR3::VEC3 _scale = VECTOR3::VEC3();     // 弾の大きさ
 
         /// <summary>
         /// リセット

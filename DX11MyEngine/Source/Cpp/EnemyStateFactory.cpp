@@ -46,20 +46,22 @@ void EnemyStateFactory::Create(StateMachine<EnemyController>& _out, int _createS
 //*----------------------------------------------------------------------------------------
 void EnemyStateFactory::CreateAntState(StateMachine<class EnemyController>& _out, RendererEngine& _renderer)
 {
-	// ルートシーン作成
-	std::shared_ptr<Ant_PT_IdleState> pPTIdle = std::make_shared<Ant_PT_IdleState>();
-	std::shared_ptr<Ant_PT_MoveState> pPTMove = std::make_shared<Ant_PT_MoveState>();
-	std::shared_ptr<Ant_AT_TrackingState> pATTracking = std::make_shared<Ant_AT_TrackingState>();
-	std::shared_ptr<Ant_AT_MoveState> pATMove = std::make_shared<Ant_AT_MoveState>();
-	std::shared_ptr<Ant_AT_AttackAcidState> pATAttackAcid = std::make_shared<Ant_AT_AttackAcidState>();
+	// ルート作成
+	std::shared_ptr<Ant_PT_IdleState> pPTIdle = std::make_shared<Ant_PT_IdleState>();					// PT 待機
+	std::shared_ptr<Ant_PT_MoveState> pPTMove = std::make_shared<Ant_PT_MoveState>();					// PT 移動
+	std::shared_ptr<Ant_AT_TrackingState> pATTracking = std::make_shared<Ant_AT_TrackingState>();		// AT 追従
+	std::shared_ptr<Ant_AT_MoveState> pATMove = std::make_shared<Ant_AT_MoveState>();					// AT 移動
+	std::shared_ptr<Ant_AT_AttackAcidState> pATAttackAcid = std::make_shared<Ant_AT_AttackAcidState>();	// AT 酸攻撃
+	std::shared_ptr<Ant_AT_DeadState> pATDead = std::make_shared<Ant_AT_DeadState>();					// AT死亡
 
 	//描画インターフェイス設定
-	// add_childの中で子シーンにもセットしてるのでaddする前に呼んで！
+	// add_childの中で子にもセットしてるのでaddする前に呼んで！
 	pPTIdle->set_Renderer(&_renderer);
 	pPTMove->set_Renderer(&_renderer);
 	pATTracking->set_Renderer(&_renderer);
 	pATMove->set_Renderer(&_renderer);
 	pATAttackAcid->set_Renderer(&_renderer);
+	pATDead->set_Renderer(&_renderer);
 
 	// ********************************************************************************
 	// 子ステート作成
@@ -78,4 +80,5 @@ void EnemyStateFactory::CreateAntState(StateMachine<class EnemyController>& _out
 	_out.RegisterState(ANT_STATE::ANT_STATE_ACTIVE_TRACKING, std::move(pATTracking));
 	_out.RegisterState(ANT_STATE::ANT_STATE_ACTIVE_MOVE, std::move(pATMove));
 	_out.RegisterState(ANT_STATE::ANT_STATE_ACTIVE_ATTACK_ACID, std::move(pATAttackAcid));
+	_out.RegisterState(ANT_STATE::ANT_STATE_ACTIVE_DEAD, std::move(pATDead));
 }

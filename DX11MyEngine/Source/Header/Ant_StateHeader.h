@@ -79,7 +79,10 @@ private:
 
 	const float TRACKING_TIME_MAX = 7.0f;	// 追跡の最大時間
 	const float TRACKING_TIME_MIN = 3.0f;	// 追跡の最小時間
+	const float ATTACK_POSSIBLE_RANGE_MAX = 50.0f;	// 攻撃可能最大距離
+	const float ATTACK_POSSIBLE_RANGE_MIN = 15.0f;	// 攻撃可能最小距離
 
+	float m_AttackPossibleRange;// 攻撃可能距離
 	float m_TrackingDuration;	// 追従時間
 
 public:
@@ -134,8 +137,8 @@ public:
 class Ant_AT_AttackAcidState : public IState<class EnemyController>
 {
 private:
-	const float PREATTACK_STUN_TIME_MAX = 4.0f;		// 攻撃前の硬直最大時間
-	const float PREATTACK_STUN_TIME_MIN = 1.0f;		// 攻撃前の硬直最小時間 
+	const float PREATTACK_STUN_TIME_MAX = 2.0f;		// 攻撃前の硬直最大時間
+	const float PREATTACK_STUN_TIME_MIN = 0.5f;		// 攻撃前の硬直最小時間 
 
 	float m_PreAttackStunDuration = 0.0f;	// 攻撃前の硬直時間
 
@@ -143,4 +146,49 @@ public:
 	void OnEnter(class EnemyController *pOwner) override;
 	void OnExit(class EnemyController *pOwner)override;
 	int Update(class EnemyController *pOwner)override;
+};
+
+
+// ***************************************************************************************
+// ---------------------------------------------------------------------------------------
+/* --- @:Ant_AT_AttackAcidState Class --- */
+//
+//  ★継承：IState ★
+//
+// 【?】[アクティブ]
+//		死亡ステート
+//		
+// ***************************************************************************************
+class Ant_AT_DeadState : public IState<class EnemyController>
+{
+private:
+	const float OVERTURN_TIME = 1.0f;		// ひっくり返るまでの時間
+	const float FALL_END_TIME = 2.0f;		// 死亡後、裏世界に落ちるまでの時間
+	const float FALL_SPEED = 20.0f;
+	const float DELETE_POS_Y = -30.0f;		// 削除されるY座標
+
+	DirectX::XMVECTOR m_TargetRotQ;	// ひっくり返った後のクオータニオン
+	DirectX::XMVECTOR m_StartRotQ;	// ひっくり返った後のクオータニオン
+
+public:
+	void OnEnter(class EnemyController *pOwner) override;
+	void OnExit(class EnemyController *pOwner)override;
+	int Update(class EnemyController *pOwner)override;
+};
+
+/// <summary>
+/// 共通処理
+/// </summary>
+class Ant_CommonStateProcess {
+public:
+	/// <summary>
+	/// 共通処理
+	/// </summary>
+	/// <param name="pOwner">ステートの親</param>
+	/// <returns>ステートID（-1の場合は変更なし）</returns>
+	static int CommonProcess(class EnemyController* pOwner);
+	
+	
+	//static void RotateToPlayer(class EnemyController* pOwner);
+	//static void ApplyGravity(class EnemyController* pOwner);
 };

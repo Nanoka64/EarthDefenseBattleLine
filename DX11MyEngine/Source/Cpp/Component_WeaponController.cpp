@@ -27,7 +27,7 @@ const VEC2 g_WeaponSpriteCenterSize = VEC2(200.0f, 120.0f);
 
 // 後ろs
 const VEC2 g_WeaponSpriteBackPos    = VEC2(1520.0f, 715.0f);
-const VEC2 g_WeaponSpriteBackSize   = VEC2(100.0f, 60.0f);
+const VEC2 g_WeaponSpriteBackSize   = VEC2(0.0f, 0.0f);		// 後ろの武器スプライトは表示しない
 
 
 /* 武器のパラメータ文字の位置 */

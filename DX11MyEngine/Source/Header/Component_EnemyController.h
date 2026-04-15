@@ -92,5 +92,6 @@ public:
 	/* 開始時の位置を取得する*/
 	const VECTOR3::VEC3 &get_StartPos() { return m_StartPos; }
 
+	/* 死亡フラグ */
+	bool get_IsDead()const { return m_IsDead; }
 };
-

@@ -376,7 +376,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Source\Cpp\Ant_AT_AttackAcid.cpp" />
+    <ClCompile Include="Source\Cpp\Ant_AT_DeadState.cpp" />
     <ClCompile Include="Source\Cpp\Ant_AT_MoveState.cpp" />
+    <ClCompile Include="Source\Cpp\Ant_CommonStateProcess.cpp" />
     <ClCompile Include="Source\Cpp\Ant_PT_IdleState.cpp" />
     <ClCompile Include="Source\Cpp\Ant_AT_TrackingState.cpp" />
     <ClCompile Include="Source\Cpp\Ant_PT_MoveState.cpp" />

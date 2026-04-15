@@ -20,7 +20,10 @@
     "collisionSize": 0.0,
     "gravityScale": 0.0,
     "collisionMask": ["ENEMY", "BUILDING", "DESTRUCTION_BUILDING"],
-    "explosionRadius": 50.0,
+    "bulletMaterialTag" : "Bullet_01",
+    "decalMaterialTag" : "Decal_BulletHole",
+    "scale" : [0.25, 0.25, 0.25],
+    "explosionRadius": 150.0,
     "explosionEffectHandleTag": "Explosion_03",
     "isSmoke" : true
   }

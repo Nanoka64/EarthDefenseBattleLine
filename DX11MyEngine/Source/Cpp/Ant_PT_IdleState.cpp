@@ -53,6 +53,13 @@ int Ant_PT_IdleState::Update(class EnemyController* pOwner)
 	}
 	else
 	{
+		// 共通処理
+		int commonRes = Ant_CommonStateProcess::CommonProcess(pOwner);
+		if (commonRes != -1)
+		{
+			return commonRes;
+		}
+		
 		//=========================================================================================
 		//
 		//						待機期間を終えたら、移動ステートへ

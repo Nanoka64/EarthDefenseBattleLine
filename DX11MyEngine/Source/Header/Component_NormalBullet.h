@@ -14,7 +14,7 @@
 class NormalBullet : public BulletBase
 {
 private:
-	BulletData::NormalBulletData m_Parameter;	// 弾に関するパラメータ
+	//BulletData::NormalBulletData m_Parameter;	// 弾に関するパラメータ
 
 public:
 	NormalBullet(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
@@ -24,9 +24,8 @@ public:
 	void Update(RendererEngine &renderer) override;		// 更新処理
 
 	void OnCollisionEnter(const class CollisionInfo &other);	// 衝突処理
-	void set_Parameter(const BulletData::NormalBulletData &_param) { m_Parameter = _param; };	// パラメータ設定
 	void Reset()override;
-	void Setup()override;
-
+	void Setup(const BulletData::NormalBulletData* _pParam)override;
+	const BulletData::NormalBulletData* get_Parameter()const; // パラメータの取得
 };
 

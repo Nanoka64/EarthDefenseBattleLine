@@ -84,6 +84,7 @@ void TrailRenderer::Update(RendererEngine &renderer)
 	else {	// ‰‰ñ—p
 		dist = m_MinVertexDistance;
 	}
+
 	if (dist >= m_MinVertexDistance)
 	{
 		TrailInfo trail;

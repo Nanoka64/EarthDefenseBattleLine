@@ -20,7 +20,7 @@ using namespace UtilityData;
 using namespace Input;
 using namespace VECTOR3;
 
-constexpr float DECAL_SIZE_FACTOR        = 25.0f;   // デカールの大きさの補正値（transformのスケールだと小さすぎるため）
+constexpr float DECAL_SIZE_FACTOR        = 7.0f;   // デカールの大きさの補正値（transformのスケールだと小さすぎるため）
 constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 5.0f;    // デカールの奥行に加算する補正値
 constexpr float DECAL_LIFE_TIME          = 5.0f;    // デカールの生存時間
 
@@ -76,7 +76,7 @@ void NormalBullet::Start(RendererEngine& renderer)
             if (health && hitCategory != COLLISION_CATEGORY::DESTRUCTION_BUILDING)
             {
                 // 弾が保持しているダメージ値を渡す
-                health->TakeDamage(m_Parameter._damage);
+                health->TakeDamage(m_pParameter->_damage);
             }
 
             // 建物に当たったら即消えるようにして、その他は貫通数を減らす
@@ -88,7 +88,7 @@ void NormalBullet::Start(RendererEngine& renderer)
             {
                 m_CrntPenetrationCount++; // 貫通数を増やす
 
-                if (m_CrntPenetrationCount >= m_Parameter._penetrationsCount)
+                if (m_CrntPenetrationCount >= m_pParameter->_penetrationsCount)
                 {
                     m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
                 }
@@ -97,7 +97,7 @@ void NormalBullet::Start(RendererEngine& renderer)
             //*****************************************************************************************
             //						デカールの生成
             //*****************************************************************************************
-            auto matPtr = Master::m_pResourceManager->FindMaterial("Decal_BulletHole");
+            auto matPtr = Master::m_pResourceManager->FindMaterial(m_pParameter->_decalMaterialTag);
 
             SetupMaterialInfo matInfo[1];
             matInfo[0].Index = 0;
@@ -156,6 +156,7 @@ void NormalBullet::Start(RendererEngine& renderer)
             float angleZ = Tool::RandRange(0.0f, 6.14f);
 
             VEC3 scale = transform->get_VEC3ToScale();
+            scale *= DECAL_SIZE_FACTOR;
             scale.z += DECAL_Z_AXIS_SIZE_FACTOR;
 
 
@@ -206,8 +207,8 @@ void NormalBullet::Update(RendererEngine &renderer)
 
     MoveParam param;
     param._moveDirection = m_MoveDir;
-    param._moveSpeed = m_Parameter._speed;
-    param._gravity = m_Parameter._gravityScale;
+    param._moveSpeed = m_pParameter->_speed;
+    param._gravity = m_pParameter->_gravityScale;
 
     m_PrevPos = crntPos;
 
@@ -219,14 +220,14 @@ void NormalBullet::Update(RendererEngine &renderer)
 
     // 射程距離外で削除
     float distSq = VEC3::DistanceSq(newPos, m_StartPos);
-    if (distSq > m_Parameter._range * m_Parameter._range) {
+    if (distSq > m_pParameter->_range * m_pParameter->_range) {
         m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
     }
     // レイキャストで衝突判定（コライダーの衝突処理をこっちに移動）
     CollInData_Ray ray;
     ray._point = crntPos;
 	ray._dir = newPos - crntPos;    // 前回の位置から新しい位置へのベクトル
-    unsigned mask = m_Parameter._collisionMask;
+    unsigned mask = m_pParameter->_collisionMask;
     CollisionInfo hitInfo;
 
     if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
@@ -289,11 +290,14 @@ void NormalBullet::OnCollisionEnter(const class CollisionInfo& _other)
 //*---------------------------------------------------------------------------------------
 //*【?】パラメータ等の設定
 //*     発射時に呼ぶ 
-//* [引数]なし
+//* [引数]
+//* _pParam : 弾のパラメータ 
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-void NormalBullet::Setup()
+void NormalBullet::Setup(const BulletData::NormalBulletData* _pParam)
 {
+    m_pParameter = _pParam;
+
     auto transform = m_pOwner.lock()->get_Transform().lock();
 
     // 開始位置
@@ -317,7 +321,18 @@ void NormalBullet::Setup()
 //*----------------------------------------------------------------------------------------
 void NormalBullet::Reset()
 {
-    m_Parameter.Reset();
+    //m_pParameter->Reset();
 
     m_CrntPenetrationCount = 0;
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】パラメータの取得
+//* [引数]なし
+//* [返値]
+//* 爆発弾のデータ 
+//*----------------------------------------------------------------------------------------
+const BulletData::NormalBulletData* NormalBullet::get_Parameter()const
+{
+    return static_cast<const BulletData::NormalBulletData*>(m_pParameter);
 }

@@ -498,29 +498,52 @@ std::vector<std::shared_ptr<Collider>> CollisionManager::CheckSphere(const VECTO
         // マスクチェック
         if (!(UINT_CAST(col->get_CollisionCategory()) & _mask)) continue;
 
-		float colRadius = 0.0f;
+        // トランスフォーム取得
+        auto trans = col->get_OwnerObj().lock()->get_Component<MyTransform>();
+
+        // 相手が球の場合
         if (col->get_ColliderType() == COLLIDER_TYPE::SPHERE) {
+            float colRadius = 0.0f;
             auto sphereCol = std::static_pointer_cast<SphereCollider>(col);
             colRadius = sphereCol->get_Radius();
+
+            VEC3 pos = trans->get_VEC3ToPos();
+            CollInData_Sphere srcA = { _center,_radius };
+            CollInData_Sphere srcB = { pos,    colRadius };
+
+            // スフィアとスフィアで判定
+            if (HitCheck_SphereVsSphere(srcA, srcB))
+            {
+                hitList.push_back(col);
+            }
+
         }
+
+        // ボックスの場合
          else if (col->get_ColliderType() == COLLIDER_TYPE::BOX) {
             auto boxCol = std::static_pointer_cast<BoxCollider>(col);
-            colRadius = boxCol->get_Size().Length();
+            // コライダーの位置と、オブジェクトの位置を合わせる。
+            VEC3 center = boxCol->get_Center() + trans->get_VEC3ToPos();
+
+
+            // AABB
+            CollInData_AABB srcA;
+            srcA._min = center - boxCol->get_Size();
+            srcA._max = center + boxCol->get_Size();
+
+            // スフィア
+            CollInData_Sphere srcB = { _center,_radius };
+
+            // ボックスとスフィアで判定
+            if (HitCheck_BoxVsSphere(srcA, srcB))
+            {
+                hitList.push_back(col);
+            }
         }
          else {
             continue; // その他のコライダータイプはスキップ
 		}
-        
-        // トランスフォーム取得
-        auto trans = col->get_OwnerObj().lock()->get_Component<MyTransform>();
-        VEC3 pos = trans->get_VEC3ToPos();
-        CollInData_Sphere srcA = { _center,_radius };
-        CollInData_Sphere srcB = { pos,    colRadius };
 
-        if (HitCheck_SphereVsSphere(srcA, srcB))
-        {
-            hitList.push_back(col);
-        }
     }
     return hitList;
 }
@@ -691,7 +714,7 @@ bool CollisionManager::HitCheck_BoxVsSphere(const CollInData_AABB &_box, const C
                      (P.z - _sphere._pos.z) * (P.z - _sphere._pos.z);
 
     // 距離が球の半径より小さいなら衝突
-    return distance < _sphere._radius;
+    return distance < _sphere._radius * _sphere._radius;
 }
 
 

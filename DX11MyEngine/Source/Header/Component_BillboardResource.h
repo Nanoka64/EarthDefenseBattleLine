@@ -48,15 +48,11 @@ public:
 
 	bool Setup(RendererEngine& renderer, BILLBOARD_USAGE_TYPE usageType, std::shared_ptr<Material> pMaterial, UINT materialNum);	// 初期化
 
-
 	/// <summary>
-	/// テクスチャマップ設定 Setup後に呼ぶ
+	/// マテリアルの設定
 	/// </summary>
-	/// <param name="mapType"></param>
-	/// <param name="matIndex"></param>
-	/// <param name="path"></param>
-	/// <returns></returns>
-	virtual bool set_TextureMap(TEXTURE_MAP mapType, UINT matIndex, const std::wstring& path);
+	/// <param name="pMaterial"></param>
+	void set_Material(std::shared_ptr<Material> pMaterial);
 
 	/// <summary>
 	/// 定数バッファの作成

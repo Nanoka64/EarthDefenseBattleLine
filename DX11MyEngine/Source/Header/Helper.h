@@ -34,6 +34,7 @@ namespace Tool
 
     //-----------------------------------------
     /*      イージング関数    */
+    // 参考サイト：https://easings.net/ja
     // In : 加速
     // Out : 減速
     //-----------------------------------------
@@ -111,6 +112,25 @@ namespace Tool
             // (t-1) を計算
             float t1 = t - 1.0f;
             return 1.0f + c3 * FLOAT_CAST(pow(t1, 3)) + c1 * FLOAT_CAST(pow(t1, 2));
+        }
+
+        // バウンドするやつ
+        inline float EaseOutBounce(float t) {
+            const float n1 = 7.5625;
+            const float d1 = 2.75;
+
+            if (t < 1 / d1) {
+                return n1 * t * t;
+            }
+            else if (t < 2 / d1) {
+                return n1 * (t -= 1.5 / d1) * t + 0.75;
+            }
+            else if (t < 2.5 / d1) {
+                return n1 * (t -= 2.25 / d1) * t + 0.9375;
+            }
+            else {
+                return n1 * (t -= 2.625 / d1) * t + 0.984375;
+            }
         }
     }
 
@@ -224,6 +244,9 @@ namespace Tool
             return originalPos + _shakeOffset;
         }
     };
+
+
+    
 
     //-----------------------------------------
     /*      線形補間関数    */
@@ -471,6 +494,34 @@ namespace Tool
         stream << std::fixed << std::setprecision(precision) << value;
         return stream.str();
     }
+
+    //-----------------------------------------
+    /*      クオータニオン系    */
+    //-----------------------------------------
+    
+    /// <summary>
+    /// バラつきクオータニオンを求める
+    /// </summary>
+    /// <param name="_Out">出力先</param>
+    /// <param name="_originalQ">バラつかせるクオータニオン</param>
+    /// <param name="_accuracy">バラつき具合（rad）</param>
+    /// <returns></returns>
+    //DirectX::XMVECTOR CalcQuaternionAccuracy(DirectX::XMVECTOR* _Out, const DirectX::XMVECTOR& _originalQ, const VECTOR3::VEC3& _accuracy)
+    //{
+    //    VECTOR3::VEC3 accuracy = Master::m_pRandomManager->GetVEC3Random(-_accuracy, _accuracy);
+    //    // バラつきクォータニオン
+    //    DirectX::XMVECTOR spreadQ = DirectX::XMQuaternionRotationRollPitchYaw(accuracy.x, accuracy.y, accuracy.z);
+
+    //    // 最終的なクォータニオン作成
+    //    DirectX::XMVECTOR finalRotQ = DirectX::XMQuaternionMultiply(_originalQ, spreadQ);
+    //    finalRotQ = DirectX::XMQuaternionNormalize(finalRotQ); // 念のため正規化
+
+    //    // 出力
+    //    *_Out = finalRotQ;
+
+    //    return finalRotQ;
+    //}
+
 
 
     /// <summary>

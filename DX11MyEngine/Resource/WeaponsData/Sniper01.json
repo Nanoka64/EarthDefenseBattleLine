@@ -19,6 +19,9 @@
     "penetrationsCount": 5,
     "collisionSize": 0.0,
     "gravityScale": 0.0,
-    "collisionMask": ["ENEMY", "BUILDING", "DESTRUCTION_BUILDING"]
+    "collisionMask": ["ENEMY", "BUILDING", "DESTRUCTION_BUILDING"],
+    "bulletMaterialTag" : "Bullet_02",
+    "decalMaterialTag" : "Decal_BulletHole",
+    "scale" : [0.25, 0.25, 0.25]
   }
 }

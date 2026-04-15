@@ -54,6 +54,13 @@ void Ant_AT_MoveState::OnExit(class EnemyController* pOwner)
 //*----------------------------------------------------------------------------------------
 int Ant_AT_MoveState::Update(class EnemyController* pOwner)
 {
+	// 共通処理
+	int commonRes = Ant_CommonStateProcess::CommonProcess(pOwner);
+	if (commonRes != -1)
+	{
+		return commonRes;
+	}
+
 	//=========================================================================================
 	//
 	//						移動期間を終えたら、追従ステートへ

@@ -17,9 +17,10 @@
 constexpr float DECAL_SIZE_FACTOR        = 100.0f;   // デカールの大きさの補正値
 constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 2.0f;     // デカールの奥行に加算する補正値
 constexpr float DECAL_LIFE_TIME = 10.0f;             // デカールの生存時間
-constexpr float SHAKE_MAX_RANGE_EXPLOSION_SCALE_FACTOR = 15.0f;  // カメラシェイク時、シェイクの最大距離を求める際に掛ける補正値
-constexpr float SHAKE_LENGTH_SCALE_FACTOR = 0.01f;               // カメラシェイク時、シェイクの大きさを求める際に掛ける補正値
+constexpr float SHAKE_MAX_RANGE_EXPLOSION_SCALE_FACTOR = 15.0f; // カメラシェイク時、シェイクの最大距離を求める際に掛ける補正値
+constexpr float SHAKE_LENGTH_SCALE_FACTOR = 0.007f;             // カメラシェイク時、シェイクの大きさを求める際に掛ける補正値
 constexpr float SHAKEDURATION = 1.0f;                           // カメラシェイクの持続時間
+constexpr float EFFECT_SCALE_FACTOR = 0.15f;            // そのままだと、エフェクトが大きすぎるので
 
 using namespace UtilityData;
 using namespace VECTOR3;
@@ -66,11 +67,13 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             auto transform = m_pOwner.lock()->get_Transform().lock();
             VEC3 pos = transform->get_VEC3ToPos();
             
+            auto bulletParam = this->get_ExplosionParameter();
+
             // ****************************************************
             //				 カメラシェイク
             // ****************************************************
-            float maxRange = m_Parameter._explosionRadius * SHAKE_MAX_RANGE_EXPLOSION_SCALE_FACTOR;
-            float shaleLength = m_Parameter._explosionRadius * SHAKE_LENGTH_SCALE_FACTOR;
+            float maxRange = bulletParam->_explosionRadius * SHAKE_MAX_RANGE_EXPLOSION_SCALE_FACTOR;
+            float shaleLength = bulletParam->_explosionRadius * SHAKE_LENGTH_SCALE_FACTOR;
             renderer.get_CameraComponent()->DistanceDecay(SHAKEDURATION, VEC3(shaleLength), pos, maxRange);
 
 
@@ -82,7 +85,7 @@ void ExplosionBullet::Start(RendererEngine& renderer)
 
 
             // デカールの作成
-            auto matPtr = Master::m_pResourceManager->FindMaterial("Decal_BulletHole");
+            auto matPtr = Master::m_pResourceManager->FindMaterial(bulletParam->_decalMaterialTag);
 
             SetupMaterialInfo matInfo[1];
             matInfo[0].Index = 0;
@@ -110,9 +113,9 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             float angleZ = Tool::RandRange(0.0f, 6.14f);
 
             VEC3 scale;
-            scale.x = m_Parameter._explosionRadius;
-            scale.y = m_Parameter._explosionRadius;
-            scale.z = m_Parameter._explosionRadius;
+            scale.x = bulletParam->_explosionRadius;
+            scale.y = bulletParam->_explosionRadius;
+            scale.z = bulletParam->_explosionRadius;
 
             auto obj = MeshFactory::CreateDecal(decal);
             obj->get_Component<DecalRenderer>()->Start(renderer);
@@ -125,9 +128,9 @@ void ExplosionBullet::Start(RendererEngine& renderer)
 
             // エフェクト
             VEC3 effectRot = VEC3(abs(angleX - 0.05f), angleY, 0.0f);
-            int exp_handle = Master::m_pEffectManager->PlayEffect(m_Parameter._explosionEffectHandleTag);   // 爆発
+            int exp_handle = Master::m_pEffectManager->PlayEffect(bulletParam->_explosionEffectHandleTag);   // 爆発
 
-            float expSize = m_Parameter._explosionRadius * 0.15f;   // 爆発半径
+            float expSize = bulletParam->_explosionRadius * EFFECT_SCALE_FACTOR;   // 爆発半径（そのままだと大きすぎるので補正）
             VEC3 expRot = VEC3(
                 Master::m_pRandomManager->GetFloatRandom(0.0f, 3.14f), 
                 Master::m_pRandomManager->GetFloatRandom(0.0f, 3.14f), 
@@ -139,7 +142,7 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             Master::m_pEffectManager->SetPositionEffect(exp_handle, pos.x, pos.y, pos.z);
             Master::m_pEffectManager->SetRotationEffect(exp_handle, expRot.x, expRot.y, expRot.z);
 
-            if (m_Parameter._isSmoke) 
+            if (bulletParam->_isSmoke)
             {
                 int exp_smoke_handle = Master::m_pEffectManager->PlayEffect("Explosion_Smoke_01");   // 煙
             
@@ -167,14 +170,17 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     float moveDistance = VEC3::Distance(crntPos, m_PrevPos);
     float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 
+    // 爆発弾のパラメータ
+    auto bulletParam = get_ExplosionParameter();
+
+
     MoveParam param;
     param._moveDirection = m_MoveDir;// ※マイナスにしているのはプレイヤーの方向がおかしいせい（後で直す）
-    param._moveSpeed = m_Parameter._speed;
-    param._gravity = m_Parameter._gravityScale;
+    param._moveSpeed = bulletParam->_speed;
+    param._gravity = bulletParam->_gravityScale;
 
     // 前回の位置として保持
     m_PrevPos = crntPos;  
-
 
     // 移動
     moveComp->Calculate(param); 
@@ -184,7 +190,7 @@ void ExplosionBullet::Update(RendererEngine &renderer)
 
     // 射程距離外で削除
     float distSq = VEC3::DistanceSq(newPos, m_StartPos);
-    if (distSq > m_Parameter._range * m_Parameter._range) {
+    if (distSq > bulletParam->_range * bulletParam->_range) {
         m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
     }
 
@@ -192,7 +198,7 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     CollInData_Ray ray;
 	ray._point = crntPos;
 	ray._dir = newPos - crntPos;    // 前回の位置から新しい位置へのベクトル
-    unsigned mask = m_Parameter._collisionMask;
+    unsigned mask = bulletParam->_collisionMask;
 	CollisionInfo hitInfo;
 
     if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
@@ -201,7 +207,7 @@ void ExplosionBullet::Update(RendererEngine &renderer)
         auto transform = owner->get_Transform().lock();
         transform->set_Pos(crntPos);     // 衝突位置に合わせる
 
-
+        // 衝突処理
         if (m_CollisionTask)
         {
             m_CollisionTask(hitInfo);
@@ -211,10 +217,10 @@ void ExplosionBullet::Update(RendererEngine &renderer)
 
         VEC3 pos = transform->get_VEC3ToPos();
 
-        unsigned mask = UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);   // 敵と破壊可能な建物
+        unsigned mask = bulletParam->_collisionMask;;   
 
         // 範囲内チェック
-        auto targets = Master::m_pCollisionManager->CheckSphere(pos, m_Parameter._explosionRadius, mask);
+        auto targets = Master::m_pCollisionManager->CheckSphere(pos, bulletParam->_explosionRadius, mask);
 
         // 範囲内の全員にダメージ
         for (auto& target : targets) {
@@ -223,14 +229,13 @@ void ExplosionBullet::Update(RendererEngine &renderer)
             {
                 if (auto health = obj->get_Component<Health>())
                 {
-                    health->TakeDamage(m_Parameter._damage);
+                    health->TakeDamage(bulletParam->_damage);
                 }
             }
         }
 
         m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
     }
-
 }
 
 
@@ -248,16 +253,30 @@ void ExplosionBullet::OnTriggerEnter(const class CollisionInfo &_other)
 
 
 //*---------------------------------------------------------------------------------------
+//*【?】パラメータの取得
+//* [引数]なし
+//* [返値]
+//* 爆発弾のデータ 
+//*----------------------------------------------------------------------------------------
+const BulletData::ExplosionBulletData* ExplosionBullet::get_ExplosionParameter()const
+{
+    return static_cast<const BulletData::ExplosionBulletData*>(m_pParameter);
+}
+
+
+//*---------------------------------------------------------------------------------------
 //*【?】パラメータ等の設定
 //*     発射時に呼ぶ 
 //* [引数]なし
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-void ExplosionBullet::Setup()
+void ExplosionBullet::Setup(const BulletData::NormalBulletData* _pParam)
 {
     if (m_pOwner.expired())return;
     auto owner = m_pOwner.lock();
     auto transform = owner->get_Transform().lock();
+
+    m_pParameter = static_cast<const BulletData::ExplosionBulletData*>(_pParam);
 
     // 開始位置
     m_StartPos = transform->get_VEC3ToPos();
@@ -298,5 +317,5 @@ void ExplosionBullet::Reset()
 
 
 
-    m_Parameter.Reset();
+    //m_Parameter.Reset();
 }

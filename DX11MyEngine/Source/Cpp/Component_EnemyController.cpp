@@ -221,11 +221,7 @@ void EnemyController::Update(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void EnemyController::LateUpdate(RendererEngine& renderer)
 {
-	if (m_IsDead)
-	{
-		m_pColliderComp.lock()->set_IsEnable(false);	// コライダーの判定をオフに
-		m_pOwner.lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DELETE);
-	}
+
 	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 
 	auto target = Master::m_pGameObjectManager->get_ObjectByTagConst("Player");
@@ -236,12 +232,6 @@ void EnemyController::LateUpdate(RendererEngine& renderer)
 
 	// ステートの実行
 	m_StateMachine.Update();
-
-
-	// ステート内で移動処理が実行されるので、移動後の値が取れる
-	auto myTransform = m_pOwner.lock()->get_Transform().lock();
-	VEC3 newPos = myTransform->get_VEC3ToPos();
-	newPos.y = 0.0f;
 
 
 	//if(m_IsGrounded == false)
@@ -257,23 +247,6 @@ void EnemyController::LateUpdate(RendererEngine& renderer)
 	//	}
 	//}
 	//newPos.y += m_GravityVelocity;
-
-	myTransform->set_Pos(newPos);
-
-
-	////目標の方向ベクトルから角度値を算出c
-	//float targetAngleY = atan2(m_MoveVelocity.x, m_MoveVelocity.z);
-
-	//// 目標とするクォータニオン
-	//XMVECTOR targetRotQ = XMQuaternionRotationRollPitchYaw(0.0f, targetAngleY, 0.0f);
-
-	//XMVECTOR crntRotQ = myTransform->get_RotationQuaternion();
-
-	//// クォータニオンの球面線形補間
-	//// 普通の線形補間だと、値が飛んでしまうためクォータニオンの場合は球面線形補間を使う
-	//XMVECTOR newRotQ = XMQuaternionSlerp(crntRotQ, targetRotQ, 0.1f);
-
-	//myTransform->set_RotationQuaternion(newRotQ);
 }
 
 
@@ -299,11 +272,6 @@ void EnemyController::Draw(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void EnemyController::OnCollisionEnter(const class CollisionInfo& _other)
 {
-	if (_other.get_HitObject().lock()->get_Tag() == "Player")
-	{
-		_other.get_HitObject().lock()->get_Component<Health>()->TakeDamage(0.1f);
-	}
-
 	VEC3 normal = _other.get_HitNormal();
 
 	// 法線のY成分が一定以上（例：0.7f以上で約45度以下の坂）なら床とみなす
@@ -315,18 +283,6 @@ void EnemyController::OnCollisionEnter(const class CollisionInfo& _other)
 		}
 		m_IsGrounded = true;
 	}
-
-	//// 通常弾
-	//if (_other.get_HitObject().lock()->get_Tag() == "Bullet_Normal")
-	//{
-	//	m_pHealthComp->TakeDamage(50.0f);
-	//}
-
-	//// 爆発
-	//if (_other.get_HitObject().lock()->get_Tag() == "Bullet_Explosion")
-	//{
-	//	m_pHealthComp->TakeDamage(100.0f);
-	//}
 }
 
 //*---------------------------------------------------------------------------------------

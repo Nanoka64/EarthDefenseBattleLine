@@ -159,26 +159,42 @@ bool BulletManager::Init(RendererEngine &renderer)
         // 生成時に実行 ******************************************************************************************
         [&renderer]()->GameObject *
         {
-            // マテリアル取得
-            auto matPtr1 = Master::m_pResourceManager->FindMaterial("Bullet");
+            //// マテリアル取得
+            //auto matPtr1 = Master::m_pResourceManager->FindMaterial("Bullet");
+            //SetupMaterialInfo matInfo[1];
+            //matInfo[0].Index = 0;
+            //matInfo[0].pMaterialData = matPtr1;
+
+            //// メッシュ作成
+            //CreateModelInfo model;
+            //model.pRenderer = &renderer;
+            //model.Path = "Resource/Model/Weapon/bullet.fbx";
+            //model.ObjTag = "Bullet_Normal";
+            //model.IsAnim = false;
+            //model.MatNum = 1;
+            //model.SetupMaterial = matInfo;
+            //model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
+            //auto obj = MeshFactory::CreateModel(model);
+            //if (obj == nullptr) {
+            //    assert(false);
+            //    return nullptr;
+            //}
+
+            auto matPtr = Master::m_pResourceManager->FindMaterial("Bullet_01");
+
             SetupMaterialInfo matInfo[1];
             matInfo[0].Index = 0;
-            matInfo[0].pMaterialData = matPtr1;
+            matInfo[0].pMaterialData = matPtr;
+            CreateBillboradInfo billboard;
+            billboard.pRenderer = &renderer;
+            billboard.Type = BILLBOARD_USAGE_TYPE::SIMPLE;
+            billboard.ShaderType = SHADER_TYPE::FORWARD_UNLIT_STATIC;
+            billboard.IsActive = true;
+            billboard.MatNum = 1;
+            billboard.MaterialData = matInfo;
+            billboard.IsTransparent = true; // 透明度があり
+            auto obj = MeshFactory::CreateBillboard(billboard);
 
-            // メッシュ作成
-            CreateModelInfo model;
-            model.pRenderer = &renderer;
-            model.Path = "Resource/Model/Weapon/bullet.fbx";
-            model.ObjTag = "Bullet_Normal";
-            model.IsAnim = false;
-            model.MatNum = 1;
-            model.SetupMaterial = matInfo;
-            model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
-            auto obj = MeshFactory::CreateModel(model);
-            if (obj == nullptr) {
-                assert(false);
-                return nullptr;
-            }
             
             obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);    // ノンデストロイ
             obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);        // ノンアクティブ
@@ -189,6 +205,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             // バレットコンポーネントの追加
             auto bulletComp = obj->add_Component<NormalBullet>();
 
+            // 直線移動
             auto moveComp = obj->add_Component<MoveLogic>();
             moveComp->Register(MOVE_BEHAVIOUR_TYPE::LINEAR);
             moveComp->ChangeBehaviour(MOVE_BEHAVIOUR_TYPE::LINEAR);
@@ -250,10 +267,9 @@ bool BulletManager::Init(RendererEngine &renderer)
         [this](GameObject* obj)          
         {
             auto bulletComp = obj->get_Component<ExplosionBullet>();
-            float explosionRadius = bulletComp->get_Parameter()._explosionRadius;   // 爆発半径を取得
+            const auto bulletParam = bulletComp->get_ExplosionParameter();
+            float explosionRadius = bulletParam->_explosionRadius;   // 爆発半径を取得
             bulletComp->Reset();
-
-
 
             //// コライダーの使用をオフに
             //auto collider = obj->get_Component<BoxCollider>();
@@ -552,13 +568,20 @@ void BulletManager::Shot(RendererEngine &renderer, const BulletTransformData &_t
     transform->set_Pos(_transformData._pos);
     transform->set_RotationQuaternion(_transformData._rotQ);
     //transform->set_RotateToRad(_transformData._rotRad);
-    transform->set_Scale(_transformData._scale);
+    transform->set_Scale(_param._scale);
 
 
     // 弾コンポーネントのセットアップ
     auto bulletComp = obj->get_Component<NormalBullet>();
-    bulletComp->set_Parameter(_param);
-    bulletComp->Setup();
+    bulletComp->Setup(&_param);
+
+    const auto bulletParam = bulletComp->get_Parameter();
+
+    // 弾に合わせたマテリアルに付け替え
+    auto matPtr = Master::m_pResourceManager->FindMaterial(bulletParam->_bulletMaterialTag);
+    if (auto billboardRes = obj->get_Component<BillboardResource>()) {
+        billboardRes->set_Material(matPtr);
+    }
 
     // 更新リストに登録
     m_ExtractedBulletMap[BULLET_TYPE::NORMAL].push_back(obj);
@@ -591,13 +614,12 @@ void BulletManager::Shot(RendererEngine &renderer, const BulletTransformData &_t
     transform->set_Pos(_transformData._pos);
     transform->set_RotationQuaternion(_transformData._rotQ);
     //transform->set_RotateToRad(_transformData._rotRad);
-    transform->set_Scale(_transformData._scale);
+    transform->set_Scale(_param._scale);
 
 
     // 弾コンポーネントのセットアップ
     auto bulletComp = bulletObj->get_Component<ExplosionBullet>();
-    bulletComp->set_Parameter(_param);
-    bulletComp->Setup();
+    bulletComp->Setup(&_param);
 
     //auto collider = bulletObj->get_Component<BoxCollider>();
     //collider->set_Size(VEC3(_transformData._scale));
@@ -629,7 +651,7 @@ void BulletManager::Shot(RendererEngine &renderer, const BulletTransformData &_t
     transform->set_Pos(_transformData._pos);
     transform->set_RotationQuaternion(_transformData._rotQ);
     //transform->set_RotateToRad(_transformData._rotRad);
-    transform->set_Scale(_transformData._scale);
+    transform->set_Scale(_param._scale);
 
     // 更新リストに登録
     m_ExtractedBulletMap[BULLET_TYPE::HORMING].push_back(obj);
