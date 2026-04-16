@@ -75,6 +75,9 @@ void GunWeapon::Start(RendererEngine& renderer)
 
     // 全ビットを0に
     m_WeaponFlags.Init();
+
+    // 有効状態に
+    get_WeaponFlags().EnableFlag(WEAPON_STATUS::ENABLED);
 }
 
 
@@ -241,6 +244,10 @@ bool GunWeapon::Setup(const WeaponData::BaseWeaponData* _pWeaponData)
         },
         gunParam->_bulletParam);
 
+
+    // 有効状態に
+    get_WeaponFlags().EnableFlag(WEAPON_STATUS::ENABLED);
+
     return true;
 }
 
@@ -278,7 +285,7 @@ void GunWeapon::SwicthReset()
 void GunWeapon::Shoot(RendererEngine& renderer)
 {
 	// 武器使用の有無の設定がオフなら発射しない
-    if (!Master::m_pDataManager->get_IsUseWeapon()) {
+    if (!Master::m_pDataManager->get_IsUseWeapon() || !get_WeaponFlags().GetFlag(WEAPON_STATUS::ENABLED)) {
         return;
     }
 

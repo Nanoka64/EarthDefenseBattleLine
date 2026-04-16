@@ -91,7 +91,7 @@ int Ant_AT_DeadState::Update(class EnemyController* pOwner)
 			myTransform->set_RotationQuaternion(crntRotQ);
 
 			// ’µ‚Ë‚éŠ´‚¶‚É
-			crntPos.y = (Tool::Easing::EaseOutBounce(t) * 3.0f);
+			crntPos.y = ((Tool::Easing::EaseOutBounce(t)*-1.0f) * -3.0f);
 			myTransform->set_Pos(crntPos);
 		}
 

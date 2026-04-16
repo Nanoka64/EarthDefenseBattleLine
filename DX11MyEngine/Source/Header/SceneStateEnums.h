@@ -36,6 +36,7 @@ namespace SceneStateEnums
     {
         c_GAME_LOAD,            // ロード
         c_GAME_PLAY,            // プレイ
+        c_GAME_CONFIG,          // ゲームプレイ中の設定画面
 
         c_GO_RESULT_SCENE,      // 特殊フラグ リザルトシーンへ行く
 
@@ -47,10 +48,12 @@ namespace SceneStateEnums
     /// </summary>
     enum c_RESULT
     {
+        c_CLEARED,              // ミッションクリア
+        c_FAILED,               // ミッション失敗
         c_GETITEM_CHECK,        // 取得したアイテムの確認
-
+        
         c_GO_TITLE_SCENE,       // 特殊フラグ タイトルシーンへ
-
+        
         c_RESULT_NUM,           
     };
 };

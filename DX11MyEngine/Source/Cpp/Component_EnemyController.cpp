@@ -97,8 +97,6 @@ void EnemyController::Start(RendererEngine& renderer)
 			Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y, pos.z);
 			Master::m_pEffectManager->SetRotationEffect(handle, rot.x, rot.y, rot.z);
 
-
-
 			auto matPtr = Master::m_pResourceManager->FindMaterial("Decal_Ant_Splash");
 
 			SetupMaterialInfo matInfo[1];
@@ -116,9 +114,9 @@ void EnemyController::Start(RendererEngine& renderer)
 			decal.IsDynamic = true;
 
 			VEC3 scale;
-			scale.x = 10.0f;
-			scale.y = 10.0f;
-			scale.z = 10.0f;
+			scale.x = 6.0f;
+			scale.y = 6.0f;
+			scale.z = 6.0f;
 			auto obj = MeshFactory::CreateDecal(decal);
 			obj->get_Component<DecalRenderer>()->Start(renderer);
 			obj->get_Transform().lock()->set_Pos(pos);

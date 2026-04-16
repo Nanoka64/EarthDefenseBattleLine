@@ -116,20 +116,20 @@ namespace Tool
 
         // バウンドするやつ
         inline float EaseOutBounce(float t) {
-            const float n1 = 7.5625;
-            const float d1 = 2.75;
+            const float n1 = 7.5625f;
+            const float d1 = 2.75f;
 
-            if (t < 1 / d1) {
+            if (t < 1.0f / d1) {
                 return n1 * t * t;
             }
-            else if (t < 2 / d1) {
-                return n1 * (t -= 1.5 / d1) * t + 0.75;
+            else if (t < 2.0f / d1) {
+                return n1 * (t -= 1.5f / d1) * t + 0.75f;
             }
-            else if (t < 2.5 / d1) {
-                return n1 * (t -= 2.25 / d1) * t + 0.9375;
+            else if (t < 2.5f / d1) {
+                return n1 * (t -= 2.25f / d1) * t + 0.9375f;
             }
             else {
-                return n1 * (t -= 2.625 / d1) * t + 0.984375;
+                return n1 * (t -= 2.625f / d1) * t + 0.984375f;
             }
         }
     }
@@ -140,44 +140,61 @@ namespace Tool
     //-----------------------------------------
     struct VEC2_Shaker
     {
-    private:
-        int currentFrame = 0;       // 現在のフレーム
-        int duration = 0;           // 継続時間
-        float strength = 0.0f;      // 揺れの強さ
-        bool isShaking = false;
-        VECTOR2::VEC2 offset = { 0.0f, 0.0f };
+        float _shakeTimer;               // 継続時間
+        float _shakeDuration;           // 継続時間
+        VECTOR2::VEC2 _shaleStrength;   // 揺れの強さ
+        VECTOR2::VEC2 _shakeOffset;     // シェイクによる揺れベクトル
 
-    public:
-        // シェイク開始
-        void Start(int duration, float strength)
+
+        VEC2_Shaker() :
+            _shakeTimer(0.0f),
+            _shakeDuration(0.0f),
+            _shaleStrength(VECTOR2::VEC2()),
+            _shakeOffset(VECTOR2::VEC2())
         {
-            this->duration = duration;
-            this->strength = strength;
-            currentFrame = 0;
-            isShaking = true;
+        };
+
+        /// <summary>
+        /// シェイク開始
+        /// </summary>
+        /// <param name="duration">シェイクの持続時間</param>
+        /// <param name="strength">シェイクの強さ</param>
+        void Start(float duration, const VECTOR2::VEC2& strength)
+        {
+            _shakeDuration = duration;
+            _shaleStrength = strength;
+            _shakeTimer = 0.0f;
         }
 
-        // 更新
-        void Update()
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="_deltaTime">デルタタイム</param>
+        void Update(float _deltaTime)
         {
-            if (!isShaking) return;
+            if (_shakeTimer < _shakeDuration) {
 
-            // 新しい揺れオフセットを生成
-            offset.x = (rand() % 200 - 100) / 100.0f * strength;
-            offset.y = (rand() % 200 - 100) / 100.0f * strength;
+                float t = _shakeTimer / _shakeDuration;
+                float easeOut = 1.0f - Tool::Easing::EaseOutQuad(t);  // イージングで段々弱まるように
 
-            currentFrame++;
-            if (currentFrame >= duration)
-            {
-                isShaking = false;
-                offset = { 0.0f, 0.0f };
+                // 新しい揺れオフセットを生成
+                _shakeOffset.x = (RandRange(-1.0f, 1.0f) * _shaleStrength.x) * easeOut;
+                _shakeOffset.y = (RandRange(-1.0f, 1.0f) * _shaleStrength.y) * easeOut;
+
+                _shakeTimer += _deltaTime;
+            }
+            // 終了
+            else {
+                _shakeOffset = VECTOR2::VEC2(0.0f,0.0f);
+                _shakeDuration = 0.0f;
+                _shakeTimer = 0.0f;
             }
         }
 
         // シェイクしたベクトルと引数のベクトルを足して返す
         VECTOR2::VEC2 Apply(const VECTOR2::VEC2& originalPos)const
         {
-            return originalPos + offset;
+            return originalPos + _shakeOffset;
         }
     };
 

@@ -61,10 +61,18 @@ int Gun_IdleState::Update(GunWeapon* pOwner)
 	{
 		return GUN_STATE::GUN_STATE_FIRE;
 	}
-    // リロード
-    else if (GetInputDown(GAME_CONFIG::WEAPON_RELOAD) || ammoRemaining <= 0)
+    // 残弾が0以下なら強制リロード
+    else if (ammoRemaining <= 0)
     {
         return GUN_STATE::GUN_STATE_RELOADING;
+    }
+    // 対応キーが押されたらリロード
+    else if (GetInputDown(GAME_CONFIG::WEAPON_RELOAD))
+    {
+        if (ammoRemaining < weapon_param->_bulletMaxNum)
+        {
+            return GUN_STATE::GUN_STATE_RELOADING;
+        }
     }
 
 	return GUN_STATE::GUN_STATE_IDLE;

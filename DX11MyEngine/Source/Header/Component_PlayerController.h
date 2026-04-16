@@ -163,10 +163,11 @@ public:
 	void Update(RendererEngine& renderer) override;	// 更新処理
 	void LateUpdate(RendererEngine& renderer) override;	// 更新処理
 
-	void RollingUpdate();
+	void RollingUpdate();	// ローリング更新
 
 	void OnCollisionEnter(const class CollisionInfo &other)override;
 
+	void Reset();	// パラメータ等をリセットする（ゲームの終了時などに呼ぶ）
 
 	/* 移動速度 */
     float get_MoveSpeed() const { return m_MoveSpeed; }

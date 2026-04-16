@@ -40,4 +40,10 @@ namespace EnemyData
 		ANT_STATE_ACTIVE_FALLING,		// —Ž‰º’†
 		ANT_STATE_ACTIVE_DEAD,			// Ž€–S
 	};
+
+
+	struct EnemyData
+	{
+
+	};
 }

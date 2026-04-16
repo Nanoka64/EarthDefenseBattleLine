@@ -356,7 +356,8 @@ void InputManager::InitDefaultKeyConfig()
 
     m_GameConfigMap[GAME_CONFIG::DECITION]._keys.push_back(DIK_RETURN);              // 決定
     m_GameConfigMap[GAME_CONFIG::DECITION]._keys.push_back(DIK_SPACE);
-    m_GameConfigMap[GAME_CONFIG::PAUSE]._keys.push_back(DIK_ESCAPE);                 // ポーズ画面
+    m_GameConfigMap[GAME_CONFIG::PAUSE]._keys.push_back(DIK_TAB);                    // ポーズ画面
+    m_GameConfigMap[GAME_CONFIG::EXIT]._keys.push_back(DIK_ESCAPE);                  // 終了
 
     /* マウス */
     m_GameConfigMap[GAME_CONFIG::WEAPON_FIRE]._mouse  = MOUSE_BUTTON_STATE::LEFT;    // 発射 マウス

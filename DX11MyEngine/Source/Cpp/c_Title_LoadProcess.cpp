@@ -27,7 +27,6 @@ using namespace VECTOR3;
 using namespace VECTOR4;
 using namespace GIGA_Engine;;
 
-constexpr float PLAYER_MAX_HP = 1000.0f;     // プレイヤーの最大HP
 constexpr int LAYER_RANK_CAMERA = 91;	    // カメラのレイヤーランク
 constexpr int LAYER_RANK_DIRLIGHT = 90;		// 平行ライトのレイヤーランク
 constexpr int LAYER_RANK_PLAYER = 90;		// プレイヤーのレイヤーランク
@@ -200,10 +199,12 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         pPlayerObj->set_State(OBJECT_STATE::DYNAMIC);        // 動的オブジェクト
         pPlayerObj->get_Transform().lock()->set_Pos(-900.0f, 0.0f, 900.0f);
 
+        float hp = Master::m_pDataManager->get_PlayerHP();
+
         // 体力コンポーネントの追加
         auto health = pPlayerObj->add_Component<Health>();
-		health->set_CrntHP(PLAYER_MAX_HP);
-        health->set_MaxHP(PLAYER_MAX_HP);
+		health->set_CrntHP(hp);
+        health->set_MaxHP(hp);
 
         // コライダーの追加
         auto collider = pPlayerObj->add_Component<BoxCollider>();

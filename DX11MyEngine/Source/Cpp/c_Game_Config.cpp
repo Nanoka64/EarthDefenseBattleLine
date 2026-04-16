@@ -1,10 +1,10 @@
 #include "pch.h"
-#include "c_Title_Config.h"
-#include "Root_TitleSceneState.h"
-#include "GameObjectManager.h"
+#include "c_Game_Config.h"
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
 #include "InputFactory.h"
+#include "Component_SpriteRenderer.h"
+#include "GameObjectManager.h"
 
 using namespace SceneStateEnums;
 using namespace UtilityData;
@@ -25,16 +25,16 @@ static const VECTOR2::VEC2 g_ConfigItemSize = VECTOR2::VEC2(1000.0f, 70.0f);		//
 static const VECTOR2::VEC2 g_ConfigButtonSize = VECTOR2::VEC2(100.0f, 70.0f);		// ボタンのサイズ
 
 // 項目の値を表示するテキストの位置は、項目の位置にこのオフセットを足した位置になるようにする
-static const VECTOR2::VEC2 g_ConfigValueOffsetSize = VECTOR2::VEC2(250.0f, 70.0f);	
+static const VECTOR2::VEC2 g_ConfigValueOffsetSize = VECTOR2::VEC2(250.0f, 70.0f);
 
 // 項目の位置
 static const VECTOR2::VEC2 g_ConfigItemPosArray[UINT_CAST(CONFIG_ITEM::NUM)] =
 {
+	VEC2(400.0f,400.0f),
 	VEC2(400.0f,500.0f),
 	VEC2(400.0f,600.0f),
 	VEC2(400.0f,700.0f),
 	VEC2(400.0f,800.0f),
-	VEC2(400.0f,900.0f),
 };
 
 // ボタンの位置（項目名の右側に配置）
@@ -55,37 +55,27 @@ static constexpr const char* g_ConfigItemNames[UINT_CAST(CONFIG_ITEM::NUM)] =
 	"シャドウの有無",
 };
 
-///// <summary>
-///// デフォルトの項目の情報（位置、名前、種類、値の種類、値）
-///// </summary>
-//static const ConfigMenuItemInfo g_DefaultConfigItemInfoArray[UINT_CAST(CONFIG_ITEM::NUM)] =
-//{
-//	ConfigMenuItemInfo({ 100.0f, 100.0f }, "", CONFIG_ITEM::BGM_VOLUME,			VALUE_TYPE::INT,   30),
-//	ConfigMenuItemInfo({ 100.0f, 150.0f }, "", CONFIG_ITEM::SE_VOLUME,			VALUE_TYPE::INT,   50),
-//	ConfigMenuItemInfo({ 100.0f, 200.0f }, "", CONFIG_ITEM::MOUSE_SENSITIVITY,	VALUE_TYPE::FLOAT, 40.0f),
-//	ConfigMenuItemInfo({ 100.0f, 250.0f }, "", CONFIG_ITEM::INVERT_Y,			VALUE_TYPE::BOOL,  false),
-//	ConfigMenuItemInfo({ 100.0f, 300.0f }, "", CONFIG_ITEM::SHADOW_ENABLED,     VALUE_TYPE::BOOL,  true)
-//};
 
 
+using namespace SceneStateEnums;
+using namespace VECTOR2;
+using namespace VECTOR3;
+using namespace VECTOR4;
 //*---------------------------------------------------------------------------------------
-//* @:c_Title_Config Class 
+//* @:c_Game_Config Class 
 //*【?】開始
 //* 引数：1.SceneManager
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-void c_Title_Config::OnEnter(SceneManager *pOwner)
+void c_Game_Config::OnEnter(SceneManager* pOwner)
 {
-
 	// 現在の設定情報を入れる
-	const auto& config = Master::m_pDataManager->get_UserConfigData();
+	const auto &config = Master::m_pDataManager->get_UserConfigData();
 	m_DefaultConfigItemInfoArray[0] = ConfigMenuItemInfo({ 100.0f, 100.0f }, "", CONFIG_ITEM::BGM_VOLUME, VALUE_TYPE::INT, config._BGMVolume);
 	m_DefaultConfigItemInfoArray[1] = ConfigMenuItemInfo({ 100.0f, 150.0f }, "", CONFIG_ITEM::SE_VOLUME, VALUE_TYPE::INT, config._SEVolume);
 	m_DefaultConfigItemInfoArray[2] = ConfigMenuItemInfo({ 100.0f, 200.0f }, "", CONFIG_ITEM::MOUSE_SENSITIVITY, VALUE_TYPE::FLOAT, config._mouseSensitivity);
 	m_DefaultConfigItemInfoArray[3] = ConfigMenuItemInfo({ 100.0f, 250.0f }, "", CONFIG_ITEM::INVERT_Y, VALUE_TYPE::BOOL, config._isInvertY);
 	m_DefaultConfigItemInfoArray[4] = ConfigMenuItemInfo({ 100.0f, 300.0f }, "", CONFIG_ITEM::SHADOW_ENABLED, VALUE_TYPE::BOOL, config._isShadowEnabled);
-
-
 
 	// 項目のオブジェクトとコンポーネントの取得と設定
 	for (int i = 0; i < INT_CAST(CONFIG_ITEM::NUM); i++)
@@ -138,8 +128,8 @@ void c_Title_Config::OnEnter(SceneManager *pOwner)
 		rectTrans._size = g_ConfigButtonSize;
 		rectTrans._pos.x += g_RangeBetweenButtons;	// ボタン同士の横方向の距離を空ける
 		m_pConfigAdjustmentButtonObj[i][1] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
-		
-		
+
+
 		//m_pButtonArray[i] = m_pConfigAdjustmentButtonObj[i]->get_Component<ButtonUI>();
 		//m_pMenuItemRectTransformArray[i] = m_pConfigAdjustmentButtonObj[i]->get_RectTransform();
 	}
@@ -154,19 +144,19 @@ void c_Title_Config::OnEnter(SceneManager *pOwner)
 	backSpriteData._layerRank = 100;
 	backSpriteData._tag = "ConfigSceneBackSprite";
 	backRectTrans._size = VEC2(1200.0f, 550.0f);
-	backRectTrans._pos = VEC2(300.0f, 470.0f);
-	m_pConfigBackSpriteObj= Master::m_pUIManager->GetSprite(*m_pRenderer, backRectTrans, backSpriteData);
+	backRectTrans._pos = VEC2(300.0f, 370.0f);
+	m_pConfigBackSpriteObj = Master::m_pUIManager->GetSprite(*m_pRenderer, backRectTrans, backSpriteData);
 }
 
 
 //*---------------------------------------------------------------------------------------
-//* @:c_Title_Config Class 
+//* @:c_Game_Config Class 
 //*【?】終了
 //* 引数：1.SceneManager
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-void c_Title_Config::OnExit(SceneManager* pOwner)
-{
+void c_Game_Config::OnExit(SceneManager* pOwner)
+{	
 	// *****************************************************************************************
 	// プールに返す
 	// *****************************************************************************************
@@ -194,30 +184,32 @@ void c_Title_Config::OnExit(SceneManager* pOwner)
 
 
 //*---------------------------------------------------------------------------------------
-//* @:c_Title_Config Class 
+//* @:c_Game_Config Class 
 //*【?】更新
 //* 引数：1.SceneManager
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-int c_Title_Config::Update(SceneManager *pOwner)
+int c_Game_Config::Update(SceneManager* pOwner)
 {
-	// 右クリックでメインメニューへ戻る
-	if (GetMouseClickDown(MOUSE_BUTTON_STATE::RIGHT))
-	{
-		return c_TITLE::c_TITLE_MAIN_MENU;
-	} 
+	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 
-	return c_TITLE::c_TITLE_CONFIG;
+	// 右クリックでメインメニューへ戻る
+	if (GetMouseClickDown(MOUSE_BUTTON_STATE::RIGHT) || GetInputDown(GAME_CONFIG::PAUSE))
+	{
+		return c_GAME::c_GAME_PLAY;
+	}
+
+	return c_GAME::c_GAME_CONFIG;
 }
 
 
 //*---------------------------------------------------------------------------------------
-//* @:c_Title_Config Class 
+//* @:c_Game_Config Class 
 //*【?】描画
 //* 引数：1.SceneManager
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-void c_Title_Config::Draw(SceneManager* pOwner)
+void c_Game_Config::Draw(SceneManager* pOwner)
 {
 	Master::m_pDirectWriteManager->DrawString("☆設定", VECTOR2::VEC2(40.0f, 500.0f), "White_40_STD");
 
@@ -234,7 +226,6 @@ void c_Title_Config::Draw(SceneManager* pOwner)
 	Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(D2D1::ColorF::White));
 }
 
-
 //*---------------------------------------------------------------------------------------
 //*【?】値の変更
 //*
@@ -244,7 +235,7 @@ void c_Title_Config::Draw(SceneManager* pOwner)
 //* 
 //* [返値] なし
 //*----------------------------------------------------------------------------------------
-void c_Title_Config::ChangeConfigValue(UtilityData::CONFIG_ITEM _item, bool _isLeftIndex)
+void c_Game_Config::ChangeConfigValue(UtilityData::CONFIG_ITEM _item, bool _isLeftIndex)
 {
 	int index = INT_CAST(_item);
 	if (index < 0 || index >= INT_CAST(CONFIG_ITEM::NUM))
@@ -254,9 +245,9 @@ void c_Title_Config::ChangeConfigValue(UtilityData::CONFIG_ITEM _item, bool _isL
 
 	switch (_item)
 	{
-	//=========================================================================================
-	//						BGM調整
-	//=========================================================================================
+		//=========================================================================================
+		//						BGM調整
+		//=========================================================================================
 	case UtilityData::CONFIG_ITEM::BGM_VOLUME:
 	{
 		int crntValue = std::get<int>(m_ItemInfoArray[index]._value);
@@ -273,11 +264,11 @@ void c_Title_Config::ChangeConfigValue(UtilityData::CONFIG_ITEM _item, bool _isL
 	{
 		int crntValue = std::get<int>(m_ItemInfoArray[index]._value);
 		crntValue += (_isLeftIndex ? -1 : 1);
-		crntValue = std::clamp(crntValue, MIN_SE_VOLUME, MAX_SE_VOLUME);		
+		crntValue = std::clamp(crntValue, MIN_SE_VOLUME, MAX_SE_VOLUME);
 		m_ItemInfoArray[index].SetValue(crntValue);
 		Master::m_pDataManager->set_SEVolume(crntValue);
 	}
-	break;	
+	break;
 	//=========================================================================================
 	//						マウス感度調整
 	//=========================================================================================
@@ -285,11 +276,11 @@ void c_Title_Config::ChangeConfigValue(UtilityData::CONFIG_ITEM _item, bool _isL
 	{
 		float crntValue = std::get<float>(m_ItemInfoArray[index]._value);
 		crntValue += (_isLeftIndex ? -0.5f : 0.5f);
-		crntValue = std::clamp(crntValue, MIN_MOUSE_SENSITIVITY, MAX_MOUSE_SENSITIVITY);		
+		crntValue = std::clamp(crntValue, MIN_MOUSE_SENSITIVITY, MAX_MOUSE_SENSITIVITY);
 		m_ItemInfoArray[index].SetValue(crntValue);
 		Master::m_pDataManager->set_MouseSensitivity(crntValue);
 	}
-	break;	
+	break;
 	//=========================================================================================
 	//						Y反転の有無
 	//=========================================================================================
@@ -300,7 +291,7 @@ void c_Title_Config::ChangeConfigValue(UtilityData::CONFIG_ITEM _item, bool _isL
 		m_ItemInfoArray[index].SetValue(crntValue);
 		Master::m_pDataManager->set_IsInvertY(crntValue);
 	}
-	break;	
+	break;
 	//=========================================================================================
 	//						シャドウの有無
 	//=========================================================================================

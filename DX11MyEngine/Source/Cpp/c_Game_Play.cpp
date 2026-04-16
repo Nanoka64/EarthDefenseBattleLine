@@ -10,6 +10,7 @@
 #include "Component_3DCamera.h"
 
 using namespace SceneStateEnums;
+using namespace VECTOR4;
 using namespace VECTOR3;
 using namespace VECTOR2;
 
@@ -29,6 +30,9 @@ void c_Game_Play::OnEnter(SceneManager* pOwner)
     //				ゲームBGMの再生
     // ****************************************************
     Master::m_pSoundManager->PlayBGM(BGM_ID::BGM_GAME_01);
+
+    
+    Master::m_pDataManager->set_IsMissionCleared(true);
 }
 
 
@@ -61,12 +65,26 @@ int c_Game_Play::Update(SceneManager *pOwner)
         MessageBox(NULL, "プレイヤーが存在しない", "c_Game_Play", MB_OK);
         pOwner->OnSceneClose();
     }
+
+    // せってい
+    if (GetInput(GAME_CONFIG::PAUSE))
+    {
+        return c_GAME::c_GAME_CONFIG;
+    }
+
+    // プレイヤーが死んでいたら、リザルトへ
+    if (Master::m_pDataManager->get_IsPlayerDead())
+    {
+        Master::m_pDataManager->set_IsMissionCleared(false);    // ミッション失敗
+        return c_GAME::c_GO_RESULT_SCENE;
+    }
     
     auto antList = Master::m_pGameObjectManager->get_ObjectsByTag("Ant");
     m_EnemyNum = INT_CAST(antList.size());
     // 敵が居なくなったらリザルトへ
     if (m_EnemyNum == 0)
     {
+        Master::m_pDataManager->set_IsMissionCleared(true);     // ミッションクリア
         return c_GAME::c_GO_RESULT_SCENE;
     }
 

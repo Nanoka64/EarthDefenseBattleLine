@@ -128,6 +128,17 @@ bool WeaponController::Setup(RendererEngine& renderer, int _maxSlot)
 //*----------------------------------------------------------------------------------------
 void WeaponController::Update(RendererEngine& renderer)
 {
+	// プレイヤーが死んでたら、武器の有効を解除し、操作不能に
+	if (Master::m_pDataManager->get_IsPlayerDead())
+	{
+		for (int i = 0; i < m_MaxSlot; i++)
+		{
+			m_WeaponArray[i]->get_WeaponFlags().DisableFlag(WEAPON_STATUS::ENABLED);
+		}
+
+		return;
+	}
+
 	if (m_WeaponChangeIntervalCounter != 0)
 	{
 		m_WeaponChangeIntervalCounter--;

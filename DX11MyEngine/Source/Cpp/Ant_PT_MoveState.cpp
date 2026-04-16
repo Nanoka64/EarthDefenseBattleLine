@@ -22,7 +22,7 @@ void Ant_PT_MoveState::OnEnter(class EnemyController* pOwner)
 {
 	pOwner->set_IsAnim(true);
 
-	pOwner->set_MoveSpeed(15.0f);
+	pOwner->set_MoveSpeed(MOVE_SPEED);
 
 	// 直線移動
 	pOwner->set_MoveLogicState(MOVE_BEHAVIOUR_TYPE::LINEAR);
@@ -93,7 +93,7 @@ int Ant_PT_MoveState::Update(class EnemyController* pOwner)
 		VEC3 myPos = myTransform->get_VEC3ToPos();	// 自分の位置
 		VEC3 startPos = pOwner->get_StartPos();
 
-		// 方向転換
+		// 方向転換（半分の時間で）
 		if (pOwner->get_StateTimer() > m_MoveDuration * 0.5f && m_IsDirChange == false)
 		{
 			m_IsDirChange = true;
@@ -107,6 +107,20 @@ int Ant_PT_MoveState::Update(class EnemyController* pOwner)
 			m_MoveDir = VEC3::Reflect(m_MoveDir, boundaryNorm.Normalize());
 		}
 
+		/* 前方に壁があれば、反射させる */
+		// 前方トレース
+		VEC3 myForward = myTransform->get_Forward();
+		int collisionMask = UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);
+		CollisionInfo hitInfo;
+		CollInData_Ray frontTraceRay;
+		frontTraceRay._point = myPos;
+		frontTraceRay._dir = myForward * 5.0f;
+		if (Master::m_pCollisionManager->CheckRaycast(frontTraceRay, collisionMask, &hitInfo)){
+			VEC3 hitNorm = hitInfo.get_HitNormal();	// 衝突した面の法線
+			m_MoveDir = VEC3::Reflect(m_MoveDir, hitNorm);	// 反射
+		}
+
+
 		/* 親の移動コンポーネントを使い、移動処理を行う */
 		// 方向を変えて、移動させる
 		MoveParam movePram;
@@ -115,7 +129,7 @@ int Ant_PT_MoveState::Update(class EnemyController* pOwner)
 		movePram._moveDirection = m_MoveDir;
 		auto move = pOwner->get_MoveLogicComponent().lock();
 		move->Calculate(movePram);
-
+		
 
 		// 壁のぼり
 		//VEC3 myForward = myTransform->get_Forward();

@@ -47,9 +47,10 @@ private:
 	const float SEARCH_FIELD_OF_VIEW_DEG = 70.0f;	// 視界
 	const float MOVE_TIME_MIN = 3.0f;				// 移動の最小時間
 	const float MOVE_TIME_MAX = 7.0f;				// 移動の最大時間
-	const float MOVE_RANGE = 50.0f;					// 移動範囲
+	const float MOVE_RANGE = 30.0f;					// 移動範囲
 	const float DIR_RAND_MAX = Tool::G_PI_4_F;		// 移動の方向 ランダム最大 
 	const float DIR_RAND_MIN = -Tool::G_PI_4_F;		// 移動の方向 ランダム最小 
+	const float MOVE_SPEED = 15.0f;
 
 	float m_MoveDuration = 0.0f;	// 移動時間
 	VECTOR3::VEC3 m_MoveDir;		// 移動方向
@@ -81,6 +82,7 @@ private:
 	const float TRACKING_TIME_MIN = 3.0f;	// 追跡の最小時間
 	const float ATTACK_POSSIBLE_RANGE_MAX = 50.0f;	// 攻撃可能最大距離
 	const float ATTACK_POSSIBLE_RANGE_MIN = 15.0f;	// 攻撃可能最小距離
+	const float MOVE_SPEED = 12.0f;
 
 	float m_AttackPossibleRange;// 攻撃可能距離
 	float m_TrackingDuration;	// 追従時間
@@ -112,6 +114,7 @@ private:
 	const float MOVE_RANGE = 50.0f;					// 移動範囲
 	const float DIR_RAND_MAX = Tool::G_PI_4_F;		// 移動の方向 ランダム最大 
 	const float DIR_RAND_MIN = -Tool::G_PI_4_F;		// 移動の方向 ランダム最小 
+	const float MOVE_SPEED = 20.0f;
 
 	float m_MoveDuration = 0.0f;	// 移動時間
 	VECTOR3::VEC3 m_MoveDir;		// 移動方向

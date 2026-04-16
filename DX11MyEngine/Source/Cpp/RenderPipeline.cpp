@@ -158,7 +158,8 @@ void RenderPipeline::Execute(RendererEngine& renderer)
     /* フォワードパス */
     Forward_PathRender(renderer);
 
-
+    // DirectWrite描画終了
+    Master::m_pDirectWriteManager->EndDraw();
 
     /* ポストエフェクトパス */
     PostEffect_PathRender(renderer);
@@ -402,22 +403,22 @@ void RenderPipeline::Decal_PathRender(RendererEngine &renderer)
     Master::m_pBlendManager->DeviceToSetBlendState(BLEND_MODE::ALPHA);
 
     // デカール描画
-    auto decal = Master::m_pGameObjectManager->get_ObjectsByTag("BulletHole");
-    if (!decal.empty()) {
-        for (auto& hole : decal) {
+    auto decals = Master::m_pGameObjectManager->get_ObjectsByTag("BulletHole");
+    if (!decals.empty()) {
+        for (auto& hole : decals) {
             hole->get_Component<DecalRenderer>()->Draw(renderer);
             hole->get_Component<TimerDestruction>()->Update(renderer);
         }
     }
-    decal.clear();
-    decal = Master::m_pGameObjectManager->get_ObjectsByTag("Ant_Splash");
-    if (!decal.empty()) {
-        for (auto& hole : decal) {
+    decals.clear();
+    decals = Master::m_pGameObjectManager->get_ObjectsByTag("Ant_Splash");
+    if (!decals.empty()) {
+        for (auto& hole : decals) {
             hole->get_Component<DecalRenderer>()->Draw(renderer);
             hole->get_Component<TimerDestruction>()->Update(renderer);
         }
     }
-    decal.clear();
+    decals.clear();
 
     Master::m_pBlendManager->DeviceToSetBlendState(BLEND_MODE::NONE);
 
@@ -496,16 +497,12 @@ void RenderPipeline::Forward_PathRender(RendererEngine &renderer)
     {
         skybox->get_Component<SkyRenderer>()->Draw(renderer);
     }
-    // スカイボックス深度ステンシル設定解除
-    renderer.RegisterDepthStencilState(NULL, 0);
-
 
     // ************************************************************************
     // 
     // ここからフォワードオブジェクトの描画
     // 
     // ************************************************************************
-
     renderer.RegisterCullMode(CULL_MODE::BACK);   
 
     /*
@@ -514,6 +511,8 @@ void RenderPipeline::Forward_PathRender(RendererEngine &renderer)
     Master::m_pEffectManager->DrawEffect();
     Master::m_pGameObjectManager->Alpha_ObjectRenderPass(renderer);
 
+    // スカイボックス深度ステンシル設定解除
+    renderer.RegisterDepthStencilState(NULL, 0);
 
     // デフォルトの深度ステンシル設定に戻す
     renderer.RegisterDefaultDepthStencilState(0);

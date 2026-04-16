@@ -160,9 +160,6 @@
     <Filter Include="ソース ファイル\Game\Weapon">
       <UniqueIdentifier>{7f4d5bfc-2228-4ce9-9bf8-039edfcb9cd9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Game\Manager">
-      <UniqueIdentifier>{2d94edcf-a51b-42da-beb0-dfab9b29c8a3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\Game\Component">
       <UniqueIdentifier>{d5c4c426-4745-498a-9983-68356c09d097}</UniqueIdentifier>
     </Filter>
@@ -276,6 +273,9 @@
     </Filter>
     <Filter Include="ソース ファイル\Game\Component\Enemy\State_Ant\Patrol">
       <UniqueIdentifier>{0735c5e9-e9fb-479a-8392-3720bdef1e41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Manager">
+      <UniqueIdentifier>{2d94edcf-a51b-42da-beb0-dfab9b29c8a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -713,6 +713,15 @@
     </ClCompile>
     <ClCompile Include="Source\Cpp\Ant_CommonStateProcess.cpp">
       <Filter>ソース ファイル\Game\Component\Enemy\State_Ant</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\c_Result_Cleared.cpp">
+      <Filter>ソース ファイル\Game\Scene\Result</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\c_Result_Failed.cpp">
+      <Filter>ソース ファイル\Game\Scene\Result</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\c_Game_Config.cpp">
+      <Filter>ソース ファイル\Game\Scene\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1177,6 +1186,15 @@
     </ClInclude>
     <ClInclude Include="Source\Header\HormingMove_Behaviour.h">
       <Filter>ソース ファイル\BaseComponent\Move\Behaviour</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\c_Result_Cleared.h">
+      <Filter>ソース ファイル\Game\Scene\Result</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\c_Result_Failed.h">
+      <Filter>ソース ファイル\Game\Scene\Result</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\c_Game_Config.h">
+      <Filter>ソース ファイル\Game\Scene\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

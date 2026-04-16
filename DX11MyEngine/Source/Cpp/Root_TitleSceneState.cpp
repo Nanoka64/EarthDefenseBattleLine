@@ -55,7 +55,7 @@ void Root_TitleSceneState::OnEnter(SceneManager* pOwner)
 	spriteData._imagePath = "Resource/Texture/Title/2221833.png";
 	spriteData._tag = "TitleBackGrid_Sp";
 	spriteData._layerRank = 99;
-	spriteRect._size = VEC2(2000.0f, 2300.0f);
+	spriteRect._size = VEC2(0.0f, 0.0f);
 	m_pTitleBackGridObj_Red = Master::m_pUIManager->GetSprite(*m_pRenderer, spriteRect, spriteData);
 	m_pTitleBackGridObj_Blue = Master::m_pUIManager->GetSprite(*m_pRenderer, spriteRect, spriteData);
 

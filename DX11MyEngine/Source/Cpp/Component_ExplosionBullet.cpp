@@ -15,7 +15,7 @@
 #include "ResourceManager.h"
 
 constexpr float DECAL_SIZE_FACTOR        = 100.0f;   // デカールの大きさの補正値
-constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 2.0f;     // デカールの奥行に加算する補正値
+constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 0.0f;     // デカールの奥行に加算する補正値
 constexpr float DECAL_LIFE_TIME = 10.0f;             // デカールの生存時間
 constexpr float SHAKE_MAX_RANGE_EXPLOSION_SCALE_FACTOR = 15.0f; // カメラシェイク時、シェイクの最大距離を求める際に掛ける補正値
 constexpr float SHAKE_LENGTH_SCALE_FACTOR = 0.007f;             // カメラシェイク時、シェイクの大きさを求める際に掛ける補正値

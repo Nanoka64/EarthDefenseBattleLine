@@ -14,11 +14,14 @@
 /* ゲーム */
 #include "Root_GameSceneState.h"
 #include "c_Game_LoadProcess.h"
+#include "c_Game_Config.h"
 #include "c_Game_Play.h"
 
 
 /* リザルト */
 #include "Root_ResultSceneState.h"
+#include "c_Result_Cleared.h"
+#include "c_Result_Failed.h"
 #include "c_Result_GetItemCheck.h"
 
 
@@ -124,16 +127,19 @@ void SceneFactory::CreateGameScene(StateMachine<SceneManager> &_out, RendererEng
 	// ********************************************************************************
 	// シーンの子ステート作成
 	// ********************************************************************************
-	std::shared_ptr<c_Game_LoadProcess> c_LoadProcess = std::make_shared<c_Game_LoadProcess>();	// ミッション選択
-	std::shared_ptr<c_Game_Play> c_GamePlay = std::make_shared<c_Game_Play>();	// ミッション選択
+	std::shared_ptr<c_Game_LoadProcess> c_LoadProcess = std::make_shared<c_Game_LoadProcess>();	// ゲームロード
+	std::shared_ptr<c_Game_Play> c_GamePlay = std::make_shared<c_Game_Play>();					// ゲームプレイ
+	std::shared_ptr<c_Game_Config> c_GameConfig = std::make_shared<c_Game_Config>();			// 設定画面
 
 	// 親を設定
 	c_LoadProcess->set_Parent(pGameScene);
 	c_GamePlay->set_Parent(pGameScene);
+	c_GameConfig->set_Parent(pGameScene);
 
 	// 子を登録
 	pGameScene->add_Child(c_GAME::c_GAME_LOAD, (c_LoadProcess));
 	pGameScene->add_Child(c_GAME::c_GAME_PLAY, (c_GamePlay));
+	pGameScene->add_Child(c_GAME::c_GAME_CONFIG, (c_GameConfig));
 
 	// タイトルをステートマシンに登録
 	_out.RegisterState(SCENE_STATE::SCENE_STATE_GAME, std::move(pGameScene));
@@ -164,12 +170,18 @@ void SceneFactory::CreateResultScene(StateMachine<SceneManager> &_out, RendererE
 	// シーンの子ステート作成
 	// ********************************************************************************
 	std::shared_ptr<c_Result_GetItemCheck> c_GetItemCheck = std::make_shared<c_Result_GetItemCheck>();	// 入手したアイテムの確認
+	std::shared_ptr<c_Result_Cleared> c_Cleared = std::make_shared<c_Result_Cleared>();	// 入手したアイテムの確認
+	std::shared_ptr<c_Result_Failed> c_Failed = std::make_shared<c_Result_Failed>();	// 入手したアイテムの確認
 
 	// 親を設定
 	c_GetItemCheck->set_Parent(pRsultScene);
+	c_Cleared->set_Parent(pRsultScene);
+	c_Failed->set_Parent(pRsultScene);
 
 	// 子を登録
 	pRsultScene->add_Child(c_RESULT::c_GETITEM_CHECK, (c_GetItemCheck));
+	pRsultScene->add_Child(c_RESULT::c_CLEARED, (c_Cleared));
+	pRsultScene->add_Child(c_RESULT::c_FAILED, (c_Failed));
 
 	// タイトルをステートマシンに登録
 	_out.RegisterState(SCENE_STATE::SCENE_STATE_RESULT, std::move(pRsultScene));

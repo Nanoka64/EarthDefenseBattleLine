@@ -20,7 +20,7 @@ using namespace EnemyData;
 void Ant_AT_MoveState::OnEnter(class EnemyController* pOwner)
 {
 	pOwner->set_IsAnim(true);
-	pOwner->set_MoveSpeed(20.0f);
+	pOwner->set_MoveSpeed(MOVE_SPEED);
 
 	// ’¼üˆÚ“®
 	pOwner->set_MoveLogicState(MOVE_BEHAVIOUR_TYPE::LINEAR);
@@ -32,7 +32,6 @@ void Ant_AT_MoveState::OnEnter(class EnemyController* pOwner)
 	m_MoveDir = Master::m_pRandomManager->GetVEC3Random(DIR_RAND_MIN, DIR_RAND_MAX);
 
 	m_IsDirChange = false;
-
 }
 
 //*---------------------------------------------------------------------------------------

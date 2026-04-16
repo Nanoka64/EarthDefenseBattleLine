@@ -129,7 +129,7 @@ void AssultRifle::Update(RendererEngine &renderer)
         // トランスフォームパラメータ
         BulletTransformData bulletTransform;
         bulletTransform._pos = pos;
-        bulletTransform._rotRad = rad;
+        //bulletTransform._rotRad = rad;
         bulletTransform._scale = VEC3(0.005f, 0.005f, 0.025f);
 
         if (m_IsExplosionBullet)

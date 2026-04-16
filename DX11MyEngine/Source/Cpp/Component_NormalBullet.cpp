@@ -21,7 +21,7 @@ using namespace Input;
 using namespace VECTOR3;
 
 constexpr float DECAL_SIZE_FACTOR        = 7.0f;   // デカールの大きさの補正値（transformのスケールだと小さすぎるため）
-constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 5.0f;    // デカールの奥行に加算する補正値
+constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 0.0f;    // デカールの奥行に加算する補正値
 constexpr float DECAL_LIFE_TIME          = 5.0f;    // デカールの生存時間
 
 //*---------------------------------------------------------------------------------------

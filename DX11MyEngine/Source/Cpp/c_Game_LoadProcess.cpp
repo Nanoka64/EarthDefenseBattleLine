@@ -732,6 +732,13 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
     playerObj->get_Transform().lock()->set_Pos(-90.0f, 0.0f, 90.0f);  // プレイヤーの初期位置を設定
     playerObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
     auto playerControl = playerObj->add_Component<PlayerController>(1); // コンポーネントの追加
+    playerControl->Reset(); // パラメータ等リセットする
+
+    // 体力コンポーネントの追加
+    float hp = Master::m_pDataManager->get_PlayerHP();
+    auto health = playerObj->get_Component<Health>();
+    health->set_CrntHP(hp);
+    health->set_MaxHP(hp);
 
 
     //*****************************************************************************************
@@ -744,7 +751,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
     weaponControl->RegisterWeapon(weapon_1, 0);
     weaponControl->RegisterWeapon(weapon_2, 1);
     weaponControl->StartingWeapon(0); // 0の武器を初期装備に
-
     playerControl->Start(*m_pRenderer);
 
 

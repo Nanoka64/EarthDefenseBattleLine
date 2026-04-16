@@ -405,7 +405,7 @@ int DXApp::MainLoop()
             if (difference > 1000.0f / g_Fps)
             {
                 // 終了ボタンが押されるか、ゲームの終了フラグが立っているか
-                if (GetInput(GAME_CONFIG::PAUSE) || m_pGameManager->get_IsGameClose()) break;   
+                if (GetInput(GAME_CONFIG::EXIT) || m_pGameManager->get_IsGameClose()) break;   
 
                 // 前回時刻を更新
                 lastTime = crntTime;

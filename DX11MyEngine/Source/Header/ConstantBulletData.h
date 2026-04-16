@@ -30,7 +30,7 @@ namespace BulletData
     /// </summary>
     struct BulletTransformData {
         VECTOR3::VEC3 _pos;
-        VECTOR3::VEC3 _rotRad;
+        //VECTOR3::VEC3 _rotRad;
         DirectX::XMVECTOR _rotQ;
         VECTOR3::VEC3 _scale;       // 弾のデータに持たせてしまったので必要ないかも？（Shot関数内で取り出し）
     };

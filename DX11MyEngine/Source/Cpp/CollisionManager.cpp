@@ -714,7 +714,7 @@ bool CollisionManager::HitCheck_BoxVsSphere(const CollInData_AABB &_box, const C
                      (P.z - _sphere._pos.z) * (P.z - _sphere._pos.z);
 
     // ‹——£‚ª‹…‚Ì”¼Œa‚æ‚è¬‚³‚¢‚È‚çÕ“Ë
-    return distance < _sphere._radius * _sphere._radius;
+    return distance < (_sphere._radius * _sphere._radius);
 }
 
 

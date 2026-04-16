@@ -140,7 +140,12 @@ void PlayerController::Update(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void PlayerController::LateUpdate(RendererEngine& renderer)
 {
-	if (m_IsDead)return;
+	// プレイヤー死亡
+	if (m_IsDead) {
+		Master::m_pDataManager->set_IsPlayerDead(true);
+		return;
+	}
+
 
 	// ローリングの処理のみ行って返す
 	if (m_IsRolling)
@@ -352,7 +357,6 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 
 	if (m_pWeaponController.lock()->get_IsCrntWeaponReloading())
 	{
-		Master::m_pDirectWriteManager->DrawString("リロード中", VEC2(900.0f, 490.0f), "White_30_STD", D2D1_DRAW_TEXT_OPTIONS_NONE, false);
 
 		if (m_MoveVelocity.Length() > 0.001f) {
 			ChangeAnimation(PLAYER_RANGER_ANIM_ID::RUNNNING_RELOAD);
@@ -453,6 +457,17 @@ void PlayerController::OnCollisionEnter(const class CollisionInfo &other)
 			m_JumpVelocity = 0.0f;
 		}
 	}
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】パラメータ等をリセットする
+//*
+//* [引数] なし
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void PlayerController::Reset()
+{
+	m_IsDead = false;
 }
 
 //*---------------------------------------------------------------------------------------

@@ -256,8 +256,11 @@
     <ClInclude Include="Source\Header\ConstantUIData.h" />
     <ClInclude Include="Source\Header\ConstantUtilityData.h" />
     <ClInclude Include="Source\Header\ConstantWeaponData.h" />
+    <ClInclude Include="Source\Header\c_Game_Config.h" />
     <ClInclude Include="Source\Header\c_Game_LoadProcess.h" />
     <ClInclude Include="Source\Header\c_Game_Play.h" />
+    <ClInclude Include="Source\Header\c_Result_Cleared.h" />
+    <ClInclude Include="Source\Header\c_Result_Failed.h" />
     <ClInclude Include="Source\Header\c_Result_GetItemCheck.h" />
     <ClInclude Include="Source\Header\c_Title_Config.h" />
     <ClInclude Include="Source\Header\c_Title_LoadProcess.h" />
@@ -442,8 +445,11 @@
     <ClCompile Include="Source\Cpp\CompositeState.cpp" />
     <ClCompile Include="Source\Cpp\Component_GunWeapon.cpp" />
     <ClCompile Include="Source\Cpp\ConstantUIData.cpp" />
+    <ClCompile Include="Source\Cpp\c_Game_Config.cpp" />
     <ClCompile Include="Source\Cpp\c_Game_LoadProcess.cpp" />
     <ClCompile Include="Source\Cpp\c_Game_Play.cpp" />
+    <ClCompile Include="Source\Cpp\c_Result_Cleared.cpp" />
+    <ClCompile Include="Source\Cpp\c_Result_Failed.cpp" />
     <ClCompile Include="Source\Cpp\c_Result_GetItemCheck.cpp" />
     <ClCompile Include="Source\Cpp\c_Title_Config.cpp" />
     <ClCompile Include="Source\Cpp\c_Title_LoadProcess.cpp" />

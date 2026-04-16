@@ -20,7 +20,7 @@
 #include "InputFactory.h"
 
 constexpr float VOLUME_SCALE = 0.01f;  // 音量のスケール（0.0f～1.0f）
-
+constexpr float PLAYER_HP = 1000.0f;	// プレイヤーのHP（今後、成長要素が増えたら、保存できるように）
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
 //*----------------------------------------------------------------------------------------
@@ -32,7 +32,10 @@ m_IsDebugMode(true),
 m_IsUseWeapon(true),
 m_IsCameraControl(true),
 m_pRenderer(nullptr),
-m_SelectWeaponID()
+m_SelectWeaponID(),
+m_IsPlayerDead(false),
+m_IsMissionCleared(false),
+m_PlayerHP(PLAYER_HP)
 {
 }
 
