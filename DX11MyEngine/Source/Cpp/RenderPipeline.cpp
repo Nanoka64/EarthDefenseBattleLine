@@ -158,9 +158,6 @@ void RenderPipeline::Execute(RendererEngine& renderer)
     /* フォワードパス */
     Forward_PathRender(renderer);
 
-    // DirectWrite描画終了
-    Master::m_pDirectWriteManager->EndDraw();
-
     /* ポストエフェクトパス */
     PostEffect_PathRender(renderer);
 
