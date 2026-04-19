@@ -50,7 +50,7 @@ bool WeaponDataManager::Init()
     m_AllWeaponsDataMap[1] = std::make_unique<GunWeaponData>(gunData);
     
     // ラピッド ************************************************************************************
-    if (LoadGunWeaponData("Resource/WeaponsData/Flamethrower01.json", gunData) == false){
+    if (LoadGunWeaponData("Resource/WeaponsData/AssultRifle03.json", gunData) == false){
         assert(false);
     }
     m_AllWeaponsDataMap[2] = std::make_unique<GunWeaponData>(gunData);
@@ -83,10 +83,27 @@ bool WeaponDataManager::Init()
     m_AllWeaponsDataMap[7] = std::make_unique<GunWeaponData>(gunData);
 
 
-    if (LoadGunWeaponData("Resource/EnemysData/AntAcid01.json", gunData) == false) {
+    // 敵の武器 ************************************************************************************
+    if (LoadGunWeaponData("Resource/EnemysData/AntAcid01_EASY.json", gunData) == false) {           // イージー用
         assert(false);
     }
     m_EnemyWeaponsDataMap[0] = std::make_unique<GunWeaponData>(gunData);
+    if (LoadGunWeaponData("Resource/EnemysData/AntAcid01_NORMAL.json", gunData) == false) {         // ノーマル用
+        assert(false);
+    }
+    m_EnemyWeaponsDataMap[1] = std::make_unique<GunWeaponData>(gunData);
+    if (LoadGunWeaponData("Resource/EnemysData/AntAcid01_HARD.json", gunData) == false) {           // ハード用
+        assert(false);
+    }
+    m_EnemyWeaponsDataMap[2] = std::make_unique<GunWeaponData>(gunData);
+    if (LoadGunWeaponData("Resource/EnemysData/AntAcid01_DISASTER.json", gunData) == false) {       // ディザスター用
+        assert(false);
+    }
+    m_EnemyWeaponsDataMap[3] = std::make_unique<GunWeaponData>(gunData);
+    if (LoadGunWeaponData("Resource/EnemysData/AntAcid01_IMPOSSIBLE.json", gunData) == false) {     // インポッシブル用
+        assert(false);
+    }
+    m_EnemyWeaponsDataMap[4] = std::make_unique<GunWeaponData>(gunData);
 
 
 
@@ -138,19 +155,6 @@ const WeaponData::BaseWeaponData* WeaponDataManager::FindEnemysWeaponData(int _i
     // 見つからなかった場合はnullptr
     return nullptr;
 }
-
-
-// 文字列をEnumに変換するマップ
-static std::map<std::string, COLLISION_CATEGORY> CollisionCategoryMap = {
-    {"PLAYER",				 COLLISION_CATEGORY::PLAYER},
-    {"PLAYER_BULLET",		 COLLISION_CATEGORY::PLAYER_BULLET},
-    {"ENEMY",				 COLLISION_CATEGORY::ENEMY},
-    {"ENEMY_BULLET",		 COLLISION_CATEGORY::ENEMY_BULLET},
-    {"DESTRUCTION_BUILDING", COLLISION_CATEGORY::DESTRUCTION_BUILDING},
-    {"BUILDING",			 COLLISION_CATEGORY::BUILDING},
-    {"EVERY",				 COLLISION_CATEGORY::EVERY},
-};
-
 
 //*---------------------------------------------------------------------------------------
 //*【?】武器のデータ読み込み（json）

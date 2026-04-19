@@ -72,9 +72,9 @@ void EnemyController::Start(RendererEngine& renderer)
 
 	// HP管理コンポーネントの取得
 	m_pHealthComp = m_pOwner.lock()->get_Component<Health>();
-	m_pHealthComp.lock()->set_MaxHP(200.0f);
-	m_pHealthComp.lock()->set_CrntHP(200.0f);
-	// 被弾時のコールバック
+
+	// TODO:処理関数を外から入れるようにする
+	// 被弾時の処理登録
 	m_pHealthComp.lock()->RegisterOnDamage(
 		[this, &renderer](float _damage)
 		{
@@ -127,7 +127,7 @@ void EnemyController::Start(RendererEngine& renderer)
 			timer->set_LifeTime(8.0f);  // 生存時間
 		}
 	);
-	// 死亡時のコールバック
+	// 死亡時の処理登録
 	m_pHealthComp.lock()->RegisterOnDead(
 		[this, &renderer]
 		{
@@ -139,15 +139,20 @@ void EnemyController::Start(RendererEngine& renderer)
 			// ****************************************************
 			Master::m_pSoundManager->Play_3D(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_DEAD), pos, SOUND_DEAD_RADIUS);
 
+			// ****************************************************
+			//				アイテム出現
+			// ****************************************************
+			Master::m_pItemManager->SpawnItemRand(DROP_ITEM_MIN, DROP_ITEM_MAX, pos, 0.0f);
+
+
             // 死亡エフェクト
-			int handle = Master::m_pEffectManager->PlayEffect("DeadExplosion");
-			Master::m_pEffectManager->SetScaleEffect(handle,1.0f, 1.0f, 1.0f);
+			int handle = Master::m_pEffectManager->PlayEffect("Distortion");
+			Master::m_pEffectManager->SetScaleEffect(handle,10.0f, 10.0f, 10.0f);
 			Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y, pos.z);
 			m_IsDead = true;
 			m_IsAnim = false;
 
 			auto matPtr = Master::m_pResourceManager->FindMaterial("Decal_Ant_Splash");
-
 			SetupMaterialInfo matInfo[1];
 			matInfo[0].Index = 0;
 			matInfo[0].pMaterialData = matPtr;
@@ -162,11 +167,10 @@ void EnemyController::Start(RendererEngine& renderer)
 			decal.IsNormalMap = false;
 			decal.IsDynamic = true;
 
-
 			VEC3 scale;
-			scale.x = 10.0f;
-			scale.y = 10.0f;
-			scale.z = 10.0f;
+			scale.x = 20.0f;
+			scale.y = 20.0f;
+			scale.z = 20.0f;
 
 			auto obj = MeshFactory::CreateDecal(decal);
 			obj->get_Component<DecalRenderer>()->Start(renderer);
@@ -267,10 +271,10 @@ void EnemyController::OnCollisionEnter(const class CollisionInfo& _other)
 {
 	VEC3 normal = _other.get_HitNormal();
 
-	// 法線のY成分が一定以上（例：0.7f以上で約45度以下の坂）なら床とみなす
+	// 法線のY成分が一定以上なら床とみなす
 	if (normal.y < -0.7f)
 	{
-		// めり込み防止のため、下方向への速度（重力による落下速度）をリセット
+		// めり込み防止のため、下方向への速度をリセット
 		if (m_GravityVelocity < 0.0f) {
 			m_GravityVelocity = 0.0f;
 		}
@@ -345,4 +349,15 @@ std::shared_ptr<MyTransform> EnemyController::get_TargetTransform() const
 void EnemyController::set_MoveLogicState(UtilityData::MOVE_BEHAVIOUR_TYPE _moveType)
 {
 	m_pMoveLogicComp.lock()->ChangeBehaviour(_moveType);
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】パラメータ取得
+//*
+//* [引数] なし
+//* [返値] 書き換え不可のエネミーパラメータ
+//*----------------------------------------------------------------------------------------
+const EnemyData::BaseEnemyData* EnemyController::get_EnemyData()const
+{
+	return static_cast<const EnemyData::BaseEnemyData*>(m_pEnemyData);
 }

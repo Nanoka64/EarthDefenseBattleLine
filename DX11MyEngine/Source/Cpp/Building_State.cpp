@@ -91,7 +91,7 @@ void Building_CllapseInState::OnEnter(BuildingController* pOwner)
 		Master::m_pEffectManager->SetRotationEffect(handle, rot.x, rot.y, rot.z);
 		Master::m_pEffectManager->SetScaleEffect(handle, scale, scale, scale);
 	}
-	ownerObj->set_State(OBJECT_STATE::DYNAMIC);	// 動的オブジェクトに変更
+	ownerObj->set_IsStatic(false);	// 動的オブジェクトに変更
 
 }
 

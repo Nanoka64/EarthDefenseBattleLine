@@ -68,6 +68,10 @@ enum class SOUND_ID
     ENEMY_ANT_DEAD,         // アリやられる
     ENEMY_ANT_ACID_SHOOT,   // 酸射出
 
+    /* アイテム */
+    ITEM_GET,               // 取得
+
+
     
     /* システム */
     SYSTEM_MOVING_CURSOR01, // 項目にカーソルがホバーしている状態
@@ -110,6 +114,7 @@ enum class BGM_ID
     // BGM
     BGM_TITLE_01,
 	BGM_GAME_01,
+    BGM_VICTORY01,
 
     NUM
 };

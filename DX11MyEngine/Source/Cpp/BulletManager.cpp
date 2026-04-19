@@ -200,7 +200,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);        // ノンアクティブ
 
             // 動的オブジェクトとして設定
-            obj->set_State(OBJECT_STATE::DYNAMIC);
+            obj->set_IsStatic(false);
 
             // バレットコンポーネントの追加
             auto bulletComp = obj->add_Component<NormalBullet>();
@@ -330,7 +330,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             }
 
             // 動的オブジェクトとして設定
-            obj->set_State(OBJECT_STATE::DYNAMIC);
+            obj->set_IsStatic(false);
 
             obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);    // ノンデストロイ
             obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);        // ノンアクティブ

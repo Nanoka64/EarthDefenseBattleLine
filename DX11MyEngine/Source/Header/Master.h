@@ -17,6 +17,7 @@
 #include "UIManager.h"
 #include "RandomManager.h"
 #include "WeaponDataManager.h"
+#include "ItemManager.h"
 
 // ***************************************************************************************
 // ---------------------------------------------------------------------------------------
@@ -24,9 +25,13 @@
 //
 // 【?】シングルトンクラスをまとめたもの
 //		
-//		基本的に初期化、更新などはDXAppクラスで行っている。
-//		UIManagerとBulletManagerはそれぞれ、タイトルロードシーン、ゲームロードシーンで行っている。
-//
+//		基本的に生成、初期化、更新などはDXAppクラスで行っている。
+// 
+//	 ・その他
+//		UIManager : タイトルロードシーン
+//		BulletManager : ゲームロードシーン
+//		ItemManager : ゲームロードシーン
+//		
 // ***************************************************************************************
 class Master
 {
@@ -49,4 +54,5 @@ public:
 	static UIManager			* m_pUIManager;			// UI管理
 	static RandomManager		* m_pRandomManager;		// 乱数管理
 	static WeaponDataManager	* m_pWeaponDataManager;	// 武器データ管理
+	static ItemManager			* m_pItemManager;		// アイテム管理
 };

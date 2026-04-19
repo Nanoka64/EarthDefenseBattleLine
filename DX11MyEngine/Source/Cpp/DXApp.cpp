@@ -36,7 +36,7 @@ BulletManager           *Master::m_pBulletManager       = nullptr;   // 弾管理
 UIManager               *Master::m_pUIManager           = nullptr;   // UI管理
 RandomManager           *Master::m_pRandomManager       = nullptr;   // 乱数管理
 WeaponDataManager       *Master::m_pWeaponDataManager   = nullptr;   // 武器データ管理
-
+ItemManager             *Master::m_pItemManager         = nullptr;   // アイテム管理
 
 //*---------------------------------------------------------------------------------------
 //* @:DXApp Class 
@@ -104,7 +104,8 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
     Master::m_pBulletManager        = new BulletManager();          // 弾管理 
     Master::m_pUIManager            = new UIManager();              // UI管理
     Master::m_pRandomManager        = new RandomManager();          // 乱数管理
-    Master::m_pWeaponDataManager    = new WeaponDataManager();      // 武器データ管理
+    Master::m_pWeaponDataManager    = new WeaponDataManager();      // 武器管理
+    Master::m_pItemManager          = new ItemManager();            // アイテム管理
 
     // *************************************************************************************************
     /**  ウインドウの初期化 **/
@@ -114,7 +115,6 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
         assert(false);
         return false;
     }
-
 
     // *************************************************************************************************
     /**  ランダムマネージャー初期化 **/
@@ -230,7 +230,6 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
         return false;
     }
 
-
     // *************************************************************************************************
     /**  ライトマネージャー初期化 **/
     // *************************************************************************************************
@@ -275,6 +274,7 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
         assert(false);
         return false;
     }
+
     // *************************************************************************************************
     /**  タイムマネージャの初期化 **/
     // *************************************************************************************************

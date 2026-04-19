@@ -20,7 +20,7 @@ public:
 
 
 private:
-	VECTOR4::VEC4 m_StateColor[UINT_CAST(UIData::STATE::NUM)];	// それぞれのステートごとのカラー
+	std::array<VECTOR4::VEC4, UINT_CAST(UIData::STATE::NUM)> m_StateColor;	// それぞれのステートごとのカラ;
 	VECTOR2::VEC2 m_TextOffsetPos;					// テキストの位置補正用
 	UIData::STATE m_CrntState;						// 現在の状態
 	UIData::STATE m_InputValidationState;			// 入力判定とするステート
@@ -148,5 +148,12 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	int get_InputWaitCounter()const { return m_InputWaitFrame; }
+
+	/// <summary>
+	/// 状態ごとのカラー値を設定
+	/// </summary>
+	/// <param name="_color">カラー</param>
+	/// <param name="_state">設定する状態</param>
+	void set_Color(const VECTOR4::VEC4& _color, UIData::STATE _state);
 };
 

@@ -10,7 +10,7 @@
 WeaponBase::WeaponBase(std::weak_ptr<GameObject> pOwner, int updateRank )
 	: IComponent(pOwner, updateRank),
 	m_WeaponFlags(),
-	m_pParameter(nullptr)
+	m_pWeaponData(nullptr)
 {
 
 }

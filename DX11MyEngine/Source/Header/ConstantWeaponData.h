@@ -13,8 +13,10 @@ namespace WeaponData
     struct WeaponUIData
     {
         std::wstring _name;             // •Ší–¼
-        int _ammoMaxNum = 0;          // ’e”( 0‚È‚ç’e‚ğ‚½‚È‚¢•Ší )
-        int _ammoRemaining = 0;        // Œ»İ‚Ì’e”
+        int _ammoMaxNum = 0;            // ’e”( 0‚È‚ç’e‚ğ‚½‚È‚¢•Ší )
+        int _ammoRemaining = 0;         // Œ»İ‚Ì’e”
+        float _reloadTime;              // ƒŠƒ[ƒhŠÔ
+        float _crntReloadTime;          // Œ»İ‚ÌƒŠƒ[ƒhŠÔ
     };
 
 

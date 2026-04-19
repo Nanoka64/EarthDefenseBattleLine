@@ -16,7 +16,6 @@ using namespace VECTOR4;
 //*----------------------------------------------------------------------------------------
 ButtonUI::ButtonUI(std::weak_ptr<GameObject> pOwner, int updateRank)
 	: IComponent(pOwner, updateRank),
-	m_StateColor(VEC4()),
 	m_CrntState(UIData::STATE::NORMAL),
 	m_InputValidationState(UIData::STATE::PRESSED),
 	m_FadeDuration(0.1f),
@@ -25,7 +24,13 @@ ButtonUI::ButtonUI(std::weak_ptr<GameObject> pOwner, int updateRank)
 	m_TextOffsetPos(VEC2()),
 	m_InputSoundID(SOUND_ID_TO_INT(SOUND_ID::SYSTEM_DECISION01)),
 	m_RepeatInputInterval(1),
-	m_InputWaitFrame(0)
+	m_InputWaitFrame(0),
+	m_StateColor{
+		VEC4(1.0f, 1.0f, 1.0f, 1.0f),   // 通常
+		VEC4(0.6f, 0.6f, 0.6f, 1.0f),   // ハイライト
+		VEC4(0.4f, 0.4f, 0.4f, 1.0f),   // 押されている
+		VEC4(1.0f, 1.0f, 1.0f, 1.0f),   // 選択された
+		VEC4(0.1f, 0.1f, 0.1f, 1.0f) }  // 無効
 {
 	this->set_Tag("Button");
 }
@@ -57,11 +62,6 @@ void ButtonUI::Start(RendererEngine &renderer)
 	m_pMyTransform = m_pOwner.lock()->get_RectTransform();
 
 
-	m_StateColor[UINT_CAST(UIData::STATE::NORMAL)]		 = VEC4(1.0f, 1.0f, 1.0f, 1.0f);	// 通常
-	m_StateColor[UINT_CAST(UIData::STATE::HIGH_LIGHTED)] = VEC4(0.6f, 0.6f, 0.6f, 1.0f);	// ハイライト
-	m_StateColor[UINT_CAST(UIData::STATE::PRESSED)]		 = VEC4(0.4f, 0.4f, 0.4f, 1.0f);	// 押されている
-	m_StateColor[UINT_CAST(UIData::STATE::SELECTED)]	 = VEC4(1.0f, 1.0f, 1.0f, 1.0f);	// 選択された
-	m_StateColor[UINT_CAST(UIData::STATE::DISABLED)]	 = VEC4(0.1f, 0.1f, 0.1f, 1.0f);	// 無効
 }
 
 
@@ -135,9 +135,8 @@ void ButtonUI::Draw(RendererEngine &renderer)
 {
 	auto transform = m_pMyTransform.lock();
 	VEC2 pos = transform->get_RectPosition();
-	Master::m_pDirectWriteManager->SetOutLine(2.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
-	Master::m_pDirectWriteManager->DrawString(m_Text, pos + m_TextOffsetPos, "White_40_STD");
-	Master::m_pDirectWriteManager->SetOutLine(0.0f);
+
+	Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(1.0f, 1.0f, 1.0f));	// 白
 
 	if (!m_pSprite.expired())
 	{
@@ -145,5 +144,23 @@ void ButtonUI::Draw(RendererEngine &renderer)
 
 		/* 状態によってスプライトの色を変える */
 		sprite->set_Color(m_StateColor[UINT_CAST(m_CrntState)]);
+
 	}
+	Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(m_StateColor[UINT_CAST(m_CrntState)].x, m_StateColor[UINT_CAST(m_CrntState)].y, m_StateColor[UINT_CAST(m_CrntState)].z));	
+	Master::m_pDirectWriteManager->SetOutLine(2.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
+	Master::m_pDirectWriteManager->DrawString(m_Text, pos + m_TextOffsetPos, "White_40_STD");
+	Master::m_pDirectWriteManager->SetOutLine(0.0f);
+	Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(1.0f, 1.0f, 1.0f));	// 白
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】ボタンのそれぞれの状態ごとのカラー値を設定
+//*
+//* [引数]
+//* &renderer : 描画エンジンの参照
+//* [返値]なし
+//*----------------------------------------------------------------------------------------
+void ButtonUI::set_Color(const VECTOR4::VEC4 &_color, UIData::STATE _state)
+{
+	m_StateColor[UINT_CAST(_state)] = _color;
 }

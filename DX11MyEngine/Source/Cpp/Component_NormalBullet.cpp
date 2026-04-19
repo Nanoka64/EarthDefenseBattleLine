@@ -76,7 +76,7 @@ void NormalBullet::Start(RendererEngine& renderer)
             if (health && hitCategory != COLLISION_CATEGORY::DESTRUCTION_BUILDING)
             {
                 // 弾が保持しているダメージ値を渡す
-                health->TakeDamage(m_pParameter->_damage);
+                health->TakeDamage(m_pWeaponData->_damage);
             }
 
             // 建物に当たったら即消えるようにして、その他は貫通数を減らす
@@ -88,7 +88,7 @@ void NormalBullet::Start(RendererEngine& renderer)
             {
                 m_CrntPenetrationCount++; // 貫通数を増やす
 
-                if (m_CrntPenetrationCount >= m_pParameter->_penetrationsCount)
+                if (m_CrntPenetrationCount >= m_pWeaponData->_penetrationsCount)
                 {
                     m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
                 }
@@ -97,7 +97,7 @@ void NormalBullet::Start(RendererEngine& renderer)
             //*****************************************************************************************
             //						デカールの生成
             //*****************************************************************************************
-            auto matPtr = Master::m_pResourceManager->FindMaterial(m_pParameter->_decalMaterialTag);
+            auto matPtr = Master::m_pResourceManager->FindMaterial(m_pWeaponData->_decalMaterialTag);
 
             SetupMaterialInfo matInfo[1];
             matInfo[0].Index = 0;
@@ -207,8 +207,8 @@ void NormalBullet::Update(RendererEngine &renderer)
 
     MoveParam param;
     param._moveDirection = m_MoveDir;
-    param._moveSpeed = m_pParameter->_speed;
-    param._gravity = m_pParameter->_gravityScale;
+    param._moveSpeed = m_pWeaponData->_speed;
+    param._gravity = m_pWeaponData->_gravityScale;
 
     m_PrevPos = crntPos;
 
@@ -220,14 +220,14 @@ void NormalBullet::Update(RendererEngine &renderer)
 
     // 射程距離外で削除
     float distSq = VEC3::DistanceSq(newPos, m_StartPos);
-    if (distSq > m_pParameter->_range * m_pParameter->_range) {
+    if (distSq > m_pWeaponData->_range * m_pWeaponData->_range) {
         m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
     }
     // レイキャストで衝突判定（コライダーの衝突処理をこっちに移動）
     CollInData_Ray ray;
     ray._point = crntPos;
 	ray._dir = newPos - crntPos;    // 前回の位置から新しい位置へのベクトル
-    unsigned mask = m_pParameter->_collisionMask;
+    unsigned mask = m_pWeaponData->_collisionMask;
     CollisionInfo hitInfo;
 
     if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
@@ -296,7 +296,7 @@ void NormalBullet::OnCollisionEnter(const class CollisionInfo& _other)
 //*----------------------------------------------------------------------------------------
 void NormalBullet::Setup(const BulletData::NormalBulletData* _pParam)
 {
-    m_pParameter = _pParam;
+    m_pWeaponData = _pParam;
 
     auto transform = m_pOwner.lock()->get_Transform().lock();
 
@@ -321,7 +321,7 @@ void NormalBullet::Setup(const BulletData::NormalBulletData* _pParam)
 //*----------------------------------------------------------------------------------------
 void NormalBullet::Reset()
 {
-    //m_pParameter->Reset();
+    //m_pWeaponData->Reset();
 
     m_CrntPenetrationCount = 0;
 }
@@ -334,5 +334,5 @@ void NormalBullet::Reset()
 //*----------------------------------------------------------------------------------------
 const BulletData::NormalBulletData* NormalBullet::get_Parameter()const
 {
-    return static_cast<const BulletData::NormalBulletData*>(m_pParameter);
+    return static_cast<const BulletData::NormalBulletData*>(m_pWeaponData);
 }

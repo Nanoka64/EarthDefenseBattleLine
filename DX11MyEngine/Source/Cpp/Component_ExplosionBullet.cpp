@@ -260,7 +260,7 @@ void ExplosionBullet::OnTriggerEnter(const class CollisionInfo &_other)
 //*----------------------------------------------------------------------------------------
 const BulletData::ExplosionBulletData* ExplosionBullet::get_ExplosionParameter()const
 {
-    return static_cast<const BulletData::ExplosionBulletData*>(m_pParameter);
+    return static_cast<const BulletData::ExplosionBulletData*>(m_pWeaponData);
 }
 
 
@@ -276,7 +276,7 @@ void ExplosionBullet::Setup(const BulletData::NormalBulletData* _pParam)
     auto owner = m_pOwner.lock();
     auto transform = owner->get_Transform().lock();
 
-    m_pParameter = static_cast<const BulletData::ExplosionBulletData*>(_pParam);
+    m_pWeaponData = static_cast<const BulletData::ExplosionBulletData*>(_pParam);
 
     // ŠJŽnˆÊ’u
     m_StartPos = transform->get_VEC3ToPos();

@@ -8,6 +8,7 @@
 #include "c_Title_LoadProcess.h"
 #include "c_Title_MainMenu.h"
 #include "c_Title_MissionSelect.h"
+#include "c_MissionSelect_DifficultSelect.h"
 #include "c_Title_SoldierSelect.h"
 #include "c_Title_Config.h"
 
@@ -84,6 +85,7 @@ void SceneFactory::CreateTitleScene(StateMachine<SceneManager> &_out, RendererEn
 	std::shared_ptr<c_Title_MissionSelect> c_MissionSelect	= std::make_shared<c_Title_MissionSelect>();	// ミッション選択
 	std::shared_ptr<c_Title_SoldierSelect> c_SoldierSelect	= std::make_shared<c_Title_SoldierSelect>();	// 兵科選択
 	std::shared_ptr<c_Title_Config> c_Config				= std::make_shared<c_Title_Config>();			// 設定
+	std::shared_ptr<c_MissionSelect_DifficultSelect> c_DifficultSelect	= std::make_shared<c_MissionSelect_DifficultSelect>();	// ミッション選択 - 難易度選択
 
 	// 親を設定
 	c_LoadProcess->set_Parent(pTitleScene);
@@ -91,6 +93,8 @@ void SceneFactory::CreateTitleScene(StateMachine<SceneManager> &_out, RendererEn
 	c_MissionSelect->set_Parent(pTitleScene);
 	c_SoldierSelect->set_Parent(pTitleScene);
 	c_Config->set_Parent(pTitleScene);
+	
+	c_DifficultSelect->set_Parent(c_MissionSelect);
 
 	// 子を登録
 	pTitleScene->add_Child(c_TITLE::c_TITLE_LOAD_PROCESS, (c_LoadProcess));
@@ -98,6 +102,8 @@ void SceneFactory::CreateTitleScene(StateMachine<SceneManager> &_out, RendererEn
 	pTitleScene->add_Child(c_TITLE::c_TITLE_MISSION_SELECT, (c_MissionSelect));
 	pTitleScene->add_Child(c_TITLE::c_TITLE_SOLDIER_SELECT, (c_SoldierSelect));
 	pTitleScene->add_Child(c_TITLE::c_TITLE_CONFIG, (c_Config));
+
+	c_MissionSelect->add_Child(c_TITLE::c_TITLE_DIFFICULT_SELECT, (c_DifficultSelect));	// ミッションの子に難易度選択
 
 	// タイトルをステートマシンに登録
 	_out.RegisterState(SCENE_STATE::SCENE_STATE_TITLE, std::move(pTitleScene));

@@ -2,7 +2,9 @@
 #include "Component_WeaponController.h"
 #include "Component_GunWeapon.h"
 #include "Component_WeaponBase.h"
+#include "Component_SpriteRenderer.h"
 
+using namespace VECTOR4;
 using namespace VECTOR3;
 using namespace VECTOR2;
 
@@ -114,6 +116,39 @@ bool WeaponController::Setup(RendererEngine& renderer, int _maxSlot)
 	m_pWeaponSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
 
 
+
+
+
+
+	{
+		// リロードバー用スプライトを作る **********************************************
+		UIData::RectTransformData rectData;
+		UIData::SpriteUIData spriteData;
+		rectData._size = VEC2(0.0f, 0.0f);
+		rectData._pos = RELOAD_BAR_POS;
+		rectData._anchorMax = VEC2(0.5f, 0.5f);		// 中心を画面の真ん中に
+		rectData._anchorMin = VEC2(0.5f, 0.5f);
+		rectData._pivot = VEC2(0.0f, 0.0f);		// ピボットは左上
+		spriteData._tag = "ReloadBar";
+		spriteData._layerRank = 108;
+		spriteData._color = VEC4(0.0f, 1.0f, 0.0f, 1.0f);
+		spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
+		m_pReloadBarSpriteObj = Master::m_pUIManager->GetSprite(renderer, rectData, spriteData);
+
+		// リロードバー背景用スプライトを作る **********************************************
+		rectData._size = RELOAD_BAR_BACK_SIZE;
+		rectData._pos = RELOAD_BAR_BACK_POS;
+		rectData._anchorMax = VEC2(0.5f, 0.5f);		// 中心を画面の真ん中に
+		rectData._anchorMin = VEC2(0.5f, 0.5f);
+		rectData._pivot = VEC2(0.5f, 0.5f);
+		spriteData._tag = "ReloadBarBack";
+		spriteData._layerRank = 107;
+		spriteData._color = VEC4(0.1f, 0.1f, 0.1f, 1.0f);	// 黒背景
+		spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
+		m_pReloadBarBackSpriteObj = Master::m_pUIManager->GetSprite(renderer, rectData, spriteData);
+	}
+
+
 	return true;
 }
 
@@ -139,6 +174,7 @@ void WeaponController::Update(RendererEngine& renderer)
 		return;
 	}
 
+	// 武器切り替えカウンター
 	if (m_WeaponChangeIntervalCounter != 0)
 	{
 		m_WeaponChangeIntervalCounter--;
@@ -165,6 +201,39 @@ void WeaponController::Update(RendererEngine& renderer)
 	else if (scroll < 0)
 	{
 		PrevWeapon();
+	}
+
+
+	if (get_IsCrntWeaponReloading())
+	{
+		/* 背景スプライトの位置と大きさ */
+		auto backSpriteRect = m_pReloadBarBackSpriteObj->get_RectTransform().lock();
+		backSpriteRect->set_Size(RELOAD_BAR_BACK_SIZE);
+		backSpriteRect->set_RectPosition(RELOAD_BAR_BACK_POS);
+
+		/* バー本体 */
+		float reloatTime = m_WeaponArray[m_CrntWeaponSlotIndex]->get_WeaponUIData()._reloadTime;
+		float crntReloatTime = m_WeaponArray[m_CrntWeaponSlotIndex]->get_WeaponUIData()._crntReloadTime;
+		
+		// リロードの進捗に合わせて、スプライトの横幅を変える
+		float t = crntReloatTime / reloatTime;
+		auto barRect = m_pReloadBarSpriteObj->get_RectTransform().lock();
+		barRect->set_Size(RELOAD_BAR_SIZE.x * t, RELOAD_BAR_SIZE.y);	// 横幅を動かす
+
+
+		/* 文字 */
+		float width = Master::m_pDataManager->get_ScreenWidth();
+		float height = Master::m_pDataManager->get_ScreenHeight();
+		Master::m_pDirectWriteManager->DrawStringToAligment("リロード中", RELOAD_TEXT_POS, "White_20_STD", H_ALIGNMENT::CENTER, V_ALIGNMENT::CENTER, VEC2(width, height));
+	}
+	// リロード中でない場合は、サイズを0.0にする
+	else
+	{
+		auto backSpriteRect = m_pReloadBarBackSpriteObj->get_RectTransform().lock();
+		backSpriteRect->set_Size(0.0f);
+
+		auto barRect = m_pReloadBarSpriteObj->get_RectTransform().lock();
+		barRect->set_Size(0.0f);
 	}
 }
 
@@ -356,4 +425,8 @@ void WeaponController::ClearWeapon()
 	m_pBulletGageSpriteObjArray.clear();
 	m_pWeaponSpriteObjArray.clear();
 	m_WeaponArray.clear(); 
+
+	// スプライトをプールへ返す
+	m_pReloadBarSpriteObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+	m_pReloadBarBackSpriteObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 }

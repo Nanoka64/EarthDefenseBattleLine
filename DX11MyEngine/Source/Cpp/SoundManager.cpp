@@ -284,10 +284,14 @@ bool SoundManager::InitXA2Sound(void)
 	Load_Wav("Resource/Sound/SE/Enemy/DSGNImpt_Impact High Spark 04_RSCPC_HV.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_DEAD));
 	Load_Wav("Resource/Sound/SE/Enemy/DSGNImpt_Impact Smear Short 06_RSCPC_HV.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_ACID_SHOOT));
 	
+	// アイテム
+	Load_Wav("Resource/Sound/SE/Game/ItemGet.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ITEM_GET));
+
 	
 	// BGM
 	Load_Wav("Resource/Sound/BGM/Flash_Shadow.wav", SOUND_TYPE::BGM, SOUND_ID_TO_INT(BGM_ID::BGM_TITLE_01));
 	Load_Wav("Resource/Sound/BGM/MusMus-BGM-170.wav", SOUND_TYPE::BGM, SOUND_ID_TO_INT(BGM_ID::BGM_GAME_01));
+	Load_Wav("Resource/Sound/BGM/Victory.wav", SOUND_TYPE::BGM, SOUND_ID_TO_INT(BGM_ID::BGM_VICTORY01));
 
 	// ボイス
 	Load_Wav("Resource/Sound/Voice/Ranger/an000_01.wav",SOUND_TYPE::VOICE, SOUND_ID_TO_INT(VOICE_ID::SOLDIER_R_SHOUT_01));

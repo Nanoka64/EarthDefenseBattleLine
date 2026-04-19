@@ -13,8 +13,8 @@ class c_Result_Cleared : public IState<SceneManager>
 private:
 	const float TEXT_FADE_IN_DURATION = 3.0f;	// テキストのフェードインにかける時間
 	const float WHITE_FADE_DURATION = 3.0f;		// フェードアウトにかける時間
-	const float BLACK_FADE_DURATION = 5.0f;		// フェードアウトにかける時間
-	const float FADE_OUT_START_DELAY = 4.0f;	// フェードアウトを開始するまでの時間（BGMに合わせる）
+	const float BLACK_FADE_DURATION = 2.0f;		// フェードアウトにかける時間
+	const float FADE_OUT_START_DELAY = 2.0f;	// フェードアウトを開始するまでの時間（BGMに合わせる）
 	float m_ElapsedTime = 0.0f;					// 経過時間
 
 	/*スプライト*/

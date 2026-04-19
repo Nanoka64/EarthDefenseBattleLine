@@ -23,7 +23,7 @@ void Gun_FireState::OnEnter(GunWeapon* pOwner)
 	pOwner->get_WeaponFlags().EnableFlag(WEAPON_STATUS::FIRE);
 
 	// 1秒あたりの発射回数から発射間隔を計算
-	m_FireInterval = 1.0f / pOwner->get_GunWeaponParameter()->_fireRate;
+	m_FireInterval = 1.0f / pOwner->get_GunWeaponData()->_fireRate;
 
 	if (m_ShootTimer >= m_FireInterval)
 	{
@@ -60,7 +60,7 @@ int Gun_FireState::Update(GunWeapon* pOwner)
     auto player = Master::m_pGameObjectManager->get_ObjectByTag("Player");
     if (player->get_Component<PlayerController>()->get_AnimID() == PlayerData::PLAYER_RANGER_ANIM_ID::RUNING_DIVE_ROLL)return GUN_STATE::GUN_STATE_IDLE;
 
-	const auto& weapon_param = pOwner->get_GunWeaponParameter();
+	const auto& weapon_param = pOwner->get_GunWeaponData();
 	int ammoRemaining = pOwner->get_AmmoRemaining();
 
 	m_ShootTimer += deltaTime;	// タイマー更新

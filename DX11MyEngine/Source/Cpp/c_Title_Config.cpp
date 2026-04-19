@@ -12,13 +12,6 @@ using namespace VECTOR2;
 using namespace VECTOR3;
 using namespace VECTOR4;
 
-constexpr int MAX_BGM_VOLUME = 100;			// BGM音量の最大値
-constexpr int MIN_BGM_VOLUME = 0;			// BGM音量の最小値
-constexpr int MAX_SE_VOLUME = 100;			// SE音量の最大値
-constexpr int MIN_SE_VOLUME = 0;			// SE音量の最小値
-constexpr float MAX_MOUSE_SENSITIVITY = 100.0f;	// マウス感度の最大値
-constexpr float MIN_MOUSE_SENSITIVITY = 0.0f;	// マウス感度の最小値
-
 
 // 項目の衝突判定用サイズ
 static const VECTOR2::VEC2 g_ConfigItemSize = VECTOR2::VEC2(1000.0f, 70.0f);		// 項目のサイズ
@@ -38,10 +31,10 @@ static const VECTOR2::VEC2 g_ConfigItemPosArray[UINT_CAST(CONFIG_ITEM::NUM)] =
 };
 
 // ボタンの位置（項目名の右側に配置）
-static const float g_Button_OffsetPos_X = 600.0f;
+static constexpr float g_Button_OffsetPos_X = 600.0f;
 
 // ボタン同士の間の距離
-static const float g_RangeBetweenButtons = 300.0f;
+static constexpr float g_RangeBetweenButtons = 300.0f;
 
 /// <summary>
 /// 項目名
@@ -168,7 +161,7 @@ void c_Title_Config::OnEnter(SceneManager *pOwner)
 void c_Title_Config::OnExit(SceneManager* pOwner)
 {
 	// *****************************************************************************************
-	// プールに返す
+	// 	// オブジェクトを非アクティブに（プールに返す）
 	// *****************************************************************************************
 	for (int i = 0; i < INT_CAST(CONFIG_ITEM::NUM); i++)
 	{

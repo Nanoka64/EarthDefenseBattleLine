@@ -9,8 +9,8 @@
 //*----------------------------------------------------------------------------------------
 GameObject::GameObject():
 	m_IsCalcUpdate(false),
-	m_IsShadow(false),
-	m_State(OBJECT_STATE::STATIC)
+	//m_IsShadow(false),
+	m_IsStatic(true)
 {
 
 }
@@ -149,6 +149,34 @@ std::weak_ptr<RectTransform> GameObject::get_RectTransform()const
 
 	return {};
 }
+
+//*---------------------------------------------------------------------------------------
+//* @:Object Class 
+//*【?】読み取り専用トランスフォーム取得
+//* 引数：なし
+//* 戻値：読み取り専用ポインタ
+//*----------------------------------------------------------------------------------------
+const MyTransform* GameObject::get_TransformConst()const
+{
+	return m_pTransform.get();
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:Object Class 
+//*【?】読み取り専用トランスフォーム取得
+//* 引数：なし
+//* 戻値：読み取り専用ポインタ
+//*----------------------------------------------------------------------------------------
+const RectTransform* GameObject::get_RectTransformConst()const
+{
+	if (m_pTransform->get_IsRectTransform())
+	{
+		return std::static_pointer_cast<RectTransform>(m_pTransform).get();
+	}
+
+	return {};
+}
+
 
 
 //Transform* GameObject::get_Transform() const

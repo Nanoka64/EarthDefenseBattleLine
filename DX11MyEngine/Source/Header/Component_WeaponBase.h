@@ -23,7 +23,7 @@ class WeaponBase : public IComponent
 {
 protected:
 	GIGA_Engine::BitFlag::BIT_FLAG<unsigned int> m_WeaponFlags;
-	const WeaponData::BaseWeaponData *m_pParameter;
+	const WeaponData::BaseWeaponData *m_pWeaponData;
 
 public:
 	WeaponBase(std::weak_ptr<GameObject> pOwner, int updateRank = 100);

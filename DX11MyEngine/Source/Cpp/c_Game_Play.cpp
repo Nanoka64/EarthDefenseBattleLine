@@ -9,6 +9,7 @@
 #include "GameObject.h"
 #include "Component_3DCamera.h"
 
+using namespace UtilityData;
 using namespace SceneStateEnums;
 using namespace VECTOR4;
 using namespace VECTOR3;
@@ -25,6 +26,7 @@ void c_Game_Play::OnEnter(SceneManager* pOwner)
 {
     m_pPlayerObj = Master::m_pGameObjectManager->get_ObjectByTag("Player");
 
+    m_EnemyNum = 0;
 
     // ****************************************************
     //				ƒQ[ƒ€BGM‚ÌÄ¶
@@ -79,8 +81,8 @@ int c_Game_Play::Update(SceneManager *pOwner)
         return c_GAME::c_GO_RESULT_SCENE;
     }
     
-    auto antList = Master::m_pGameObjectManager->get_ObjectsByTag("Ant");
-    m_EnemyNum = INT_CAST(antList.size());
+    auto enemys = Master::m_pGameObjectManager->get_ObjectListByFactionAlive(FACTION::ENEMY);
+    m_EnemyNum = INT_CAST(enemys.size());
     // “G‚ª‹‚È‚­‚È‚Á‚½‚çƒŠƒUƒ‹ƒg‚Ö
     if (m_EnemyNum == 0)
     {
@@ -150,7 +152,7 @@ void c_Game_Play::BomberMove()
             B2PrevPos[i] = pos;
 
             B2Transform->set_Pos(pos);
-            B2Transform->SlerpLookAt(playerPos, 0.5f);
+            //B2Transform->SlerpLookAt(playerPos, 0.5f);
         }
     }
 }

@@ -12,6 +12,10 @@
 class c_Title_LoadProcess : public IState<SceneManager>
 {
 private:
+	static constexpr int LAYER_RANK_CAMERA = 91;	    // カメラのレイヤーランク
+	static constexpr int LAYER_RANK_DIRLIGHT = 90;		// 平行ライトのレイヤーランク
+	static constexpr int LAYER_RANK_PLAYER = 90;		// プレイヤーのレイヤーランク
+
 	//std::shared_ptr<class SpriteRenderer>m_pLoadBackSprite;
 	class GameObject* m_pLoadBackObj;
 	bool m_IsLoad = false;	// すでにロード済みか

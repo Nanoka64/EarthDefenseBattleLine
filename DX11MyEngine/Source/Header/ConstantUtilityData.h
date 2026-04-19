@@ -16,14 +16,12 @@ namespace UtilityData
 		ENEMY,		// 敵
 		NEUTRAL,	// 中立
 		VEHICLE,	// 乗り物
+		ITEM,		// アイテム
 	};
 
-	struct FactionInfo
-	{
-		FACTION _faction;
-	};
-
-
+	/// <summary>
+	/// コライダー種類
+	/// </summary>
 	enum class COLLIDER_TYPE
 	{
 		NONE,
@@ -44,11 +42,12 @@ namespace UtilityData
 		ENEMY_BULLET			= 1 << 3,	// 敵の弾
 		DESTRUCTION_BUILDING	= 1 << 4,	// 破壊可能な建物
 		BUILDING				= 1 << 5,	// 破壊不可能な建物
+		ITEM					= 1 << 6,	// アイテム
 
 		EVERY = 0xFFFFFFFF	// 全てに衝突
 	};
 
-	// 文字列をEnumに変換するマップ
+	// 衝突判定 文字列をEnumに変換するマップ
 	static std::map<std::string, COLLISION_CATEGORY> g_CollisionCategoryMap = {
 		{"PLAYER",				 COLLISION_CATEGORY::PLAYER},
 		{"PLAYER_BULLET",		 COLLISION_CATEGORY::PLAYER_BULLET},
@@ -57,6 +56,21 @@ namespace UtilityData
 		{"DESTRUCTION_BUILDING", COLLISION_CATEGORY::DESTRUCTION_BUILDING},
 		{"BUILDING",			 COLLISION_CATEGORY::BUILDING},
 		{"EVERY",				 COLLISION_CATEGORY::EVERY},
+	};
+
+	/// <summary>
+	/// 難易度
+	/// </summary>
+	enum class DIFFICULTY_LEVEL
+	{
+		EASY,
+		NORMAL,
+		HARD,
+		DISASTER,
+		//APOCALYPSE,
+		IMPOSSIBLE,
+
+		NUM
 	};
 
 
@@ -73,33 +87,57 @@ namespace UtilityData
 		NUM,
 	};
 
-
-
 	/// <summary>
-	/// 兵科
+	/// 兵科の種類
 	/// </summary>
 	enum class SOLDIER_TYPE
 	{
-		RANGER,	// レンジャー
+		RANGER,	// 歩兵
+		RAPID,
+		SCOUT,
+		HEAVY,
 
-		// WING,
-		// AIR,
-		// F,
+		NUM,
 	};
-
 	/// <summary>
 	/// 設定項目
 	/// </summary>
 	enum class CONFIG_ITEM
 	{
-		BGM_VOLUME,
-		SE_VOLUME,
-		MOUSE_SENSITIVITY,
-		INVERT_Y,
-		SHADOW_ENABLED,
+		BGM_VOLUME,			// BGM
+		SE_VOLUME,			// SE
+		MOUSE_SENSITIVITY,	// マウス感度
+		INVERT_Y,			// 上下反転
+		SHADOW_ENABLED,		// シャドウの有無
 
 		NUM
 	};
+
+	/// <summary>
+	/// アイテムの種類
+	/// </summary>
+	enum class ITEM_TYPE
+	{
+		RECOVERY_SMALL,	// 回復 - 小 15%
+		RECOVERY_LARGE,	// 回復 - 大 30%
+		ARMOR,			// アーマー
+		WEAPON,			// 武器箱
+
+		NUM
+	};
+
+
+	/// <summary>
+	/// 移動挙動の種類
+	/// </summary>
+	enum class MOVE_BEHAVIOUR_TYPE : unsigned char
+	{
+		NONE,
+
+		LINEAR,     // 直線移動
+		HOMING,     // ホーミング移動
+	};
+
 
 	/// <summary>
 	/// 共用体の値の種類
@@ -109,6 +147,12 @@ namespace UtilityData
 		BOOL,
 		INT,
 		FLOAT,
+	};
+
+
+	struct FactionInfo
+	{
+		FACTION _faction;
 	};
 
 	/// <summary>
@@ -202,6 +246,13 @@ namespace UtilityData
 	};
 
 
+	constexpr int MAX_BGM_VOLUME = 100;			// BGM音量の最大値
+	constexpr int MIN_BGM_VOLUME = 0;			// BGM音量の最小値
+	constexpr int MAX_SE_VOLUME = 100;			// SE音量の最大値
+	constexpr int MIN_SE_VOLUME = 0;			// SE音量の最小値
+	constexpr float MAX_MOUSE_SENSITIVITY = 100.0f;	// マウス感度の最大値
+	constexpr float MIN_MOUSE_SENSITIVITY = 0.0f;	// マウス感度の最小値
+
 	/// <summary>
 	/// ユーザーの設定データ
 	/// </summary>
@@ -223,19 +274,67 @@ namespace UtilityData
 		}
 	};
 
-
 	/// <summary>
-	/// 移動挙動の種類
+	/// タイトル項目名
 	/// </summary>
-	enum class MOVE_BEHAVIOUR_TYPE : unsigned char
+	static const const char* g_TitleMenuItemNames[static_cast<int>(TITLEMENU_ITEM::NUM)] =
 	{
-		NONE,
-
-		LINEAR,     // 直線移動
-		HOMING,     // ホーミング移動
+		"ミッション選択",
+		//"兵科選択",
+		"兵装選択",
+		"設定",
+		"終了",
 	};
 
+	/// <summary>
+	/// 兵科名
+	/// </summary>
+	static const char* g_SoldierNames[static_cast<int>(SOLDIER_TYPE::NUM)] =
+	{
+		//"陸戦歩兵",
+		//"...",
+		//"...",
+		//"...",
 
+		"スタンダード",
+		"ラピッド",
+		"スカウト",
+		"ヘビー",
+	};
 
+	/// <summary>
+	/// 兵装説明
+	/// </summary>
+	static const char* g_WeaponDescriptions[static_cast<int>(SOLDIER_TYPE::NUM)] =
+	{
+		"・バランスの取れた兵装\n特にクセもなく、初心者におすすめだ。",
+		"・連射性能に優れた兵装\n威力は低めだが、弾数、連射性能に優れているぞ。",
+		"・中/遠距離に特化した兵装\n連射性能は抑え目だが、中距離以上からの射撃に長けているぞ。",
+		"・高火力兵装\n扱いは難しいが、火力は群を抜いて高い。まさにロマン砲！",
+	};
 
+	/// <summary>
+	/// 難易度名
+	/// </summary>
+	static const char* g_DifficultyNames[static_cast<int>(DIFFICULTY_LEVEL::NUM)] =
+	{
+		"EASY",
+		"NORMAL",
+		"HARD",
+		"DISASTER",
+		//"APOCALYPSE",
+		"IMPOSSIBLE",
+	};
+
+	/// <summary>
+	/// 難易度説明
+	/// </summary>
+	static const char* g_DifficultyDescriptions[static_cast<int>(DIFFICULTY_LEVEL::NUM)] =
+	{
+		"初心者におすすめの難易度です。\n敵も接待してくれます。",
+		"標準的な難易度です。\nまずはこの難易度でプレイされることを推奨します。",
+		"かなり難しくなっています。\n一匹ずつ確実に倒しましょう。",
+		"敵が全力で襲い掛かってきます。",
+		"クリア不可",
+	};
 };

@@ -14,6 +14,7 @@ using namespace VECTOR3;
 using namespace VECTOR4;
 using namespace UtilityData;
 
+
 // メニュー項目の衝突判定用サイズ
 static const VECTOR2::VEC2 g_MenuItemSize = VECTOR2::VEC2(450.0f, 100.0f);
 
@@ -26,17 +27,13 @@ static const VECTOR2::VEC2 g_MenuItemPosArray[static_cast<int>(TITLEMENU_ITEM::N
 	VEC2(400.0f,900.0f),
 };
 
+
+
 /// <summary>
-/// タイトル項目名
+/// マウスカーソルが項目の上に乗った際に、項目をどれくらいずらすか
 /// </summary>
-static constexpr const char* g_TitleMenuItemNames[static_cast<int>(TITLEMENU_ITEM::NUM)] =
-{
-	"ミッション選択",
-	//"兵科選択",
-	"兵装選択",   
-	"設定",
-	"終了",
-};
+static const float g_MouseHoveredItemSlideOffset = 50.0f;
+
 
 //*---------------------------------------------------------------------------------------
 //* @:c_Title_MainMenu Class 
@@ -46,7 +43,6 @@ static constexpr const char* g_TitleMenuItemNames[static_cast<int>(TITLEMENU_ITE
 //*----------------------------------------------------------------------------------------
 void c_Title_MainMenu::OnEnter(SceneManager* pOwner)
 {
-
 	// 遷移先シーンの設定
 	m_MenuItemInfoArray[0]._nextState = c_TITLE::c_TITLE_MISSION_SELECT;
 	m_MenuItemInfoArray[1]._nextState = c_TITLE::c_TITLE_SOLDIER_SELECT;
@@ -69,6 +65,8 @@ void c_Title_MainMenu::OnEnter(SceneManager* pOwner)
 		rectTrans._pos = g_MenuItemPosArray[i];
 		m_pButtonsObjArray[i] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
 		m_pButtonArray[i] = m_pButtonsObjArray[i]->get_Component<ButtonUI>();
+		m_pButtonArray[i].lock()->set_Color(VEC4(10.0f, 10.0f, 0.0f, 1.0f), UIData::STATE::HIGH_LIGHTED);	// 選択されている状態で「黄色」に
+		m_pButtonArray[i].lock()->set_Color(VEC4(5.0f, 5.0f, 0.0f, 1.0f), UIData::STATE::PRESSED);	
 		m_pMenuItemRectTransformArray[i] = m_pButtonsObjArray[i]->get_RectTransform();
 
 		m_MenuItemInfoArray[i]._pos = g_MenuItemPosArray[i];
@@ -82,62 +80,9 @@ void c_Title_MainMenu::OnEnter(SceneManager* pOwner)
 	Master::m_pSoundManager->PlayBGM(BGM_ID::BGM_TITLE_01);
 
 	m_NextState = c_TITLE_MAIN_MENU;
-
-	//// すでに初期化済みなら項目背景画像のみアクティブにして返す
-	//if (m_IsInit)
-	//{
-	//	// 背景画像をアクティブに
-	//	for (int i = 0; i < static_cast<int>(TITLEMENU_ITEM::NUM); i++)
-	//	{
-	//		auto obj = m_pMenuItemRectTransformArray[i].lock()->get_OwnerObj();
-	//		if (obj.expired())
-	//		{
-	//			assert(false);
-	//			continue;
-	//		}
-	//		obj.lock()->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-
-	//		auto button = m_pButtonArray[i].lock();
-
-	//		// ボタンにテキスト設定
-	//		button->set_Text(g_TitleMenuItemNames[i]);
-
-	//		// 処理設定
-	//		button->OnClickFunc([this, i]() {m_NextState = m_MenuItemInfoArray[i]._nextState; });
-	//	}
-
-	//	return;
-	//}
-
-	//m_PrevHoveredMenuItem = TITLEMENU_ITEM::EXIT;
-
-
-
-	//// アクティブにしてトランスフォームを取得
-	//for (int i = 0; i < static_cast<int>(TITLEMENU_ITEM::NUM); i++)
-	//{
-	//	auto obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_" + std::to_string(i + 1));
-	//	if (obj)
-	//	{
-	//		obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	//		m_pMenuItemRectTransformArray[i] = obj->get_RectTransform();
-
-	//		// ボタンコンポーネント
-	//		auto button = obj->get_Component<ButtonUI>();
-	//		button->set_Text(g_TitleMenuItemNames[i]);
-
-	//		// シーンを遷移させる処理
-	//		button->OnClickFunc([this, i]() {m_NextState = m_MenuItemInfoArray[i]._nextState; });	
-
-	//		m_pButtonArray[i] = button;
-	//	}
-
-	//	m_MenuItemInfoArray[i]._pos = g_MenuItemPosArray[i];
-	//	m_MenuItemInfoArray[i]._name = g_TitleMenuItemNames[i];
-	//	m_MenuItemInfoArray[i]._type = static_cast<TITLEMENU_ITEM>(i);
-	//}
-
 	m_IsInit = true;
+
+	m_CrntSelectItem = TITLEMENU_ITEM::MISSION_SELECT;
 }
 
 
@@ -149,7 +94,9 @@ void c_Title_MainMenu::OnEnter(SceneManager* pOwner)
 //*----------------------------------------------------------------------------------------
 void c_Title_MainMenu::OnExit(SceneManager* pOwner)
 {
-	// オブジェクトを非アクティブに（プールに返す）
+	// *****************************************************************************************
+	// 	// オブジェクトを非アクティブに（プールに返す）
+	// *****************************************************************************************
 	for (int i = 0; i < static_cast<int>(TITLEMENU_ITEM::NUM); i++)
 	{
 		m_pButtonsObjArray[i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
@@ -182,10 +129,17 @@ int c_Title_MainMenu::Update(SceneManager* pOwner)
 		case UIData::STATE::NORMAL:
 			break;
 		case UIData::STATE::HIGH_LIGHTED:
+			if (m_CrntSelectItem != static_cast<TITLEMENU_ITEM>(i))
+			{
+				// ****************************************************
+				//				カーソルが載った時のSE再生
+				// ****************************************************
+				Master::m_pSoundManager->Play(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SYSTEM_MOVING_CURSOR01));
+			}
+			m_CrntSelectItem = static_cast<TITLEMENU_ITEM>(i);
 			m_MenuItemInfoArray[i]._isHovered = true;	// マウスが乗ってる
 			break;
 		case UIData::STATE::PRESSED:
-			m_MenuItemInfoArray[i]._isHovered = true;	// マウスが乗ってる
 			break;
 		case UIData::STATE::SELECTED:
 			break;
@@ -212,32 +166,19 @@ void c_Title_MainMenu::Draw(SceneManager* pOwner)
 {
 	for (auto& item : m_MenuItemInfoArray)
 	{
-		// 項目の位置
-		VEC2 menuItemPos = item._pos;
-
 		// スプライトの位置（文字の少し左側になるよう補正している）
 		VEC2 spritePos;
-		spritePos.x = menuItemPos.x - 100.0f;
-		spritePos.y = menuItemPos.y;
+		spritePos.x = item._pos.x - 100.0f;
+		spritePos.y = item._pos.y;
 
 		// マウスが乗ってるならずらす
-		if (item._isHovered)
+		if (m_CrntSelectItem == item._type)
 		{
-			menuItemPos.x += 50.0f;
-			spritePos.x += 50.0f;
-			if (m_PrevHoveredMenuItem != item._type)
-			{
-				// ****************************************************
-				//				カーソルが載った時のSE再生
-				// ****************************************************
-				Master::m_pSoundManager->Play(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SYSTEM_MOVING_CURSOR01));
-			}
-
-			m_PrevHoveredMenuItem = item._type;	// なんの項目に乗ったか保持
+			spritePos.x += g_MouseHoveredItemSlideOffset;
 		}
-		
+
 		m_pMenuItemRectTransformArray[static_cast<int>(item._type)].lock()->set_RectPosition(VEC2(spritePos.x, spritePos.y));
-		m_pMenuItemRectTransformArray[static_cast<int>(item._type)].lock()->set_Size(g_MenuItemSize.x,g_MenuItemSize.y);
+		m_pMenuItemRectTransformArray[static_cast<int>(item._type)].lock()->set_Size(g_MenuItemSize.x, g_MenuItemSize.y);
 	}
 
 	Master::m_pDirectWriteManager->SetOutLine(3.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));

@@ -16,8 +16,11 @@
 class EnemyController :  public IComponent
 {
 private:
+	// TODO:一旦、ここにパラメータを直接置く
 	const float SOUND_HIT_RADIUS = 600.0f;				// 被弾音が聞こえる範囲
 	const float SOUND_DEAD_RADIUS = 600.0f;				// 死亡音が聞こえる範囲
+	const int DROP_ITEM_MIN = 0;						// 落とすアイテムの最小数
+	const int DROP_ITEM_MAX = 1;						// 落とすアイテムの最大数
 
 	std::weak_ptr<class Health>m_pHealthComp;					// 体力管理コンポーネント
 	std::weak_ptr<class SkinnedMeshAnimator> m_pAnimatorComp;	// アニメータコンポーネント
@@ -28,6 +31,8 @@ private:
 
 	VECTOR3::VEC3 m_MoveVelocity;	// 移動
 	VECTOR3::VEC3 m_StartPos;		// 開始位置
+	const EnemyData::BaseEnemyData* m_pEnemyData;	// 読み取り専用データ
+
 	int m_CrntAnimID;				// 現在のアニメーション番号
 	float m_MoveSpeed;				// 移動速度
 	float m_StateTimer;				// ステート時間
@@ -46,7 +51,9 @@ public:
 	void Update(RendererEngine& renderer) override;	// 更新
 	void Draw(RendererEngine& renderer) override;	// 描画
 	void OnCollisionEnter(const class CollisionInfo &_other)override;
-	
+	void set_EnemyData(const EnemyData::BaseEnemyData* _enemyData) { m_pEnemyData = _enemyData; }	// エネミーデータの設定
+	const EnemyData::BaseEnemyData* get_EnemyData()const;
+
 	/// <summary>
 	/// ステートの変更
 	/// </summary>

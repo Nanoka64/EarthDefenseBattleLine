@@ -19,6 +19,11 @@ void c_Result_Cleared::OnEnter(SceneManager* pOwner)
 {
 	m_ElapsedTime = 0.0f;
 
+	// ****************************************************
+	//				クリアBGMの再生
+	// ****************************************************
+	Master::m_pSoundManager->PlayBGM(BGM_ID::BGM_VICTORY01, false);
+
 
 	// クリアテキスト用スプライトを作る **********************************************
 	UIData::RectTransformData rectData;

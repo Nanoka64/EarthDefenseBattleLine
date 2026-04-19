@@ -4,15 +4,12 @@
 #include "GameObject.h"
 #include "Component_3DCamera.h"
 
+using namespace UtilityData;
 using namespace Tool;
+using namespace VECTOR4;
 using namespace VECTOR3;
 using namespace VECTOR2;
 
-constexpr float MINIMAP_X = 1750.0f;    // ミニマップの中心X座標
-constexpr float MINIMAP_Y = 150.0f;     // ミニマップの中心X座標
-constexpr float MINIMAP_RADIUS = 130.0f;// ミニマップの半径
-constexpr float MINIMAP_SIZE = 300.0f;  // ミニマップのサイズ
-constexpr float MINIMAP_ENEMY_ICON_SIZE = 10.0f; // ミニマップ上の敵アイコンのサイズ
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
@@ -73,19 +70,19 @@ void MiniMapRader::Start(RendererEngine& renderer)
     m_pRaderBackSpriteObj = Master::m_pUIManager->GetSprite(renderer, rectData, spriteData);
 
     // レーダーに映す点用スプライト **********************************************
-    rectData._size = VEC2(MINIMAP_ENEMY_ICON_SIZE, MINIMAP_ENEMY_ICON_SIZE);
-    rectData._pos = VEC2(0.0f, 0.0f);
-    rectData._anchorMax = VEC2(0.0f, 0.0f);
-    rectData._anchorMin = VEC2(0.0f, 0.0f);
-    rectData._pivot = VEC2(0.5f, 0.5f);         // ピボットを中心に設定
-    spriteData._tag = "Circle";
-    spriteData._imagePath = "Resource/Texture/UI/Circle.png";
-    spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-    spriteData._layerRank = 100;
-    spriteData._color = VECTOR4::VEC4(5.0f, 0.0f, 0.0f, 1.0f);
-    for (int i = 0; i < 50; i++) {
-        m_pRaderEnemySpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
-    }
+    //rectData._size = VEC2(MINIMAP_ENEMY_ICON_SIZE, MINIMAP_ENEMY_ICON_SIZE);
+    //rectData._pos = VEC2(0.0f, 0.0f);
+    //rectData._anchorMax = VEC2(0.0f, 0.0f);
+    //rectData._anchorMin = VEC2(0.0f, 0.0f);
+    //rectData._pivot = VEC2(0.5f, 0.5f);         // ピボットを中心に設定
+    //spriteData._tag = "Circle";
+    //spriteData._imagePath = "Resource/Texture/UI/Circle.png";
+    //spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+    //spriteData._layerRank = 100;
+    //spriteData._color = VECTOR4::VEC4(5.0f, 0.0f, 0.0f, 1.0f);
+    //for (int i = 0; i < 50; i++) {
+    //    m_pRaderEnemySpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
+    //}
 }
 
 //*---------------------------------------------------------------------------------------
@@ -97,36 +94,82 @@ void MiniMapRader::Start(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void MiniMapRader::Update(RendererEngine& renderer)
 {
-    auto antList = Master::m_pGameObjectManager->get_ObjectsByTag("Ant");
+    //auto antList = Master::m_pGameObjectManager->get_ObjectsByTag("Ant");
+    auto enemys = Master::m_pGameObjectManager->get_ObjectListByFactionAlive(FACTION::ENEMY);    // 生存状態の敵取得
+    auto items = Master::m_pGameObjectManager->get_ObjectListByFaction(FACTION::ITEM);         // アイテム取得
+    
+    size_t enemySpriteSize = m_pRaderEnemySpriteObjArray.size();
+    size_t itemSpriteSize = m_pRaderItemSpriteObjArray.size();
+
+    // 敵のアイコンスプライト確保
+    if (enemySpriteSize < enemys.size()) {
+        SecuringMiniMapIconSprite(renderer, enemys.size(), m_pRaderEnemySpriteObjArray, VEC2(MINIMAP_ENEMY_ICON_SIZE), VEC4(1.0f, 0.0f, 0.0f, 1.0f));
+    }
+    // 少なくなっていたら、プールへ返す
+    else if(enemySpriteSize > enemys.size()) {
+        m_pRaderEnemySpriteObjArray.back()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+        m_pRaderEnemySpriteObjArray.pop_back(); // 除外
+    }
+
+    // アイテムのアイコンスプライト確保
+    if (itemSpriteSize < items.size()) {
+        SecuringMiniMapIconSprite(renderer, items.size(), m_pRaderItemSpriteObjArray, VEC2(MINIMAP_ENEMY_ICON_SIZE), VEC4(0.0f, 1.0f, 0.0f, 1.0f));
+    }
+    // 少なくなっていたら、プールへ返す
+    else if(itemSpriteSize > items.size()) {
+        m_pRaderItemSpriteObjArray.back()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+        m_pRaderItemSpriteObjArray.pop_back(); // 除外
+    }
 
     VEC3 playerPos = m_pPlayerObj.lock()->get_Transform().lock()->get_VEC3ToPos();
     float cameraAngleH = renderer.get_CameraComponent()->get_Angle_H();
 
-    // カメラの水平回転角度に基づいて、サインとコサインを計算（ずれてしまうので0.7で補正）
+    UpdateRadarIcons(enemys, m_pRaderEnemySpriteObjArray, playerPos, cameraAngleH); // 敵
+    UpdateRadarIcons(items, m_pRaderItemSpriteObjArray, playerPos, cameraAngleH);   // アイテム
+}
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】レーダー上のアイコンを更新する
+//*
+//* [引数]
+//* &targetObjs : 表示対象
+//* &iconSprites : 表示するUI
+//* &centerPos : 中心点（プレイヤー等）
+//* cameraAngleH : 基準となる角度
+//* [返値]なし
+//*----------------------------------------------------------------------------------------
+void MiniMapRader::UpdateRadarIcons(
+    const std::vector<std::shared_ptr<GameObject>>& targetObjs, 
+    const std::vector<GameObject*>& iconSprites,
+    const VEC3& centerPos,
+    float cameraAngleH)
+{
+    // カメラの水平回転角度に基づいて、サインとコサインを計算（ずれてしまうので1.57で補正）
     float cameraH_s = sinf(-cameraAngleH - G_PI_2_F);
     float cameraH_c = cosf(-cameraAngleH - G_PI_2_F);
 
     // レーダーの敵の位置更新
-    for (int i = 0; i < antList.size(); i++)
+    for (int i = 0; i < targetObjs.size(); i++)
     {
-        auto& enemy = antList[i];
-        VEC3 enemyPos = enemy->get_Transform().lock()->get_VEC3ToPos();
+        auto& target = targetObjs[i];
+        VEC3 targetPos = target->get_Transform().lock()->get_VEC3ToPos();
 
         // 相対座標の計算
-        float relativeX = enemyPos.x - playerPos.x;
-        float relativeZ = enemyPos.z - playerPos.z;
+        float relativeX = targetPos.x - centerPos.x;
+        float relativeZ = targetPos.z - centerPos.z;
 
         // 回転とスケールの適用を一度に行う
         float rotX = (relativeX * cameraH_c - relativeZ * cameraH_s);
         float rotY = (relativeX * cameraH_s + relativeZ * cameraH_c);
 
-        int enemyMapX = static_cast<int>(MINIMAP_X + rotX);
-        int enemyMapY = static_cast<int>(MINIMAP_Y - rotY);
+        int targetMapX = static_cast<int>(MINIMAP_X + rotX);
+        int targetMapY = static_cast<int>(MINIMAP_Y - rotY);
 
         // 位置をミニマップの円内に収める
-        ClampToMinimap(enemyMapX, enemyMapY, static_cast<int>(MINIMAP_X), static_cast<int>(MINIMAP_Y), MINIMAP_RADIUS);
+        ClampToMinimap(targetMapX, targetMapY, static_cast<int>(MINIMAP_X), static_cast<int>(MINIMAP_Y), MINIMAP_RADIUS);
 
-        m_pRaderEnemySpriteObjArray[i]->get_RectTransform().lock()->set_RectPosition(VEC2(FLOAT_CAST(enemyMapX), FLOAT_CAST(enemyMapY)));
+        iconSprites[i]->get_RectTransform().lock()->set_RectPosition(VEC2(FLOAT_CAST(targetMapX), FLOAT_CAST(targetMapY)));
     }
 }
 
@@ -154,5 +197,37 @@ void MiniMapRader::ClampToMinimap(int& _Out_X, int& _Out_Y, int _centerX, int _c
         float scale = _radius / dist;
         _Out_X = _centerX + static_cast<int>(dx * scale);
         _Out_Y = _centerY + static_cast<int>(dy * scale);
+    }
+}
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】ミニマップに表示する円のスプライトを確保
+//*
+//* [引数] 
+//* &renderer : 描画エンジンの参照
+//* _num : 確保する数
+//* &_size : サイズ
+//* &_color : 色
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void MiniMapRader::SecuringMiniMapIconSprite(RendererEngine& renderer, int _num, std::vector<class GameObject*>& iconSprites, const VECTOR2::VEC2& _size, const VECTOR4::VEC4& _color)
+{
+    UIData::RectTransformData rectData;
+    UIData::SpriteUIData spriteData;
+    // レーダーに映す点用スプライト **********************************************
+    rectData._size = _size;
+    rectData._pos = VEC2(0.0f, 0.0f);
+    rectData._anchorMax = VEC2(0.0f, 0.0f);
+    rectData._anchorMin = VEC2(0.0f, 0.0f);
+    rectData._pivot = VEC2(0.5f, 0.5f);         // ピボットを中心に設定
+    spriteData._tag = "Icon";
+    spriteData._imagePath = "Resource/Texture/UI/Circle.png";
+    spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+    spriteData._layerRank = 110;
+    spriteData._color = _color;
+    for (int i = 0; i < _num; i++)
+    {
+        iconSprites.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
     }
 }

@@ -10,6 +10,7 @@
 
 using namespace VECTOR2;
 using namespace VECTOR3;
+using namespace VECTOR4;
 
 // メニュー項目の衝突判定用サイズ
 static const VECTOR2::VEC2 g_MissionItemSize = VECTOR2::VEC2(400.0f, 70.0f);
@@ -19,6 +20,11 @@ static const VECTOR2::VEC2 g_MissionItemPosArray[MISSION_NUM] =
 {
 	VEC2(400.0f,600.0f),
 };
+
+/// <summary>
+/// マウスカーソルが項目の上に乗った際に、項目をどれくらいずらすか
+/// </summary>
+static const float g_MouseHoveredItemSlideOffset = 50.0f;
 
 /// <summary>
 /// ミッション名
@@ -37,6 +43,9 @@ using namespace SceneStateEnums;
 //*----------------------------------------------------------------------------------------
 void c_Title_MissionSelect::OnEnter(SceneManager *pOwner)
 {
+	// 最初は空
+	this->SetInitChildState(pOwner, c_TITLE::NONE);
+
 	m_NextState = c_TITLE_MISSION_SELECT;
 
 	// メニュー項目のオブジェクトとコンポーネントの取得と設定
@@ -48,21 +57,25 @@ void c_Title_MissionSelect::OnEnter(SceneManager *pOwner)
 		buttonData._text = g_MissionNames[i];
 		buttonData._layerRank = 105;
 		buttonData._inputValidationState = UIData::STATE::PRESSED;
-		buttonData._onClicFunction = [this, i]() { m_NextState = c_TITLE::c_GO_GAME_SCENE; };
+		buttonData._onClicFunction = [this, i, pOwner]() { 	this->MissionSelectButton_OnClicFunction(pOwner); };	// 難易度選択へ
 		buttonData._textOffsetPos = VEC2(100.0f, 0.0f);
 		rectTrans._size = g_MissionItemSize;
 		rectTrans._pos = g_MissionItemPosArray[i];
 		m_pButtonsObjArray[i]		 = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
 		m_pButtonArray[i]				 = m_pButtonsObjArray[i]->get_Component<ButtonUI>();
+		m_pButtonArray[i].lock()->set_Color(VEC4(10.0f, 10.0f, 0.0f, 1.0f), UIData::STATE::HIGH_LIGHTED);	// 選択されている状態で「黄色」に
+		m_pButtonArray[i].lock()->set_Color(VEC4(5.0f, 5.0f, 0.0f, 1.0f), UIData::STATE::PRESSED);
 		m_pMenuItemRectTransformArray[i] = m_pButtonsObjArray[i]->get_RectTransform();
 
 		m_ItemInfoArray[i]._pos = g_MissionItemPosArray[i];
 		m_ItemInfoArray[i]._name = g_MissionNames[i];
 	}
 
-	m_PrevHoveredMIssionItem = 0;
+
+	m_CrntSelectItem = -1;
 
 	m_IsInit = true;
+
 }
 
 
@@ -74,9 +87,12 @@ void c_Title_MissionSelect::OnEnter(SceneManager *pOwner)
 //*----------------------------------------------------------------------------------------
 void c_Title_MissionSelect::OnExit(SceneManager *pOwner)
 {
-	// オブジェクトを非アクティブに（プールに返す）
+	// *****************************************************************************************
+	// 	// オブジェクトを非アクティブに（プールに返す）
+	// *****************************************************************************************
 	for (int i = 0; i < MISSION_NUM; i++)
 	{
+		m_pButtonArray[i].lock()->set_IsInteractable(true);
 		m_pButtonsObjArray[i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	}
 }
@@ -90,6 +106,43 @@ void c_Title_MissionSelect::OnExit(SceneManager *pOwner)
 //*----------------------------------------------------------------------------------------
 int c_Title_MissionSelect::Update(SceneManager *pOwner)
 {
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+	//
+	//						子シーンの処理
+	// 
+	//////////////////////////////////////////////////////////////////////////////////////////
+	if (m_CrntChildStateID != -1) {
+		// 子ステートの更新
+		int newState = m_pChildStateMap[m_CrntChildStateID]->Update(pOwner);
+
+		// ゲームシーンへ
+		if (newState == c_TITLE::c_GO_GAME_SCENE)
+		{
+			m_pChildStateMap[m_CrntChildStateID]->OnExit(pOwner);	// 子ステートの終了
+			return c_TITLE::c_GO_GAME_SCENE;
+		}
+		// ミッション選択のままであれば、子をNONEに戻す
+		else if (newState == c_TITLE::c_TITLE_MISSION_SELECT)
+		{
+			m_pChildStateMap[m_CrntChildStateID]->OnExit(pOwner);	// 子ステートの終了
+			this->SetInitChildState(pOwner, c_TITLE::NONE);
+
+			// ボタンも有効状態に
+			for (int i = 0; i < static_cast<int>(MISSION_NUM); i++)
+			{
+				m_pButtonArray[i].lock()->set_IsInteractable(true);
+			}
+		}
+	}
+
+
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+	//
+	//						ミッション選択ステートの処理
+	// 
+	//////////////////////////////////////////////////////////////////////////////////////////
 	// 右クリックでメインメニューへ戻る
 	if (GetMouseClickDown(MOUSE_BUTTON_STATE::RIGHT))
 	{
@@ -109,14 +162,20 @@ int c_Title_MissionSelect::Update(SceneManager *pOwner)
 		{
 		case UIData::STATE::NORMAL:
 			break;
-		case UIData::STATE::HIGH_LIGHTED:
-			m_ItemInfoArray[i]._isHovered = true;	// マウスが乗ってる
+		case UIData::STATE::HIGH_LIGHTED:	// マウスが乗ってる
+
+			// 前回と値が違うなら音を鳴らす
+			if (m_CrntSelectItem != i) {
+				// ****************************************************
+				//				カーソルが載った時のSE再生
+				// ****************************************************
+				Master::m_pSoundManager->Play(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SYSTEM_MOVING_CURSOR01));
+			}
+			m_CrntSelectItem = i;
 			break;
 		case UIData::STATE::PRESSED:
-			m_ItemInfoArray[i]._isHovered = true;	// マウスが乗ってる
 			break;
 		case UIData::STATE::SELECTED:
-			m_ItemInfoArray[i]._isHovered = true;	// マウスが乗ってる
 			break;
 		case UIData::STATE::DISABLED:
 			break;
@@ -126,6 +185,8 @@ int c_Title_MissionSelect::Update(SceneManager *pOwner)
 
 		i++;
 	}
+
+
 
 	return m_NextState;
 }
@@ -137,8 +198,10 @@ int c_Title_MissionSelect::Update(SceneManager *pOwner)
 //* 引数：1.SceneManager
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-void c_Title_MissionSelect::Draw(SceneManager *pOwner)
+void c_Title_MissionSelect::Draw(SceneManager* pOwner)
 {
+	int i = 0;
+
 	for (auto& item : m_ItemInfoArray)
 	{
 		// 項目の位置
@@ -151,31 +214,46 @@ void c_Title_MissionSelect::Draw(SceneManager *pOwner)
 
 
 		// マウスが乗ってるならずらす
-		if (item._isHovered)
+		if (m_CrntSelectItem == i)
 		{
-			menuItemPos.x += 50.0f;
-			spritePos.x += 50.0f;
-			if (m_PrevHoveredMIssionItem)
-			{
-				// ****************************************************
-				//				カーソルが載った時のSE再生
-				// ****************************************************
-				Master::m_pSoundManager->Play(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SYSTEM_MOVING_CURSOR01));
-			}
-
-			m_PrevHoveredMIssionItem = 0;	// なんの項目に乗ったか保持
-
-			menuItemPos.x += 50.0f;
-			spritePos.x += 50.0f;
+			spritePos.x += g_MouseHoveredItemSlideOffset;
 		}
 
 		m_pMenuItemRectTransformArray[0].lock()->set_RectPosition(VEC2(spritePos.x, spritePos.y));
 		m_pMenuItemRectTransformArray[0].lock()->set_Size(500.0f, 100.0f);
 
-		// 文字表示
-		//Master::m_pDirectWriteManager->DrawString(item._name, menuItemPos, "White_40_STD");
+		i++;
 	}
 
 
 	Master::m_pDirectWriteManager->DrawString("☆ミッション選択", VECTOR2::VEC2(40.0f, 500.0f), "White_40_STD");
+
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+	//
+	//						子シーンの描画処理
+	// 
+	//////////////////////////////////////////////////////////////////////////////////////////
+	if (m_CrntChildStateID != -1)
+	{
+		m_pChildStateMap[m_CrntChildStateID]->Draw(pOwner);
+	}
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:c_Title_MissionSelect Class 
+//*【?】ミッション選択ボタンが押された際の処理
+//* 引数：pOwner
+//* 返値：なし
+//*----------------------------------------------------------------------------------------
+void c_Title_MissionSelect::MissionSelectButton_OnClicFunction(SceneManager* pOwner)
+{
+	// 子ステートを難易度選択へ
+	this->SetInitChildState(pOwner, c_TITLE::c_TITLE_DIFFICULT_SELECT);
+
+	// ボタンを無効状態に
+	for (int i = 0; i < static_cast<int>(MISSION_NUM); i++)
+	{
+		m_pButtonArray[i].lock()->set_IsInteractable(false);
+	}
 }

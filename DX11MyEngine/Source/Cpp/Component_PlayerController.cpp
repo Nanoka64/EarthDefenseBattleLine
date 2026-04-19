@@ -468,6 +468,12 @@ void PlayerController::OnCollisionEnter(const class CollisionInfo &other)
 void PlayerController::Reset()
 {
 	m_IsDead = false;
+	if (m_pHealthComp.lock()) {
+		m_pHealthComp.lock()->Reset();
+	}
+	if (m_pAnimatorComp.lock())	{
+		ChangeAnimation(PlayerData::PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE);
+	}
 }
 
 //*---------------------------------------------------------------------------------------

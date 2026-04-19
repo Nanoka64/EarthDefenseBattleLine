@@ -38,6 +38,11 @@ public:
 	float get_CrntHP()const { return m_CrntHP; }
 	float get_MaxHP()const { return m_MaxHP; }
 	void set_MaxHP(const float _hp) { m_MaxHP = _hp; }
-	void set_CrntHP(const float _hp) { m_CrntHP = _hp; }
+	void set_CrntHP(const float _hp);
+	void set_RecoveryHP(const float _hp);
+
+	bool get_IsDead()const { return m_IsDead; }	// Ž€–Sƒtƒ‰ƒOŽæ“¾
+
+	void Reset();
 };
 

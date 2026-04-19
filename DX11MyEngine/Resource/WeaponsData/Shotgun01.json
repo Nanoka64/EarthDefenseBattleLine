@@ -4,7 +4,7 @@
   "bulletMaxNum": 10,
   "bulletSimultaneousNum": 12,
   "fireRate": 2.0,
-  "reloadTime": 2.8,
+  "reloadTime": 5.8,
   "accuracy": 0.05,
   "zoomLength": 1.0,
   "isLaserSight": false,

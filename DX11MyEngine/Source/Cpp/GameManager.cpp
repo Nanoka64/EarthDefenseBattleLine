@@ -64,6 +64,8 @@ void GameManager::Update(RendererEngine& renderer)
 	Master::m_pBulletManager->Update(renderer);
 	// UIの更新
 	Master::m_pUIManager->Update(renderer);
+	// アイテムの更新
+	Master::m_pItemManager->Update(renderer);
 
 	// シーンが終了していたら終わらせる
 	if (m_pSceneManager->get_IsSceneClose())

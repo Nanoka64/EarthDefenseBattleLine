@@ -40,9 +40,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateModel(const CreateModelInfo
 
     // オブジェクトの生成
     std::shared_ptr<GameObject> pModelObj = Instantiate3D(std::move(obj), info.IsTransparent);
-    pModelObj->Init(*info.pRenderer);
     pModelObj->set_Tag(info.ObjTag.c_str());
-    pModelObj->set_IsShadow(true);  // シャドウをする
 
     // オブジェクトの状態をアクティブにする
     if (info.IsActive) {
@@ -101,9 +99,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateUtilityMesh(const CreateUti
 {
     // オブジェクトの生成
     std::shared_ptr<GameObject> pObj = Instantiate3D(std::move(std::make_shared<GameObject>()), info.IsTransparent);
-    pObj->Init(*info.pRenderer);
     pObj->set_Tag(info.ObjTag.c_str());
-    pObj->set_IsShadow(true);   // シャドウをする
     pObj->set_LayerRank(info.ObjLayer);  // 更新レイヤーの設定
 
 
@@ -139,7 +135,6 @@ std::shared_ptr<class GameObject> MeshFactory::CreateSprite(const CreateSpriteIn
 {
     // オブジェクトの生成
     std::shared_ptr<GameObject> pObj = Instantiate2D(std::move(std::make_shared<GameObject>()), info.IsTransparent);
-    pObj->Init(*info.pRenderer);
     pObj->set_Tag(info.ObjTag.c_str());
 
     // オブジェクトの状態をアクティブにする
@@ -171,7 +166,6 @@ std::shared_ptr<class GameObject> MeshFactory::CreateBillboard(const CreateBillb
 {
     // オブジェクトの生成
     std::shared_ptr<GameObject> pObj = Instantiate3D(std::move(std::make_shared<GameObject>()), info.IsTransparent);
-    pObj->Init(*info.pRenderer);
     pObj->set_Tag(info.ObjTag.c_str());
 
     // オブジェクトの状態をアクティブにする
@@ -203,7 +197,6 @@ std::shared_ptr<class GameObject> MeshFactory::CreateSkybox(const CreateSkyboxIn
 {
     // オブジェクトの生成
     std::shared_ptr<GameObject> pObj = Instantiate3D(std::move(std::make_shared<GameObject>()), info.IsTransparent);
-    pObj->Init(*info.pRenderer);
     pObj->set_Tag(info.ObjTag.c_str());
 
     // オブジェクトの状態をアクティブにする
@@ -234,7 +227,6 @@ std::shared_ptr<class GameObject> MeshFactory::CreateDecal(const CreateDecalInfo
 {
     // オブジェクトの生成
     std::shared_ptr<GameObject> pObj = Instantiate3D(std::move(std::make_shared<GameObject>()), info.IsTransparent);
-    pObj->Init(*info.pRenderer);
     pObj->set_Tag(info.ObjTag.c_str());
 
     // オブジェクトの状態をアクティブにする

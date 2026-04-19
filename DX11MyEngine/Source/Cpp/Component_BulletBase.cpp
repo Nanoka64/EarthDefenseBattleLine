@@ -17,7 +17,7 @@ BulletBase::BulletBase(std::weak_ptr<GameObject> pOwner, int updateRank) :
     m_PrevPos(VEC3()),
     m_MoveDir(VEC3()),
     m_Counter(0),
-    m_pParameter(nullptr),
+    m_pWeaponData(nullptr),
     m_CrntPenetrationCount(0)
 {
 	this->set_Tag("BulletBase");

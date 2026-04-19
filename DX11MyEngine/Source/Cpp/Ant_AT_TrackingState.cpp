@@ -19,7 +19,7 @@ using namespace UtilityData;
 void Ant_AT_TrackingState::OnEnter(class EnemyController *pOwner)
 {
 	pOwner->set_IsAnim(true);
-	pOwner->set_MoveSpeed(MOVE_SPEED);
+	pOwner->set_MoveSpeed(MOVE_SPEED * Master::m_pDataManager->get_EnemyDifficultyFactor()._moveSpeedRate);
 
 	// ’Ç]
 	pOwner->set_MoveLogicState(MOVE_BEHAVIOUR_TYPE::HOMING);

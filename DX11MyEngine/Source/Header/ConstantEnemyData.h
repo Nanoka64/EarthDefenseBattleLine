@@ -41,9 +41,26 @@ namespace EnemyData
 		ANT_STATE_ACTIVE_DEAD,			// 死亡
 	};
 
+	const float ENEMY_ANT01_BASE_HP = 200.0f;	// アリの基本HP
 
-	struct EnemyData
+	/// <summary>
+	/// 敵の基本データ
+	/// </summary>
+	struct BaseEnemyData
 	{
+		float _hp = 0.0f;
+		float _attack = 0.0f;
+		float _moveSpeed = 0.0f;
+	};
 
+
+	/// <summary>
+	/// 難易度係数
+	/// </summary>
+	struct EnemyDifficultyFactor
+	{
+		float _hpRate = 0.0f;
+		float _attackRate = 0.0f;
+		float _moveSpeedRate = 0.0f;
 	};
 }

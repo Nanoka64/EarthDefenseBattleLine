@@ -19,6 +19,8 @@
 #include "MeshFactory.h"
 #include "InputFactory.h"
 
+using namespace UtilityData;
+using namespace EnemyData;
 constexpr float VOLUME_SCALE = 0.01f;  // 音量のスケール（0.0f～1.0f）
 constexpr float PLAYER_HP = 1000.0f;	// プレイヤーのHP（今後、成長要素が増えたら、保存できるように）
 //*---------------------------------------------------------------------------------------
@@ -35,7 +37,9 @@ m_pRenderer(nullptr),
 m_SelectWeaponID(),
 m_IsPlayerDead(false),
 m_IsMissionCleared(false),
-m_PlayerHP(PLAYER_HP)
+m_PlayerHP(PLAYER_HP),
+m_SelectDifficultyLevel(DIFFICULTY_LEVEL::NORMAL),
+m_IsPause(false)
 {
 }
 
@@ -71,6 +75,14 @@ bool DataManager::Init(std::shared_ptr<RendererEngine>pRenderer)
 
 	Master::m_pSoundManager->set_Volume(SOUND_TYPE::BGM, m_UserConfigData._BGMVolume * VOLUME_SCALE);
 	Master::m_pSoundManager->set_Volume(SOUND_TYPE::SE, m_UserConfigData._SEVolume * VOLUME_SCALE);
+
+	// TODO:難易度係数一旦ここに書く
+	//																			hp	  atk   speed
+	m_EnemyDifficultyFactorArray[UINT_CAST(DIFFICULTY_LEVEL::EASY)]			= { 0.5f, 0.5f, 0.5f };
+	m_EnemyDifficultyFactorArray[UINT_CAST(DIFFICULTY_LEVEL::NORMAL)]		= { 1.0f, 1.0f, 1.0f };
+	m_EnemyDifficultyFactorArray[UINT_CAST(DIFFICULTY_LEVEL::HARD)]			= { 1.5f, 1.5f, 1.5f };
+	m_EnemyDifficultyFactorArray[UINT_CAST(DIFFICULTY_LEVEL::DISASTER)]		= { 2.5f, 3.5f, 2.0f };
+	m_EnemyDifficultyFactorArray[UINT_CAST(DIFFICULTY_LEVEL::IMPOSSIBLE)]	= { 3.0f, 4.0f, 2.2f };
 
 	return true;
 }
@@ -210,4 +222,12 @@ void DataManager::set_IsInvertY(bool _isInv)
 void DataManager::set_IsShadowEnabled(bool _isShadow)
 {
 	m_UserConfigData._isShadowEnabled = _isShadow;
+}
+
+//*----------------------------------------------------------------------------------------
+//*【?】エネミーの難易度係数取得
+//*----------------------------------------------------------------------------------------
+const EnemyData::EnemyDifficultyFactor& DataManager::get_EnemyDifficultyFactor()const
+{
+	return m_EnemyDifficultyFactorArray[UINT_CAST(m_SelectDifficultyLevel)];
 }

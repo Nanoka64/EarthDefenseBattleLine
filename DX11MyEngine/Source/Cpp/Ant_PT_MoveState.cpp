@@ -22,7 +22,7 @@ void Ant_PT_MoveState::OnEnter(class EnemyController* pOwner)
 {
 	pOwner->set_IsAnim(true);
 
-	pOwner->set_MoveSpeed(MOVE_SPEED);
+	pOwner->set_MoveSpeed(MOVE_SPEED * Master::m_pDataManager->get_EnemyDifficultyFactor()._moveSpeedRate);
 
 	// ’¼üˆÚ“®
 	pOwner->set_MoveLogicState(MOVE_BEHAVIOUR_TYPE::LINEAR);

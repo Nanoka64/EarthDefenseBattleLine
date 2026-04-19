@@ -39,7 +39,8 @@ GunWeapon::GunWeapon(std::weak_ptr<GameObject> pOwner, int updateRank)
     m_IsNowZoom(false),
     m_IsStopFire(false),
     m_AmmoRemaining(0),
-    m_Range(0.0f)
+    m_Range(0.0f),
+    m_CrntReloadTime(0.0f)
 {
     this->set_Tag("GunWeapon");
 }
@@ -108,7 +109,7 @@ void GunWeapon::LateUpdate(RendererEngine& renderer)
     // 水平方向はプレイヤーに合わせているので垂直方向のみ、カメラの回転を使う。
     //transform->set_RotateToRad(VEC3(c_AngleV * -1, 0.0f, 0.0f));
 
-    auto gunParam = get_GunWeaponParameter();
+    auto gunParam = get_GunWeaponData();
 
     // レーザーサイト
     if (gunParam->_isLaserSight && !m_pLineRendererComp.expired())
@@ -213,9 +214,9 @@ void GunWeapon::Draw(RendererEngine& renderer)
 //* [引数] なし
 //* [返値] 書き換え不可の武器パラメータ
 //*----------------------------------------------------------------------------------------
-const WeaponData::GunWeaponData* GunWeapon::get_GunWeaponParameter()const
+const WeaponData::GunWeaponData* GunWeapon::get_GunWeaponData()const
 {
-    return static_cast<const WeaponData::GunWeaponData*>(m_pParameter);
+    return static_cast<const WeaponData::GunWeaponData*>(m_pWeaponData);
 }
 
 //*---------------------------------------------------------------------------------------
@@ -227,14 +228,14 @@ const WeaponData::GunWeaponData* GunWeapon::get_GunWeaponParameter()const
 //*----------------------------------------------------------------------------------------
 bool GunWeapon::Setup(const WeaponData::BaseWeaponData* _pWeaponData)
 {
-    m_pParameter = static_cast<const GunWeaponData*>(_pWeaponData);
-    if (!m_pParameter)
+    m_pWeaponData = static_cast<const GunWeaponData*>(_pWeaponData);
+    if (!m_pWeaponData)
     {
         MessageBox(NULL, "武器のパラメータが一致しません", "GunWeapon", MB_OK);
         return false;
     }
 
-    auto gunParam = get_GunWeaponParameter();
+    auto gunParam = get_GunWeaponData();
 
     m_AmmoRemaining = gunParam->_bulletMaxNum;
 
@@ -300,7 +301,7 @@ void GunWeapon::Shoot(RendererEngine& renderer)
     // ****************************************************
     Master::m_pSoundManager->Play_RandPitch(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::GUN_FIRE02), 300);
         
-    auto gunParam = get_GunWeaponParameter();
+    auto gunParam = get_GunWeaponData();
 
 
     // 同時発射
@@ -369,9 +370,11 @@ void GunWeapon::Shoot(RendererEngine& renderer)
 WeaponUIData GunWeapon::get_WeaponUIData()const
 {
     WeaponUIData uiData;
-    uiData._name = get_GunWeaponParameter()->_name;
-    uiData._ammoMaxNum = get_GunWeaponParameter()->_bulletMaxNum;
+    uiData._name = get_GunWeaponData()->_name;
+    uiData._ammoMaxNum = get_GunWeaponData()->_bulletMaxNum;
     uiData._ammoRemaining = m_AmmoRemaining;
+    uiData._reloadTime = get_GunWeaponData()->_reloadTime;
+    uiData._crntReloadTime = m_CrntReloadTime;
 
     return uiData;
 }

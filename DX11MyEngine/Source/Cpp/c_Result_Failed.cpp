@@ -29,7 +29,7 @@ void c_Result_Failed::OnEnter(SceneManager* pOwner)
 	rectData._anchorMin = VEC2(0.5f, 0.5f);
 	rectData._pos = VEC2(0.0f, 0.0f);
 	spriteData._tag = "ClearedTextSprite";
-	spriteData._imagePath = "Resource/Texture/UI/MissionCleared.png";
+	spriteData._imagePath = "Resource/Texture/UI/MissionFailed.png";
 	spriteData._layerRank = 999;
 	spriteData._color = VEC4(1.0f, 1.0f, 1.0f, 0.0f);
 	m_pFailedTextSpriteObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
@@ -75,7 +75,7 @@ int c_Result_Failed::Update(SceneManager* pOwner)
 	m_ElapsedTime += deltaTime;
 
 	// 失敗テキストのフェード
-	float text_t = m_ElapsedTime / TEXT_FADE_IN_DURATION;
+	float text_t = m_ElapsedTime / FADE_IN_TEXT_DURATION;
 	if (text_t <= 1.0f)
 	{
 		auto textSprite = m_pFailedTextSpriteRenderer.lock();
@@ -84,10 +84,10 @@ int c_Result_Failed::Update(SceneManager* pOwner)
 	else
 	{
 		// ワイプのフェードイン
-		if (FADE_OUT_START_DELAY < (m_ElapsedTime - TEXT_FADE_IN_DURATION))
+		if (FADE_IN_WIPE_START_DELAY < (m_ElapsedTime - FADE_IN_TEXT_DURATION))
 		{
 			// テキストとワイプのフェードに入るまでの時間の差分を打ち消す
-			float wipeElapsed = m_ElapsedTime - FADE_OUT_START_DELAY - TEXT_FADE_IN_DURATION;
+			float wipeElapsed = m_ElapsedTime - FADE_IN_WIPE_START_DELAY - FADE_IN_TEXT_DURATION;
 
 			// フェードイン
 			float wipe_t = wipeElapsed / FADE_DURATION;

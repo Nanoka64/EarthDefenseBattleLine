@@ -11,9 +11,9 @@
 class c_Result_Failed : public IState<SceneManager>
 {
 private:
-	const float TEXT_FADE_IN_DURATION = 3.0f;	// テキストのフェードインにかける時間
-	const float FADE_DURATION = 3.0f;			// フェードアウトにかける時間
-	const float FADE_OUT_START_DELAY = 2.0f;	// フェードアウトを開始するまでの時間（BGMに合わせる）
+	const float FADE_IN_TEXT_DURATION = 3.0f;	// テキストのフェードインにかける時間
+	const float FADE_DURATION = 2.0f;			// フェードアウトにかける時間
+	const float FADE_IN_WIPE_START_DELAY = 1.0f;	// フェードアウトを開始するまでの時間（BGMに合わせる）
 
 	float m_ElapsedTime = 0.0f;					// 経過時間
 	class GameObject* m_pFailedWipeSpriteObj;	// ミッション失敗時のワイプスプライト

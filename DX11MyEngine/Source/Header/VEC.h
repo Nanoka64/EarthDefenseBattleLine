@@ -337,6 +337,7 @@ namespace VECTOR2
 		float x, y;
 		VEC2() : x(0.f), y(0.f) {};
 		VEC2(float _x, float _y) : x(_x), y(_y) {};
+		VEC2(float _scl) :x(_scl), y(_scl) {};
 		VEC2(DirectX::XMFLOAT2& v) : x(v.x), y(v.y) {}; // XMFLOAT2を受け取る際の変換
 
 		// オーバーロード

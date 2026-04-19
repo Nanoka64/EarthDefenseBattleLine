@@ -72,7 +72,9 @@ public:
 	/// <param name="id"></param>
 	void SetInitChildState(Owner *pOwner, const int id)
 	{
-		m_pChildStateMap[id]->OnEnter(pOwner);
+		if (id != -1) {
+			m_pChildStateMap[id]->OnEnter(pOwner);
+		}
 		m_CrntChildStateID = id;
 	}
 

@@ -20,7 +20,7 @@ protected:
 	std::function<void(const class CollisionInfo &_other)> m_CollisionTask;		// 衝突時の処理
 	int m_CrntPenetrationCount;	// 現在の貫通数
 	//std::shared_ptr<BulletData::NormalBulletData> m_pBulletParameter;	// 弾のパラメータ
-	const BulletData::NormalBulletData* m_pParameter;	// 読みとり専用の弾データを持つ
+	const BulletData::NormalBulletData* m_pWeaponData;	// 読みとり専用の弾データを持つ
 
 public:
 	BulletBase(std::weak_ptr<GameObject> pOwner, int updateRank = 100);

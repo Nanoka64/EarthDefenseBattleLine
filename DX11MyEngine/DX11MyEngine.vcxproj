@@ -195,6 +195,8 @@
     <ClInclude Include="Source\Header\BuildingStateFactory.h" />
     <ClInclude Include="Source\Header\Building_State.h" />
     <ClInclude Include="Source\Header\BulletManager.h" />
+    <ClInclude Include="Source\Header\Component_Item.h" />
+    <ClInclude Include="Source\Header\c_MissionSelect_DifficultSelect.h" />
     <ClInclude Include="Source\Header\CollisionManager.h" />
     <ClInclude Include="Source\Header\Component_BoxCollider.h" />
     <ClInclude Include="Source\Header\CollisionInfo.h" />
@@ -282,6 +284,7 @@
     <ClInclude Include="Source\Header\IMoveBehaviour.h" />
     <ClInclude Include="Source\Header\InspectorEditors.h" />
     <ClInclude Include="Source\Header\InspectorWindow.h" />
+    <ClInclude Include="Source\Header\ItemManager.h" />
     <ClInclude Include="Source\Header\KeyState.h" />
     <ClInclude Include="Source\Header\LightManager.h" />
     <ClInclude Include="Source\Header\LinearMove_Behaviour.h" />
@@ -390,6 +393,8 @@
     <ClCompile Include="Source\Cpp\BuildingStateFactory.cpp" />
     <ClCompile Include="Source\Cpp\Building_State.cpp" />
     <ClCompile Include="Source\Cpp\BulletManager.cpp" />
+    <ClCompile Include="Source\Cpp\Component_Item.cpp" />
+    <ClCompile Include="Source\Cpp\c_MissionSelect_DifficultSelect.cpp" />
     <ClCompile Include="Source\Cpp\CollisionManager.cpp" />
     <ClCompile Include="Source\Cpp\Component_BoxCollider.cpp" />
     <ClCompile Include="Source\Cpp\CollisionInfo.cpp" />
@@ -473,6 +478,7 @@
     <ClCompile Include="Source\Cpp\IMoveBehaviour.cpp" />
     <ClCompile Include="Source\Cpp\InspectorEditors.cpp" />
     <ClCompile Include="Source\Cpp\InspectorWindow.cpp" />
+    <ClCompile Include="Source\Cpp\ItemManager.cpp" />
     <ClCompile Include="Source\Cpp\LightManager.cpp" />
     <ClCompile Include="Source\Cpp\LinearMove_Behaviour.cpp" />
     <ClCompile Include="Source\Cpp\Material.cpp" />

@@ -15,15 +15,15 @@ private:
 	bool m_IsLoad;	// ロード完了しているか
 	
 	// 緑背景
-	std::shared_ptr<class SpriteRenderer> m_pBackSprite;
+	std::weak_ptr<class SpriteRenderer> m_pBackSprite;
 
 	// 赤いグリッド背景
-	std::shared_ptr<class SpriteRenderer> m_pBackSprite2;		
-	std::shared_ptr<class RectTransform> m_pBackSprite2_Rect;	
+	std::weak_ptr<class SpriteRenderer> m_pBackSprite2;
+	std::weak_ptr<class RectTransform> m_pBackSprite2_Rect;
 
 	// 青いグリッド背景
-	std::shared_ptr<class SpriteRenderer> m_pBackSprite3;		
-	std::shared_ptr<class RectTransform> m_pBackSprite3_Rect;	
+	std::weak_ptr<class SpriteRenderer> m_pBackSprite3;
+	std::weak_ptr<class RectTransform> m_pBackSprite3_Rect;
 
 	class GameObject* m_pTitleLogoObj = nullptr;			// タイトルロゴオブジェクト
 	class GameObject* m_pTitleBackObj = nullptr;			// タイトル背景の緑のスプライトオブジェクト

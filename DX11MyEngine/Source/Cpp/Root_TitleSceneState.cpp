@@ -81,7 +81,9 @@ void Root_TitleSceneState::OnEnter(SceneManager* pOwner)
 void Root_TitleSceneState::OnExit(SceneManager* pOwner)
 {
     //Master::m_pGameObjectManager->clear_AllObject();
-
+	// *****************************************************************************************
+	// オブジェクトを非アクティブに（プールに返す）
+	// *****************************************************************************************
 	m_pTitleLogoObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	m_pTitleBackObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	m_pTitleBackGridObj_Red->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
@@ -92,8 +94,6 @@ void Root_TitleSceneState::OnExit(SceneManager* pOwner)
 	m_pBackSprite2_Rect.reset();
 	m_pBackSprite3.reset();
 	m_pBackSprite3_Rect.reset();
-
-
 
 	// タイトル用のスプライトをオフに
 	auto obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_1");
@@ -173,7 +173,7 @@ void Root_TitleSceneState::Draw(SceneManager* pOwner)
 	constexpr float GRID_COLOR_A	= 0.4f;		// グリッドカラーのα
 
 	// スプライト取得
-	if (!m_pBackSprite)
+	if (m_pBackSprite.expired())
 	{
 		if (m_pTitleBackObj && m_pTitleBackGridObj_Red && m_pTitleBackGridObj_Blue)
 		{
@@ -191,15 +191,19 @@ void Root_TitleSceneState::Draw(SceneManager* pOwner)
 	}
 	else
 	{
+		auto backSprite = m_pBackSprite.lock();
+		auto backSprite2 = m_pBackSprite2.lock();
+		auto backSprite3 = m_pBackSprite3.lock();
+
 		// 最奥背景（緑のやつ）のグリッドスプライトの挙動
 		m_UVScroll.x += UV_SCROLL_SPEED;			// UVスクロール（左に動かす）
-		m_pBackSprite->set_UVOffset(m_UVScroll);
+		backSprite->set_UVOffset(m_UVScroll);
 
 
 		// 背景のグリッドスプライト（青＆赤）の挙動
 		m_UVScroll2.x -= UV_SCROLL_SPEED;			// UVスクロール 最奥背景とは反対（右方向）に動かす 
-		m_pBackSprite2->set_UVOffset(m_UVScroll2);	// 赤グリッド
-		m_pBackSprite3->set_UVOffset(m_UVScroll);	// 青グリッド
+		backSprite2->set_UVOffset(m_UVScroll2);	// 赤グリッド
+		backSprite3->set_UVOffset(m_UVScroll);	// 青グリッド
 
 		float cos_factor = cosf(m_UVScroll.x * COS_SPEED);	// 揺れ
 		VEC2 rectPos = VEC2(1000.0f, 700.0f);				// 基準の位置
@@ -209,20 +213,22 @@ void Root_TitleSceneState::Draw(SceneManager* pOwner)
 		//size.y += rot_cos_factor * 1000.0f;			// 縦幅を-1000.0f～1000.0fの幅で揺らす
 
 		/* 赤グリッド背景 */
-		m_pBackSprite2_Rect->set_Pivot(VEC2(0.5f, 0.5f));	// 真ん中を中心に
-		m_pBackSprite2_Rect->set_RotateToDeg(VEC3(0.0f, 0.0f, rot_sin_factor * GRID_ROT));
-		m_pBackSprite2_Rect->set_Size(size.x, size.y);
-		m_pBackSprite2_Rect->set_RectPosition(rectPos);
+		auto backSprote2_Rect = m_pBackSprite2_Rect.lock();
+		backSprote2_Rect->set_Pivot(VEC2(0.5f, 0.5f));	// 真ん中を中心に
+		backSprote2_Rect->set_RotateToDeg(VEC3(0.0f, 0.0f, rot_sin_factor * GRID_ROT));
+		backSprote2_Rect->set_Size(size.x, size.y);
+		backSprote2_Rect->set_RectPosition(rectPos);
 
 		/* 青グリッド背景 */
-		m_pBackSprite3_Rect->set_Pivot(VEC2(0.5f, 0.5f));	// 真ん中を中心に
-		m_pBackSprite3_Rect->set_RotateToDeg(VEC3(0.0f, 0.0f, rot_sin_factor * GRID_ROT));
-		m_pBackSprite3_Rect->set_Size(size.x, size.y);
-		m_pBackSprite3_Rect->set_RectPosition(rectPos);
+		auto backSprote3_Rect = m_pBackSprite3_Rect.lock();
+		backSprote3_Rect->set_Pivot(VEC2(0.5f, 0.5f));	// 真ん中を中心に
+		backSprote3_Rect->set_RotateToDeg(VEC3(0.0f, 0.0f, rot_sin_factor * GRID_ROT));
+		backSprote3_Rect->set_Size(size.x, size.y);
+		backSprote3_Rect->set_RectPosition(rectPos);
 
 		float color = abs(cos_factor);
-		m_pBackSprite2->set_Color(VEC4(color + 5.0f, color, color, GRID_COLOR_A));	// 色を赤っぽくする	αは最大0.3まで
-		m_pBackSprite3->set_Color(VEC4(color, color, color, GRID_COLOR_A));			// 元の画像そのまま	αは最大0.3まで
+		backSprite2->set_Color(VEC4(color + 5.0f, color, color, GRID_COLOR_A));	// 色を赤っぽくする	αは最大0.3まで
+		backSprite3->set_Color(VEC4(color, color, color, GRID_COLOR_A));			// 元の画像そのまま	αは最大0.3まで
 
 	}
 

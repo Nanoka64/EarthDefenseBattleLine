@@ -31,8 +31,11 @@
 #include "Component_MiniMapRader.h"
 #include "Component_Player_HPBar.h"
 #include "Component_MoveLogic.h"
+#include "Component_Faction.h"
+#include "Component_Item.h"
 
 using namespace UtilityData;
+using namespace EnemyData;
 using namespace SceneStateEnums;
 using namespace VECTOR4;
 using namespace VECTOR3;
@@ -82,35 +85,13 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         assert(false);
     }
 
-
-
-    std::shared_ptr<GameObject> sphireObj;
-
-    /* スフィア */
+    // *************************************************************************************************
+    // アイテム管理クラスの初期化
+    // *************************************************************************************************
+    if (!Master::m_pItemManager->Init(*m_pRenderer))
     {
-        // マテリアル取得
-        auto matPtr = Master::m_pResourceManager->FindMaterial("Canonn");
-
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr;
-
-        CreateUtilityMeshInfo mesh;
-        mesh.pRenderer = m_pRenderer;
-        mesh.Type = UTILITY_MESH_TYPE::SPHERE;
-        mesh.MatNum = 1;
-        mesh.MaterialData = matInfo;
-        mesh.IsActive = true;
-        mesh.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
-        mesh.IsNormalMap = false;
-        mesh.ObjTag = "Canonn";
-
-        sphireObj = MeshFactory::CreateUtilityMesh(mesh);
-        sphireObj->get_Transform().lock()->set_Scale(1.0f, 1.0f, 1.0f);
-        sphireObj->get_Transform().lock()->set_Pos(-150.0f, 1.0f, 100.0f);
-        sphireObj->get_Transform().lock()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
-
-        auto light = sphireObj->add_Component<PointLight>();
+        MessageBox(NULL, "アイテム管理クラスの初期化に失敗しました", "GameLoad", MB_OK);
+        assert(false);
     }
 
     /* アリ モデルの生成 */
@@ -139,16 +120,30 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             auto transform = obj->get_Component<MyTransform>();
 
             // 動的オブジェクト
-            obj->set_State(OBJECT_STATE::DYNAMIC);
+            obj->set_IsStatic(false);
 
             obj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
             obj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(0);
 
-            // エネミーコントローラーと体力管理を追加
+            //
+            // エネミーコントローラー追加
+            //
             obj->add_Component<EnemyController>();
-            obj->add_Component<Health>();
             obj->add_Component<MoveLogic>();
-
+            
+            //
+            // 派閥コンポーネント追加
+            //
+            auto faction = obj->add_Component<Faction>();
+            faction->set_Faction(FACTION::ENEMY);
+            
+            //
+            // 体力コンポーネント追加
+            //
+            auto health = obj->add_Component<Health>();
+            float hp = ENEMY_ANT01_BASE_HP * Master::m_pDataManager->get_EnemyDifficultyFactor()._hpRate;
+            health->set_MaxHP(hp);
+            health->set_CrntHP(hp);
 
             VEC3 pos = VEC3();
             pos.x = Tool::RandRange(-50.0, 50.0);
@@ -162,7 +157,9 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             transform->set_RotateToDeg(rot);
             transform->set_Scale(1);
 
+            //
             // コライダーの追加
+            //
             auto collider = obj->add_Component<BoxCollider>();
             collider->set_Size(VEC3(2.0f, 2.0f, 2.0f));
             collider->set_Center(VEC3(0.0f, 2.0f, 0.0f));
@@ -201,30 +198,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
     /* クレイモア モデルの生成 */
     {
-        // マテリアル取得
-        auto matPtr = Master::m_pResourceManager->FindMaterial("Claymore");
-
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr;
-
-        CreateModelInfo model;
-        model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Claymore/Claymore.fbx";
-        model.ObjTag = "Claymore";
-        model.IsAnim = false;
-        model.MatNum = 1;
-        model.SetupMaterial = matInfo;
-        model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
-        auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<MyTransform>()->set_Scale(2.0f, 2.0f, 2.0f);
-        obj->get_Component<MyTransform>()->set_Pos(0.0f, 100.0f, 400.0f);
-    }
-
-    /* テストUV球 モデルの生成 */
-    {
         //// マテリアル取得
-        //auto matPtr = Master::m_pResourceManager->FindMaterial("Ground");
+        //auto matPtr = Master::m_pResourceManager->FindMaterial("Claymore");
 
         //SetupMaterialInfo matInfo[1];
         //matInfo[0].Index = 0;
@@ -232,22 +207,15 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
         //CreateModelInfo model;
         //model.pRenderer = m_pRenderer;
-        //model.Path = "Resource/Model/TestSphere.fbx";
-        //model.ObjTag = "TestSphere";
+        //model.Path = "Resource/Model/Claymore/Claymore.fbx";
+        //model.ObjTag = "Claymore";
         //model.IsAnim = false;
         //model.MatNum = 1;
         //model.SetupMaterial = matInfo;
         //model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
-        //model.ObjLayer = 20;
         //auto obj = MeshFactory::CreateModel(model);
-        //obj->get_Component<MyTransform>()->set_Scale(1.0f, 1.0f, 1.0f);
-        //obj->get_Component<MyTransform>()->set_Pos(-100.0f, 0.0f, 100.0f);
-
-        //auto collider = obj->add_Component<BoxCollider>();
-        //collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
-        //collider->set_Center(VEC3(0, 0, 0));
-        //collider->set_IsStatic(true);
-        //Master::m_pCollisionManager->RegisterCollider(collider);
+        //obj->get_Component<MyTransform>()->set_Scale(2.0f, 2.0f, 2.0f);
+        //obj->get_Component<MyTransform>()->set_Pos(0.0f, 100.0f, 400.0f);
     }
 
     /* 建物 モデルの生成 */
@@ -292,8 +260,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
                 // 体力コンポーネントの追加
                 auto health = obj->add_Component<Health>();
-				health->set_CrntHP(600.0f);
 				health->set_MaxHP(600.0f);
+				health->set_CrntHP(600.0f);
 
                 // コライダーの追加
                 auto collider = obj->add_Component<BoxCollider>();
@@ -516,35 +484,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         Master::m_pCollisionManager->RegisterCollider(collider);
     }
 
-    /* ビルボードの生成 */
-    {
-        // マテリアル取得
-        auto matPtrR = Master::m_pResourceManager->FindMaterial("Recovery_Billboard");
-        auto matPtrRP = Master::m_pResourceManager->FindMaterial("RecoveryPlus_Billboard");
-        auto matPtrW = Master::m_pResourceManager->FindMaterial("WeaponBox_Billboard");
-        auto matPtrA = Master::m_pResourceManager->FindMaterial("Armor_Billboard");
-
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtrRP;
-
-        CreateBillboradInfo billboard;
-        billboard.pRenderer = m_pRenderer;
-        billboard.Type = BILLBOARD_USAGE_TYPE::SIMPLE;
-        billboard.ShaderType = SHADER_TYPE::FORWARD_UNLIT_STATIC;
-        billboard.IsActive = true;
-        billboard.MatNum = 1;
-        billboard.MaterialData = matInfo;
-        billboard.IsTransparent = true; // 透明度があり
-
-        VEC3 pos = VEC3(-120.0f, 1.0f, 100.0f);
-
-        auto obj = MeshFactory::CreateBillboard(billboard);
-        obj->get_Transform().lock()->set_Pos(pos);
-        obj->get_Transform().lock()->set_Scale(1.0f, 1.0f, 1.0f);
-        obj->set_Tag("Armor_Billboard");
-    }
-
     /* 武器のサイト用スプライト*/
     {
         CreateSpriteInfo sprite;
@@ -625,7 +564,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
             // 破棄しない
             //obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
-            obj->set_State(OBJECT_STATE::DYNAMIC);
+            // 動的オブジェクトに設定
+            obj->set_IsStatic(false);
 
 
             // アサルトライフル
@@ -672,7 +612,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
             // 破棄しない
             //obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
-            obj->set_State(OBJECT_STATE::DYNAMIC);
+            // 動的オブジェクトに設定
+            obj->set_IsStatic(false);
 
             // コンポーネントの追加
             weapon_2 = obj->add_Component<GunWeapon>(1);
@@ -737,8 +678,9 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
     // 体力コンポーネントの追加
     float hp = Master::m_pDataManager->get_PlayerHP();
     auto health = playerObj->get_Component<Health>();
-    health->set_CrntHP(hp);
+    health->Reset();    // 前回までの値が残っているのでリセット
     health->set_MaxHP(hp);
+    health->set_CrntHP(hp);
 
 
     //*****************************************************************************************
@@ -752,6 +694,36 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
     weaponControl->RegisterWeapon(weapon_2, 1);
     weaponControl->StartingWeapon(0); // 0の武器を初期装備に
     playerControl->Start(*m_pRenderer);
+
+
+    //*****************************************************************************************
+    //						難易度によって空の色を変える
+    //                        ちょっとした雰囲気作り  
+    //*****************************************************************************************
+    DIFFICULTY_LEVEL crntDiffLevel = Master::m_pDataManager->get_DifficultyLevel();
+    auto dirLightObj = Master::m_pGameObjectManager->get_ObjectByTag("DirectionLight");
+    auto dirLight = dirLightObj->get_Component<DirectionalLight>();
+    VEC3 color = VEC3(1.0f);
+    switch (crntDiffLevel)
+    {
+    case UtilityData::DIFFICULTY_LEVEL::EASY:
+        break;
+    case UtilityData::DIFFICULTY_LEVEL::NORMAL:
+        break;
+    case UtilityData::DIFFICULTY_LEVEL::HARD:
+        color = VEC3(1.0f, 0.7f, 0.7f);
+        break;
+    case UtilityData::DIFFICULTY_LEVEL::DISASTER:
+        color = VEC3(0.8f, 0.3f, 0.8f);
+        break;
+    case UtilityData::DIFFICULTY_LEVEL::IMPOSSIBLE:
+        color = VEC3(1.0f, 0.0f, 0.0f);
+        break;
+    default:
+        break;
+    }
+    dirLight->set_LightColor(color);
+
 
 
     // ロード画面用スプライトをオフに

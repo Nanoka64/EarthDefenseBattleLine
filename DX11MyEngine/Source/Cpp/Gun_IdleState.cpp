@@ -52,7 +52,7 @@ int Gun_IdleState::Update(GunWeapon* pOwner)
         auto flashLight = pOwner->get_FlashPointLight().lock();
         flashLight->set_Intensity(0.0f);
     }
-    const auto& weapon_param = pOwner->get_GunWeaponParameter();
+    const auto& weapon_param = pOwner->get_GunWeaponData();
 
     int ammoRemaining = pOwner->get_AmmoRemaining();    // Žc’e
 

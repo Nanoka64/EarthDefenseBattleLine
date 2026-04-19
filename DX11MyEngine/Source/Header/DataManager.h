@@ -1,5 +1,5 @@
 #pragma once
-
+#include "ConstantEnemyData.h"
 
 // ***************************************************************************************
 // ---------------------------------------------------------------------------------------
@@ -28,13 +28,17 @@ private:
 	//std::weak_ptr<class Camera3D> m_pCameraComponent;
 	
 	int m_SelectWeaponID[2];	// 武器選択で選択した武器のID 一時的にここに置く
-	UtilityData::UserConfigData m_UserConfigData;	// ユーザ設定データ
+	UtilityData::UserConfigData m_UserConfigData;		// ユーザ設定データ
+	UtilityData::DIFFICULTY_LEVEL m_SelectDifficultyLevel;	// 選択された難易度
+	std::array<EnemyData::EnemyDifficultyFactor, UINT_CAST(UtilityData::DIFFICULTY_LEVEL::NUM)> m_EnemyDifficultyFactorArray;	// 難易度係数（敵ごとでは無く、一旦一括で管理）
+
 
 	float m_PlayerHP;		// プレイヤーの体力
 	bool m_IsCameraControl;	// カメラ制御の有無
 	bool m_IsUseWeapon;		// 武器を使用するか
 	bool m_IsPlayerDead;	// プレイヤーが死んだか
 	bool m_IsMissionCleared;// ミッションクリアしたかどうか（リザルトで分岐）
+	bool m_IsPause;			// ポーズ画面中か
 
 public:
 	DataManager();
@@ -56,6 +60,8 @@ public:
 	void set_IsPlayerDead(bool _isDead) { m_IsPlayerDead = _isDead; }	// プレイヤーが死亡したかの設定
 	void set_IsMissionCleared(bool _isflag) { m_IsMissionCleared = _isflag; }	// ミッションクリアしたかの設定
 	void set_PlayerHP(float _hp) { m_PlayerHP = _hp; }
+	void set_SelectDifficultyLevel(UtilityData::DIFFICULTY_LEVEL _diffLevel) { m_SelectDifficultyLevel = _diffLevel; }	// 難易度の設定
+	void set_IsPause(bool _flag) { m_IsPause = _flag; }				// ポーズフラグ設定
 
 	UINT get_ScreenWidth() const { return m_ScreenWidth; };			// スクリーンの横幅を取得
 	UINT get_ScreenHeight() const { return m_ScreenHeight; }		// スクリーンの縦幅を取得
@@ -65,9 +71,11 @@ public:
 	bool get_IsCameraControl()const { return m_IsCameraControl; }	// カメラ制御の有無の取得
 	bool get_IsUseWeapon()const { return m_IsUseWeapon; }			// 武器使用の有無の取得
 	bool get_IsPlayerDead()const { return m_IsPlayerDead; }			// プレイヤーが死亡したか
-	bool get_IsMissionCleared()const { return m_IsMissionCleared; }	// ミッションクリアしたかの設定
+	bool get_IsMissionCleared()const { return m_IsMissionCleared; }	// ミッションクリアしたか
 	float get_PlayerHP()const { return m_PlayerHP; }
-
+	const UtilityData::DIFFICULTY_LEVEL get_DifficultyLevel()const { return m_SelectDifficultyLevel; }	// 設定された難易度を取得
+	const EnemyData::EnemyDifficultyFactor& get_EnemyDifficultyFactor()const;
+	bool get_IsPause()const { return m_IsPause; }					// ポーズフラグ取得
 
 	// 設定項目
 	void set_BGMVolume(int _vol);				// BGM音量の設定

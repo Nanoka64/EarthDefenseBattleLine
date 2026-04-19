@@ -5,6 +5,7 @@
 #include "Master.h"
 #include "RendererEngine.h"
 #include "Component_RectTransform.h"
+#include "Component_Health.h"
 #include "Component_Faction.h"
 #include  <algorithm>
 
@@ -206,12 +207,12 @@ void GameObjectManager::ObjectMainRenderPass(RendererEngine& renderer)
     for (auto& obj : m_3DOpaqueList)
     {
         // *** 静的 ***
-        if (obj->get_State() == OBJECT_STATE::STATIC)
+        if (obj->get_IsStatic())
         {
             renderer.RegisterDefaultDepthStencilState(1);
         }
         // *** 動的 ***
-        else if (obj->get_State() == OBJECT_STATE::DYNAMIC)
+        else if (!obj->get_IsStatic())
         {
             renderer.RegisterDefaultDepthStencilState(0);
         }
@@ -258,8 +259,7 @@ void GameObjectManager::ObjectShadowRenderPass(RendererEngine &renderer)
     // 描画
     for (auto &obj : m_3DOpaqueList)
     {
-        if (!obj->get_IsShadow() ||
-            !obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE))
+        if ( !obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE))
         {
             continue;
         }
@@ -729,6 +729,9 @@ std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectListByFact
     // 不透明3Dオブジェクト**********************
     for (auto& obj : m_3DOpaqueList)
     {
+        if (obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == false) {
+            continue;
+        }
         if (auto factionComp = obj->get_Component<Faction>())
         {
             if (factionComp->get_Faction() == _faction) {
@@ -736,9 +739,13 @@ std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectListByFact
             }
         }
     }
+
     // 透明度のある3Dオブジェクト**********************
     for (auto& obj : m_3DTranslucentList)
     {
+        if (obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == false) {
+            continue;
+        }
         if (auto factionComp = obj->get_Component<Faction>())
         {
             if (factionComp->get_Faction() == _faction) {
@@ -749,9 +756,70 @@ std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectListByFact
     // 透明度のある2Dオブジェクト**********************
     for (auto& obj : m_2DTranslucentList)
     {
+        if (obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == false) {
+            continue;
+        }
         if (auto factionComp = obj->get_Component<Faction>())
         {
             if (factionComp->get_Faction() == _faction) {
+                resList.push_back(obj);
+            }
+        }
+    }
+    return resList;
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:GameObjectManager Class 
+//*【?】指定派閥のオブジェクトをすべてリストにして取得（生存状態）
+///     ※ 透明/不透明両方
+//* 引数：1.派閥
+//* 返値：オブジェクトの参照ポインタリスト
+//*----------------------------------------------------------------------------------------
+std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectListByFactionAlive(const UtilityData::FACTION& _faction)
+{
+    std::vector<std::shared_ptr<GameObject>> resList;
+    // 不透明3Dオブジェクト**********************
+    for (auto& obj : m_3DOpaqueList)
+    {
+        if (obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == false) {
+            continue;
+        }
+        auto factionComp = obj->get_Component<Faction>();
+        auto healthComp = obj->get_Component<Health>();
+        if (factionComp && healthComp )
+        {
+            if (factionComp->get_Faction() == _faction && healthComp->get_IsDead() == false) {
+                resList.push_back(obj);
+            }
+        }
+    }
+    // 透明度のある3Dオブジェクト**********************
+    for (auto& obj : m_3DTranslucentList)
+    {
+        if (obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == false){
+            continue;
+        }
+        auto factionComp = obj->get_Component<Faction>();
+        auto healthComp = obj->get_Component<Health>();
+        if (factionComp && healthComp)
+        {
+            if (factionComp->get_Faction() == _faction && healthComp->get_IsDead() == false) {
+                resList.push_back(obj);
+            }
+        }
+    }
+    // 透明度のある2Dオブジェクト**********************
+    for (auto& obj : m_2DTranslucentList)
+    {
+        if (obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == false)  {
+            continue;
+        }
+        auto factionComp = obj->get_Component<Faction>();
+        auto healthComp = obj->get_Component<Health>();
+        if (factionComp && healthComp)
+        {
+            if (factionComp->get_Faction() == _faction && healthComp->get_IsDead() == false) {
                 resList.push_back(obj);
             }
         }

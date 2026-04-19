@@ -84,7 +84,17 @@ int Ant_AT_AttackAcidState::Update(class EnemyController* pOwner)
 			// ****************************************************
 			Master::m_pSoundManager->Play_3D(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_ACID_SHOOT), myPos, SOUND_RADIUS);
 
-			auto data = static_cast<const WeaponData::GunWeaponData*>(Master::m_pWeaponDataManager->FindEnemysWeaponData(0));
+			auto diffLevel = Master::m_pDataManager->get_DifficultyLevel();
+			int id = 0;
+			switch (diffLevel){
+			case UtilityData::DIFFICULTY_LEVEL::EASY:id = 0; break;
+			case UtilityData::DIFFICULTY_LEVEL::NORMAL:id = 1; break;
+			case UtilityData::DIFFICULTY_LEVEL::HARD:id = 2; break;
+			case UtilityData::DIFFICULTY_LEVEL::DISASTER:id = 3; break;
+			case UtilityData::DIFFICULTY_LEVEL::IMPOSSIBLE:id = 4; break;
+			default:break;
+			}
+			auto data = static_cast<const WeaponData::GunWeaponData*>(Master::m_pWeaponDataManager->FindEnemysWeaponData(id));
 			data->_bulletParam;
 			
 			XMVECTOR rotQuat = myTransform->get_RotationQuaternion();

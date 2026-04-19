@@ -16,6 +16,7 @@
 #include "Component_AssultRifle.h"
 #include "Component_Health.h"
 #include "Component_PointLight.h"
+#include "Component_Faction.h"
 #include "GameObject.h"
 #include "MeshFactory.h"
 #include "InputFactory.h"
@@ -26,11 +27,6 @@ using namespace VECTOR2;
 using namespace VECTOR3;
 using namespace VECTOR4;
 using namespace GIGA_Engine;;
-
-constexpr int LAYER_RANK_CAMERA = 91;	    // カメラのレイヤーランク
-constexpr int LAYER_RANK_DIRLIGHT = 90;		// 平行ライトのレイヤーランク
-constexpr int LAYER_RANK_PLAYER = 90;		// プレイヤーのレイヤーランク
-
 
 //*---------------------------------------------------------------------------------------
 //* @:c_Title_LoadProcess Class 
@@ -61,7 +57,6 @@ void c_Title_LoadProcess::OnEnter(SceneManager *pOwner)
         {
             assert(false);
         }
-        obj->Init(*m_pRenderer);
         obj->set_LayerRank(LAYER_RANK_CAMERA);
         obj->set_Tag("Camera");
         obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
@@ -196,15 +191,19 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
         pPlayerObj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(INT_CAST(PlayerData::PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE));
         pPlayerObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);        // 破棄しない
-        pPlayerObj->set_State(OBJECT_STATE::DYNAMIC);        // 動的オブジェクト
+        pPlayerObj->set_IsStatic(false);        // 動的オブジェクト
         pPlayerObj->get_Transform().lock()->set_Pos(-900.0f, 0.0f, 900.0f);
 
         float hp = Master::m_pDataManager->get_PlayerHP();
 
         // 体力コンポーネントの追加
         auto health = pPlayerObj->add_Component<Health>();
-		health->set_CrntHP(hp);
         health->set_MaxHP(hp);
+		health->set_CrntHP(hp);
+
+        // 派閥コンポーネントの追加
+        auto faction = pPlayerObj->add_Component<Faction>();
+        faction->set_Faction(FACTION::PLAYER);
 
         // コライダーの追加
         auto collider = pPlayerObj->add_Component<BoxCollider>();
@@ -215,7 +214,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         collider->set_CollisionCategory(COLLISION_CATEGORY::PLAYER);
 
         // 衝突マスクの設定
-        collider->set_CollisionBitMask(UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING));
+        collider->set_CollisionBitMask(UINT_CAST(COLLISION_CATEGORY::ENEMY) | UINT_CAST(COLLISION_CATEGORY::ITEM) | UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING));
 
         // コライダーの登録
         Master::m_pCollisionManager->RegisterCollider(collider);
@@ -236,13 +235,12 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         CreateUtilityMeshInfo mesh;
         mesh.pRenderer = m_pRenderer;
         mesh.Type = UTILITY_MESH_TYPE::CUBE;
-        mesh.ObjTag = "DirLight";
+        mesh.ObjTag = "DirectionLight";
         mesh.MatNum = 1;
         mesh.MaterialData = matInfo;
 
         auto obj = MeshFactory::CreateUtilityMesh(mesh);
         //auto obj = Instantiate3D(std::move(std::make_shared<GameObject>()));
-        obj->set_Tag("DirLight");
         obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
         obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);// 破棄しない
 		obj->set_LayerRank(LAYER_RANK_DIRLIGHT);
@@ -257,7 +255,7 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         obj->get_Transform().lock()->set_RotateToDeg(VEC3(30.0f, 150.0f, 0.0f));
     }
 
-	// ロード画面用スプライトオフ
+    // オブジェクトを非アクティブに（プールに返す）
     m_pLoadBackObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 
     m_IsMatLoad = true;
