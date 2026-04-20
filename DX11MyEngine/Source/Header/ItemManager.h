@@ -34,6 +34,11 @@ public:
     void Update(RendererEngine& renderer);
 
 	/// <summary>
+	/// 現在取り出されているアイテムをすべてクリア
+	/// </summary>
+	void AllClear();
+
+	/// <summary>
 	/// アイテムをスポーンさせる
 	/// </summary>
 	/// <param name="_type">種類</param>

@@ -15,14 +15,14 @@ Building01_Base2,1,1,1,1,1,1,1,1,150,0,0,0,0,Resource/Model/Building/02/Textures
 Building01_Base3,1,1,1,1,1,1,1,1,150,0,0,0,0,Resource/Model/Building/02/Textures/tex03.jpg,Resource/Texture/DefaultN_Map.png,-1,0
 Building,1,1,1,1,1,1,1,1,150,0,0,0,0,Resource/Model/Building/01/texture/building5-lo.jpg,Resource/Texture/DefaultN_Map.png,-1,0
 MotherShip,1,1,1,1,1,1,1,1,150,0,0,0,0,Resource/Texture/metal_plate_02_diff_2k.jpg,Resource/Texture/DefaultN_Map.png,-1,0
-Ground,1,1,1,1,1,1,1,1,50,1,1,1,0,Resource/Texture/Materials/asphalt_02_diff_2k.png,Resource/Texture/Materials/asphalt_02_nor_dx_2k.png,Resource/Texture/Materials/asphalt_02_rough_2k.png,0
+Ground,1,1,1,1,1,1,1,1,100,1,1,1,0,Resource/Texture/Materials/brick_moss_001_diff_2k.png,Resource/Texture/Materials/brick_moss_001_nor_dx_2k.png,-1,0
 Billboard,1,1,1,1,1,1,1,1,50,0,0,0,0,Resource/Texture/Billboard.png,-1,-1,1
 Recovery_Billboard,1,1,1,1,1,1,1,1,50,1,0,0,5,Resource/Texture/Item/Recovery.png,-1,-1,1
 RecoveryPlus_Billboard,1,1,1,1,1,1,1,1,50,1,0,0,5,Resource/Texture/Item/RecoveryPlus.png,-1,-1,1
 WeaponBox_Billboard,1,1,1,1,1,1,1,1,50,1,0,0,5,Resource/Texture/Item/WeaponBox.png,-1,-1,1
 Armor_Billboard,1,1,1,1,1,1,1,1,50,1,0,0,5,Resource/Texture/Item/Armor.png,-1,-1,1
 LaserPointBillboard,5,1,1,1,1,1,1,1,50,1,0,0,1,Resource/Texture/Particle/Particle04_bokashi_hard.png,-1,-1,1
-PointLight,1,1,1,1,1,1,1,1,50,1,1,1,0.1,Resource/Texture/Wall_W040.jpg,Resource/Texture/Wall_W040_n.png,-1,0
+PointLight,1,1,1,1,1,1,1,1,50,1,1,1,0,Resource/Texture/Wall_W040.jpg,Resource/Texture/Wall_W040_n.png,-1,0
 Decal_BulletHole,1,1,1,1,1,1,1,1,100,1,1,1,1,Resource/Texture/Particle/BulletHole.png,Resource/Texture/Particle/BulletHole_n.png,-1,0
 Decal_Ant_Splash,1,1,1,1,1,1,1,1,100,1,1,1,1.5,Resource/Texture/Particle/Ant_Hit1.png,Resource/Texture/Particle/Ant_Hit1_n.png,-1,1
 RocketLauncher,1,1,1,1,1,1,1,1,100,0,0,0,0,Resource/Model/Weapon/RocketLauncher/Simple rocket launcher Tex.png,Resource/Texture/DefaultN_Map.png,-1,0

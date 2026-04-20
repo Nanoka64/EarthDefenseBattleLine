@@ -92,8 +92,6 @@ void MeshRenderer::Draw(RendererEngine& renderer)
     if (renderer.get_CrntRenderPass() == RENDER_PASS::MAIN) {
         Master::m_pShaderManager->DeviceToSetShader(m_pMeshResource.lock()->get_ShaderType());
 
-        m_Counter += 0.005f;
-
         // マテリアル取得
         auto pMatData = meshInfo->pMaterials.lock();
 
@@ -107,7 +105,7 @@ void MeshRenderer::Draw(RendererEngine& renderer)
         mat.OffsetUV ;
         cbMatSet->Data = mat;
 
-        // 定数バッファに転送
+        // 定数バッファに更新
         pContext->UpdateSubresource(
             cbMatSet->pBuff,
             0,

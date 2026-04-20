@@ -62,7 +62,6 @@ void PointLight::Start(RendererEngine &renderer)
 void PointLight::Update(RendererEngine &renderer)
 {
     auto pContext = renderer.get_DeviceContext();
-    CB_POINT_LIGHT pointData{};
 
 
     // フラッシュ処理
@@ -83,6 +82,7 @@ void PointLight::Update(RendererEngine &renderer)
 
     VEC3 pos = m_pOwnerTransform.lock()->get_WorldVEC3ToPos();;
 
+    CB_PointLightData pointData{};
     // バッファの更新
     pointData.Pos               = pos;
 	pointData.Range	            = m_Range;

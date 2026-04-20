@@ -126,9 +126,9 @@ public:
 		return meshData;
 	}
 
-	static std::shared_ptr<MeshResourceData> CreateQuadInfo(RendererEngine& renderer,	std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap);
-	static std::shared_ptr<MeshResourceData> CreateCubeInfo(RendererEngine& renderer,	std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap);
-	static std::shared_ptr<MeshResourceData> CreateSphereInfo(RendererEngine& renderer,	std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap);
+	static std::shared_ptr<MeshResourceData> CreateQuadInfo(RendererEngine& renderer,	std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap, const VECTOR2::VEC2& _tilingScale);
+	static std::shared_ptr<MeshResourceData> CreateCubeInfo(RendererEngine& renderer,	std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap, const VECTOR2::VEC2& _tilingScale);
+	static std::shared_ptr<MeshResourceData> CreateSphereInfo(RendererEngine& renderer,	std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap, const VECTOR2::VEC2& _tilingScale);
 	static std::shared_ptr<MeshResourceData> CreatePlaneInfo(RendererEngine& renderer,	std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap, const VECTOR2::VEC2 & _tilingScale);
 	//static std::shared_ptr<MeshResourceData> CreateTriangleInfo(RendererEngine& renderer);
 	//static std::shared_ptr<MeshResourceData> CreateCylinderInfo(RendererEngine& renderer);

@@ -19,8 +19,8 @@ class Ant_PT_IdleState : public IState<class EnemyController>
 private:
 	const float SEARCH_RANGE = 40.0f;				// 索敵範囲
 	const float SEARCH_FIELD_OF_VIEW_DEG = 70.0f;	// 視界
-	const float IDLE_MIN_TIME = 2.0f;				// 移動の最小時間
-	const float IDLE_MAX_TIME = 5.0f;				// 移動の最大時間
+	const float IDLE_MIN_TIME = 0.5f;				// 待機の最小時間
+	const float IDLE_MAX_TIME = 7.5f;				// 待機の最大時間
 	float m_IdleDuration = 0.0f;	// 待機状態の時間
 
 public:
@@ -45,8 +45,8 @@ class Ant_PT_MoveState : public IState<class EnemyController>
 private:
 	const float SEARCH_RANGE = 40.0f;				// 索敵範囲
 	const float SEARCH_FIELD_OF_VIEW_DEG = 70.0f;	// 視界
-	const float MOVE_TIME_MIN = 3.0f;				// 移動の最小時間
-	const float MOVE_TIME_MAX = 7.0f;				// 移動の最大時間
+	const float MOVE_TIME_MIN = 0.5f;				// 移動の最小時間
+	const float MOVE_TIME_MAX = 7.5f;				// 移動の最大時間
 	const float MOVE_RANGE = 30.0f;					// 移動範囲
 	const float DIR_RAND_MAX = Tool::G_PI_4_F;		// 移動の方向 ランダム最大 
 	const float DIR_RAND_MIN = -Tool::G_PI_4_F;		// 移動の方向 ランダム最小 
@@ -79,9 +79,9 @@ class Ant_AT_TrackingState : public IState<class EnemyController>
 private:
 
 	const float TRACKING_TIME_MAX = 7.0f;	// 追跡の最大時間
-	const float TRACKING_TIME_MIN = 3.0f;	// 追跡の最小時間
+	const float TRACKING_TIME_MIN = 1.0f;	// 追跡の最小時間
 	const float ATTACK_POSSIBLE_RANGE_MAX = 50.0f;	// 攻撃可能最大距離
-	const float ATTACK_POSSIBLE_RANGE_MIN = 15.0f;	// 攻撃可能最小距離
+	const float ATTACK_POSSIBLE_RANGE_MIN = 10.0f;	// 攻撃可能最小距離
 	const float MOVE_SPEED = 12.0f;
 
 	float m_AttackPossibleRange;// 攻撃可能距離
@@ -109,12 +109,12 @@ class Ant_AT_MoveState : public IState<class EnemyController>
 private:
 	const float SEARCH_RANGE = 40.0f;				// 索敵範囲
 	const float SEARCH_FIELD_OF_VIEW_DEG = 70.0f;	// 視界
-	const float MOVE_TIME_MIN = 3.0f;				// 移動の最小時間
-	const float MOVE_TIME_MAX = 7.0f;				// 移動の最大時間
+	const float MOVE_TIME_MIN = 0.5f;				// 移動の最小時間
+	const float MOVE_TIME_MAX = 7.5f;				// 移動の最大時間
 	const float MOVE_RANGE = 50.0f;					// 移動範囲
 	const float DIR_RAND_MAX = Tool::G_PI_4_F;		// 移動の方向 ランダム最大 
 	const float DIR_RAND_MIN = -Tool::G_PI_4_F;		// 移動の方向 ランダム最小 
-	const float MOVE_SPEED = 20.0f;
+	const float MOVE_SPEED = 15.0f;
 
 	float m_MoveDuration = 0.0f;	// 移動時間
 	VECTOR3::VEC3 m_MoveDir;		// 移動方向
@@ -166,7 +166,7 @@ public:
 class Ant_AT_DeadState : public IState<class EnemyController>
 {
 private:
-	const float OVERTURN_TIME = 1.0f;		// ひっくり返るまでの時間
+	const float OVERTURN_TIME = 0.5f;		// ひっくり返るまでの時間
 	const float FALL_END_TIME = 2.0f;		// 死亡後、裏世界に落ちるまでの時間
 	const float FALL_SPEED = 20.0f;
 	const float DELETE_POS_Y = -30.0f;		// 削除されるY座標

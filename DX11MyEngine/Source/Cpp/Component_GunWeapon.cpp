@@ -339,7 +339,7 @@ void GunWeapon::Shoot(RendererEngine& renderer)
         BulletTransformData bulletTransform;
         bulletTransform._pos = pos;
         bulletTransform._rotQ = finalRotQuat;
-        bulletTransform._scale; ;
+        bulletTransform._scale;
 
         BULLET_TYPE type = gunParam->_bulletType;
 

@@ -74,6 +74,10 @@ namespace Tool
         //                  減速
         // --------------------------------------
 
+        inline float EaseOutSin(float _t){
+            return sinf((_t * DirectX::XM_PI) / 2.0f);
+        }
+
         // ヒュッ...シュタッって感じ
         // 2乗
         inline float EaseOutQuad(float _t) {

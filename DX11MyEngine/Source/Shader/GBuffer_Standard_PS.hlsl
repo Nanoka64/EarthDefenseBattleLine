@@ -52,8 +52,9 @@ PS_OUT PSMain(PS_IN input)
     
     // ディフューズマップとcpp側で設定したカラーを足す
     finalCol = diffuseMap * cb_DiffuseColor;
-    float3 normal = GetNorm(normalMap, input.Tan, input.BiNorm, input.Normal);
     
+    // TODO:法線マップによって上手く適用されない場合がある
+    float3 normal = GetNorm(normalMap, input.Tan, input.BiNorm, input.Normal);
     float3 emissiveColor = cb_EmissiveColor * cb_EmissivePower;
     
     // テスト出力

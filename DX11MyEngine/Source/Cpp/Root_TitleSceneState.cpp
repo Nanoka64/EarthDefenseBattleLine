@@ -69,6 +69,9 @@ void Root_TitleSceneState::OnEnter(SceneManager* pOwner)
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	obj = Master::m_pGameObjectManager->get_ObjectByTag("MenuItem_Button_4");
 	if (obj)obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
+
+	Master::m_pDataManager->set_IsTitle(true);
 }
 
 
@@ -109,6 +112,8 @@ void Root_TitleSceneState::OnExit(SceneManager* pOwner)
 	//				ƒ^ƒCƒgƒ‹BGM‚Ì’âŽ~
 	// ****************************************************
 	Master::m_pSoundManager->StopBGM(BGM_ID::BGM_TITLE_01);
+
+	Master::m_pDataManager->set_IsTitle(false);
 }
 
 

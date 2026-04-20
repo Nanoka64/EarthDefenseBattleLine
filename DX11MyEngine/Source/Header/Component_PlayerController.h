@@ -151,9 +151,8 @@ private:
 	bool m_IsDead;
 	bool m_IsContinuousAngle ;	// マウスに合わせて継続的に回転させるか
 
-	int m_RollingDuration;				// ローリングの持続時間	
-	int m_RollingCounter;				// ローリング用のカウンタ
-
+	float m_RollingDuration;			// ローリングの持続時間	
+	float m_RollingElapsedTime;			// ローリング経過時間
 
 public:
 	PlayerController(std::weak_ptr<GameObject> pOwner, int updateRank = 100);

@@ -213,7 +213,7 @@ OUT_DiffAndSpec PointLightCalc(PointLight _ligData, float3 _eyePos, float3 _spcC
     float3 diffPoint = LambertDiffuseLightCalc(ligDir, _ligData.DiffuseColor, _norm);
     
     // フォン反射
-    float3 spcPoint = PhongSpecularLightCalc(ligDir, _eyePos, _spcCol, _spcPow, _worldPos, _norm);
+    float3 spcPoint = Blinn_PhongSpecularLightCalc(ligDir, _eyePos, _spcCol, _spcPow, _worldPos, _norm);
     
     // そのままだと薄すぎる場合があるので少し補正
     //diffPoint += 0.3f;

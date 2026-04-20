@@ -129,7 +129,7 @@ MeshInfoFactory::~MeshInfoFactory()
 // 引数 1.マテリアル
 // 		2.マテリアル数
 // ----------------------------------------------------------------------------------------------------------------------
-std::shared_ptr<MeshResourceData> MeshInfoFactory::CreateQuadInfo(RendererEngine& renderer, std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap)
+std::shared_ptr<MeshResourceData> MeshInfoFactory::CreateQuadInfo(RendererEngine& renderer, std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap, const VECTOR2::VEC2& _tilingScale)
 {
 	auto meshData = std::make_shared<MeshResourceData>();
 	WORD indices[] = { 0, 1, 2, 1, 3, 2 };
@@ -139,13 +139,13 @@ std::shared_ptr<MeshResourceData> MeshInfoFactory::CreateQuadInfo(RendererEngine
 	{
 		VERTEX::VERTEX_Static_N vertices[] = {
 			// 座標						    // uv,			// カラー                   // 法線                  
-			{ VEC3(-1.0f,  1.0f,  0.0f), VEC2(0.0f, 0.0f),  VEC4(1.0f, 1.0f, 1.0f, 1.0f),  VEC3(0.0f, 0.0f, -1.0f), VEC3(),VEC3() }, // 8 左上
-			{ VEC3( 1.0f,  1.0f,  0.0f), VEC2(1.0f, 0.0f),  VEC4(1.0f, 1.0f, 1.0f, 1.0f),  VEC3(0.0f, 0.0f, -1.0f), VEC3(),VEC3() }, // 9 右上
-			{ VEC3(-1.0f, -1.0f,  0.0f), VEC2(0.0f, 1.0f),  VEC4(1.0f, 1.0f, 1.0f, 1.0f),  VEC3(0.0f, 0.0f, -1.0f), VEC3(),VEC3() }, // 10左下
-			{ VEC3( 1.0f, -1.0f,  0.0f), VEC2(1.0f, 1.0f),  VEC4(1.0f, 1.0f, 1.0f, 1.0f),  VEC3(0.0f, 0.0f, -1.0f), VEC3(),VEC3() }, // 11右下
+			{ VEC3(-1.0f,  1.0f,  0.0f), VEC2(0.0f, 0.0f) * _tilingScale,  VEC4(1.0f, 1.0f, 1.0f, 1.0f),  VEC3(0.0f, 0.0f, -1.0f), VEC3(),VEC3() }, // 8 左上
+			{ VEC3( 1.0f,  1.0f,  0.0f), VEC2(1.0f, 0.0f) * _tilingScale,  VEC4(1.0f, 1.0f, 1.0f, 1.0f),  VEC3(0.0f, 0.0f, -1.0f), VEC3(),VEC3() }, // 9 右上
+			{ VEC3(-1.0f, -1.0f,  0.0f), VEC2(0.0f, 1.0f) * _tilingScale,  VEC4(1.0f, 1.0f, 1.0f, 1.0f),  VEC3(0.0f, 0.0f, -1.0f), VEC3(),VEC3() }, // 10左下
+			{ VEC3( 1.0f, -1.0f,  0.0f), VEC2(1.0f, 1.0f) * _tilingScale,  VEC4(1.0f, 1.0f, 1.0f, 1.0f),  VEC3(0.0f, 0.0f, -1.0f), VEC3(),VEC3() }, // 11右下
 		};
 		// 接線・副接線を求める
-		Tool::CalcTangentAndBitangent(vertices, g_CubeVertexNum, g_QuadIndices, g_CubeIndexNum);
+		Tool::CalcTangentAndBitangent(vertices, g_QuadVertexNum, g_QuadIndices, g_QuadIndexNum);
 
 		*meshData = CreateMesh(pDevice,vertices, g_QuadVertexNum, g_QuadIndices, g_QuadIndexNum);
 	}
@@ -196,34 +196,34 @@ std::shared_ptr<MeshResourceData> MeshInfoFactory::CreateQuadInfo(RendererEngine
 // 引数 1.マテリアル
 // 		2.マテリアル数
 // ----------------------------------------------------------------------------------------------------------------------
-std::shared_ptr<MeshResourceData> MeshInfoFactory::CreateCubeInfo(RendererEngine& renderer, std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap)
+std::shared_ptr<MeshResourceData> MeshInfoFactory::CreateCubeInfo(RendererEngine& renderer, std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap, const VECTOR2::VEC2& _tilingScale)
 {
 	auto pDevice = renderer.get_Device();
 	auto meshData = std::make_shared<MeshResourceData>();
-	WORD indices[] = {	
-		0,1,2,
-		1,3,2,  // 時計回りなら順番は何でもいい
+	//WORD indices[] = {	
+	//	0,1,2,
+	//	1,3,2,  // 時計回りなら順番は何でもいい
 
-		// 天井
-		4,5,6,
-		5,7,6,
+	//	// 天井
+	//	4,5,6,
+	//	5,7,6,
 
-		// 地面
-		8,9,10,
-		9,11,10,
+	//	// 地面
+	//	8,9,10,
+	//	9,11,10,
 
-		// 後ろ
-		12,13,14,
-		13,15,14,
+	//	// 後ろ
+	//	12,13,14,
+	//	13,15,14,
 
-		// 右
-		16,17,18,
-		17,19,18,
+	//	// 右
+	//	16,17,18,
+	//	17,19,18,
 
-		// 左
-		20,21,22,
-		21,23,22,
-	};
+	//	// 左
+	//	20,21,22,
+	//	21,23,22,
+	//};
 
 	VEC3 tan;
 	VEC3 biTan;
@@ -236,40 +236,40 @@ std::shared_ptr<MeshResourceData> MeshInfoFactory::CreateCubeInfo(RendererEngine
 			// 座標                       // uv            // カラー					// 法線                
 			// 頂点フォーマット
 			// 正面 1
-			{ VEC3(-1.0f,  1.0f, -1.0f), VEC2(0.0f, 0.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, -1.0f), tan, biTan},  // 0 左上
-			{ VEC3( 1.0f,  1.0f, -1.0f), VEC2(1.0f, 0.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, -1.0f), tan, biTan},  // 1 右上
-			{ VEC3(-1.0f, -1.0f, -1.0f), VEC2(0.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, -1.0f), tan, biTan},  // 2 左下
-			{ VEC3( 1.0f, -1.0f, -1.0f), VEC2(1.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, -1.0f), tan, biTan},  // 3 右下
+			{ VEC3(-1.0f,  1.0f, -1.0f), VEC2(0.0f, 0.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, -1.0f), tan, biTan},  // 0 左上
+			{ VEC3( 1.0f,  1.0f, -1.0f), VEC2(1.0f, 0.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, -1.0f), tan, biTan},  // 1 右上
+			{ VEC3(-1.0f, -1.0f, -1.0f), VEC2(0.0f, 1.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, -1.0f), tan, biTan},  // 2 左下
+			{ VEC3( 1.0f, -1.0f, -1.0f), VEC2(1.0f, 1.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, -1.0f), tan, biTan},  // 3 右下
 										 
 			// 天井ポリゴン  3                   
-			{ VEC3(-1.0f,  1.0f,  1.0f), VEC2(0.0f, 0.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 1.0f, 0.0f), tan, biTan }, // 4 左上
-			{ VEC3( 1.0f,  1.0f,  1.0f), VEC2(1.0f, 0.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 1.0f, 0.0f), tan, biTan }, // 5 右上
-			{ VEC3(-1.0f,  1.0f, -1.0f), VEC2(0.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 1.0f, 0.0f), tan, biTan }, // 6 左下
-			{ VEC3( 1.0f,  1.0f, -1.0f), VEC2(1.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 1.0f, 0.0f), tan, biTan }, // 7 右下
+			{ VEC3(-1.0f,  1.0f,  1.0f), VEC2(0.0f, 0.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 1.0f, 0.0f), tan, biTan }, // 4 左上
+			{ VEC3( 1.0f,  1.0f,  1.0f), VEC2(1.0f, 0.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 1.0f, 0.0f), tan, biTan }, // 5 右上
+			{ VEC3(-1.0f,  1.0f, -1.0f), VEC2(0.0f, 1.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 1.0f, 0.0f), tan, biTan }, // 6 左下
+			{ VEC3( 1.0f,  1.0f, -1.0f), VEC2(1.0f, 1.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 1.0f, 0.0f), tan, biTan }, // 7 右下
 
 			// 地面ポリゴン   4                                                                      
-			{ VEC3( 1.0f,  -1.0f,  1.0f),VEC2(0.0f, 0.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f) ,VEC3(0.0f, -1.0f, 0.0f), tan, biTan }, // 8 左上
-			{ VEC3(-1.0f,  -1.0f,  1.0f),VEC2(1.0f, 0.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f) ,VEC3(0.0f, -1.0f, 0.0f), tan, biTan }, // 9 右上
-			{ VEC3( 1.0f,  -1.0f, -1.0f),VEC2(0.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f) ,VEC3(0.0f, -1.0f, 0.0f), tan, biTan }, // 10左下
-			{ VEC3(-1.0f,  -1.0f, -1.0f),VEC2(1.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f) ,VEC3(0.0f, -1.0f, 0.0f), tan, biTan }, // 11右下
+			{ VEC3( 1.0f,  -1.0f,  1.0f),VEC2(0.0f, 0.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f) ,VEC3(0.0f, -1.0f, 0.0f), tan, biTan }, // 8 左上
+			{ VEC3(-1.0f,  -1.0f,  1.0f),VEC2(1.0f, 0.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f) ,VEC3(0.0f, -1.0f, 0.0f), tan, biTan }, // 9 右上
+			{ VEC3( 1.0f,  -1.0f, -1.0f),VEC2(0.0f, 1.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f) ,VEC3(0.0f, -1.0f, 0.0f), tan, biTan }, // 10左下
+			{ VEC3(-1.0f,  -1.0f, -1.0f),VEC2(1.0f, 1.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f) ,VEC3(0.0f, -1.0f, 0.0f), tan, biTan }, // 11右下
 
-			// 裏ポリゴン 6
-			{ VEC3( 1.0f,  1.0f,  1.0f), VEC2(0.0f, 0.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, 1.0f), tan, biTan }, // 12 左上
-			{ VEC3(-1.0f,  1.0f,  1.0f), VEC2(1.0f, 0.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, 1.0f), tan, biTan }, // 13 右上
-			{ VEC3( 1.0f, -1.0f,  1.0f), VEC2(0.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, 1.0f), tan, biTan }, // 14 左下
-			{ VEC3(-1.0f, -1.0f,  1.0f), VEC2(1.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, 1.0f), tan, biTan }, // 15 右下
+			// 裏ポリゴン *  6
+			{ VEC3( 1.0f,  1.0f,  1.0f), VEC2(0.0f, 0.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, 1.0f), tan, biTan }, // 12 左上
+			{ VEC3(-1.0f,  1.0f,  1.0f), VEC2(1.0f, 0.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, 1.0f), tan, biTan }, // 13 右上
+			{ VEC3( 1.0f, -1.0f,  1.0f), VEC2(0.0f, 1.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, 1.0f), tan, biTan }, // 14 左下
+			{ VEC3(-1.0f, -1.0f,  1.0f), VEC2(1.0f, 1.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(0.0f, 0.0f, 1.0f), tan, biTan }, // 15 右下
 
 			// 右ポリゴン  2                                                                         
-			{ VEC3(1.0f,   1.0f, -1.0f), VEC2(0.0f, 0.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(1.0f, 0.0f, 0.0f), tan, biTan }, // 16 左上
-			{ VEC3(1.0f,   1.0f,  1.0f), VEC2(1.0f, 0.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(1.0f, 0.0f, 0.0f), tan, biTan }, // 17 右上
-			{ VEC3(1.0f,  -1.0f, -1.0f), VEC2(0.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(1.0f, 0.0f, 0.0f), tan, biTan }, // 18 左下
-			{ VEC3(1.0f,  -1.0f,  1.0f), VEC2(1.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(1.0f, 0.0f, 0.0f), tan, biTan }, // 19 右下
+			{ VEC3(1.0f,   1.0f, -1.0f), VEC2(0.0f, 0.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(1.0f, 0.0f, 0.0f), tan, biTan }, // 16 左上
+			{ VEC3(1.0f,   1.0f,  1.0f), VEC2(1.0f, 0.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(1.0f, 0.0f, 0.0f), tan, biTan }, // 17 右上
+			{ VEC3(1.0f,  -1.0f, -1.0f), VEC2(0.0f, 1.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(1.0f, 0.0f, 0.0f), tan, biTan }, // 18 左下
+			{ VEC3(1.0f,  -1.0f,  1.0f), VEC2(1.0f, 1.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(1.0f, 0.0f, 0.0f), tan, biTan }, // 19 右下
 
 			// 左ポリゴン 5
-			{ VEC3(-1.0f,   1.0f,  1.0f),VEC2(0.0f, 0.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(-1.0f, 0.0f, 0.0f), tan, biTan },  // 20 左上
-			{ VEC3(-1.0f,   1.0f, -1.0f),VEC2(1.0f, 0.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(-1.0f, 0.0f, 0.0f), tan, biTan },  // 21 右上
-			{ VEC3(-1.0f,  -1.0f,  1.0f),VEC2(0.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(-1.0f, 0.0f, 0.0f), tan, biTan },  // 22 左下
-			{ VEC3(-1.0f,  -1.0f, -1.0f),VEC2(1.0f, 1.0f), VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(-1.0f, 0.0f, 0.0f), tan, biTan },  // 23 右下
+			{ VEC3(-1.0f,   1.0f,  1.0f),VEC2(0.0f, 0.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(-1.0f, 0.0f, 0.0f), tan, biTan },  // 20 左上
+			{ VEC3(-1.0f,   1.0f, -1.0f),VEC2(1.0f, 0.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(-1.0f, 0.0f, 0.0f), tan, biTan },  // 21 右上
+			{ VEC3(-1.0f,  -1.0f,  1.0f),VEC2(0.0f, 1.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(-1.0f, 0.0f, 0.0f), tan, biTan },  // 22 左下
+			{ VEC3(-1.0f,  -1.0f, -1.0f),VEC2(1.0f, 1.0f) * _tilingScale, VEC4(1.0f, 1.0f, 1.0f, 1.0f), VEC3(-1.0f, 0.0f, 0.0f), tan, biTan },  // 23 右下
 		};
 
 		// 接線・副接線を求める
@@ -294,7 +294,7 @@ std::shared_ptr<MeshResourceData> MeshInfoFactory::CreateCubeInfo(RendererEngine
 // 引数 1.マテリアル
 // 		2.マテリアル数
 // ----------------------------------------------------------------------------------------------------------------------
-std::shared_ptr<MeshResourceData> MeshInfoFactory::CreateSphereInfo(RendererEngine& renderer, std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap)
+std::shared_ptr<MeshResourceData> MeshInfoFactory::CreateSphereInfo(RendererEngine& renderer, std::weak_ptr<Material> materials, UINT matNum, bool isNormalMap, const VECTOR2::VEC2& _tilingScale)
 {
 	auto pDevice = renderer.get_Device();
 	auto meshData = std::make_shared<MeshResourceData>();

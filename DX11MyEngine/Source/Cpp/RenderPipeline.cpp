@@ -43,6 +43,7 @@ RenderPipeline::RenderPipeline() :
     m_pShadowGaussianBlur(nullptr),
     m_pEmissive_RT(nullptr),
     m_DoF_BlurIncensity(2.0f),
+    m_Bloom_BlurIncensity(8.0f),
     m_ShadowData(),
     m_DofData(),
     m_ScreenWidth(0),
@@ -122,47 +123,56 @@ void RenderPipeline::Execute(RendererEngine& renderer)
         DebugRenderTargetImGui();
     }
 
-    // ライトの更新
-    Master::m_pLightManager->Update();
 
     // パス終了時にSRVを解除する
     ID3D11ShaderResourceView* nullSRVs[8] = { nullptr };
 
-    m_ShadowData.isEnable = Master::m_pDataManager->get_UserConfigData()._isShadowEnabled;
-    m_pDefferdLighting_Sprite->setToGPU_ExtendUserPS_CBuffer(renderer, 0, &m_ShadowData);
-    // シャドウが有効ならシャドウパスも実行
-    if (m_ShadowData.isEnable)
+    if (Master::m_pDataManager->get_IsTitle() == false)
     {
-        /* シャドウパス */
-        Shadow_PathRender(renderer);
+        // ライトの更新
+        Master::m_pLightManager->Update();
 
+
+        m_ShadowData.isEnable = Master::m_pDataManager->get_UserConfigData()._isShadowEnabled;
+        m_pDefferdLighting_Sprite->setToGPU_ExtendUserPS_CBuffer(renderer, 0, &m_ShadowData);
+        // シャドウが有効ならシャドウパスも実行
+        if (m_ShadowData.isEnable)
+        {
+            /* シャドウパス */
+            Shadow_PathRender(renderer);
+
+            renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
+            renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
+        }
+
+        /* ジオメトリパス */
+        Geometry_PathRender(renderer);
         renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
         renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
+
+        /* デカールパス */
+        Decal_PathRender(renderer);
+        renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
+        renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
+
+        /* ディファードライティングパス */
+        Lighting_PathRender(renderer);
+        renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
+        renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
+
+        /* フォワードパス */
+        Forward_PathRender(renderer);
+
+        /* ポストエフェクトパス */
+        PostEffect_PathRender(renderer);
+
     }
-
-    /* ジオメトリパス */
-    Geometry_PathRender(renderer);
-    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
-    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
-
-    /* デカールパス */
-    Decal_PathRender(renderer);
-    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
-    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
-
-    /* ディファードライティングパス */
-    Lighting_PathRender(renderer);
-    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
-    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
-
-    /* フォワードパス */
-    Forward_PathRender(renderer);
-
-    /* ポストエフェクトパス */
-    PostEffect_PathRender(renderer);
 
     /* 最終パス（フレームバッファにコピー） */
     CopyToFrameBuffer_PathRender(renderer);
+
+    renderer.get_DeviceContext()->PSSetShaderResources(0, 8, nullSRVs);
+    renderer.get_DeviceContext()->VSSetShaderResources(0, 8, nullSRVs);
 }
 
 
@@ -211,18 +221,20 @@ void RenderPipeline::DebugRenderTargetImGui()
         {
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"輝度抽出"));
             Master::m_pDebugger->DG_Image(m_pLuminance_RT->get_SRV(), VEC2(400, 200));
+            Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ぼかしの強さ"));
+            Master::m_pDebugger->DG_DragFloat("##BloomBlur", 1, &m_Bloom_BlurIncensity, 0.1f, 0.1f, 32.0f);
             Master::m_pDebugger->DG_Separator();
 
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"被写界深度"));
             Master::m_pDebugger->DG_Image(m_pDoF_GaussianBlur->get_AfterBlurTexture().Get(), VEC2(400, 200));
-            Master::m_pDebugger->DG_BulletText(U8ToChar(u8"強度"));
-            Master::m_pDebugger->DG_SliderFloat("##DofBlur", 1, &m_DoF_BlurIncensity, 0.1f, 32.0f);
+            Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ぼかしの強さ"));
+            Master::m_pDebugger->DG_DragFloat("##DofBlur", 1, &m_DoF_BlurIncensity, 0.1f, 0.1f, 32.0f);
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ブラー開始距離"));
             Master::m_pDebugger->DG_SameLine();
-            Master::m_pDebugger->DG_SliderFloat("##DofMinRange", 1, &m_DofData.dof_MinRange, 0.1f, 1000.0f);
+            Master::m_pDebugger->DG_DragFloat("##DofMinRange", 1, &m_DofData.dof_MinRange, 1.0f, 0.1f, 1000.0f);
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ブラー最大位置"));
             Master::m_pDebugger->DG_SameLine();
-            Master::m_pDebugger->DG_SliderFloat("##DofMaxRange", 1, &m_DofData.dof_MaxRange, 1.0f, 10000.0f);
+            Master::m_pDebugger->DG_DragFloat("##DofMaxRange", 1, &m_DofData.dof_MaxRange, 1.0f, 1.0f, 10000.0f);
             Master::m_pDebugger->DG_Separator();
 
             Master::m_pDebugger->DG_TreePop();  // ポストエフェクト終了
@@ -233,17 +245,17 @@ void RenderPipeline::DebugRenderTargetImGui()
         {
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"シャドウマップ"));
             Master::m_pDebugger->DG_Image(m_pShadowMap_RT->get_SRV_ComPtr().Get(), VEC2(400, 200));
-            Master::m_pDebugger->DG_BulletText(U8ToChar(u8"分散シャドウ用ブラー掛け"));
-            Master::m_pDebugger->DG_Image(m_pShadowGaussianBlur->get_AfterBlurTexture().Get(), VEC2(400, 200));
-            Master::m_pDebugger->DG_BulletText(U8ToChar(u8"バイアス"));
-            Master::m_pDebugger->DG_SameLine();
-            Master::m_pDebugger->DG_DragFloat("##BaseBias", 1, &m_ShadowData.baseShadowBias, 0.0001f, 0.0f, 0.1f);
-            Master::m_pDebugger->DG_BulletText(U8ToChar(u8"傾斜バイアス"));
-            Master::m_pDebugger->DG_SameLine();
-            Master::m_pDebugger->DG_DragFloat("##SlopeBias", 1, &m_ShadowData.slopeScaledBias, 0.0001f, 0.0f, 1.0);
-            Master::m_pDebugger->DG_BulletText(U8ToChar(u8"最大バイアス"));
-            Master::m_pDebugger->DG_SameLine();
-            Master::m_pDebugger->DG_DragFloat("##ClampBias", 1, &m_ShadowData.depthBiasClamp, 0.0001f, 0.0001f, 0.1f);
+            //Master::m_pDebugger->DG_BulletText(U8ToChar(u8"分散シャドウ用ブラー掛け"));
+            //Master::m_pDebugger->DG_Image(m_pShadowGaussianBlur->get_AfterBlurTexture().Get(), VEC2(400, 200));
+            //Master::m_pDebugger->DG_BulletText(U8ToChar(u8"バイアス"));
+            //Master::m_pDebugger->DG_SameLine();
+            //Master::m_pDebugger->DG_DragFloat("##BaseBias", 1, &m_ShadowData.baseShadowBias, 0.0001f, 0.0f, 0.1f);
+            //Master::m_pDebugger->DG_BulletText(U8ToChar(u8"傾斜バイアス"));
+            //Master::m_pDebugger->DG_SameLine();
+            //Master::m_pDebugger->DG_DragFloat("##SlopeBias", 1, &m_ShadowData.slopeScaledBias, 0.0001f, 0.0f, 1.0);
+            //Master::m_pDebugger->DG_BulletText(U8ToChar(u8"最大バイアス"));
+            //Master::m_pDebugger->DG_SameLine();
+            //Master::m_pDebugger->DG_DragFloat("##ClampBias", 1, &m_ShadowData.depthBiasClamp, 0.0001f, 0.0001f, 0.1f);
 
             Master::m_pDebugger->DG_Separator();
 
@@ -589,10 +601,10 @@ void RenderPipeline::PostEffect_PathRender(RendererEngine &renderer)
     // 輝度抽出テクスチャにダウンサンプリングしたガウスブラーを掛ける
     //
     // ************************************************************************
-    m_pBloomGaussianBlur[0].ExcuteOnGPU(renderer, 8.0f);
-    m_pBloomGaussianBlur[1].ExcuteOnGPU(renderer, 8.0f);
-    m_pBloomGaussianBlur[2].ExcuteOnGPU(renderer, 8.0f);
-    m_pBloomGaussianBlur[3].ExcuteOnGPU(renderer, 8.0f);
+    m_pBloomGaussianBlur[0].ExcuteOnGPU(renderer, m_Bloom_BlurIncensity);
+    m_pBloomGaussianBlur[1].ExcuteOnGPU(renderer, m_Bloom_BlurIncensity);
+    m_pBloomGaussianBlur[2].ExcuteOnGPU(renderer, m_Bloom_BlurIncensity);
+    m_pBloomGaussianBlur[3].ExcuteOnGPU(renderer, m_Bloom_BlurIncensity);
 
     // 加算モード
     Master::m_pBlendManager->DeviceToSetBlendState(BLEND_MODE::ADD);
@@ -621,13 +633,16 @@ void RenderPipeline::PostEffect_PathRender(RendererEngine &renderer)
 //* [返値] なし
 //*----------------------------------------------------------------------------------------
 void RenderPipeline::CopyToFrameBuffer_PathRender(RendererEngine &renderer)
-{
+{    
+    // ビューポートの設定
+    renderer.set_ViewPort(0, 0, m_ScreenWidth, m_ScreenHeight);
+    
     // 深度はGバッファ作成時のもの
     renderer.RegisterRenderTarget(m_pSceneFinal_RT->get_RTV(), nullptr);
     renderer.RegisterCullMode(CULL_MODE::BACK);
 
     // 2Dオブジェクトの描画
-    Master::m_pGameObjectManager->Alpha_2DObjectRenderPass(renderer);
+   Master::m_pGameObjectManager->Alpha_2DObjectRenderPass(renderer);
 
     // レンダリングターゲット解除
     renderer.ReleaseRenderTargetSetNull();
@@ -641,6 +656,7 @@ void RenderPipeline::CopyToFrameBuffer_PathRender(RendererEngine &renderer)
     // トーンマッピングを適用する
     m_pFinalSceneToneMappingFilter_Sprite->Draw(renderer);
 
+    renderer.ClearRenderTargetView(m_pSceneFinal_RT);
 }
 
 

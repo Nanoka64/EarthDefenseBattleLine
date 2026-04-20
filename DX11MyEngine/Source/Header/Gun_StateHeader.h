@@ -53,13 +53,6 @@ class Gun_ReloadingState : public IState< GunWeapon>
 {
 private:
 	float m_ReloadElapsed = 0.0f;	// リロード経過時間
-	class GameObject* m_pReloadBarSpriteObj;		// リロードバー
-	class GameObject* m_pReloadBarBackSpriteObj;	// リロードバー背景
-	const VECTOR2::VEC2 RELOAD_BAR_POS = VECTOR2::VEC2(-100.0f, -10.0f);	 // リロードバー位置（真ん中が中心にしてるので、サイズの半分引く）
-	const VECTOR2::VEC2 RELOAD_BAR_SIZE = VECTOR2::VEC2(200.0f, 20.0f);		 // リロードバーサイズ
-	const VECTOR2::VEC2 RELOAD_BAR_BACK_POS = VECTOR2::VEC2(0.0f, 0.0f);	 // リロードバー背景位置
-	const VECTOR2::VEC2 RELOAD_BAR_BACK_SIZE = VECTOR2::VEC2(210.0f, 30.0f); // リロードバー背景サイズ
-	const VECTOR2::VEC2 RELOAD_TEXT_POS = VECTOR2::VEC2(0.0f, 0.0f);	 // リロードテキスト位置
 
 public:
 	void OnEnter(GunWeapon* pOwner) override;

@@ -20,8 +20,8 @@ using namespace DirectX;
 using namespace Tool;
 
 constexpr float MOVE_SPEED = 10.0f;		// プレイヤーの移動速度
-constexpr float ROLLING_SPEED = 30.0f;	// ローリング時初速
-constexpr int ROLLING_DURATION = 60;	// ローリング時間
+constexpr float ROLLING_SPEED = 25.0f;	// ローリング時初速
+constexpr float ROLLING_DURATION = 1.0f;// ローリング時間
 constexpr float JUMP_HEIGHT = 2.5f;		// ジャンプの高さ
 constexpr float GRAVITY = 18.0f;		// 重力
 
@@ -43,9 +43,9 @@ m_MoveVelocity(VEC3()),
 m_MoveSpeed(MOVE_SPEED),
 m_CrntAnimID(PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE),
 m_JumpVelocity(0.0f),
-m_RollingCounter(0),
 m_Gravity(GRAVITY),
 m_JumpForce(0.0f),
+m_RollingElapsedTime(0.0f),
 m_RollingDuration(ROLLING_DURATION)
 {
 	this->set_Tag("PlayerController");
@@ -145,7 +145,6 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 		Master::m_pDataManager->set_IsPlayerDead(true);
 		return;
 	}
-
 
 	// ローリングの処理のみ行って返す
 	if (m_IsRolling)
@@ -390,6 +389,7 @@ void PlayerController::RollingUpdate()
 	ChangeAnimation(PLAYER_RANGER_ANIM_ID::RUNING_DIVE_ROLL);
 
 	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
+	
 
 	auto pOwner = m_pOwner.lock();
 	m_pMyTransformComp = pOwner->get_Transform().lock();
@@ -400,19 +400,23 @@ void PlayerController::RollingUpdate()
 
 	// 0.0 ～ 1.0 に正規化
 	float t = std::min(
-		static_cast<float>( m_RollingCounter) / static_cast<float>(m_RollingDuration), 
+		m_RollingElapsedTime / m_RollingDuration,
 		1.0f); 
 
+	// ※ イージングより、経過時間の割合の方が、本家の挙動に似ている感じがするので、変更
 	// イージング関数でカウンタに合わせて速度を落としていく
-	float easeOut = 1.0f - Tool::Easing::EaseOutQuad(t);
-	newPos = crntPos + (m_MoveVelocity * (ROLLING_SPEED * easeOut)) * deltaTime;
+	//float easeOut = 1.0f - Tool::Easing::EaseOutSin(t);
+	newPos = crntPos + (m_MoveVelocity * (ROLLING_SPEED * (1.0f - t))) * deltaTime;
+
+	
+	m_RollingElapsedTime += deltaTime;
 
 	// 時間で止める
-	if (m_RollingCounter >= m_RollingDuration)
+	if (t >= 1.0f)
 	{
 		/* 移動ベクトルとかを元に戻す */
 		m_IsRolling = false;
-		m_RollingCounter = 0;
+		m_RollingElapsedTime = 0.0f;
 
 		// ****************************************************
 		//				 ローリング終了音再生
@@ -424,8 +428,6 @@ void PlayerController::RollingUpdate()
 
 	// ローリング方向に合わせて回転させる
 	MovedAngle(crntRot,m_MoveVelocity);
-
-	m_RollingCounter++;
 }
 
 

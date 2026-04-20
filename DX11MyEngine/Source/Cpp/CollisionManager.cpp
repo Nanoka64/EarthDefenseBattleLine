@@ -497,6 +497,7 @@ std::vector<std::shared_ptr<Collider>> CollisionManager::CheckSphere(const VECTO
 
         // マスクチェック
         if (!(UINT_CAST(col->get_CollisionCategory()) & _mask)) continue;
+        if (!col->get_IsActiveOwnerObj())continue;
 
         // トランスフォーム取得
         auto trans = col->get_OwnerObj().lock()->get_Component<MyTransform>();

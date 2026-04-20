@@ -166,6 +166,9 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             // 衝突カテゴリ
             collider->set_CollisionCategory(COLLISION_CATEGORY::ENEMY);
 
+            unsigned hitMask = UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);
+            collider->set_CollisionBitMask(hitMask);
+
             // コライダーの登録
             Master::m_pCollisionManager->RegisterCollider(collider);
         }
@@ -343,6 +346,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
     {
         // マテリアル取得
         auto matPtr = Master::m_pResourceManager->FindMaterial("Ground");
+        //auto matPtr = Master::m_pResourceManager->FindMaterial("PointLight");
 
         SetupMaterialInfo matInfo[1];
         matInfo[0].Index = 0;
@@ -356,7 +360,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         mesh.MaterialData = matInfo;
         mesh.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
         mesh.IsNormalMap = true;
-		mesh.TilingScale = VEC2(10.0f, 10.0f);
+		mesh.TilingScale = VEC2(20.0f, 20.0f);
+        mesh.ObjLayer = 90;
 
         auto obj = MeshFactory::CreateUtilityMesh(mesh);
         obj->get_Transform().lock()->set_Scale(200.0f, 1.0f, 200.0f);
@@ -414,6 +419,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         mesh.IsActive = true;
         mesh.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
         mesh.IsNormalMap = true;
+        mesh.ObjLayer = 90;
 
         for (int i = 0; i < 0; i++)
         {
@@ -427,8 +433,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             col.z = static_cast<float>(rand() % 255) / 255.0f;
 
             auto obj = MeshFactory::CreateUtilityMesh(mesh);
-            obj->get_Transform().lock()->set_Pos(pt);
-            obj->get_Transform().lock()->set_Scale(VEC3(10, 10, 10));
+            obj->get_Transform().lock()->set_Pos(VEC3(-100.0f, 0.0f, 100.0f));
+            obj->get_Transform().lock()->set_Scale(VEC3(1.0f, 1.0f, 1.0f));
             obj->set_Tag("PointLight" + std::to_string(i));
             auto light = obj->add_Component<PointLight>();
             light->set_LightColor(col);
@@ -437,7 +443,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
             // コライダーの追加
             auto collider = obj->add_Component<BoxCollider>();
-            collider->set_Size(VEC3(10, 10, 10));
+            collider->set_Size(VEC3(1.0f, 1.0f, 1.0f));
             collider->set_Center(VEC3(0, 0, 0));
             collider->set_IsStatic(true);
             // 衝突カテゴリ

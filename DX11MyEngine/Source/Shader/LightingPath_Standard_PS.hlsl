@@ -119,7 +119,7 @@ float4 PSMain(PS_IN input) : SV_TARGET
     //************************************************************************
     //                      ポイントライト計算 
     //************************************************************************
-    for (int pointIdx = 0; pointIdx < 50; pointIdx++)
+    for (int pointIdx = 0; pointIdx < cb_PointLightCount; pointIdx++)
     {
         OUT_DiffAndSpec res = PointLightCalc(cb_PointLightData[pointIdx], cb_EyePos, spcColor, spcPow, worldPos.xyz, normal);
         pointLig.Diffuse += res.Diffuse;
@@ -134,21 +134,23 @@ float4 PSMain(PS_IN input) : SV_TARGET
     // 平行光源のみシャドウの影響を受けるので、一旦別で保持
     float3 dirDiffuse = dirLig.Diffuse + limLig;
     float3 dirSpecular = dirLig.Specular;
-    float3 diffuse = pointLig.Diffuse + dirDiffuse + hemiLig;
-    float3 specular = pointLig.Specular + dirSpecular;
+    float3 dirLightColor =  float3(0.0f, 0.0f, 0.0f);   // ディレクションライト（シャドウの影響を受ける）
+    float3 pointLightColor = float3(0.0f, 0.0f, 0.0f);  // ポイントライト
+    float3 afterShadowColor = float3(0.0f, 0.0f, 0.0f); // シャドウ適用後のカラー値
+    float3 ambientColor = albedoTex.xyz * AMBIENT_COLOR; // アンビエントカラー
     
     // 最終色 (アルベド * 光度 + スペキュラ) + エミッシブ
-    finalCol.xyz = (albedoTex.xyz * diffuse + specular) + emissiveColor;
+    dirLightColor = (albedoTex.xyz * dirDiffuse + dirSpecular);
+    pointLightColor = (albedoTex.xyz * pointLig.Diffuse );
     
     //************************************************************************
     // シャドウ
     //************************************************************************
-    
     // シャドウの有効/無効
     if (cb_EnableShadow == true)
     {
-        float3 shadowColor = float3(0.0f, 0.0f, 0.0f);
     
+        float3 shadowColor = float3(0.0f, 0.0f, 0.0f);
         float4 posInLVP = mul(worldPos, cb_DirLightData[0].LightViewProj);
     
         //posInLVP.xyz /= posInLVP.w;
@@ -201,13 +203,16 @@ float4 PSMain(PS_IN input) : SV_TARGET
             lit_Factor = lerp(1.0f, lit_Factor, vignette);
         
             // 現在のカラーより暗く
-            shadowColor = finalCol.xyz * 0.3f;
+            shadowColor = dirLightColor.xyz * SHADOW_STRENGTH;
         
             // 通常カラーとシャドウカラーで線形補間
-            finalCol.xyz = lerp(shadowColor, finalCol.xyz, lit_Factor);
-
+            afterShadowColor.xyz = lerp(shadowColor, dirLightColor.xyz, lit_Factor);
         }
     }
+
+    // アンビエント + シャドウ後カラー + ポイントライト + エミッシブ
+    finalCol.xyz = ambientColor + afterShadowColor + pointLightColor + emissiveColor;
+    
     // シャドウマップの範囲内か
     //if (shadowMapUV.x > 0.0f && shadowMapUV.x < 1.0f &&
     //shadowMapUV.y > 0.0f && shadowMapUV.y < 1.0f)

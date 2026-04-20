@@ -30,7 +30,7 @@ MiniMapRader::MiniMapRader(std::weak_ptr<GameObject> pOwner, int updateRank)
 //*----------------------------------------------------------------------------------------
 MiniMapRader::~MiniMapRader()
 {
-	// ---------------------------------------
+    // ---------------------------------------
     // プールへ返す
     // ---------------------------------------
     if (m_pRaderBackSpriteObj != nullptr) {
@@ -39,6 +39,11 @@ MiniMapRader::~MiniMapRader()
     for (int i = 0; i < m_pRaderEnemySpriteObjArray.size(); i++) {
         if (m_pRaderEnemySpriteObjArray[i] != nullptr) {
             m_pRaderEnemySpriteObjArray[i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+        }
+    }
+    for (int i = 0; i < m_pRaderItemSpriteObjArray.size(); i++) {
+        if (m_pRaderItemSpriteObjArray[i] != nullptr) {
+            m_pRaderItemSpriteObjArray[i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
         }
     }
 }
@@ -69,20 +74,6 @@ void MiniMapRader::Start(RendererEngine& renderer)
     spriteData._layerRank = 100;
     m_pRaderBackSpriteObj = Master::m_pUIManager->GetSprite(renderer, rectData, spriteData);
 
-    // レーダーに映す点用スプライト **********************************************
-    //rectData._size = VEC2(MINIMAP_ENEMY_ICON_SIZE, MINIMAP_ENEMY_ICON_SIZE);
-    //rectData._pos = VEC2(0.0f, 0.0f);
-    //rectData._anchorMax = VEC2(0.0f, 0.0f);
-    //rectData._anchorMin = VEC2(0.0f, 0.0f);
-    //rectData._pivot = VEC2(0.5f, 0.5f);         // ピボットを中心に設定
-    //spriteData._tag = "Circle";
-    //spriteData._imagePath = "Resource/Texture/UI/Circle.png";
-    //spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-    //spriteData._layerRank = 100;
-    //spriteData._color = VECTOR4::VEC4(5.0f, 0.0f, 0.0f, 1.0f);
-    //for (int i = 0; i < 50; i++) {
-    //    m_pRaderEnemySpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
-    //}
 }
 
 //*---------------------------------------------------------------------------------------
@@ -127,6 +118,7 @@ void MiniMapRader::Update(RendererEngine& renderer)
     UpdateRadarIcons(enemys, m_pRaderEnemySpriteObjArray, playerPos, cameraAngleH); // 敵
     UpdateRadarIcons(items, m_pRaderItemSpriteObjArray, playerPos, cameraAngleH);   // アイテム
 }
+
 
 
 //*---------------------------------------------------------------------------------------

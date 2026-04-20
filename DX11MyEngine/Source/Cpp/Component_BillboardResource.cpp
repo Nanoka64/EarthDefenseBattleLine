@@ -132,7 +132,7 @@ bool BillboardResource::Setup(RendererEngine& renderer, BILLBOARD_USAGE_TYPE typ
 	{
 	case BILLBOARD_USAGE_TYPE::SIMPLE:
 		// ”Âƒ|ƒŠ‚ÅƒƒbƒVƒ…ì¬
-		m_pMeshData = MeshInfoFactory::CreateQuadInfo(renderer, pMaterial, materialNum, false);
+		m_pMeshData = MeshInfoFactory::CreateQuadInfo(renderer, pMaterial, materialNum, false, 1.0f);
 		break;
 	default:
 		break;

@@ -181,6 +181,30 @@ void ItemManager::Update(RendererEngine& renderer)
 
 
 //*---------------------------------------------------------------------------------------
+//*【?】出現中のアイテムをすべてクリア
+//*
+//* [引数] なし
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void ItemManager::AllClear()
+{
+    for (auto it = m_ExtractedItemObject.begin(); it != m_ExtractedItemObject.end(); )
+    {
+        auto item = *it;
+
+        // 非アクティブ化
+        item->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+        
+        // 返却
+        m_pItemObjectPool->release(item);
+
+        // 次の要素へ
+        it = m_ExtractedItemObject.erase(it);
+    }
+}
+
+
+//*---------------------------------------------------------------------------------------
 //*【?】アイテムをスポーンさせる
 //*
 //* [引数]
@@ -266,7 +290,7 @@ void ItemManager::SpawnItemRand(int _minNum, int _maxNum, const VECTOR3::VEC3& _
         transform->set_Pos(_pos + Master::m_pRandomManager->GetVEC3Random(-_radiuse, _radiuse));
 
         // アイテムがまだ回復しかないので
-        ITEM_TYPE type = static_cast<ITEM_TYPE>(Master::m_pRandomManager->GetIntRandom(0, 1)); 
+        ITEM_TYPE type = static_cast<ITEM_TYPE>(Master::m_pRandomManager->GetIntRandom(0, 3)); 
 
         // アイテムコンポーネントのセットアップ
         auto itemComp = obj->get_Component<Item>();

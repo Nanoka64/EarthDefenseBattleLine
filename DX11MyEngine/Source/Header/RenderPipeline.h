@@ -29,6 +29,7 @@ private:
 
     static const int BLUR_COUNT = 4;         // ブラー回数（ブルーム用）
     class GaussianBlur *m_pBloomGaussianBlur;// ブルーム用ガウスブラー
+    float m_Bloom_BlurIncensity;             // ブルームぼかしの強さ
 
     class GaussianBlur *m_pDoF_GaussianBlur; // 被写界深度用ガウスブラー
     float m_DoF_BlurIncensity;               // DOFブラーの強さ

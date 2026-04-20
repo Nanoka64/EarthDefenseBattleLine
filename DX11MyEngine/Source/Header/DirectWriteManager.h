@@ -170,6 +170,13 @@ public:
         pos.x = _pos.x;
         pos.y = _pos.y;
 
+        // ƒAƒEƒgƒ‰ƒCƒ“‚Ì•`‰æ
+        if (m_OutLineSize > 0.0f)
+        {
+            this->DrawOutLine(pos, pTextLayout);
+            m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+        }
+
         // •`‰æ
         m_pRenderTarget->DrawTextLayout(
             pos,

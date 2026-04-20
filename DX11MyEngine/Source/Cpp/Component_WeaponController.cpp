@@ -80,74 +80,9 @@ bool WeaponController::Setup(RendererEngine& renderer, int _maxSlot)
 	// 最大数分メモリ確保
 	m_WeaponArray.reserve(m_MaxSlot);
 
-	UIData::RectTransformData rectData;
-	UIData::SpriteUIData spriteData;
+	SetupWeaponSprite(renderer);	// 武器アイコン用スプライト生成
 
-	// 弾のゲージ背景スプライトを作る **********************************************
-	rectData._pos = g_BulletGageSpriteCenterPos;
-	rectData._size = g_BulletGageSpriteCenterSize;
-	rectData._anchorMax = VEC2(0.0f, 0.0f);
-	rectData._anchorMin = VEC2(0.0f, 0.0f);
-	spriteData._tag = "WeaponGage_1";
-	spriteData._imagePath = "Resource/Texture/UI/BulletGage.png";
-	spriteData._layerRank = 101;
-	m_pBulletGageSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
-
-	// 後ろ
-	spriteData._tag = "WeaponGage_2";
-	rectData._pos = g_BulletGageSpriteBackPos;
-	rectData._size = g_BulletGageSpriteBackSize;
-	m_pBulletGageSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
-
-
-	// 武器のスプライトを作る **********************************************
-	rectData._pos  = g_WeaponSpriteCenterPos;
-	rectData._size = g_WeaponSpriteCenterSize;
-	spriteData._tag = "GunIcon_AR_01";
-	spriteData._imagePath = "Resource/Texture/UI/GunIcon_AR_01.png";	// TODO:武器のパラメータから使用する画像を指定できるようにする
-	spriteData._layerRank = 101;
-	m_pWeaponSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
-
-	// 後ろ
-	spriteData._imagePath = "Resource/Texture/UI/GunIcon_RL_01.png";
-	spriteData._tag = "GunIcon_RL_01";
-	rectData._pos = g_WeaponSpriteBackPos;
-	rectData._size = g_WeaponSpriteBackSize;
-	m_pWeaponSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
-
-
-
-
-
-
-	{
-		// リロードバー用スプライトを作る **********************************************
-		UIData::RectTransformData rectData;
-		UIData::SpriteUIData spriteData;
-		rectData._size = VEC2(0.0f, 0.0f);
-		rectData._pos = RELOAD_BAR_POS;
-		rectData._anchorMax = VEC2(0.5f, 0.5f);		// 中心を画面の真ん中に
-		rectData._anchorMin = VEC2(0.5f, 0.5f);
-		rectData._pivot = VEC2(0.0f, 0.0f);		// ピボットは左上
-		spriteData._tag = "ReloadBar";
-		spriteData._layerRank = 108;
-		spriteData._color = VEC4(0.0f, 1.0f, 0.0f, 1.0f);
-		spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
-		m_pReloadBarSpriteObj = Master::m_pUIManager->GetSprite(renderer, rectData, spriteData);
-
-		// リロードバー背景用スプライトを作る **********************************************
-		rectData._size = RELOAD_BAR_BACK_SIZE;
-		rectData._pos = RELOAD_BAR_BACK_POS;
-		rectData._anchorMax = VEC2(0.5f, 0.5f);		// 中心を画面の真ん中に
-		rectData._anchorMin = VEC2(0.5f, 0.5f);
-		rectData._pivot = VEC2(0.5f, 0.5f);
-		spriteData._tag = "ReloadBarBack";
-		spriteData._layerRank = 107;
-		spriteData._color = VEC4(0.1f, 0.1f, 0.1f, 1.0f);	// 黒背景
-		spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
-		m_pReloadBarBackSpriteObj = Master::m_pUIManager->GetSprite(renderer, rectData, spriteData);
-	}
-
+	SetupReloadSprite(renderer);	// リロード用スプライト生成
 
 	return true;
 }
@@ -203,7 +138,7 @@ void WeaponController::Update(RendererEngine& renderer)
 		PrevWeapon();
 	}
 
-
+	// 現在装備している武器が、リロード中か
 	if (get_IsCrntWeaponReloading())
 	{
 		/* 背景スプライトの位置と大きさ */
@@ -414,6 +349,12 @@ void WeaponController::StartingWeapon(int _slot)
 	}
 }
 
+//*----------------------------------------------------------------------------------------
+//*【?】武器のクリア
+//*
+//* [引数] なし
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
 void WeaponController::ClearWeapon()
 {
 	for (int i = 0; i < m_MaxSlot; i++)
@@ -429,4 +370,88 @@ void WeaponController::ClearWeapon()
 	// スプライトをプールへ返す
 	m_pReloadBarSpriteObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	m_pReloadBarBackSpriteObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+}
+
+
+//*----------------------------------------------------------------------------------------
+//*【?】武器アイコンスプライトの生成
+//*
+//* [引数] 
+//* &renderer : 描画エンジンの参照
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void WeaponController::SetupWeaponSprite(RendererEngine& renderer)
+{
+
+	UIData::RectTransformData rectData;
+	UIData::SpriteUIData spriteData;
+
+	// 弾のゲージ背景スプライトを作る **********************************************
+	rectData._pos = g_BulletGageSpriteCenterPos;
+	rectData._size = g_BulletGageSpriteCenterSize;
+	rectData._anchorMax = VEC2(0.0f, 0.0f);
+	rectData._anchorMin = VEC2(0.0f, 0.0f);
+	spriteData._tag = "WeaponGage_1";
+	spriteData._imagePath = "Resource/Texture/UI/BulletGage.png";
+	spriteData._layerRank = 101;
+	m_pBulletGageSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
+
+	// 後ろ
+	spriteData._tag = "WeaponGage_2";
+	rectData._pos = g_BulletGageSpriteBackPos;
+	rectData._size = g_BulletGageSpriteBackSize;
+	m_pBulletGageSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
+
+
+	// 武器のスプライトを作る **********************************************
+	rectData._pos = g_WeaponSpriteCenterPos;
+	rectData._size = g_WeaponSpriteCenterSize;
+	spriteData._tag = "GunIcon_AR_01";
+	spriteData._imagePath = "Resource/Texture/UI/GunIcon_AR_01.png";	// TODO:武器のパラメータから使用する画像を指定できるようにする
+	spriteData._layerRank = 101;
+	m_pWeaponSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
+
+	// 後ろ
+	spriteData._imagePath = "Resource/Texture/UI/GunIcon_RL_01.png";
+	spriteData._tag = "GunIcon_RL_01";
+	rectData._pos = g_WeaponSpriteBackPos;
+	rectData._size = g_WeaponSpriteBackSize;
+	m_pWeaponSpriteObjArray.push_back(Master::m_pUIManager->GetSprite(renderer, rectData, spriteData));
+}
+
+
+//*----------------------------------------------------------------------------------------
+//*【?】リロードスプライトの生成
+//*
+//* [引数] 
+//* &renderer : 描画エンジンの参照
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void WeaponController::SetupReloadSprite(RendererEngine& renderer)
+{
+	// リロードバー用スプライトを作る **********************************************
+	UIData::RectTransformData rectData;
+	UIData::SpriteUIData spriteData;
+	rectData._size = VEC2(0.0f, 0.0f);
+	rectData._pos = RELOAD_BAR_POS;
+	rectData._anchorMax = VEC2(0.5f, 0.5f);		// 中心を画面の真ん中に
+	rectData._anchorMin = VEC2(0.5f, 0.5f);
+	rectData._pivot = VEC2(0.0f, 0.0f);		// ピボットは左上
+	spriteData._tag = "ReloadBar";
+	spriteData._layerRank = 108;
+	spriteData._color = VEC4(0.0f, 1.0f, 0.0f, 1.0f);
+	spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
+	m_pReloadBarSpriteObj = Master::m_pUIManager->GetSprite(renderer, rectData, spriteData);
+
+	// リロードバー背景用スプライトを作る **********************************************
+	rectData._size = RELOAD_BAR_BACK_SIZE;
+	rectData._pos = RELOAD_BAR_BACK_POS;
+	rectData._anchorMax = VEC2(0.5f, 0.5f);		// 中心を画面の真ん中に
+	rectData._anchorMin = VEC2(0.5f, 0.5f);
+	rectData._pivot = VEC2(0.5f, 0.5f);
+	spriteData._tag = "ReloadBarBack";
+	spriteData._layerRank = 107;
+	spriteData._color = VEC4(0.1f, 0.1f, 0.1f, 1.0f);	// 黒背景
+	spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
+	m_pReloadBarBackSpriteObj = Master::m_pUIManager->GetSprite(renderer, rectData, spriteData);
 }

@@ -63,7 +63,10 @@ void ExplosionLightController::Start(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void ExplosionLightController::Update(RendererEngine &renderer)
 {
-	if (m_pPointLight.expired())return;
+	if (m_pPointLight.expired())
+	{
+		return;
+	}
 
 	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 	m_Timer += deltaTime;
@@ -74,6 +77,7 @@ void ExplosionLightController::Update(RendererEngine &renderer)
 	if (t >= 1.0f)
 	{
 		m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+		return;
 	}
 
 	float easeOut = Tool::Easing::EaseOutQuint(t);
@@ -128,6 +132,11 @@ void ExplosionLightController::Reset()
 {
 	m_Parameter.Reset();
 	m_Timer = 0.0f;
+
+
+	auto pPointLight = m_pPointLight.lock();
+	pPointLight->set_Intensity(0.0f);
+	pPointLight->set_Range(0.0f);
 }
 
 

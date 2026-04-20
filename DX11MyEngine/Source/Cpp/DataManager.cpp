@@ -39,7 +39,8 @@ m_IsPlayerDead(false),
 m_IsMissionCleared(false),
 m_PlayerHP(PLAYER_HP),
 m_SelectDifficultyLevel(DIFFICULTY_LEVEL::NORMAL),
-m_IsPause(false)
+m_IsPause(false),
+m_IsTitle(false)
 {
 }
 

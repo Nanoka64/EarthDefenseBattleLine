@@ -81,6 +81,9 @@ public:
     /// <returns></returns>
     bool get_IsCrntWeaponReloading();
 
+    /// <summary>
+    /// •Ší‚ğƒNƒŠƒA
+    /// </summary>
     void ClearWeapon() ;
 
 private:
@@ -100,5 +103,8 @@ private:
     /// ‘O‚Ì•Ší‚ÖØ‚è‘Ö‚¦
     /// </summary>
     void PrevWeapon();
+
+    void SetupReloadSprite(RendererEngine& renderer);
+    void SetupWeaponSprite(RendererEngine& renderer);
 };
 

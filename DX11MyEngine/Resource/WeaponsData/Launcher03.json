@@ -11,7 +11,7 @@
   "soundID": 0,
   "bulletType": "EXPLOSION",
   "bulletParam": {
-    "damage": 600.0,
+    "damage": 500.0,
     "damageDistAttenuationRate": 0.5,
     "speed": 40.0,
     "acceleration": 0.0,
@@ -22,8 +22,8 @@
     "collisionMask": ["ENEMY", "BUILDING", "DESTRUCTION_BUILDING"],
     "bulletMaterialTag" : "Bullet_01",
     "decalMaterialTag" : "Decal_BulletHole",
-    "scale" : [0.25, 0.25, 0.25],
-    "explosionRadius": 150.0,
+    "scale" : [10.0, 10.0, 10.0],
+    "explosionRadius": 100.0,
     "explosionEffectHandleTag": "Explosion_03",
     "isSmoke" : true
   }

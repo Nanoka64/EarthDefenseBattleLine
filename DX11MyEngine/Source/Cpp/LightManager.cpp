@@ -133,32 +133,42 @@ void LightManager::DirectionLight_SetCBuffer()
 //*----------------------------------------------------------------------------------------
 void LightManager::PointLight_SetCBuffer()
 {
-	// バッファの更新
-	memcpy(
-		m_pCBPointLightSet->Data,
-		m_TemporaryPointLightData.data(),
-		m_TemporaryPointLightData.size() * sizeof(CB_POINT_LIGHT)
-	);
+	// サイズがオーバーしてないか
+	uint32_t lightCount = static_cast<uint32_t>(m_TemporaryPointLightData.size());
+	if (lightCount > POINTLIGHT_MAX_NUM) lightCount = POINTLIGHT_MAX_NUM;
 
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	// ライトの個数セット
+	m_pCBPointLightSet->Data.LightCount = lightCount;
 
-	// GPUメモリにアクセス
-	m_pContext->Map(m_pCBPointLightSet->pBuff, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	// ライトが0個以上あるなら
+	if (lightCount > 0) {
+		memcpy(m_pCBPointLightSet->Data.Lights, m_TemporaryPointLightData.data(), lightCount * sizeof(CB_PointLightData));
 
-	// データのコピー 
-	memcpy(mappedResource.pData, &m_pCBPointLightSet->Data, sizeof(CB_POINT_LIGHT) * POINTLIGHT_MAX_NUM);
+		//// バッファの更新
+		//memcpy(
+		//	m_pCBPointLightSet->Data.Lights,
+		//	m_TemporaryPointLightData.data(),
+		//	m_TemporaryPointLightData.size() * sizeof(CB_POINT_LIGHT)
+		//);
 
-	// アクセス終了
-	m_pContext->Unmap(m_pCBPointLightSet->pBuff, 0);
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-	// ピクセルシェーダにセット
-	m_pContext->PSSetConstantBuffers(6, 1, &m_pCBPointLightSet->pBuff);
+		// GPUメモリにアクセス
+		m_pContext->Map(m_pCBPointLightSet->pBuff, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
+		// データのコピー 
+		memcpy(mappedResource.pData, &m_pCBPointLightSet->Data, sizeof(CB_POINT_LIGHT));
 
-	// 一時データクリア
-	m_TemporaryPointLightData.clear();
+		// アクセス終了
+		m_pContext->Unmap(m_pCBPointLightSet->pBuff, 0);
+
+		// ピクセルシェーダにセット
+		m_pContext->PSSetConstantBuffers(6, 1, &m_pCBPointLightSet->pBuff);
+
+		// 一時データクリア
+		m_TemporaryPointLightData.clear();
+	}
 }
-
 
 
 //*---------------------------------------------------------------------------------------
@@ -183,7 +193,7 @@ bool LightManager::CreatePointLightCBuffer(ID3D11Device* pDevice)
 	D3D11_BUFFER_DESC bd{};
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DYNAMIC;						// 頻繁更新
-	bd.ByteWidth = sizeof(CB_POINT_LIGHT) * POINTLIGHT_MAX_NUM;				// バッファのサイズ
+	bd.ByteWidth = sizeof(CB_POINT_LIGHT);				// バッファのサイズ
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;			// 定数バッファとして使う
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;			// CPUから書き込み
 	bd.MiscFlags = 0;
@@ -256,12 +266,12 @@ void LightManager::set_CameraTransform(std::weak_ptr<class MyTransform> pCamTran
 //*【?】ポイントライトの情報をセット
 //*
 //* [引数]
-//* const CB_POINT_LIGHT& : ポイントライト情報
+//* const CB_PointLightData& : ポイントライト情報
 //*
 //* [返値]
 //* void 
 //*----------------------------------------------------------------------------------------
-void LightManager::set_PointLightData(const CB_POINT_LIGHT& data)
+void LightManager::set_PointLightData(const CB_PointLightData& data)
 {
 	// ポイントライトの最大数より少なければ追加
 	if (m_TemporaryPointLightData.size() < POINTLIGHT_MAX_NUM){

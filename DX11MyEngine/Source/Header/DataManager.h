@@ -39,6 +39,7 @@ private:
 	bool m_IsPlayerDead;	// プレイヤーが死んだか
 	bool m_IsMissionCleared;// ミッションクリアしたかどうか（リザルトで分岐）
 	bool m_IsPause;			// ポーズ画面中か
+	bool m_IsTitle;			// タイトルシーンか
 
 public:
 	DataManager();
@@ -62,6 +63,7 @@ public:
 	void set_PlayerHP(float _hp) { m_PlayerHP = _hp; }
 	void set_SelectDifficultyLevel(UtilityData::DIFFICULTY_LEVEL _diffLevel) { m_SelectDifficultyLevel = _diffLevel; }	// 難易度の設定
 	void set_IsPause(bool _flag) { m_IsPause = _flag; }				// ポーズフラグ設定
+	void set_IsTitle(bool _flag) { m_IsTitle = _flag; }				// タイトルフラグ設定
 
 	UINT get_ScreenWidth() const { return m_ScreenWidth; };			// スクリーンの横幅を取得
 	UINT get_ScreenHeight() const { return m_ScreenHeight; }		// スクリーンの縦幅を取得
@@ -76,6 +78,7 @@ public:
 	const UtilityData::DIFFICULTY_LEVEL get_DifficultyLevel()const { return m_SelectDifficultyLevel; }	// 設定された難易度を取得
 	const EnemyData::EnemyDifficultyFactor& get_EnemyDifficultyFactor()const;
 	bool get_IsPause()const { return m_IsPause; }					// ポーズフラグ取得
+	bool get_IsTitle()const { return m_IsTitle; }					// タイトルフラグ取得
 
 	// 設定項目
 	void set_BGMVolume(int _vol);				// BGM音量の設定

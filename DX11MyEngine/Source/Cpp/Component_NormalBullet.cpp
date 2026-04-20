@@ -21,8 +21,9 @@ using namespace Input;
 using namespace VECTOR3;
 
 constexpr float DECAL_SIZE_FACTOR        = 7.0f;   // デカールの大きさの補正値（transformのスケールだと小さすぎるため）
-constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 0.0f;    // デカールの奥行に加算する補正値
-constexpr float DECAL_LIFE_TIME          = 5.0f;    // デカールの生存時間
+constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 0.0f;   // デカールの奥行に加算する補正値
+constexpr float DECAL_LIFE_TIME          = 5.0f;   // デカールの生存時間
+constexpr float EFFECTL_SIZE_FACTOR      = 2.0f;   // エフェクトの大きさの補正値（transformのスケールだと小さすぎるため）
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
@@ -176,7 +177,8 @@ void NormalBullet::Start(RendererEngine& renderer)
             int spark_handle = Master::m_pEffectManager->PlayEffect("Spark");   // 火花
             int smoke_handle = Master::m_pEffectManager->PlayEffect("Smoke");   // 煙
             
-            VEC3 effectScale = 0.5f;
+            VEC3 effectScale = transform->get_VEC3ToScale();
+            effectScale *= EFFECTL_SIZE_FACTOR;
 
             // 火花
             Master::m_pEffectManager->SetScaleEffect(spark_handle, effectScale.x, effectScale.y, effectScale.z);

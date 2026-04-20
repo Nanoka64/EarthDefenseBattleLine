@@ -19,7 +19,7 @@ private:
 	std::weak_ptr<RendererEngine> m_pRenderer;
 	ID3D11DeviceContext* m_pContext;
 
-	std::vector<CB_POINT_LIGHT>		m_TemporaryPointLightData;		// ポイントライト情報の一時保持
+	std::vector<CB_PointLightData>	m_TemporaryPointLightData;		// ポイントライト情報の一時保持
 	std::vector<CB_DIRECTION_LIGHT> m_TemporaryDirectionLightData;  // ディレクションライト情報の一時保持
 
 public:
@@ -36,7 +36,7 @@ public:
 	/// <param name="pCam"></param>
 	void set_CameraTransform(std::weak_ptr<class MyTransform> pCamTransform);
 
-	void set_PointLightData(const CB_POINT_LIGHT& data);
+	void set_PointLightData(const CB_PointLightData& data);
 	void set_DirectionLightData(const CB_DIRECTION_LIGHT& data);
 
 	/// ライトビュープロジェクションの設定（多分ディレクションライト専用）

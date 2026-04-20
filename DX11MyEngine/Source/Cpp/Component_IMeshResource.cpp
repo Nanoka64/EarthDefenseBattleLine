@@ -164,13 +164,13 @@ bool IMeshResource::Setup(RendererEngine& renderer, SHADER_TYPE shaderType, UTIL
 		return false;
 		break;
 	case UTILITY_MESH_TYPE::CUBE:
-		m_pMeshData = MeshInfoFactory::CreateCubeInfo(renderer,materials, materialNum,isNormalMap);
+		m_pMeshData = MeshInfoFactory::CreateCubeInfo(renderer,materials, materialNum,isNormalMap, _tilingScale);
 		break;
 	case UTILITY_MESH_TYPE::QUAD:
-		m_pMeshData = MeshInfoFactory::CreateQuadInfo(renderer, materials, materialNum, isNormalMap);
+		m_pMeshData = MeshInfoFactory::CreateQuadInfo(renderer, materials, materialNum, isNormalMap, _tilingScale);
 		break;
 	case UTILITY_MESH_TYPE::SPHERE:
-		m_pMeshData = MeshInfoFactory::CreateSphereInfo(renderer, materials, materialNum, isNormalMap);
+		m_pMeshData = MeshInfoFactory::CreateSphereInfo(renderer, materials, materialNum, isNormalMap, _tilingScale);
 		break;	
 	case UTILITY_MESH_TYPE::PLANE:
 		m_pMeshData = MeshInfoFactory::CreatePlaneInfo(renderer, materials, materialNum, isNormalMap, _tilingScale);

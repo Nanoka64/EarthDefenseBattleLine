@@ -46,9 +46,15 @@ void Root_ResultSceneState::OnExit(SceneManager* pOwner)
 		player->get_Component<WeaponController>()->ClearWeapon();
 		player->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	}
+
+	// アイテムをすべてクリア
+	Master::m_pItemManager->AllClear();	
+
+	// 削除禁止でないオブジェクトを全てクリア
 	Master::m_pGameObjectManager->clear_NotIsDontDestroyObject();
 
-	Master::m_pEffectManager->StopAllEffects();	// 全てのエフェクトを停止する
+	// 全てのエフェクトを停止する
+	Master::m_pEffectManager->StopAllEffects();	
 
 	// パラメータを戻す
 	Master::m_pDataManager->set_IsMissionCleared(false);

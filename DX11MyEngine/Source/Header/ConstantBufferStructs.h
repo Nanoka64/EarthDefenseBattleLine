@@ -107,7 +107,7 @@ struct CB_MATERIAL {
     DirectX::XMFLOAT2 OffsetUV;   // UVオフセット（エネルギーの流れる感じとかの表現に使えそう ヘクトルみたいな）
 
     DirectX::XMFLOAT3 EmissiveColor;    // 発光カラー
-    float pad;
+    float Padding;
 
     //float Padding[2];             // パディング(16バイトアラインメント ※詳細はUtilityHeader.hlsli側を見て)
 };
@@ -126,7 +126,7 @@ struct CB_MATERIAL_SET {
 struct CB_DIRECTION_LIGHT
 {
     DirectX::XMFLOAT3 Direction;    // 方向
-    float Padding1;
+    float Padding;
     
     DirectX::XMFLOAT3 DiffuseColor; // ディフューズ色
     float DiffuseIntensity;         // ディフューズ光度
@@ -142,7 +142,7 @@ struct CB_DIRECTION_LIGHT
 
     // TODO:ここに置くと色々ずれるので場所変える
     DirectX::XMFLOAT3 EyePos;       // 視点の位置
-    float Padding4;
+    float Padding2;
 };
 
 /// <summary>
@@ -161,16 +161,24 @@ struct CB_DIRECTION_LIGHT_SET
 //						ポイントライト情報 - slot 6
 // 
 //=========================================================================================
-struct CB_POINT_LIGHT
+struct CB_PointLightData
 {
     DirectX::XMFLOAT3 Pos;          // 座標
     float Range;                    // 影響範囲
-    
+
     DirectX::XMFLOAT3 DiffuseColor; // ディフューズ色
     float DiffuseIntensity;         // ディフューズ光度
-    
+
     DirectX::XMFLOAT3 SpecularColor;// スペキュラ色
     float SpecularIntensity;        // スペキュラ強度
+};
+
+struct CB_POINT_LIGHT
+{
+    CB_PointLightData Lights[POINTLIGHT_MAX_NUM]; // 50個
+    unsigned LightCount;                       // 使用するライトの個数
+    float Padding[3];
+
 };
 
 /// <summary>
@@ -179,7 +187,7 @@ struct CB_POINT_LIGHT
 /// </summary>
 struct CB_POINT_LIGHT_SET
 {
-    CB_POINT_LIGHT Data[POINTLIGHT_MAX_NUM]{}; // 50個
+    CB_POINT_LIGHT Data; // 50個
     ID3D11Buffer* pBuff = nullptr;
 };
 

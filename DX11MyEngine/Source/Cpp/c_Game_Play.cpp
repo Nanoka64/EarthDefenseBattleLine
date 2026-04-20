@@ -105,7 +105,9 @@ int c_Game_Play::Update(SceneManager *pOwner)
 //*----------------------------------------------------------------------------------------
 void c_Game_Play::Draw(SceneManager* pOwner)
 {
+    Master::m_pDirectWriteManager->SetOutLine(3.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
     Master::m_pDirectWriteManager->DrawFormatString("Žc‚è‚Ì“G”F{:d}", VECTOR2::VEC2(0, 540), "White_40_STD",m_EnemyNum);
+    Master::m_pDirectWriteManager->SetOutLine(0.0f);
 }
 
 

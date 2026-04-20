@@ -116,7 +116,7 @@ void EnemyController::Start(RendererEngine& renderer)
 			VEC3 scale;
 			scale.x = 6.0f;
 			scale.y = 6.0f;
-			scale.z = 6.0f;
+			scale.z = 1.0f;
 			auto obj = MeshFactory::CreateDecal(decal);
 			obj->get_Component<DecalRenderer>()->Start(renderer);
 			obj->get_Transform().lock()->set_Pos(pos);
@@ -170,13 +170,13 @@ void EnemyController::Start(RendererEngine& renderer)
 			VEC3 scale;
 			scale.x = 20.0f;
 			scale.y = 20.0f;
-			scale.z = 20.0f;
+			scale.z = 1.0f;
 
 			auto obj = MeshFactory::CreateDecal(decal);
 			obj->get_Component<DecalRenderer>()->Start(renderer);
 			obj->get_Transform().lock()->set_Pos(pos);
 			obj->get_Transform().lock()->set_Scale(scale);
-			obj->get_Transform().lock()->set_RotateToRad(1.57f, 0.0f, 0.0f);
+			obj->get_Transform().lock()->set_RotateToRad(1.57f, Tool::RandRange(0.0f, 6.14f), 0.0f);
 			obj->set_Tag("Ant_Splash");
 			auto timer = obj->add_Component<TimerDestruction>();
 			timer->set_LifeTime(15.0f);  // ¶‘¶ŠÔ

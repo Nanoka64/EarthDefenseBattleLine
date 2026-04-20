@@ -21,32 +21,6 @@ void Gun_ReloadingState::OnEnter(GunWeapon* pOwner)
 
 	m_ReloadElapsed = 0.0f;
 
-
-	//// リロードバー用スプライトを作る **********************************************
-	//UIData::RectTransformData rectData;
-	//UIData::SpriteUIData spriteData;
-	//rectData._size = VEC2(0.0f, 0.0f);
-	//rectData._pos = RELOAD_BAR_POS;
-	//rectData._anchorMax = VEC2(0.5f, 0.5f);		// 中心を画面の真ん中に
-	//rectData._anchorMin = VEC2(0.5f, 0.5f);
-	//rectData._pivot = VEC2(0.0f, 0.0f);		// ピボットは左上
-	//spriteData._tag = "ReloadBar";
-	//spriteData._layerRank = 108;
-	//spriteData._color = VEC4(0.0f, 1.0f, 0.0f, 1.0f);
-	//spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
-	//m_pReloadBarSpriteObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
-	//
-	//// リロードバー背景用スプライトを作る **********************************************
-	//rectData._size = RELOAD_BAR_BACK_SIZE;
-	//rectData._pos = RELOAD_BAR_BACK_POS;
-	//rectData._anchorMax = VEC2(0.5f, 0.5f);		// 中心を画面の真ん中に
-	//rectData._anchorMin = VEC2(0.5f, 0.5f);
-	//rectData._pivot = VEC2(0.5f, 0.5f);
-	//spriteData._tag = "ReloadBarBack";
-	//spriteData._layerRank = 107;
-	//spriteData._color = VEC4(0.1f, 0.1f, 0.1f, 1.0f);	// 黒背景
-	//spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
-	//m_pReloadBarBackSpriteObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
 }
 
 //*---------------------------------------------------------------------------------------

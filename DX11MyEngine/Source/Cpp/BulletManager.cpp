@@ -32,7 +32,7 @@ constexpr int NUM_MAX__EXPLOSION_BULLET     = 100;
 // 爆発ライト
 constexpr int NUM_DEFAULT__EXPLOSION_LIG_BULLET = 25;
 constexpr int NUM_MAX__EXPLOSION_LIG_BULLET     = 50;
-constexpr float LIGHT_RADIUS_FACTOR = 5.0f; // 爆発範囲に掛ける、補正値
+constexpr float LIGHT_RADIUS_FACTOR = 10.0f; // 爆発範囲に掛ける、補正値
 
 
 // 誘導弾 =====================================================================
@@ -214,9 +214,9 @@ bool BulletManager::Init(RendererEngine &renderer)
             //auto trail = obj->add_Component<TrailRenderer>();
             //trail->set_Width(1.0f);
             //trail->set_MinVertexDistance(0.5f);
-            //trail->set_DrawTime(1.0f);
+            //trail->set_DrawTime(5.0f);
             //trail->set_EmissivePower(5.0f);
-            //trail->set_Color(VECTOR4::VEC4(0.0f, 1.0f, 0.0f, 1.0f));
+            //trail->set_Color(VECTOR4::VEC4(1.0f, 1.0f, 0.0f, 1.0f));
 
             //// コライダーの追加
             //auto collider = obj->add_Component<BoxCollider>();

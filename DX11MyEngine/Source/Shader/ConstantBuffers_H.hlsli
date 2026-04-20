@@ -124,7 +124,7 @@ cbuffer CB_DIRECTIONAL_LIGHT : register(b5)
     DirectionalLight cb_DirLightData[DIRECTIONLIGHT_MAX_NUM];
     
     float3 cb_EyePos; // 視点位置
-    float pad2;
+    float pad1;
 };
 
 
@@ -134,6 +134,9 @@ cbuffer CB_DIRECTIONAL_LIGHT : register(b5)
 cbuffer CB_POINT_LIGHT : register(b6)        
 {
     PointLight cb_PointLightData[POINTLIGHT_MAX_NUM];   // 50個
+    uint cb_PointLightCount; // ポイントライトの数
+    float3 pad2;
+    
 };
 
 //* =========================================================================
@@ -153,7 +156,7 @@ cbuffer CB_POSTEFFECT : register(b8)
     float cb_DoF_MaxRange;  // ぼかしが最大になる距離
     float cb_DoF_MinRange;  // ぼかしの開始距離
     
-    float2 pad;
+    float2 pad3;
     
     /* トーンマッピング用 */
 };
