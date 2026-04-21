@@ -126,6 +126,7 @@ bool UIManager::Init(RendererEngine &renderer)
             button->set_TextOffsetPos(VEC2());
             button->OnClickFunc(nullptr);
             button->set_Text("Button");
+            button->set_IsInteractable(true);
         },
         // ¶¬Žž‚ÉŽÀs ******************************************************************************************
         [&renderer]()->GameObject *

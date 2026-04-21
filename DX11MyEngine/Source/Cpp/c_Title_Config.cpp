@@ -5,6 +5,8 @@
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
 #include "InputFactory.h"
+#include "Component_SpriteRenderer.h"
+#include "Component_ButtonUI.h"
 
 using namespace SceneStateEnums;
 using namespace UtilityData;
@@ -15,23 +17,18 @@ using namespace VECTOR4;
 
 static const VEC2 g_ConfigItemSize = VEC2(500.0f, 35.0f);		// 項目のサイズ
 static const VEC2 g_ConfigButtonSize = VEC2(50.0f, 35.0f);		// ボタンのサイズ
+static const VEC4 g_ConfigItemColor = VEC4(0.3f, 0.3f, 0.7f, 1.0f);
 
-static const VEC2 g_BackSpriteSize = VEC2(600.0f, 400.0f);		// 最奥背景スプライトをのサイズ
-static const VEC2 g_BackSpritePos = VEC2(350.0f, 480.0f);		// 最奥背景スプライトをの位置
+static const VEC2 g_BackSpriteSize = VEC2(700.0f, 500.0f);		// 最奥背景スプライトをのサイズ
+static const VEC2 g_BackSpritePos = VEC2(550.0f, 500.0f);		// 最奥背景スプライトをの位置
 
 // 項目の値を表示するテキストの位置は、項目の位置にこのオフセットを足した位置になるようにする
 static const VEC2 g_ConfigValueOffsetSize = VEC2(250.0f, 70.0f);	
 
-// 項目の位置
-static const VEC2 g_ConfigItemPosArray[UINT_CAST(CONFIG_ITEM::NUM)] =
-{
-	VEC2(400.0f,500.0f),
-	VEC2(400.0f,550.0f),
-	VEC2(400.0f,600.0f),
-	VEC2(400.0f,650.0f),
-	VEC2(400.0f,700.0f),
-	VEC2(400.0f,750.0f),
-};
+
+static const VEC2 g_ConfigItemStartPos = VEC2(650.0f, 550.0f);  // 項目の開始位置
+static const float g_ConfigItemStepPosY = 70.0f;				// 項目と項目とのY座標間の距離
+
 
 // ボタンの位置（項目名の右側に配置）
 static constexpr float g_Button_OffsetPos_X = 350.0f;
@@ -88,24 +85,18 @@ void c_Title_Config::OnEnter(SceneManager *pOwner)
 	// 項目のオブジェクトとコンポーネントの取得と設定
 	for (int i = 0; i < INT_CAST(CONFIG_ITEM::NUM); i++)
 	{
-		//*****************************************************************************************
-		//						項目の背景スプライト
-		//*****************************************************************************************
 		UIData::SpriteUIData spriteData;
 		UIData::RectTransformData rectTrans;
-		spriteData._tag = "ConfigMenuBackSprite";
-		spriteData._color = VEC4(0.3f, 0.3f, 0.7f, 1.0f);
-		spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
-		spriteData._layerRank = 110;
-		rectTrans._size = g_ConfigItemSize;
-		rectTrans._pos = g_ConfigItemPosArray[i];
-		m_pConfigMenuSpriteObjArray[i] = Master::m_pUIManager->GetSprite(*m_pRenderer, rectTrans, spriteData);
+
+		VEC2 itemPos = g_ConfigItemStartPos;
+		itemPos.y += g_ConfigItemStepPosY * i;
+
 
 		//*****************************************************************************************
 		//						メニュー項目
 		//*****************************************************************************************
 		m_ItemInfoArray[i]._name = g_ConfigItemNames[i];
-		m_ItemInfoArray[i]._pos = g_ConfigItemPosArray[i] + VEC2(g_Button_OffsetPos_X - 50.0f, -15.0f);	// TODO:マジックナンバー（項目の値の位置がそのまま出はずれてしまうため）
+		m_ItemInfoArray[i]._pos = itemPos + VEC2(g_Button_OffsetPos_X - 50.0f, -15.0f);	// TODO:マジックナンバー（項目の値の位置がそのまま出はずれてしまうため）
 		m_ItemInfoArray[i]._type = static_cast<CONFIG_ITEM>(i);
 		m_ItemInfoArray[i]._value = m_DefaultConfigItemInfoArray[i]._value;
 		m_ItemInfoArray[i]._valueType = m_DefaultConfigItemInfoArray[i]._valueType;
@@ -123,10 +114,14 @@ void c_Title_Config::OnEnter(SceneManager *pOwner)
 		buttonData._tag = "AdjustmentButton" + std::to_string(i) + "_1";
 		buttonData._inputValidationState = UIData::STATE::PRESSED;
 		buttonData._onClicFunction = [this, i]() {this->ChangeConfigValue(static_cast<CONFIG_ITEM>(i), true); };	// クリックされたときに設定値を増やす関数を呼ぶ
+		buttonData._inputSoundID = SOUND_ID_TO_INT(SOUND_ID::SYSTEM_MOVING_CURSOR01);
 		rectTrans._size = g_ConfigButtonSize;
-		rectTrans._pos = g_ConfigItemPosArray[i];
+		rectTrans._pos = itemPos;
 		rectTrans._pos.x += g_Button_OffsetPos_X;	// 項目の右側に配置するようX座標をずらす
 		m_pConfigAdjustmentButtonObj[i][0] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
+		auto leftButton = m_pConfigAdjustmentButtonObj[i][0]->get_Component<ButtonUI>();
+		leftButton->set_Color(VEC4(0.0f), UIData::STATE::DISABLED);		// 無効の際は表示しない
+		leftButton->set_IsInteractable(false);
 
 		/* 右側 */
 		buttonData._imagePath = "Resource/Texture/Title/TriangleCursor_R.png";
@@ -136,24 +131,48 @@ void c_Title_Config::OnEnter(SceneManager *pOwner)
 		rectTrans._size = g_ConfigButtonSize;
 		rectTrans._pos.x += g_RangeBetweenButtons;	// ボタン同士の横方向の距離を空ける
 		m_pConfigAdjustmentButtonObj[i][1] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
-		
+		auto rightButton = m_pConfigAdjustmentButtonObj[i][1]->get_Component<ButtonUI>();
+		rightButton->set_Color(VEC4(0.0f), UIData::STATE::DISABLED);	// 無効の際は表示しない
+		rightButton->set_IsInteractable(false);
+
 		
 		//m_pButtonArray[i] = m_pConfigAdjustmentButtonObj[i]->get_Component<ButtonUI>();
 		//m_pMenuItemRectTransformArray[i] = m_pConfigAdjustmentButtonObj[i]->get_RectTransform();
 	}
+
+	// 最初は一番上の項目のみ、有効状態
+	m_pConfigAdjustmentButtonObj[0][0]->get_Component<ButtonUI>()->set_IsInteractable(true);
+	m_pConfigAdjustmentButtonObj[0][1]->get_Component<ButtonUI>()->set_IsInteractable(true);
+
+	//*****************************************************************************************
+	//						選択した項目をハイライトするスプライト
+	//*****************************************************************************************
+	UIData::SpriteUIData selectItemSpriteData;
+	UIData::RectTransformData selectItemRectTrans;
+	selectItemSpriteData._imagePath = "Resource/Texture/Title/Decoration01.png";
+	selectItemSpriteData._tag = "ConfigMenuBackSprite";
+	selectItemSpriteData._color = VEC4(1.0f, 10.0f, 10.0f, 1.0f);
+	//selectItemSpriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
+	selectItemSpriteData._layerRank = 110;
+	selectItemRectTrans._size = g_ConfigItemSize;
+	selectItemRectTrans._pos = g_ConfigItemStartPos;
+	m_pConfigSelectItemSpriteObj = Master::m_pUIManager->GetSprite(*m_pRenderer, selectItemRectTrans, selectItemSpriteData);
+
 
 	//*****************************************************************************************
 	//						最奥背景スプライト
 	//*****************************************************************************************
 	UIData::SpriteUIData backSpriteData;
 	UIData::RectTransformData backRectTrans;
-	backSpriteData._color = VEC4(0.0f, 0.0f, 0.0f, 0.85f);
-	backSpriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
+	backSpriteData._imagePath = "Resource/Texture/Title/ConfigBackGround.png";
 	backSpriteData._layerRank = 100;
 	backSpriteData._tag = "ConfigSceneBackSprite";
 	backRectTrans._size = g_BackSpriteSize;
 	backRectTrans._pos = g_BackSpritePos;
 	m_pConfigBackSpriteObj= Master::m_pUIManager->GetSprite(*m_pRenderer, backRectTrans, backSpriteData);
+
+
+	m_Timer = 0.0f;
 }
 
 
@@ -170,12 +189,6 @@ void c_Title_Config::OnExit(SceneManager* pOwner)
 	// *****************************************************************************************
 	for (int i = 0; i < INT_CAST(CONFIG_ITEM::NUM); i++)
 	{
-		// 拝啓スプライト
-		if (m_pConfigMenuSpriteObjArray[i])
-		{
-			m_pConfigMenuSpriteObjArray[i]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-		}
-
 		// ボタン 左右
 		for (int j = 0; j < 2; j++) {
 			if (m_pConfigAdjustmentButtonObj[i][j])
@@ -183,6 +196,9 @@ void c_Title_Config::OnExit(SceneManager* pOwner)
 				m_pConfigAdjustmentButtonObj[i][j]->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 			}
 		}
+	}
+	if (m_pConfigSelectItemSpriteObj != nullptr) {
+		m_pConfigSelectItemSpriteObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	}
 
 	if (m_pConfigBackSpriteObj != nullptr) {
@@ -197,13 +213,57 @@ void c_Title_Config::OnExit(SceneManager* pOwner)
 //* 引数：1.SceneManager
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-int c_Title_Config::Update(SceneManager *pOwner)
+int c_Title_Config::Update(SceneManager* pOwner)
 {
 	// 右クリックでメインメニューへ戻る
 	if (GetMouseClickDown(MOUSE_BUTTON_STATE::RIGHT))
 	{
 		return c_TITLE::c_TITLE_MAIN_MENU;
-	} 
+	}
+
+	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
+	m_Timer += deltaTime;
+
+
+	for (int i = 0; i < INT_CAST(CONFIG_ITEM::NUM); i++)
+	{
+		VEC2 itemPos = g_ConfigItemStartPos;
+		itemPos.y += g_ConfigItemStepPosY * i;
+
+		POINT mousePos = Master::m_pInputManager->GetMousePos();	// マウス座標
+
+		// スプライトの衝突判定情報
+		CollInData2D_AABB colData;
+		colData._min = itemPos;
+		colData._max = itemPos + g_ConfigItemSize;
+
+		auto selectItemRect = m_pConfigSelectItemSpriteObj->get_RectTransform().lock();
+		auto selectItemSpriteComp = m_pConfigSelectItemSpriteObj->get_Component<SpriteRenderer>();
+		selectItemSpriteComp->set_UVOffset(VEC2(0.0f,m_Timer ));
+
+		float t = sinf(m_Timer * 5.0f) * 0.5f + 0.5f;
+		float ease = Tool::Easing::EaseOutSin(t);
+		selectItemSpriteComp->set_Color(VEC4(1.0f * ease, 10.0f, 10.0f, 1.0f));
+
+
+		// マウスとボタンの判定
+		if (Master::m_pCollisionManager->HitCheck2D_BoxVsPoint(colData, VEC2(FLOAT_CAST(mousePos.x), FLOAT_CAST(mousePos.y))))
+		{
+			// 衝突時、黄色くする
+			//spriteComp->set_Color(VEC4(1.0f, 1.0f, 1.0f, 1.0f));
+
+			selectItemRect->set_RectPosition(itemPos);
+
+
+			m_pConfigAdjustmentButtonObj[i][0]->get_Component<ButtonUI>()->set_IsInteractable(true);
+			m_pConfigAdjustmentButtonObj[i][1]->get_Component<ButtonUI>()->set_IsInteractable(true);
+		}
+		else
+		{
+			m_pConfigAdjustmentButtonObj[i][0]->get_Component<ButtonUI>()->set_IsInteractable(false);
+			m_pConfigAdjustmentButtonObj[i][1]->get_Component<ButtonUI>()->set_IsInteractable(false);
+		}
+	}
 
 	return c_TITLE::c_TITLE_CONFIG;
 }
@@ -219,14 +279,18 @@ void c_Title_Config::Draw(SceneManager* pOwner)
 {
 	Master::m_pDirectWriteManager->DrawString("☆設定", VECTOR2::VEC2(40.0f, 500.0f), "White_40_STD");
 
-	// 文字を水色に
-	Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(D2D1::ColorF::Aqua));
 	for (int i = 0; i < INT_CAST(CONFIG_ITEM::NUM); i++)
 	{
+		VEC2 itemPos = g_ConfigItemStartPos;
+		itemPos.y += g_ConfigItemStepPosY * i;
+
 		// 項目名
-		Master::m_pDirectWriteManager->DrawStringToAligment(g_ConfigItemNames[i], g_ConfigItemPosArray[i], "White_20_STD", H_ALIGNMENT::LEADING, V_ALIGNMENT::CENTER, g_ConfigItemSize);
+		Master::m_pDirectWriteManager->SetOutLine(2.0f,D2D1::ColorF(D2D1::ColorF::Black));	 // 縁取り
+		Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(D2D1::ColorF::White));			 // 白
+		Master::m_pDirectWriteManager->DrawStringToAligment(g_ConfigItemNames[i], itemPos, "White_20_STD", H_ALIGNMENT::LEADING, V_ALIGNMENT::CENTER, g_ConfigItemSize);
 
 		// 項目の値
+		Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(D2D1::ColorF::Aqua));	// 水色
 		Master::m_pDirectWriteManager->DrawStringToAligment(m_ItemInfoArray[i].ConvertValueAsString(), m_ItemInfoArray[i]._pos, "White_20_STD", H_ALIGNMENT::CENTER, V_ALIGNMENT::CENTER, g_ConfigValueOffsetSize);
 	}
 	Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(D2D1::ColorF::White));
