@@ -51,6 +51,7 @@ public:
 	bool SettingsData_TitleLoadOnExit(RendererEngine& renderer);			// タイトルロード時
 	bool SettingsData_MissionLoad(RendererEngine& renderer, UINT _missionNumber);			// ミッション開始時
 	bool SettingsData_MissionTermination(RendererEngine& renderer, UINT _missionNumber);	// ミッション終了時
+	void ClearGameSceneResource(RendererEngine& renderer);
 
 	void set_ScreenWidth(UINT _w) { m_ScreenWidth = _w; };			// スクリーンの横幅を設定（基本的にRendererEngine以外からは設定しない）
 	void set_ScreenHeight(UINT _h) { m_ScreenHeight = _h; };		// スクリーンの縦幅を設定（基本的にRendererEngine以外からは設定しない）
@@ -85,6 +86,7 @@ public:
 	void set_SEVolume(int _vol);				// SE音量の設定
 	void set_MouseSensitivity(float _sens);		// マウス感度の設定
 	void set_IsInvertY(bool _isInvert);			// カメラのY反転の有無の設定
+	void set_IsCameraShake(bool _isShake);		// カメラシェイクの有無の設定
 	void set_IsShadowEnabled(bool _isEnable);	// シャドウの有無の設定
 	void set_UserConfigData(const UtilityData::UserConfigData &_data) { m_UserConfigData = _data; }	// ユーザ設定データの設定
 
@@ -92,7 +94,7 @@ public:
 	float get_Fov();			// FOVの取得
 
 	void set_SelectWeaponID(int _id, int _slot) { m_SelectWeaponID[_slot] = _id; }	// 武器選択で選択した武器のIDを設定
-	int get_SelectWeaponID( int _slot) { return m_SelectWeaponID[_slot]; }	// 武器選択で選択した武器のIDを取得
+	int get_SelectWeaponID( int _slot)const { return m_SelectWeaponID[_slot]; }	// 武器選択で選択した武器のIDを取得
 
 private:
 	// コピー禁止

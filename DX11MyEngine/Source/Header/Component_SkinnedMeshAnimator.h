@@ -52,6 +52,8 @@ public:
 	void Update(RendererEngine& renderer)override;
 	void Draw(RendererEngine& renderer)override;
 
+	void PlayAnim(float _time);	// アニメーションの再生
+
 	void BoneTransformsUpdate(RendererEngine &renderer, float timeInSeconds, int animIdx);	// ボーンの更新
 	void set_MeshResource(std::weak_ptr<class ModelMeshResource> meshResource);	// リソースの設定
 

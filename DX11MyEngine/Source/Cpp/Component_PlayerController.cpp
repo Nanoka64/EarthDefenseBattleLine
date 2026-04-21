@@ -24,6 +24,7 @@ constexpr float ROLLING_SPEED = 25.0f;	// ローリング時初速
 constexpr float ROLLING_DURATION = 1.0f;// ローリング時間
 constexpr float JUMP_HEIGHT = 2.5f;		// ジャンプの高さ
 constexpr float GRAVITY = 18.0f;		// 重力
+constexpr float ANIM_SPEED = 1.25f;		// アニメーション速度
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
@@ -145,6 +146,8 @@ void PlayerController::LateUpdate(RendererEngine& renderer)
 		Master::m_pDataManager->set_IsPlayerDead(true);
 		return;
 	}
+
+	m_pAnimatorComp.lock()->PlayAnim(Master::m_pTimeManager->get_DeltaTime() * ANIM_SPEED);
 
 	// ローリングの処理のみ行って返す
 	if (m_IsRolling)
@@ -493,18 +496,20 @@ void PlayerController::ChangeAnimation(PlayerData::PLAYER_RANGER_ANIM_ID id)
 		return;
 	}
 
+	auto animComp = m_pAnimatorComp.lock();
+
 	// ひとつ前のアニメーションIDセット
-	m_pAnimatorComp.lock()->set_PrevAnimIndex(static_cast<int>(m_CrntAnimID));
+	animComp->set_PrevAnimIndex(static_cast<int>(m_CrntAnimID));
 
 	m_CrntAnimID = id;
 
 	// 現在のアニメーションIDセット
-	m_pAnimatorComp.lock()->set_AnimIndex(static_cast<int>(m_CrntAnimID));
+	animComp->set_AnimIndex(static_cast<int>(m_CrntAnimID));
 
 	if (m_CrntAnimID == PLAYER_RANGER_ANIM_ID::RUNING_DIVE_ROLL)
 	{
-		m_pAnimatorComp.lock()->set_AnimProcTime(0.0f);
-		m_pAnimatorComp.lock()->set_ShadowAnimProcTime(0.0f);
+		animComp->set_AnimProcTime(0.0f);
+		animComp->set_ShadowAnimProcTime(0.0f);
 	}
 }
 

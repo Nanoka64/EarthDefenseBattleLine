@@ -94,7 +94,7 @@ void MiniMapRader::Update(RendererEngine& renderer)
 
     // 敵のアイコンスプライト確保
     if (enemySpriteSize < enemys.size()) {
-        SecuringMiniMapIconSprite(renderer, enemys.size(), m_pRaderEnemySpriteObjArray, VEC2(MINIMAP_ENEMY_ICON_SIZE), VEC4(1.0f, 0.0f, 0.0f, 1.0f));
+        SecuringMiniMapIconSprite(renderer, INT_CAST(enemys.size()), m_pRaderEnemySpriteObjArray, VEC2(MINIMAP_ENEMY_ICON_SIZE), VEC4(1.0f, 0.0f, 0.0f, 1.0f));
     }
     // 少なくなっていたら、プールへ返す
     else if(enemySpriteSize > enemys.size()) {
@@ -104,7 +104,7 @@ void MiniMapRader::Update(RendererEngine& renderer)
 
     // アイテムのアイコンスプライト確保
     if (itemSpriteSize < items.size()) {
-        SecuringMiniMapIconSprite(renderer, items.size(), m_pRaderItemSpriteObjArray, VEC2(MINIMAP_ENEMY_ICON_SIZE), VEC4(0.0f, 1.0f, 0.0f, 1.0f));
+        SecuringMiniMapIconSprite(renderer, INT_CAST(items.size()), m_pRaderItemSpriteObjArray, VEC2(MINIMAP_ENEMY_ICON_SIZE), VEC4(0.0f, 1.0f, 0.0f, 1.0f));
     }
     // 少なくなっていたら、プールへ返す
     else if(itemSpriteSize > items.size()) {

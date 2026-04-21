@@ -22,6 +22,7 @@
     "collisionMask": ["PLAYER", "BUILDING", "DESTRUCTION_BUILDING"],
     "bulletMaterialTag" : "Acid_01",
     "decalMaterialTag" : "Decal_Ant_Splash",
+    "hitEffectTag" : "BulletHit_Acid",
     "scale" : [1.0, 1.0, 1.0]
   }
 }

@@ -44,7 +44,7 @@ using namespace SceneStateEnums;
 void c_Title_MissionSelect::OnEnter(SceneManager *pOwner)
 {
 	// 最初は空
-	this->SetInitChildState(pOwner, c_TITLE::NONE);
+	this->SetInitChildState(pOwner, c_TITLE::c_TITLE_NONE);
 
 	m_NextState = c_TITLE_MISSION_SELECT;
 
@@ -109,7 +109,7 @@ int c_Title_MissionSelect::Update(SceneManager *pOwner)
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//
-	//						子シーンの処理
+	//						子ステートの処理
 	// 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	if (m_CrntChildStateID != -1) {
@@ -126,7 +126,7 @@ int c_Title_MissionSelect::Update(SceneManager *pOwner)
 		else if (newState == c_TITLE::c_TITLE_MISSION_SELECT)
 		{
 			m_pChildStateMap[m_CrntChildStateID]->OnExit(pOwner);	// 子ステートの終了
-			this->SetInitChildState(pOwner, c_TITLE::NONE);
+			this->SetInitChildState(pOwner, c_TITLE::c_TITLE_NONE);
 
 			// ボタンも有効状態に
 			for (int i = 0; i < static_cast<int>(MISSION_NUM); i++)
@@ -231,7 +231,7 @@ void c_Title_MissionSelect::Draw(SceneManager* pOwner)
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//
-	//						子シーンの描画処理
+	//						子ステートの描画処理
 	// 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	if (m_CrntChildStateID != -1)

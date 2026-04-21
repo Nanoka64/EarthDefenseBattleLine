@@ -121,7 +121,7 @@ public:
 	std::vector<std::shared_ptr<GameObject>>get_ObjectListByFaction(const UtilityData::FACTION& _findFaction);
 
 	/// <summary>
-	/// オブジェクトの派閥、生存でリストを取得
+	/// 指定派閥の、生存しているオブジェクトをvectorで取得
 	/// ※ 2D&3D 透明/不透明両方
 	/// </summary>
 	/// <returns></returns>

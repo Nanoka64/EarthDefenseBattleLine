@@ -53,6 +53,7 @@ private:
 
 	bool m_IsCalcUpdate;	// 更新処理がすでに呼ばれたかどうか
 	bool m_IsStatic;		// 静的か動的か
+	bool m_IsUpdateAllowedDuringPause;	// ポーズ中でも更新可能か
 
 	/* オブジェクトマネージャをフレンドとして登録 */
 	friend class GameObjectManager;
@@ -73,6 +74,10 @@ public:
 	/* 静的フラグ */
 	bool get_IsStatic()const { return m_IsStatic; }
 	void set_IsStatic(bool _flag) { m_IsStatic = _flag; }
+
+	/* ポーズフラグ */
+	void set_IsUpdateAllowedDuringPause(bool _flag) { m_IsUpdateAllowedDuringPause = _flag; }
+	bool get_IsUpdateAllowedDuringPause()const { return m_IsUpdateAllowedDuringPause; }
 
 	// ****************************************************************************************************************************************
 	/* コンポーネント関連 */

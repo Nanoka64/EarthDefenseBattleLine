@@ -122,6 +122,9 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             // 動的オブジェクト
             obj->set_IsStatic(false);
 
+            // ポーズ中は停止
+            obj->set_IsUpdateAllowedDuringPause(false);
+
             obj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
             obj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(0);
 
@@ -195,7 +198,9 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         {
             model.ObjTag = "B-2_" + std::to_string(i + 1);
             auto obj = MeshFactory::CreateModel(model);
-            obj->get_Component<MyTransform>()->set_Scale(0.05f, 0.05f, 0.05f);
+            obj->get_Component<MyTransform>()->set_Scale(0.05f, 0.05f, 0.05f);           
+            // ポーズ中は停止
+            obj->set_IsUpdateAllowedDuringPause(false);
         }
     }
 
@@ -257,6 +262,9 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
                 obj->get_Component<MyTransform>()->set_Scale(scale);
                 obj->get_Component<MyTransform>()->set_Pos(50.0f * x,  0.0f,  70.0f * y);
                 obj->get_Component<MyTransform>()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
+
+                // ポーズ中は停止
+                obj->set_IsUpdateAllowedDuringPause(false);
 
                 // 建物制御コンポーネント追加
                 obj->add_Component<BuildingController>();
@@ -573,6 +581,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             // 動的オブジェクトに設定
             obj->set_IsStatic(false);
 
+            // ポーズ中は停止
+            obj->set_IsUpdateAllowedDuringPause(false);
 
             // アサルトライフル
             //obj->add_Component<AssultRifle>(1);
@@ -620,6 +630,9 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             //obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
             // 動的オブジェクトに設定
             obj->set_IsStatic(false);
+
+            // ポーズ中は停止
+            obj->set_IsUpdateAllowedDuringPause(false);
 
             // コンポーネントの追加
             weapon_2 = obj->add_Component<GunWeapon>(1);

@@ -22,6 +22,7 @@
     "collisionMask": ["ENEMY", "BUILDING", "DESTRUCTION_BUILDING"],
     "bulletMaterialTag" : "Bullet_01",
     "decalMaterialTag" : "Decal_BulletHole",
+    "hitEffectTag" : "BulletHit_Standard",
     "scale" : [10.0, 10.0, 10.0],
     "explosionRadius": 100.0,
     "explosionEffectHandleTag": "Explosion_03",

@@ -13,28 +13,31 @@ using namespace VECTOR3;
 using namespace VECTOR4;
 
 
-// 項目の衝突判定用サイズ
-static const VECTOR2::VEC2 g_ConfigItemSize = VECTOR2::VEC2(1000.0f, 70.0f);		// 項目のサイズ
-static const VECTOR2::VEC2 g_ConfigButtonSize = VECTOR2::VEC2(100.0f, 70.0f);		// ボタンのサイズ
+static const VEC2 g_ConfigItemSize = VEC2(500.0f, 35.0f);		// 項目のサイズ
+static const VEC2 g_ConfigButtonSize = VEC2(50.0f, 35.0f);		// ボタンのサイズ
+
+static const VEC2 g_BackSpriteSize = VEC2(600.0f, 400.0f);		// 最奥背景スプライトをのサイズ
+static const VEC2 g_BackSpritePos = VEC2(350.0f, 480.0f);		// 最奥背景スプライトをの位置
 
 // 項目の値を表示するテキストの位置は、項目の位置にこのオフセットを足した位置になるようにする
-static const VECTOR2::VEC2 g_ConfigValueOffsetSize = VECTOR2::VEC2(250.0f, 70.0f);	
+static const VEC2 g_ConfigValueOffsetSize = VEC2(250.0f, 70.0f);	
 
 // 項目の位置
-static const VECTOR2::VEC2 g_ConfigItemPosArray[UINT_CAST(CONFIG_ITEM::NUM)] =
+static const VEC2 g_ConfigItemPosArray[UINT_CAST(CONFIG_ITEM::NUM)] =
 {
 	VEC2(400.0f,500.0f),
+	VEC2(400.0f,550.0f),
 	VEC2(400.0f,600.0f),
+	VEC2(400.0f,650.0f),
 	VEC2(400.0f,700.0f),
-	VEC2(400.0f,800.0f),
-	VEC2(400.0f,900.0f),
+	VEC2(400.0f,750.0f),
 };
 
 // ボタンの位置（項目名の右側に配置）
-static constexpr float g_Button_OffsetPos_X = 600.0f;
+static constexpr float g_Button_OffsetPos_X = 350.0f;
 
 // ボタン同士の間の距離
-static constexpr float g_RangeBetweenButtons = 300.0f;
+static constexpr float g_RangeBetweenButtons = 100.0f;
 
 /// <summary>
 /// 項目名
@@ -45,6 +48,7 @@ static constexpr const char* g_ConfigItemNames[UINT_CAST(CONFIG_ITEM::NUM)] =
 	"SE音量",
 	"マウス感度",
 	"カメラの上下反転",
+	"画面振動",
 	"シャドウの有無",
 };
 
@@ -76,7 +80,8 @@ void c_Title_Config::OnEnter(SceneManager *pOwner)
 	m_DefaultConfigItemInfoArray[1] = ConfigMenuItemInfo({ 100.0f, 150.0f }, "", CONFIG_ITEM::SE_VOLUME, VALUE_TYPE::INT, config._SEVolume);
 	m_DefaultConfigItemInfoArray[2] = ConfigMenuItemInfo({ 100.0f, 200.0f }, "", CONFIG_ITEM::MOUSE_SENSITIVITY, VALUE_TYPE::FLOAT, config._mouseSensitivity);
 	m_DefaultConfigItemInfoArray[3] = ConfigMenuItemInfo({ 100.0f, 250.0f }, "", CONFIG_ITEM::INVERT_Y, VALUE_TYPE::BOOL, config._isInvertY);
-	m_DefaultConfigItemInfoArray[4] = ConfigMenuItemInfo({ 100.0f, 300.0f }, "", CONFIG_ITEM::SHADOW_ENABLED, VALUE_TYPE::BOOL, config._isShadowEnabled);
+	m_DefaultConfigItemInfoArray[4] = ConfigMenuItemInfo({ 100.0f, 300.0f }, "", CONFIG_ITEM::CAMERA_SHAKE, VALUE_TYPE::BOOL, config._isCameraShake);
+	m_DefaultConfigItemInfoArray[5] = ConfigMenuItemInfo({ 100.0f, 350.0f }, "", CONFIG_ITEM::SHADOW_ENABLED, VALUE_TYPE::BOOL, config._isShadowEnabled);
 
 
 
@@ -100,7 +105,7 @@ void c_Title_Config::OnEnter(SceneManager *pOwner)
 		//						メニュー項目
 		//*****************************************************************************************
 		m_ItemInfoArray[i]._name = g_ConfigItemNames[i];
-		m_ItemInfoArray[i]._pos = g_ConfigItemPosArray[i] + VEC2(g_Button_OffsetPos_X + 70.0f, 0.0f);
+		m_ItemInfoArray[i]._pos = g_ConfigItemPosArray[i] + VEC2(g_Button_OffsetPos_X - 50.0f, -15.0f);	// TODO:マジックナンバー（項目の値の位置がそのまま出はずれてしまうため）
 		m_ItemInfoArray[i]._type = static_cast<CONFIG_ITEM>(i);
 		m_ItemInfoArray[i]._value = m_DefaultConfigItemInfoArray[i]._value;
 		m_ItemInfoArray[i]._valueType = m_DefaultConfigItemInfoArray[i]._valueType;
@@ -146,8 +151,8 @@ void c_Title_Config::OnEnter(SceneManager *pOwner)
 	backSpriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
 	backSpriteData._layerRank = 100;
 	backSpriteData._tag = "ConfigSceneBackSprite";
-	backRectTrans._size = VEC2(1200.0f, 550.0f);
-	backRectTrans._pos = VEC2(300.0f, 470.0f);
+	backRectTrans._size = g_BackSpriteSize;
+	backRectTrans._pos = g_BackSpritePos;
 	m_pConfigBackSpriteObj= Master::m_pUIManager->GetSprite(*m_pRenderer, backRectTrans, backSpriteData);
 }
 
@@ -219,10 +224,10 @@ void c_Title_Config::Draw(SceneManager* pOwner)
 	for (int i = 0; i < INT_CAST(CONFIG_ITEM::NUM); i++)
 	{
 		// 項目名
-		Master::m_pDirectWriteManager->DrawStringToAligment(g_ConfigItemNames[i], g_ConfigItemPosArray[i], "White_30_STD", H_ALIGNMENT::LEADING, V_ALIGNMENT::CENTER, g_ConfigItemSize);
+		Master::m_pDirectWriteManager->DrawStringToAligment(g_ConfigItemNames[i], g_ConfigItemPosArray[i], "White_20_STD", H_ALIGNMENT::LEADING, V_ALIGNMENT::CENTER, g_ConfigItemSize);
 
 		// 項目の値
-		Master::m_pDirectWriteManager->DrawStringToAligment(m_ItemInfoArray[i].ConvertValueAsString(), m_ItemInfoArray[i]._pos, "White_30_STD", H_ALIGNMENT::CENTER, V_ALIGNMENT::CENTER, g_ConfigValueOffsetSize);
+		Master::m_pDirectWriteManager->DrawStringToAligment(m_ItemInfoArray[i].ConvertValueAsString(), m_ItemInfoArray[i]._pos, "White_20_STD", H_ALIGNMENT::CENTER, V_ALIGNMENT::CENTER, g_ConfigValueOffsetSize);
 	}
 	Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(D2D1::ColorF::White));
 }
@@ -292,6 +297,17 @@ void c_Title_Config::ChangeConfigValue(UtilityData::CONFIG_ITEM _item, bool _isL
 		crntValue = (_isLeftIndex ? false : true);
 		m_ItemInfoArray[index].SetValue(crntValue);
 		Master::m_pDataManager->set_IsInvertY(crntValue);
+	}
+	break;		
+	//=========================================================================================
+	//						カメラシェイクの有無
+	//=========================================================================================
+	case UtilityData::CONFIG_ITEM::CAMERA_SHAKE:
+	{
+		bool crntValue = std::get<bool>(m_ItemInfoArray[index]._value);
+		crntValue = (_isLeftIndex ? false : true);
+		m_ItemInfoArray[index].SetValue(crntValue);
+		Master::m_pDataManager->set_IsCameraShake(crntValue);
 	}
 	break;	
 	//=========================================================================================

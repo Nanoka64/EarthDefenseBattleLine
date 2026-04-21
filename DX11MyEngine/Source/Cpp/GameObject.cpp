@@ -10,7 +10,8 @@
 GameObject::GameObject():
 	m_IsCalcUpdate(false),
 	//m_IsShadow(false),
-	m_IsStatic(true)
+	m_IsStatic(true),
+	m_IsUpdateAllowedDuringPause(true)
 {
 
 }

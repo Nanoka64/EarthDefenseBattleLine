@@ -52,6 +52,7 @@ namespace BulletData
         unsigned int _collisionMask = 0;            // どのオブジェクトと衝突するか（COLLISION_CATEGORY）
         std::string _bulletMaterialTag;             // 使用するマテリアルのタグ（TODO:ビルボードと3Dモデルで分ける必要あるかも）
         std::string _decalMaterialTag;              // 衝突時に作成するデカールのタグ
+        std::string _hitEffectTag;                  // 衝突時に発生させるエフェクト
         VECTOR3::VEC3 _scale = VECTOR3::VEC3();     // 弾の大きさ
 
         /// <summary>

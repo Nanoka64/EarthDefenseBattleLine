@@ -666,7 +666,7 @@
     <ClCompile Include="Source\Cpp\c_Result_Failed.cpp">
       <Filter>ソース ファイル\Game\Scene\Result</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Cpp\c_Game_Config.cpp">
+    <ClCompile Include="Source\Cpp\c_Game_Pause.cpp">
       <Filter>ソース ファイル\Game\Scene\Game</Filter>
     </ClCompile>
     <ClCompile Include="Source\Cpp\c_MissionSelect_DifficultSelect.cpp">
@@ -736,7 +736,7 @@
       <Filter>ソース ファイル\Singleton\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\Cpp\GameObjectManager.cpp">
-      <Filter>ソース ファイル\Singleton\Resource</Filter>
+      <Filter>ソース ファイル\Singleton\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1148,7 +1148,7 @@
     <ClInclude Include="Source\Header\c_Result_Failed.h">
       <Filter>ソース ファイル\Game\Scene\Result</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\c_Game_Config.h">
+    <ClInclude Include="Source\Header\c_Game_Pause.h">
       <Filter>ソース ファイル\Game\Scene\Game</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\c_MissionSelect_DifficultSelect.h">
@@ -1218,7 +1218,7 @@
       <Filter>ソース ファイル\Singleton\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\GameObjectManager.h">
-      <Filter>ソース ファイル\Singleton\Resource</Filter>
+      <Filter>ソース ファイル\Singleton\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

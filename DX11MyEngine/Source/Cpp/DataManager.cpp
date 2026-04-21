@@ -15,6 +15,7 @@
 #include "Component_AssultRifle.h"
 #include "Component_Health.h"
 #include "Component_PointLight.h"
+#include "Component_WeaponController.h"
 #include "GameObject.h"
 #include "MeshFactory.h"
 #include "InputFactory.h"
@@ -70,20 +71,22 @@ bool DataManager::Init(std::shared_ptr<RendererEngine>pRenderer)
 	// ユーザー設定データの初期化
 	m_UserConfigData._BGMVolume = 30;
 	m_UserConfigData._SEVolume = 50;
-	m_UserConfigData._isInvertY = false;
 	m_UserConfigData._mouseSensitivity = 40.0f;
+	m_UserConfigData._isInvertY = false;
+	m_UserConfigData._isCameraShake = true;
 	m_UserConfigData._isShadowEnabled = true;
 
 	Master::m_pSoundManager->set_Volume(SOUND_TYPE::BGM, m_UserConfigData._BGMVolume * VOLUME_SCALE);
 	Master::m_pSoundManager->set_Volume(SOUND_TYPE::SE, m_UserConfigData._SEVolume * VOLUME_SCALE);
 
-	// TODO:難易度係数一旦ここに書く
+	// TODO:敵の難易度係数一旦ここに書く
+	// 攻撃を難易度ごとにjsonで分けてしまったので、攻撃力に関しては今のところ反映してない
 	//																			hp	  atk   speed
-	m_EnemyDifficultyFactorArray[UINT_CAST(DIFFICULTY_LEVEL::EASY)]			= { 0.5f, 0.5f, 0.5f };
+	m_EnemyDifficultyFactorArray[UINT_CAST(DIFFICULTY_LEVEL::EASY)]			= { 0.6f, 0.5f, 0.5f };
 	m_EnemyDifficultyFactorArray[UINT_CAST(DIFFICULTY_LEVEL::NORMAL)]		= { 1.0f, 1.0f, 1.0f };
 	m_EnemyDifficultyFactorArray[UINT_CAST(DIFFICULTY_LEVEL::HARD)]			= { 1.5f, 1.5f, 1.5f };
 	m_EnemyDifficultyFactorArray[UINT_CAST(DIFFICULTY_LEVEL::DISASTER)]		= { 2.5f, 3.5f, 2.0f };
-	m_EnemyDifficultyFactorArray[UINT_CAST(DIFFICULTY_LEVEL::IMPOSSIBLE)]	= { 3.0f, 4.0f, 2.2f };
+	m_EnemyDifficultyFactorArray[UINT_CAST(DIFFICULTY_LEVEL::IMPOSSIBLE)]	= { 4.0f, 4.0f, 2.2f };
 
 	return true;
 }
@@ -144,6 +147,39 @@ bool DataManager::SettingsData_MissionLoad(RendererEngine& renderer, UINT _missi
 bool DataManager::SettingsData_MissionTermination(RendererEngine& renderer, UINT _missionNumber)
 {
 	return true;
+}
+//*---------------------------------------------------------------------------------------
+//*【?】ゲーム中に使用したリソースをクリアする
+//*		リザルトや、再出撃時に呼ぶ 
+//* 
+//* [引数]
+//* &renderer : 描画エンジンの参照 
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void DataManager::ClearGameSceneResource(RendererEngine& renderer)
+{
+	auto player = Master::m_pGameObjectManager->get_ObjectByTag("Player");
+	// プレイヤーの武器をクリアする
+	if (player){
+		player->get_Component<WeaponController>()->ClearWeapon();
+		player->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+	}
+
+	// 弾をクリア
+	Master::m_pBulletManager->clear_CrntActiveBullet();
+
+	// アイテムをクリア	
+	Master::m_pItemManager->clear_All();
+
+	// 削除禁止でないオブジェクトを全てクリア
+	Master::m_pGameObjectManager->clear_NotIsDontDestroyObject();
+
+	// 全てのエフェクトを停止する
+	Master::m_pEffectManager->StopAllEffects();
+
+	// パラメータを戻す
+	Master::m_pDataManager->set_IsMissionCleared(false);
+	Master::m_pDataManager->set_IsPlayerDead(false);
 }
 
 //*---------------------------------------------------------------------------------------
@@ -215,6 +251,14 @@ void DataManager::set_MouseSensitivity(float _sens)
 void DataManager::set_IsInvertY(bool _isInv)
 {
 	m_UserConfigData._isInvertY = _isInv;
+}
+
+//*----------------------------------------------------------------------------------------
+//*【?】カメラシェイクの有無の設定
+//*----------------------------------------------------------------------------------------
+void DataManager::set_IsCameraShake(bool _isShake)
+{
+	m_UserConfigData._isCameraShake = _isShake;
 }
 
 //*----------------------------------------------------------------------------------------

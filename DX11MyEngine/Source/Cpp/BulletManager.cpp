@@ -107,7 +107,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             auto obj = Instantiate3D(std::make_shared<GameObject>(), false);
             obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);    // ノンデストロイ
             obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);        // ノンアクティブ
-
+            obj->set_IsUpdateAllowedDuringPause(false);                     // ポーズ中は停止
 
             //*****************************************************************************************
             //						コンポーネントの追加
@@ -198,6 +198,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             
             obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);    // ノンデストロイ
             obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);        // ノンアクティブ
+            obj->set_IsUpdateAllowedDuringPause(false);                     // ポーズ中は停止
 
             // 動的オブジェクトとして設定
             obj->set_IsStatic(false);
@@ -334,6 +335,7 @@ bool BulletManager::Init(RendererEngine &renderer)
 
             obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);    // ノンデストロイ
             obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);        // ノンアクティブ
+            obj->set_IsUpdateAllowedDuringPause(false);                     // ポーズ中は停止
 
             // バレットコンポーネントの追加
             auto bulletComp = obj->add_Component<ExplosionBullet>();
@@ -527,6 +529,59 @@ void BulletManager::Update(RendererEngine &renderer)
 void BulletManager::Draw(RendererEngine &renderer)
 {
 
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】描現在、アクティブ状態の弾をクリアする（プールへ帰す）
+//*     シーンの遷移時など、弾が残ってしまわないように 
+//*
+//* [引数] なし
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void BulletManager::clear_CrntActiveBullet()
+{
+    //*****************************************************************************************
+    //						弾
+    //*****************************************************************************************
+    for (auto mapIt = m_ExtractedBulletMap.begin(); mapIt != m_ExtractedBulletMap.end(); )
+    {
+        // プールが存在するかどうかの確認
+        auto poolIt = m_BulletObjectPoolMap.find(mapIt->first);
+        if (poolIt == m_BulletObjectPoolMap.end())
+        {
+            OutputDebugString("指定された弾のプールが存在しません");
+            continue;
+        }
+        auto& pool = poolIt->second;        // プールの取り出し
+        auto& bulletArray = mapIt->second;  // 弾配列の取り出し
+        for (auto bulletIt = bulletArray.begin(); bulletIt != bulletArray.end(); )
+        {
+            auto bullet = *bulletIt;
+            
+            // フラグ下す
+            bullet->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+            
+            // 返却
+            pool.release(bullet);
+            // 次の要素へ
+            bulletIt = bulletArray.erase(bulletIt);
+        }
+        ++mapIt;
+    }
+
+    //*****************************************************************************************
+    //						爆発ライト
+    //*****************************************************************************************
+    for (auto it = m_ExtractedExplosionLightArray.begin(); it != m_ExtractedExplosionLightArray.end();)
+    {
+        auto obj = *it;
+        // アクティブフラグが降ろして、プールへ返却
+        obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+        // 返却
+        m_pExplosionBulletLightPool->release(obj);
+        // 次の要素へ
+        it = m_ExtractedExplosionLightArray.erase(it);
+    }
 }
 
 

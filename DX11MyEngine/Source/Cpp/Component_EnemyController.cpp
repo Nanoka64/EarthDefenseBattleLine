@@ -36,8 +36,11 @@ EnemyController::EnemyController(std::weak_ptr<GameObject> pOwner, int updateRan
 	m_MoveSpeed(0.0f),
 	m_MoveVelocity(VECTOR3::VEC3()),
 	m_StateTimer(0),
+	m_GravityVelocity(0.0f),
+	m_pEnemyData(nullptr),
 	m_pTarget(nullptr),
-	m_Gravity(18.0f)
+	m_Gravity(18.0f),
+	m_AnimSpeed(1.25f)
 {
     this->set_Tag("EnemyController");
 }
@@ -218,7 +221,6 @@ void EnemyController::Update(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void EnemyController::LateUpdate(RendererEngine& renderer)
 {
-
 	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 
 	auto target = Master::m_pGameObjectManager->get_ObjectByTagConst("Player");
@@ -229,6 +231,8 @@ void EnemyController::LateUpdate(RendererEngine& renderer)
 
 	// ステートの実行
 	m_StateMachine.Update();
+
+	m_pAnimatorComp.lock()->PlayAnim(Master::m_pTimeManager->get_DeltaTime() * m_AnimSpeed);
 
 
 	//if(m_IsGrounded == false)

@@ -465,9 +465,13 @@ int DXApp::MainLoop()
                 // エディタの更新
                 Master::m_pEditorManager->Update(*m_pRenderer);
 
+                // ポーズ中は停止
+                if (Master::m_pDataManager->get_IsPause() == false)
+                {
+                    // エフェクト更新（描画はパイプラインクラスのフォワードと同じ位置で行っている）
+                    Master::m_pEffectManager->UpdateEffect(*m_pRenderer);
+                }
 
-                // エフェクト更新（描画はパイプラインクラスのフォワードと同じ位置で行っている）
-                Master::m_pEffectManager->UpdateEffect(*m_pRenderer);
 
                 // ゲーム描画
                 m_pGameManager->Draw(*m_pRenderer);

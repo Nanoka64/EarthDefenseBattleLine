@@ -1,5 +1,5 @@
 #pragma once
-#include "IState.h"
+#include "CompositeState.h"
 
 // ***************************************************************************************
 // ---------------------------------------------------------------------------------------
@@ -7,9 +7,11 @@
 //
 // 【?】ゲームシーンの子ステート
 //		ゲームプレイ
+//	
+//		ポーズ画面の子ステートを持つ
 //
 // ***************************************************************************************
-class c_Game_Play : public IState<SceneManager>
+class c_Game_Play : public CompositeState<SceneManager>
 {
 private:
 	int m_EnemyNum;	// 残り敵数
@@ -17,6 +19,7 @@ private:
 	/* オブジェクト */
 	std::weak_ptr<class GameObject>m_pBomber[3];
 	std::weak_ptr<class GameObject>m_pPlayerObj;
+	class GameObject* m_pEnemyNumBackSpriteObj;	// 設定画面の背景スプライトオブジェクト
 
 public:
 	void OnEnter(SceneManager * pOwner) override;

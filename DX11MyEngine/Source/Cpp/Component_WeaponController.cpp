@@ -98,6 +98,9 @@ bool WeaponController::Setup(RendererEngine& renderer, int _maxSlot)
 //*----------------------------------------------------------------------------------------
 void WeaponController::Update(RendererEngine& renderer)
 {
+	if (Master::m_pDataManager->get_IsPause())return;	// TODO:ポーズ中なら返す
+
+
 	// プレイヤーが死んでたら、武器の有効を解除し、操作不能に
 	if (Master::m_pDataManager->get_IsPlayerDead())
 	{
@@ -157,8 +160,8 @@ void WeaponController::Update(RendererEngine& renderer)
 
 
 		/* 文字 */
-		float width = Master::m_pDataManager->get_ScreenWidth();
-		float height = Master::m_pDataManager->get_ScreenHeight();
+		float width = FLOAT_CAST(Master::m_pDataManager->get_ScreenWidth());
+		float height = FLOAT_CAST(Master::m_pDataManager->get_ScreenHeight());
 		Master::m_pDirectWriteManager->DrawStringToAligment("リロード中", RELOAD_TEXT_POS, "White_20_STD", H_ALIGNMENT::CENTER, V_ALIGNMENT::CENTER, VEC2(width, height));
 	}
 	// リロード中でない場合は、サイズを0.0にする

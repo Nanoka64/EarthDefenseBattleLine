@@ -202,7 +202,7 @@ namespace VECTOR3
 			// ‹ŠEŒvZ
 			// ©•ª‚ÌŒü‚«‚Æ“àÏ‚ğŒvZ‚·‚é
 			float dot = Dot(_myDir, targetDir);
-			float deg = acos(dot) * 180.0f / 3.14159265;
+			float deg = acos(dot) * 180.0f / 3.14159265f;
 
 			// ˆê’è‹——£‹ß‚Ã‚¢‚½‚ç
 			if (TargetInTheRange(_myPos, _targetPos, _range))

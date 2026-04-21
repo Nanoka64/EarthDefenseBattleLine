@@ -59,7 +59,7 @@ void NormalBullet::Start(RendererEngine& renderer)
 {
     //////////////////////////////////////////////////////////////////////////////////////////
     //
-	//						衝突時処理の設定
+    //						衝突時処理の設定
     // 
     //////////////////////////////////////////////////////////////////////////////////////////
     m_CollisionTask =
@@ -95,25 +95,6 @@ void NormalBullet::Start(RendererEngine& renderer)
                 }
             }
 
-            //*****************************************************************************************
-            //						デカールの生成
-            //*****************************************************************************************
-            auto matPtr = Master::m_pResourceManager->FindMaterial(m_pWeaponData->_decalMaterialTag);
-
-            SetupMaterialInfo matInfo[1];
-            matInfo[0].Index = 0;
-            matInfo[0].pMaterialData = matPtr;
-
-            CreateDecalInfo decal;
-            decal.pRenderer = &renderer;
-            decal.Type = UTILITY_MESH_TYPE::CUBE;
-            decal.MatNum = 1;
-            decal.MaterialData = matInfo;
-            decal.IsActive = false;
-            decal.ShaderType = SHADER_TYPE::DEFERRED_STD_DECAL;
-            decal.IsNormalMap = false;
-            decal.IsDynamic = true;
-
             auto transform = m_pOwner.lock()->get_Transform().lock();
             VEC3 pos = transform->get_VEC3ToPos();
 
@@ -128,67 +109,87 @@ void NormalBullet::Start(RendererEngine& renderer)
             // 法線の逆を向かせたいのでマイナスを付ける
             float pitch = atan2(-hitNormal.y, xzLen);
 
-            // 当たった方向に伸ばそうとしたけど上手くいかなかった
+            //*****************************************************************************************
+            //						デカールの生成
+            //*****************************************************************************************
+            if (m_pWeaponData->_decalMaterialTag.empty() == false)
             {
-                //VEC3 moveVel = -m_MoveDir.Normalize();
-                //// 法線と弾の移動ベクトルの内積
-                //float dot_HitNormToMoveVel = abs(VEC3::Dot(hitNormal, moveVel));
+                auto matPtr = Master::m_pResourceManager->FindMaterial(m_pWeaponData->_decalMaterialTag);
 
-                //// 地面を這うベクトルを求める
-                //VEC3 tempVec = moveVel - (hitNormal * dot_HitNormToMoveVel);
-                //tempVec = tempVec.Normalize();
+                SetupMaterialInfo matInfo[1];
+                matInfo[0].Index = 0;
+                matInfo[0].pMaterialData = matPtr;
 
-                //VEC3 baseUp(0.0f, 1.0f, 0.0f);
-                //// 法線が真上を向いているか確かめる
-                //if (abs(hitNormal.y) > 0.99f) {
-                //    baseUp = VEC3(1.0f, 0.0f, 0.0f); // 軸をズラす
-                //}
+                CreateDecalInfo decal;
+                decal.pRenderer = &renderer;
+                decal.Type = UTILITY_MESH_TYPE::CUBE;
+                decal.MatNum = 1;
+                decal.MaterialData = matInfo;
+                decal.IsActive = false;
+                decal.ShaderType = SHADER_TYPE::DEFERRED_STD_DECAL;
+                decal.IsNormalMap = false;
+                decal.IsDynamic = true;
 
-                //VEC3 side = VEC3::Cross(baseUp, hitNormal).Normalize();
-                //VEC3 up = VEC3::Cross(hitNormal, side);
 
-                //float dotSide = VEC3::Dot(tempVec, side);
-                //float dotUp = VEC3::Dot(tempVec, up);
+                // 当たった方向に伸ばそうとしたけど上手くいかなかった
+                {
+                    //VEC3 moveVel = -m_MoveDir.Normalize();
+                    //// 法線と弾の移動ベクトルの内積
+                    //float dot_HitNormToMoveVel = abs(VEC3::Dot(hitNormal, moveVel));
 
-                //float angleZ = atan2f(dotSide, dotUp);
-                //scale.y = 20.0f + (1.0f - dot_HitNormToMoveVel) * 120.0f;
+                    //// 地面を這うベクトルを求める
+                    //VEC3 tempVec = moveVel - (hitNormal * dot_HitNormToMoveVel);
+                    //tempVec = tempVec.Normalize();
+
+                    //VEC3 baseUp(0.0f, 1.0f, 0.0f);
+                    //// 法線が真上を向いているか確かめる
+                    //if (abs(hitNormal.y) > 0.99f) {
+                    //    baseUp = VEC3(1.0f, 0.0f, 0.0f); // 軸をズラす
+                    //}
+
+                    //VEC3 side = VEC3::Cross(baseUp, hitNormal).Normalize();
+                    //VEC3 up = VEC3::Cross(hitNormal, side);
+
+                    //float dotSide = VEC3::Dot(tempVec, side);
+                    //float dotUp = VEC3::Dot(tempVec, up);
+
+                    //float angleZ = atan2f(dotSide, dotUp);
+                    //scale.y = 20.0f + (1.0f - dot_HitNormToMoveVel) * 120.0f;
+                }
+
+                float angleZ = Tool::RandRange(0.0f, 6.14f);
+
+                VEC3 scale = transform->get_VEC3ToScale();
+                scale *= DECAL_SIZE_FACTOR;
+                scale.z += DECAL_Z_AXIS_SIZE_FACTOR;
+
+
+                auto obj = MeshFactory::CreateDecal(decal);
+                obj->get_Component<DecalRenderer>()->Start(renderer);
+                obj->get_Transform().lock()->set_Pos(pos);
+                obj->get_Transform().lock()->set_Scale(scale);
+                obj->get_Transform().lock()->set_RotateToRad(pitch, yaw, angleZ);
+                obj->set_Tag("BulletHole");
+                auto timer = obj->add_Component<TimerDestruction>();
+                timer->set_LifeTime(DECAL_LIFE_TIME);  // 生存時間
             }
 
-            float angleZ = Tool::RandRange(0.0f, 6.14f);
-
-            VEC3 scale = transform->get_VEC3ToScale();
-            scale *= DECAL_SIZE_FACTOR;
-            scale.z += DECAL_Z_AXIS_SIZE_FACTOR;
-
-
-            auto obj = MeshFactory::CreateDecal(decal);
-            obj->get_Component<DecalRenderer>()->Start(renderer);
-            obj->get_Transform().lock()->set_Pos(pos);
-            obj->get_Transform().lock()->set_Scale(scale);
-            obj->get_Transform().lock()->set_RotateToRad(pitch, yaw, angleZ);
-            obj->set_Tag("BulletHole");
-            auto timer = obj->add_Component<TimerDestruction>();
-            timer->set_LifeTime(DECAL_LIFE_TIME);  // 生存時間
-
             //*****************************************************************************************
-            //						エフェクトの再生
+            //						ヒットエフェクトの再生
             //*****************************************************************************************
-            VEC3 effectRot = VEC3(pitch, yaw, 0.0f);
-            int spark_handle = Master::m_pEffectManager->PlayEffect("Spark");   // 火花
-            int smoke_handle = Master::m_pEffectManager->PlayEffect("Smoke");   // 煙
-            
-            VEC3 effectScale = transform->get_VEC3ToScale();
-            effectScale *= EFFECTL_SIZE_FACTOR;
+            if (m_pWeaponData->_hitEffectTag.empty() == false)
+            {
+                VEC3 effectRot = VEC3(pitch, yaw, 0.0f);
+                int effectHandle = Master::m_pEffectManager->PlayEffect(m_pWeaponData->_hitEffectTag);
 
-            // 火花
-            Master::m_pEffectManager->SetScaleEffect(spark_handle, effectScale.x, effectScale.y, effectScale.z);
-            Master::m_pEffectManager->SetPositionEffect(spark_handle, pos.x, pos.y, pos.z);
-            Master::m_pEffectManager->SetRotationEffect(spark_handle, effectRot.x, effectRot.y, effectRot.z);
+                VEC3 effectScale = transform->get_VEC3ToScale();
+                effectScale *= EFFECTL_SIZE_FACTOR;     // 大きさの補正
 
-            // 煙
-            Master::m_pEffectManager->SetScaleEffect(smoke_handle, effectScale.x, effectScale.y, effectScale.z);
-            Master::m_pEffectManager->SetPositionEffect(smoke_handle, pos.x, pos.y, pos.z);
-            Master::m_pEffectManager->SetRotationEffect(smoke_handle, effectRot.x, effectRot.y, effectRot.z);
+                // エフェクトパラメータ
+                Master::m_pEffectManager->SetScaleEffect(effectHandle, effectScale.x, effectScale.y, effectScale.z);
+                Master::m_pEffectManager->SetPositionEffect(effectHandle, pos.x, pos.y, pos.z);
+                Master::m_pEffectManager->SetRotationEffect(effectHandle, effectRot.x, effectRot.y, effectRot.z);
+            }
         };
 }
 

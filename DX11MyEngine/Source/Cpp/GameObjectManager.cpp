@@ -68,6 +68,8 @@ void GameObjectManager::ObjectUpdate(RendererEngine& renderer)
     // 保留していた追加を処理した後は、保留リストをクリア
     m_PendingAddList.clear();
 
+    bool isPause = Master::m_pDataManager->get_IsPause();   // ポーズフラグ
+
     // ******************************************************************
     //
     // 不透明オブジェクト
@@ -79,8 +81,12 @@ void GameObjectManager::ObjectUpdate(RendererEngine& renderer)
         count++;
         if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
-            (*it).get()->Update(renderer);
-            (*it).get()->ComponentUpdate(renderer);
+            // ポーズ中でない、またはポーズ中も動く設定なら更新
+            if (isPause == false || (*it)->get_IsUpdateAllowedDuringPause())
+            {
+                (*it).get()->Update(renderer);
+                (*it).get()->ComponentUpdate(renderer);
+            }
         }
     }
     // ******************************************************************
@@ -92,8 +98,12 @@ void GameObjectManager::ObjectUpdate(RendererEngine& renderer)
     {
         if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
-            (*it).get()->Update(renderer);
-            (*it).get()->ComponentUpdate(renderer);
+            // ポーズ中でない、またはポーズ中も動く設定なら更新
+            if (isPause == false || (*it)->get_IsUpdateAllowedDuringPause())
+            {
+                (*it).get()->Update(renderer);
+                (*it).get()->ComponentUpdate(renderer);
+            }
         }
     }
     // ******************************************************************
@@ -105,8 +115,12 @@ void GameObjectManager::ObjectUpdate(RendererEngine& renderer)
     {
         if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
-            (*it).get()->Update(renderer);
-            (*it).get()->ComponentUpdate(renderer);
+            // ポーズ中でない、またはポーズ中も動く設定なら更新
+            if (isPause == false || (*it)->get_IsUpdateAllowedDuringPause())
+            {
+                (*it).get()->Update(renderer);
+                (*it).get()->ComponentUpdate(renderer);
+            }
         }
     }
 }
@@ -120,7 +134,7 @@ void GameObjectManager::ObjectUpdate(RendererEngine& renderer)
 void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
 {
     std::vector<std::shared_ptr<GameObject>> deleteList;       // 削除用
-
+    bool isPause = Master::m_pDataManager->get_IsPause();   // ポーズフラグ
     
     // ******************************************************************
     //
@@ -129,9 +143,13 @@ void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
     // ******************************************************************
     for (auto it = m_3DOpaqueList.begin(); it != m_3DOpaqueList.end(); it++)
     {
-        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
-        {
-            (*it).get()->ComponentLateUpdate(renderer);
+        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
+        {           
+            // ポーズ中でない、またはポーズ中も動く設定なら更新
+            if (isPause == false || (*it)->get_IsUpdateAllowedDuringPause())
+            {
+                (*it).get()->ComponentLateUpdate(renderer);
+            }
         }
         // 削除フラグが立っていれば削除リストに追加
         if ((*it).get()->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_DELETE) == true)
@@ -147,9 +165,13 @@ void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
     // ******************************************************************
     for (auto it = m_3DTranslucentList.begin(); it != m_3DTranslucentList.end(); it++)
     {
-        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
+        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
-            (*it).get()->ComponentLateUpdate(renderer);
+            // ポーズ中でない、またはポーズ中も動く設定なら更新
+            if (isPause == false || (*it)->get_IsUpdateAllowedDuringPause())
+            {
+                (*it).get()->ComponentLateUpdate(renderer);
+            }
         }
         // 削除フラグが立っていれば削除リストに追加
         if ((*it).get()->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_DELETE) == true)
@@ -165,9 +187,13 @@ void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
     // ******************************************************************
     for (auto it = m_2DTranslucentList.begin(); it != m_2DTranslucentList.end(); it++)
     {
-        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
+        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
-            (*it).get()->ComponentLateUpdate(renderer);
+            // ポーズ中でない、またはポーズ中も動く設定なら更新
+            if (isPause == false || (*it)->get_IsUpdateAllowedDuringPause())
+            {
+                (*it).get()->ComponentLateUpdate(renderer);
+            }
         }
         // 削除フラグが立っていれば削除リストに追加
         if ((*it).get()->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_DELETE) == true)

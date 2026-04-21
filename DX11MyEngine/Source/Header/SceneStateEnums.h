@@ -16,7 +16,7 @@ namespace SceneStateEnums
     // タイトルの子シーン
     enum c_TITLE
     {
-        NONE = -1,
+        c_TITLE_NONE = -1,
 
         c_TITLE_LOAD_PROCESS,       // ロード処理（一番最初に呼ばれる）
         c_TITLE_MAIN_MENU,          // どの項目へ行くか選ぶ状態
@@ -38,9 +38,12 @@ namespace SceneStateEnums
     /// </summary>
     enum c_GAME
     {
+        c_GAME_NONE = -1,
+
         c_GAME_LOAD,            // ロード
         c_GAME_PLAY,            // プレイ
-        c_GAME_CONFIG,          // ゲームプレイ中の設定画面
+
+        c_GAME_PAUSE,           // ポーズ画面
 
         c_GO_RESULT_SCENE,      // 特殊フラグ リザルトシーンへ行く
 
@@ -52,6 +55,8 @@ namespace SceneStateEnums
     /// </summary>
     enum c_RESULT
     {
+        c_RESULT_NONE = -1,
+
         c_CLEARED,              // ミッションクリア
         c_FAILED,               // ミッション失敗
         c_GETITEM_CHECK,        // 取得したアイテムの確認

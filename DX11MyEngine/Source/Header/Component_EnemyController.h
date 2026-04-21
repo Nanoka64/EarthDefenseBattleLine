@@ -38,6 +38,7 @@ private:
 	float m_StateTimer;				// ステート時間
 	float m_Gravity;				// 重力
 	float m_GravityVelocity;		// 地面方向に掛かるベロシティ
+	float m_AnimSpeed;				// アニメーション速度
 	bool m_IsDead;
 	bool m_IsAnim;					// アニメーション中かどうか
 	bool m_IsGrounded;				// 接地しているか
@@ -65,6 +66,10 @@ public:
 	/// </summary>
 	/// <param name="id"></param>
 	void ChangeAnimation(const int _newId);
+
+	/* アニメーション速度 */
+	void set_AnimSpeed(float _time) { m_AnimSpeed = _time; }
+	float get_AnimSpeed()const { return m_AnimSpeed; }
 
 	/* アニメーションID */
 	void set_AnimID(const int _id) { m_CrntAnimID = _id; }

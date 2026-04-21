@@ -55,10 +55,6 @@ void SkinnedMeshAnimator::Start(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void SkinnedMeshAnimator::Update(RendererEngine& renderer)
 {
-    if (m_IsAnimationFlag)
-    {
-        m_AnimProcTime += 0.023f;
-    }
 
     BoneTransformsUpdate(renderer, m_AnimProcTime, m_CurrentAnimIndex);
 }
@@ -130,6 +126,21 @@ void SkinnedMeshAnimator::Draw(RendererEngine &renderer)
     pContext->VSSetConstantBuffers(3, 1, &m_ConstanrBufferBonesData->pBuff);
 }
 
+
+//*---------------------------------------------------------------------------------------
+//* @:MeshRenderer Class 
+//*【?】アニメーションの時間更新
+//*     デルタタイムを掛けたものを入れて！ 
+//* 引数：1.時間
+//* 返値：void
+//*----------------------------------------------------------------------------------------
+void SkinnedMeshAnimator::PlayAnim(float _time)
+{
+    if (m_IsAnimationFlag)
+    {
+        m_AnimProcTime += _time;
+    }
+}
 
 //*---------------------------------------------------------------------------------------
 //* @:MeshRenderer Class 

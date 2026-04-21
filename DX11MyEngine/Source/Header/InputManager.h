@@ -81,7 +81,7 @@ private:
     MouseState m_PrevMouseState;  // ひとつ前のマウス状態
 
 public:
-    InputManager() = default;
+    InputManager();
     ~InputManager();
 
     bool Init(HWND hWnd);

@@ -78,6 +78,9 @@ void Camera3D::Start(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void Camera3D::LateUpdate(RendererEngine &renderer)
 {
+	if (Master::m_pDataManager->get_IsPause())return;	// TODO:ポーズ中なら返す
+
+
 	m_IsControl = Master::m_pDataManager->get_IsCameraControl();
 
 	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
@@ -108,13 +111,16 @@ void Camera3D::LateUpdate(RendererEngine &renderer)
 	lookDir.z = m_PosOffset.z * cosf(m_Angle_V) * sinf(m_Angle_H);
 
 
-	// シェイクの更新
-	m_Shaker.Update(deltaTime);
 
 	m_CameraPos = lookDir + m_FocusPoint;
 
 	// シェイクの適用
-	m_CameraPos = m_Shaker.Apply(m_CameraPos);
+	if (Master::m_pDataManager->get_UserConfigData()._isCameraShake)
+	{
+		// シェイクの更新
+		m_Shaker.Update(deltaTime);
+		m_CameraPos = m_Shaker.Apply(m_CameraPos);
+	}
 
     m_LookDir = lookDir;
 

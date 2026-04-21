@@ -81,7 +81,7 @@ float RandomManager::GetFloatRandom(float _min, float _max)
 //* [•Ô’l]
 //* float : ƒ‰ƒ“ƒ_ƒ€’l
 //*----------------------------------------------------------------------------------------
-VECTOR3::VEC3& RandomManager::GetVEC3Random(const VECTOR3::VEC3& _min, const VECTOR3::VEC3& _max)
+VECTOR3::VEC3 RandomManager::GetVEC3Random(const VECTOR3::VEC3& _min, const VECTOR3::VEC3& _max)
 {
     std::uniform_real_distribution<float>distX(_min.x, _max.x);
     std::uniform_real_distribution<float>distY(_min.y, _max.y);

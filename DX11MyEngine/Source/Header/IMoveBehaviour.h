@@ -16,6 +16,7 @@ struct MoveParam
     float _acceleration;            // 加速度
 	float _turnSpeed;               // 回転速度 
     float _gravity;                 // 重力
+    bool _isAcceleration;           // 加速度があるか
 
     MoveParam() : 
         _moveDirection(VECTOR3::VEC3()),

@@ -50,7 +50,7 @@ bool WeaponDataManager::Init()
     m_AllWeaponsDataMap[1] = std::make_unique<GunWeaponData>(gunData);
     
     // ラピッド ************************************************************************************
-    if (LoadGunWeaponData("Resource/WeaponsData/AssultRifle03.json", gunData) == false){
+    if (LoadGunWeaponData("Resource/WeaponsData/Flamethrower01.json", gunData) == false){
         assert(false);
     }
     m_AllWeaponsDataMap[2] = std::make_unique<GunWeaponData>(gunData);
@@ -204,7 +204,7 @@ bool WeaponDataManager::LoadGunWeaponData(const std::string& _filepath, WeaponDa
         normalData._speed = paramJson.value("speed", 0.0f);                                         // 速度
         normalData._acceleration = paramJson.value("acceleration", 0.0f);                           // 加速度
         normalData._range = paramJson.value("range", 0.0f);                                         // 射程
-        normalData._penetrationsCount = paramJson.value("penetrationsCount", 0.0f);                 // 貫通可能回数
+        normalData._penetrationsCount = paramJson.value("penetrationsCount", 0);                 // 貫通可能回数
         normalData._collisionSize = paramJson.value("collisionSize", 0.0f);                         // 当たり判定
         normalData._gravityScale = paramJson.value("gravityScale", 0.0f);                           // 重力
 
@@ -216,6 +216,7 @@ bool WeaponDataManager::LoadGunWeaponData(const std::string& _filepath, WeaponDa
         }
         normalData._bulletMaterialTag = paramJson.value("bulletMaterialTag", "");                   // 弾そのもののマテリアル
         normalData._decalMaterialTag = paramJson.value("decalMaterialTag", "");                     // デカールに使うマテリアル
+        normalData._hitEffectTag = paramJson.value("hitEffectTag", "");                             // ヒットエフェクト
 
         if (paramJson["scale"].is_array()){                                                         // 大きさ
             normalData._scale.x = paramJson["scale"][0].get<float>();
@@ -236,7 +237,7 @@ bool WeaponDataManager::LoadGunWeaponData(const std::string& _filepath, WeaponDa
         expData._speed = paramJson.value("speed", 0.0f);
         expData._acceleration = paramJson.value("acceleration", 0.0f);
         expData._range = paramJson.value("range", 0.0f);
-        expData._penetrationsCount = paramJson.value("penetrationsCount", 0.0f);
+        expData._penetrationsCount = paramJson.value("penetrationsCount", 0);
         expData._collisionSize = paramJson.value("collisionSize", 0.0f);
         expData._gravityScale = paramJson.value("gravityScale", 0.0f);
 
@@ -247,8 +248,9 @@ bool WeaponDataManager::LoadGunWeaponData(const std::string& _filepath, WeaponDa
             }
         }
 
-        expData._bulletMaterialTag = paramJson.value("bulletMaterialTag", "");                   // 弾そのもののマテリアル
-        expData._decalMaterialTag = paramJson.value("decalMaterialTag", "");
+        expData._bulletMaterialTag = paramJson.value("bulletMaterialTag", "");                  // 弾そのもののマテリアル
+        expData._decalMaterialTag = paramJson.value("decalMaterialTag", "");                    // デカールマテリアル
+        expData._hitEffectTag = paramJson.value("hitEffectTag", "");                            // ヒットエフェクト
 
         if (paramJson["scale"].is_array()) {                                                         // 大きさ
             expData._scale.x = paramJson["scale"][0].get<float>();

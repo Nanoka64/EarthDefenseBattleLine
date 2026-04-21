@@ -65,6 +65,9 @@ void c_Title_LoadProcess::OnEnter(SceneManager *pOwner)
         m_pCameraComp = obj->add_Component<Camera3D>(); // カメラコンポーネントの追加
         m_pCameraComp->set_IsControl(false);    // 操作フラグをオフに
 
+        // ポーズ中は停止
+        obj->set_IsUpdateAllowedDuringPause(false);
+        
         // 描画エンジン側にカメラコンポーネントを渡す
         m_pRenderer->set_CameraComponent(m_pCameraComp);
     }
@@ -193,6 +196,9 @@ void c_Title_LoadProcess::OnExit(SceneManager *pOwner)
         pPlayerObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);        // 破棄しない
         pPlayerObj->set_IsStatic(false);        // 動的オブジェクト
         pPlayerObj->get_Transform().lock()->set_Pos(-900.0f, 0.0f, 900.0f);
+
+        // ポーズ中は停止
+        pPlayerObj->set_IsUpdateAllowedDuringPause(false);
 
         float hp = Master::m_pDataManager->get_PlayerHP();
 

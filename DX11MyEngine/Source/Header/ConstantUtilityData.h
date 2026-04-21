@@ -108,10 +108,28 @@ namespace UtilityData
 		SE_VOLUME,			// SE
 		MOUSE_SENSITIVITY,	// マウス感度
 		INVERT_Y,			// 上下反転
+		CAMERA_SHAKE,		// カメラシェイクの有無
 		SHADOW_ENABLED,		// シャドウの有無
 
 		NUM
 	};
+
+
+	/// <summary>
+	/// ポーズ画面の項目
+	/// </summary>
+	enum class PAUSE_ITEM
+	{
+		RETURN_GAME,	// ゲームに戻る
+		RESTART,		// 再出撃
+		RETURN_TITLE,	// 退却
+		//CONFIG,		// 設定
+
+		NUM
+	};
+
+
+
 
 	/// <summary>
 	/// アイテムの種類
@@ -175,7 +193,6 @@ namespace UtilityData
 			: _pos(pos), _name(name), _isHovered(false) {
 		}
 	};
-
 
 	/// <summary>
 	/// メインメニュー項目
@@ -262,6 +279,7 @@ namespace UtilityData
 		int _SEVolume;				// SEの音量 : 100.0が最大（実際はさらにスケールがかけられ、小さくなる）
 		float _mouseSensitivity;	// マウス感度 : 100.0が最大（実際はさらにスケールがかけられ、小さくなる）
 		bool _isInvertY;			// Y軸反転の有無
+		bool _isCameraShake;		// カメラシェイクの有無
 		bool _isShadowEnabled;		// シャドウの有効/無効
 
 		UserConfigData() :
@@ -269,6 +287,7 @@ namespace UtilityData
 			_SEVolume(70),
 			_mouseSensitivity(40.0f), 
 			_isInvertY(false),
+			_isCameraShake(true),
 			_isShadowEnabled(true)
 		{
 		}
@@ -277,13 +296,24 @@ namespace UtilityData
 	/// <summary>
 	/// タイトル項目名
 	/// </summary>
-	static const const char* g_TitleMenuItemNames[static_cast<int>(TITLEMENU_ITEM::NUM)] =
+	static const char* g_TitleMenuItemNames[static_cast<int>(TITLEMENU_ITEM::NUM)] =
 	{
 		"ミッション選択",
 		//"兵科選択",
 		"兵装選択",
 		"設定",
 		"終了",
+	};
+
+	/// <summary>
+	/// ポーズ項目名
+	/// </summary>
+	static const char* g_PauseItemNames[static_cast<int>(PAUSE_ITEM::NUM)] =
+	{
+		"ゲームに戻る",
+		"再出撃",
+		"退却",
+		//"設定",
 	};
 
 	/// <summary>

@@ -58,6 +58,10 @@ public:
     /// <param name="renderer">描画エンジンの参照</param>
     void Draw(RendererEngine &renderer);  
 
+    /// <summary>
+    /// 現在、アクティブ状態の弾をクリアする（プールへ帰す）
+    /// </summary>
+    void clear_CrntActiveBullet();
 
     /// <summary>
     /// 弾の登録

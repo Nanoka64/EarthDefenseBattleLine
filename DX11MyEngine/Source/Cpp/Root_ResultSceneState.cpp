@@ -39,26 +39,8 @@ void Root_ResultSceneState::OnEnter(SceneManager* pOwner)
 //*----------------------------------------------------------------------------------------
 void Root_ResultSceneState::OnExit(SceneManager* pOwner)
 {
-	auto player = Master::m_pGameObjectManager->get_ObjectByTag("Player");
-	if (player)
-	{
-		// プレイヤーの武器をクリアする
-		player->get_Component<WeaponController>()->ClearWeapon();
-		player->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
-	}
-
-	// アイテムをすべてクリア
-	Master::m_pItemManager->AllClear();	
-
-	// 削除禁止でないオブジェクトを全てクリア
-	Master::m_pGameObjectManager->clear_NotIsDontDestroyObject();
-
-	// 全てのエフェクトを停止する
-	Master::m_pEffectManager->StopAllEffects();	
-
-	// パラメータを戻す
-	Master::m_pDataManager->set_IsMissionCleared(false);
-	Master::m_pDataManager->set_IsPlayerDead(false);
+	// ゲーム中に使用したリソースをクリアする
+	Master::m_pDataManager->ClearGameSceneResource(*m_pRenderer);
 }
 
 

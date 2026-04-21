@@ -186,7 +186,7 @@ void ItemManager::Update(RendererEngine& renderer)
 //* [à¯êî] Ç»Çµ
 //* [ï‘íl] Ç»Çµ
 //*----------------------------------------------------------------------------------------
-void ItemManager::AllClear()
+void ItemManager::clear_All()
 {
     for (auto it = m_ExtractedItemObject.begin(); it != m_ExtractedItemObject.end(); )
     {
