@@ -182,7 +182,6 @@ void c_Title_MainMenu::Draw(SceneManager* pOwner)
 	}
 
 	Master::m_pDirectWriteManager->SetOutLine(3.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
-	Master::m_pDirectWriteManager->DrawString("☆メインメニュー", VECTOR2::VEC2(40.0f, 500.0f), "White_40_STD");
+	Master::m_pDirectWriteManager->DrawString("☆作戦司令本部", VECTOR2::VEC2(40.0f, 500.0f), "White_40_STD");
 	Master::m_pDirectWriteManager->SetOutLine(0.0f);
-
 }

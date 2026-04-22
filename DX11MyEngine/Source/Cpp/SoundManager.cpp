@@ -1362,7 +1362,7 @@ void SoundManager::set_Volume(SOUND_TYPE _type, float _vol)
 //* [•Ô’l] 
 //* float : ‰¹—Ê 
 //*---------------------------------------------------------------------------------------
-float SoundManager::get_Volume(SOUND_TYPE _type)
+float SoundManager::get_Volume(SOUND_TYPE _type)const
 {
 	switch (_type)
 	{

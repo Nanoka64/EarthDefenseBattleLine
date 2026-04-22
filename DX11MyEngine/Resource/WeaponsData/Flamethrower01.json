@@ -1,21 +1,21 @@
 {
   "level": 0,
-  "name": "火炎放射器F1",
+  "name": "火炎放射器Σ",
   "bulletMaxNum": 400,
   "bulletSimultaneousNum": 1,
   "fireRate": 30.0,
   "reloadTime": 3.5,
-  "accuracy": 0.08,
+  "accuracy": 0.05,
   "zoomLength": 1.0,
   "isLaserSight": false,
   "soundID": 0,
   "bulletType": "NORMAL",
   "bulletParam": {
-    "damage": 1.0,
+    "damage": 5.0,
     "damageDistAttenuationRate": 0.5,
-    "speed": 40.8,
+    "speed": 140.8,
     "acceleration": 0.0,
-    "range": 60.0,
+    "range": 40.0,
     "penetrationsCount": 5,
     "collisionSize": 0.0,
     "gravityScale": 0.0,
@@ -23,6 +23,6 @@
     "bulletMaterialTag" : "Flame_01",
     "decalMaterialTag" : "",
     "hitEffectTag" : "BulletHit_Flame",
-    "scale" : [1.0, 1.0, 1.0]
+    "scale" : [0.7, 0.7, 0.7]
   }
 }

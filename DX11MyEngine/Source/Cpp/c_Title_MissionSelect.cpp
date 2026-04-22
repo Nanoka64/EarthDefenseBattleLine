@@ -225,8 +225,9 @@ void c_Title_MissionSelect::Draw(SceneManager* pOwner)
 		i++;
 	}
 
-
+	Master::m_pDirectWriteManager->SetOutLine(3.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
 	Master::m_pDirectWriteManager->DrawString("☆ミッション選択", VECTOR2::VEC2(40.0f, 500.0f), "White_40_STD");
+	Master::m_pDirectWriteManager->SetOutLine(0.0f);
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////

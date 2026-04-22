@@ -154,7 +154,9 @@ int c_MissionSelect_DifficultSelect::Update(SceneManager* pOwner)
 //*----------------------------------------------------------------------------------------
 void c_MissionSelect_DifficultSelect::Draw(SceneManager* pOwner)
 {
+	Master::m_pDirectWriteManager->SetOutLine(3.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
 	Master::m_pDirectWriteManager->DrawString("™“ïˆÕ“x‘I‘ğ", VECTOR2::VEC2(600.0f, 500.0f), "White_40_STD");
+	Master::m_pDirectWriteManager->SetOutLine(0.0f);
 
 
 	// “ïˆÕ“xà–¾

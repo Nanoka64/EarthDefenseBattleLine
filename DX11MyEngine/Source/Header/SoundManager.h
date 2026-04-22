@@ -267,7 +267,7 @@ public:
     bool StopBGM(BGM_ID _id);                 // 停止（BGMのみ）
 
 	void set_Volume(SOUND_TYPE _type, float _volume);    // 音量の設定
-    float get_Volume(SOUND_TYPE _type);        // 音量の取得
+    float get_Volume(SOUND_TYPE _type)const;        // 音量の取得
 
 private:
     // コピー禁止

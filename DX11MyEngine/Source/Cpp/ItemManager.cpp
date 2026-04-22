@@ -186,7 +186,7 @@ void ItemManager::Update(RendererEngine& renderer)
 //* [引数] なし
 //* [返値] なし
 //*----------------------------------------------------------------------------------------
-void ItemManager::clear_All()
+void ItemManager::clear_AllItem()
 {
     for (auto it = m_ExtractedItemObject.begin(); it != m_ExtractedItemObject.end(); )
     {
@@ -290,7 +290,7 @@ void ItemManager::SpawnItemRand(int _minNum, int _maxNum, const VECTOR3::VEC3& _
         transform->set_Pos(_pos + Master::m_pRandomManager->GetVEC3Random(-_radiuse, _radiuse));
 
         // アイテムがまだ回復しかないので
-        ITEM_TYPE type = static_cast<ITEM_TYPE>(Master::m_pRandomManager->GetIntRandom(0, 3)); 
+        ITEM_TYPE type = static_cast<ITEM_TYPE>(Master::m_pRandomManager->GetIntRandom(0, 1)); 
 
         // アイテムコンポーネントのセットアップ
         auto itemComp = obj->get_Component<Item>();

@@ -28,7 +28,7 @@ void c_Result_Cleared::OnEnter(SceneManager* pOwner)
 	// クリアテキスト用スプライトを作る **********************************************
 	UIData::RectTransformData rectData;
 	UIData::SpriteUIData spriteData;
-	rectData._size = VEC2(1280.0f, 256.0f);
+	rectData._size = VEC2(6000.0f, 6000.0f);	//縮小フェードなので、初期は大きく
 	rectData._pivot = VEC2(0.5f, 0.5f);
 	rectData._anchorMax = VEC2(0.5f, 0.5f);
 	rectData._anchorMin = VEC2(0.5f, 0.5f);
@@ -98,8 +98,12 @@ int c_Result_Cleared::Update(SceneManager* pOwner)
 	// テキストのフェードイン
 	float text_t = m_ElapsedTime / TEXT_FADE_IN_DURATION;
 	if (text_t <= 1.0f) {
+		auto rect = m_pClearedTextSpriteObj->get_RectTransform().lock();
 		auto textSprite = m_pClearedTextSpriteRenderer.lock();
 		textSprite->set_Color(VEC4(1.0f, 1.0f, 1.0f, text_t));
+
+		VEC2 crntSize = rect->get_SizeDelta();
+		rect->set_Size(VEC2::Lerp(crntSize, VEC2(1280.0f, 256.0f), text_t));
 	}
 	else
 	{

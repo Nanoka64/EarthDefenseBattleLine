@@ -169,7 +169,7 @@ void DataManager::ClearGameSceneResource(RendererEngine& renderer)
 	Master::m_pBulletManager->clear_CrntActiveBullet();
 
 	// アイテムをクリア	
-	Master::m_pItemManager->clear_All();
+	Master::m_pItemManager->clear_AllItem();
 
 	// 削除禁止でないオブジェクトを全てクリア
 	Master::m_pGameObjectManager->clear_NotIsDontDestroyObject();

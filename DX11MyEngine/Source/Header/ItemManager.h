@@ -36,7 +36,7 @@ public:
 	/// <summary>
 	/// 現在取り出されているアイテムをすべてクリア
 	/// </summary>
-	void clear_All();
+	void clear_AllItem();
 
 	/// <summary>
 	/// アイテムをスポーンさせる
