@@ -20,6 +20,9 @@ private:
 	const float MINIMAP_SIZE = 300.0f;  // ミニマップのサイズ
 	const float MINIMAP_ENEMY_ICON_SIZE = 10.0f; // ミニマップ上の敵アイコンのサイズ
 
+	const int ENEMY_ICON_LAYER = 111;	// 敵アイコンのレイヤー
+	const int ITEM_ICON_LAYER = 110;	// アイテムアイコンのレイヤー
+
 	class GameObject* m_pRaderBackSpriteObj;		// レーダー背景オブジェクト
 	std::vector<class GameObject*> m_pRaderEnemySpriteObjArray;   // レーダーに表示する敵オブジェクト
 	std::vector<class GameObject*> m_pRaderItemSpriteObjArray;    // レーダーに表示するアイテムオブジェクト
@@ -62,6 +65,6 @@ private:
 	/// <param name="_num">確保する数</param>
 	/// <param name="_size">サイズ</param>
 	/// <param name="_color">色</param>
-	void SecuringMiniMapIconSprite(RendererEngine& renderer, int _num, std::vector<class GameObject*>& iconSprites, const VECTOR2::VEC2& _size, const VECTOR4::VEC4& _color);
+	void SecuringMiniMapIconSprite(RendererEngine& renderer, int _num, std::vector<class GameObject*>& iconSprites, const VECTOR2::VEC2& _size, const VECTOR4::VEC4& _color, int _layer);
 };
 

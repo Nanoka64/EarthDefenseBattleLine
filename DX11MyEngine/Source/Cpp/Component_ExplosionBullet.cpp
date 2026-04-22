@@ -112,10 +112,11 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             float angleX = atan2(-hitNormal.y, xzLen);
             float angleZ = Tool::RandRange(0.0f, 6.14f);
 
+            float expSize = bulletParam->_explosionRadius * 2.0f;   // Œ³‚ª”¼Œa‚È‚Ì‚Å2”{‚É
             VEC3 scale;
-            scale.x = bulletParam->_explosionRadius;
-            scale.y = bulletParam->_explosionRadius;
-            scale.z = bulletParam->_explosionRadius;
+            scale.x = expSize;
+            scale.y = expSize;
+            scale.z = expSize;
 
             auto obj = MeshFactory::CreateDecal(decal);
             obj->get_Component<DecalRenderer>()->Start(renderer);
@@ -130,7 +131,7 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             VEC3 effectRot = VEC3(abs(angleX - 0.05f), angleY, 0.0f);
             int exp_handle = Master::m_pEffectManager->PlayEffect(bulletParam->_explosionEffectHandleTag);   // ”š”­
 
-            float expSize = bulletParam->_explosionRadius * EFFECT_SCALE_FACTOR;   // ”š”­”¼Œai‚»‚Ì‚Ü‚Ü‚¾‚Æ‘å‚«‚·‚¬‚é‚Ì‚Å•â³j
+            float effectExpSize = expSize * EFFECT_SCALE_FACTOR;   // ”š”­”¼Œai‚»‚Ì‚Ü‚Ü‚¾‚Æ‘å‚«‚·‚¬‚é‚Ì‚Å•â³j
             VEC3 expRot = VEC3(
                 Master::m_pRandomManager->GetFloatRandom(0.0f, 3.14f), 
                 Master::m_pRandomManager->GetFloatRandom(0.0f, 3.14f), 
@@ -138,7 +139,7 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             );
 
             // ”š”­
-            Master::m_pEffectManager->SetScaleEffect(exp_handle, expSize, expSize, expSize);
+            Master::m_pEffectManager->SetScaleEffect(exp_handle, effectExpSize, effectExpSize, effectExpSize);
             Master::m_pEffectManager->SetPositionEffect(exp_handle, pos.x, pos.y, pos.z);
             Master::m_pEffectManager->SetRotationEffect(exp_handle, expRot.x, expRot.y, expRot.z);
 
@@ -147,7 +148,7 @@ void ExplosionBullet::Start(RendererEngine& renderer)
                 int exp_smoke_handle = Master::m_pEffectManager->PlayEffect("Explosion_Smoke_01");   // ‰Œ
             
                 // ”š”­‰Œ
-                Master::m_pEffectManager->SetScaleEffect(exp_smoke_handle, expSize, expSize, expSize);
+                Master::m_pEffectManager->SetScaleEffect(exp_smoke_handle, effectExpSize, effectExpSize, effectExpSize);
                 Master::m_pEffectManager->SetPositionEffect(exp_smoke_handle, pos.x, pos.y, pos.z);
                 Master::m_pEffectManager->SetRotationEffect(exp_smoke_handle, expRot.x, expRot.y, expRot.z);
             }

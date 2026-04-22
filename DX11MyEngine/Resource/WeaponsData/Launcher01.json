@@ -24,7 +24,7 @@
     "decalMaterialTag" : "Decal_BulletHole",
     "hitEffectTag" : "BulletHit_Standard",
     "scale" : [0.25, 0.25, 0.25],
-    "explosionRadius": 15.0,
+    "explosionRadius": 10.0,
     "explosionEffectHandleTag": "Explosion_01",
     "isSmoke" : true
   }

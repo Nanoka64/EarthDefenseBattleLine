@@ -40,7 +40,9 @@ GunWeapon::GunWeapon(std::weak_ptr<GameObject> pOwner, int updateRank)
     m_IsStopFire(false),
     m_AmmoRemaining(0),
     m_Range(0.0f),
-    m_CrntReloadTime(0.0f)
+    m_CrntReloadTime(0.0f),
+    m_FireInterval(0.0f),
+    m_FireTimer(0.0f)
 {
     this->set_Tag("GunWeapon");
 }
@@ -93,6 +95,7 @@ void GunWeapon::LateUpdate(RendererEngine& renderer)
 {
     float c_AngleH = renderer.get_CameraComponent()->get_Angle_H();
     float c_AngleV = renderer.get_CameraComponent()->get_Angle_V();
+    float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 
     auto transform = m_pOwner.lock()->get_Transform().lock();
 
@@ -179,6 +182,8 @@ void GunWeapon::LateUpdate(RendererEngine& renderer)
         renderer.get_CameraComponent()->set_Fov(zoomFov);
     }
 
+    m_FireTimer += deltaTime;
+
 
     /* 武器情報 */
     //const auto& baseBulletData = std::visit([](const auto& arg) -> const BulletData::NormalBulletData& {
@@ -249,6 +254,13 @@ bool GunWeapon::Setup(const WeaponData::BaseWeaponData* _pWeaponData)
     // 有効状態に
     get_WeaponFlags().EnableFlag(WEAPON_STATUS::ENABLED);
 
+
+    // 1秒あたりの発射回数から発射間隔を計算
+    m_FireInterval = 1.0f / get_GunWeaponData()->_fireRate;
+
+    // 開始時は直ぐ撃てるよう大きな値を入れる
+    m_FireTimer = 9999.0f;
+
     return true;
 }
 
@@ -283,8 +295,14 @@ void GunWeapon::SwicthReset()
 //* &renderer : 描画エンジンの参照
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-void GunWeapon::Shoot(RendererEngine& renderer)
+void GunWeapon::Fire(RendererEngine& renderer)
 {
+    // まだ発射可能時間に達していなければ、返す
+    if (m_FireTimer <= m_FireInterval)return;
+
+    // タイマーリセット
+    m_FireTimer = 0.0f;
+
 	// 武器使用の有無の設定がオフなら発射しない
     if (!Master::m_pDataManager->get_IsUseWeapon() || !get_WeaponFlags().GetFlag(WEAPON_STATUS::ENABLED)) {
         return;

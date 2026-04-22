@@ -95,13 +95,13 @@ void EnemyController::Start(RendererEngine& renderer)
 			// ****************************************************
 			Master::m_pSoundManager->Play_3D(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_HIT01), pos, SOUND_HIT_RADIUS);
 
-			int handle = Master::m_pEffectManager->PlayEffect("Hit");
-			Master::m_pEffectManager->SetScaleEffect(handle, 1.0f, 1.0f, 1.0f);
-			Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y, pos.z);
-			Master::m_pEffectManager->SetRotationEffect(handle, rot.x, rot.y, rot.z);
+			int hit_handle = Master::m_pEffectManager->PlayEffect("EnemyHit_01");
+			Master::m_pEffectManager->SetScaleEffect(hit_handle, 1.0f, 1.0f, 1.0f);
+			Master::m_pEffectManager->SetPositionEffect(hit_handle, pos.x, pos.y + 2.0f, pos.z);	// 位置が足元になってしまってるので、少し上に補正
+			Master::m_pEffectManager->SetRotationEffect(hit_handle, rot.x, rot.y, rot.z);
+
 
 			auto matPtr = Master::m_pResourceManager->FindMaterial("Decal_Ant_Splash");
-
 			SetupMaterialInfo matInfo[1];
 			matInfo[0].Index = 0;
 			matInfo[0].pMaterialData = matPtr;
@@ -149,9 +149,9 @@ void EnemyController::Start(RendererEngine& renderer)
 
 
             // 死亡エフェクト
-			int handle = Master::m_pEffectManager->PlayEffect("Distortion");
-			Master::m_pEffectManager->SetScaleEffect(handle,10.0f, 10.0f, 10.0f);
-			Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y, pos.z);
+			int handle = Master::m_pEffectManager->PlayEffect("EnemyDead_01");
+			Master::m_pEffectManager->SetScaleEffect(handle,1.0f,1.0f, 1.0f);
+			Master::m_pEffectManager->SetPositionEffect(handle, pos.x, pos.y + 2.0f, pos.z);
 			m_IsDead = true;
 			m_IsAnim = false;
 

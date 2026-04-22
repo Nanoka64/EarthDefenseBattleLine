@@ -516,6 +516,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         {
             obj->get_RectTransform().lock()->set_AnchorMax(VEC2(0.5f, 0.5f));
             obj->get_RectTransform().lock()->set_AnchorMin(VEC2(0.5f, 0.5f));
+            obj->get_RectTransform().lock()->set_RectPosition(VEC2(-30.0f, 0.0f));
             obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
         }
     }

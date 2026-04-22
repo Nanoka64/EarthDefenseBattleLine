@@ -94,7 +94,7 @@ void MiniMapRader::Update(RendererEngine& renderer)
 
     // 敵のアイコンスプライト確保
     if (enemySpriteSize < enemys.size()) {
-        SecuringMiniMapIconSprite(renderer, INT_CAST(enemys.size()), m_pRaderEnemySpriteObjArray, VEC2(MINIMAP_ENEMY_ICON_SIZE), VEC4(1.0f, 0.0f, 0.0f, 1.0f));
+        SecuringMiniMapIconSprite(renderer, INT_CAST(enemys.size()), m_pRaderEnemySpriteObjArray, VEC2(MINIMAP_ENEMY_ICON_SIZE), VEC4(1.0f, 0.0f, 0.0f, 1.0f), ENEMY_ICON_LAYER);
     }
     // 少なくなっていたら、プールへ返す
     else if(enemySpriteSize > enemys.size()) {
@@ -104,7 +104,7 @@ void MiniMapRader::Update(RendererEngine& renderer)
 
     // アイテムのアイコンスプライト確保
     if (itemSpriteSize < items.size()) {
-        SecuringMiniMapIconSprite(renderer, INT_CAST(items.size()), m_pRaderItemSpriteObjArray, VEC2(MINIMAP_ENEMY_ICON_SIZE), VEC4(0.0f, 1.0f, 0.0f, 1.0f));
+        SecuringMiniMapIconSprite(renderer, INT_CAST(items.size()), m_pRaderItemSpriteObjArray, VEC2(MINIMAP_ENEMY_ICON_SIZE), VEC4(0.0f, 1.0f, 0.0f, 1.0f), ITEM_ICON_LAYER);
     }
     // 少なくなっていたら、プールへ返す
     else if(itemSpriteSize > items.size()) {
@@ -115,8 +115,8 @@ void MiniMapRader::Update(RendererEngine& renderer)
     VEC3 playerPos = m_pPlayerObj.lock()->get_Transform().lock()->get_VEC3ToPos();
     float cameraAngleH = renderer.get_CameraComponent()->get_Angle_H();
 
-    UpdateRadarIcons(enemys, m_pRaderEnemySpriteObjArray, playerPos, cameraAngleH); // 敵
     UpdateRadarIcons(items, m_pRaderItemSpriteObjArray, playerPos, cameraAngleH);   // アイテム
+    UpdateRadarIcons(enemys, m_pRaderEnemySpriteObjArray, playerPos, cameraAngleH); // 敵
 }
 
 
@@ -203,7 +203,7 @@ void MiniMapRader::ClampToMinimap(int& _Out_X, int& _Out_Y, int _centerX, int _c
 //* &_color : 色
 //* [返値] なし
 //*----------------------------------------------------------------------------------------
-void MiniMapRader::SecuringMiniMapIconSprite(RendererEngine& renderer, int _num, std::vector<class GameObject*>& iconSprites, const VECTOR2::VEC2& _size, const VECTOR4::VEC4& _color)
+void MiniMapRader::SecuringMiniMapIconSprite(RendererEngine& renderer, int _num, std::vector<class GameObject*>& iconSprites, const VECTOR2::VEC2& _size, const VECTOR4::VEC4& _color, int _layer)
 {
     UIData::RectTransformData rectData;
     UIData::SpriteUIData spriteData;
@@ -216,7 +216,7 @@ void MiniMapRader::SecuringMiniMapIconSprite(RendererEngine& renderer, int _num,
     spriteData._tag = "Icon";
     spriteData._imagePath = "Resource/Texture/UI/Circle.png";
     spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
-    spriteData._layerRank = 110;
+    spriteData._layerRank = _layer;
     spriteData._color = _color;
     for (int i = 0; i < _num; i++)
     {

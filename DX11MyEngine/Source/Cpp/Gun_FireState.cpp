@@ -22,15 +22,8 @@ void Gun_FireState::OnEnter(GunWeapon* pOwner)
 {
 	pOwner->get_WeaponFlags().EnableFlag(WEAPON_STATUS::FIRE);
 
-	// 1秒あたりの発射回数から発射間隔を計算
-	m_FireInterval = 1.0f / pOwner->get_GunWeaponData()->_fireRate;
-
-	if (m_ShootTimer >= m_FireInterval)
-	{
-		// 発射
-		pOwner->Shoot(*m_pRenderer);
-		m_ShootTimer = 0.0f;	// タイマーリセット
-	}
+	// 発射
+	pOwner->Fire(*m_pRenderer);
 }
 
 //*---------------------------------------------------------------------------------------
@@ -42,8 +35,6 @@ void Gun_FireState::OnEnter(GunWeapon* pOwner)
 void Gun_FireState::OnExit(GunWeapon* pOwner)
 {
 	pOwner->get_WeaponFlags().DisableFlag(WEAPON_STATUS::FIRE);
-
-	//m_ShootTimer = 0.0f;	// タイマーリセット
 }
 
 //*---------------------------------------------------------------------------------------
@@ -63,16 +54,10 @@ int Gun_FireState::Update(GunWeapon* pOwner)
 	const auto& weapon_param = pOwner->get_GunWeaponData();
 	int ammoRemaining = pOwner->get_AmmoRemaining();
 
-	m_ShootTimer += deltaTime;	// タイマー更新
-
 	// 左クリックで発射続ける
 	if (GetMouseClick(MOUSE_BUTTON_STATE::LEFT))
 	{
-		if (m_ShootTimer >= m_FireInterval)
-		{
-			pOwner->Shoot(*m_pRenderer);
-			m_ShootTimer = 0.0f;	// タイマーリセット
-		}
+		pOwner->Fire(*m_pRenderer);
 	}
 	// 何もなし
 	else
@@ -83,7 +68,6 @@ int Gun_FireState::Update(GunWeapon* pOwner)
 	// リロード
 	if (GetInputDown(GAME_CONFIG::WEAPON_RELOAD) || ammoRemaining <= 0)
 	{
-		m_ShootTimer = 9999.0f;	// タイマーを大きくして、リロード後は直ぐ発射できるようにする
 		return GUN_STATE::GUN_STATE_RELOADING;
 	}
 

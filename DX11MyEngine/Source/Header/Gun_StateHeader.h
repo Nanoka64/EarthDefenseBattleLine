@@ -70,9 +70,6 @@ public:
 class Gun_FireState : public IState< GunWeapon>
 {
 private:
-	float m_FireInterval = 0.0f;	// 発射間隔
-	float m_ShootTimer = 9999.0f;   // 発射タイマー
-
 public:
 	void OnEnter(GunWeapon* pOwner) override;
 	void OnExit(GunWeapon* pOwner)override;

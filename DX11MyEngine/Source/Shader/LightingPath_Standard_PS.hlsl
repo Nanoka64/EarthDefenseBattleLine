@@ -208,10 +208,15 @@ float4 PSMain(PS_IN input) : SV_TARGET
             // 通常カラーとシャドウカラーで線形補間
             afterShadowColor.xyz = lerp(shadowColor, dirLightColor.xyz, lit_Factor);
         }
+        
+        // アンビエント + シャドウ後カラー + ポイントライト + エミッシブ
+        finalCol.xyz = ambientColor + afterShadowColor + pointLightColor + emissiveColor;
     }
-
-    // アンビエント + シャドウ後カラー + ポイントライト + エミッシブ
-    finalCol.xyz = ambientColor + afterShadowColor + pointLightColor + emissiveColor;
+    // シャドウなしの場合は、そのままディレクションライトの結果を入れる
+    else
+    {
+        finalCol.xyz = ambientColor + dirLightColor + pointLightColor + emissiveColor;
+    }
     
     // シャドウマップの範囲内か
     //if (shadowMapUV.x > 0.0f && shadowMapUV.x < 1.0f &&

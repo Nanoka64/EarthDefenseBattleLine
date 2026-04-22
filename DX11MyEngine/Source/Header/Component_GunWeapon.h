@@ -19,6 +19,8 @@ private:
 	//WeaponData::GunWeaponData m_WeaponParameter;
 	float m_Range;	// 射程距離
 	float m_CrntReloadTime; // 現在のリロード時間
+	float m_FireInterval;	// 発射間隔（1秒間あたり）
+	float m_FireTimer;		// 発射タイマー
 	int m_AmmoRemaining;	// 残弾数
 	bool m_IsNowZoom;		// ズーム中かどうか
 	bool m_IsStopFire;		// 発射止める
@@ -32,7 +34,7 @@ public:
 	void LateUpdate(RendererEngine& renderer) override;		// 更新処理
 	void Draw(RendererEngine& renderer)override;		// 描画処理
 
-	void Shoot(RendererEngine& renderer);	// 弾の発射
+	void Fire(RendererEngine& renderer);	// 弾の発射
 	bool Setup(const WeaponData::BaseWeaponData* _pWeaponData)override;
 	void SwicthReset() override;	// 武器切り替え時のリセット
 

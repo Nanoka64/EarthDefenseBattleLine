@@ -100,7 +100,7 @@ int c_Result_Cleared::Update(SceneManager* pOwner)
 	if (text_t <= 1.0f) {
 		auto rect = m_pClearedTextSpriteObj->get_RectTransform().lock();
 		auto textSprite = m_pClearedTextSpriteRenderer.lock();
-		textSprite->set_Color(VEC4(1.0f, 1.0f, 1.0f, text_t));
+		textSprite->set_Color(VEC4(1.0f, 1.0f, 1.0f, 1.0));
 
 		VEC2 crntSize = rect->get_SizeDelta();
 		rect->set_Size(VEC2::Lerp(crntSize, VEC2(1280.0f, 256.0f), text_t));
