@@ -123,7 +123,6 @@ void RenderPipeline::Execute(RendererEngine& renderer)
         DebugRenderTargetImGui();
     }
 
-
     // パス終了時にSRVを解除する
     ID3D11ShaderResourceView* nullSRVs[8] = { nullptr };
 
@@ -131,7 +130,6 @@ void RenderPipeline::Execute(RendererEngine& renderer)
     {
         // ライトの更新
         Master::m_pLightManager->Update();
-
 
         m_ShadowData.isEnable = Master::m_pDataManager->get_UserConfigData()._isShadowEnabled;
         m_pDefferdLighting_Sprite->setToGPU_ExtendUserPS_CBuffer(renderer, 0, &m_ShadowData);
@@ -165,7 +163,6 @@ void RenderPipeline::Execute(RendererEngine& renderer)
 
         /* ポストエフェクトパス */
         PostEffect_PathRender(renderer);
-
     }
 
     /* 最終パス（フレームバッファにコピー） */
@@ -191,26 +188,28 @@ void RenderPipeline::DebugRenderTargetImGui()
     {
         Master::m_pDebugger->BeginDebugWindow(U8ToChar(u8"レンダーターゲット"));
 
+        VEC2 rtSize = VEC2(400, 200);
+
         if (Master::m_pDebugger->DG_TreeNode("G-Buffer"))
         {
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"アルベド"));
-            Master::m_pDebugger->DG_Image(m_pAlbedo_RT->get_SRV(), VEC2(400, 200));
+            Master::m_pDebugger->DG_Image(m_pAlbedo_RT->get_SRV(), rtSize);
             Master::m_pDebugger->DG_Separator();
 
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ノーマル"));
-            Master::m_pDebugger->DG_Image(m_pNormal_RT->get_SRV(), VEC2(400, 200));
+            Master::m_pDebugger->DG_Image(m_pNormal_RT->get_SRV(),rtSize);
             Master::m_pDebugger->DG_Separator();
 
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"スペキュラ"));
-            Master::m_pDebugger->DG_Image(m_pSpecular_RT->get_SRV(), VEC2(400, 200));
+            Master::m_pDebugger->DG_Image(m_pSpecular_RT->get_SRV(), rtSize);
             Master::m_pDebugger->DG_Separator();
 
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"エミッシブ"));
-            Master::m_pDebugger->DG_Image(m_pEmissive_RT->get_SRV(), VEC2(400, 200));
+            Master::m_pDebugger->DG_Image(m_pEmissive_RT->get_SRV(), rtSize);
             Master::m_pDebugger->DG_Separator();
 
             Master::m_pDebugger->DG_BulletText(U8ToChar(u8"深度"));
-            Master::m_pDebugger->DG_Image(m_pDepth_RT->get_DepthSRV_ComPtr().Get(), VEC2(400, 200));
+            Master::m_pDebugger->DG_Image(m_pDepth_RT->get_DepthSRV_ComPtr().Get(), rtSize);
             Master::m_pDebugger->DG_Separator();
 
             Master::m_pDebugger->DG_TreePop();// G-Buffer終了
@@ -794,8 +793,8 @@ bool RenderPipeline::CreateRenderTargets(RendererEngine &renderer)
     result = m_pShadowMap_RT->Create(
         renderer,
         // 影の品質は何も対策しなければ解像度依存
-        4096,       
-        4096,
+        SHADOW_SIZE_X,
+        SHADOW_SIZE_Y,
         1,
         1,
         // ・Rにライトから見た深度値 ・Gにライトから見た深度値の二乗をいれる

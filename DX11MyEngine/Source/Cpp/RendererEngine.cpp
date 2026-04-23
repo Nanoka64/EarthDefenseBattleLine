@@ -196,7 +196,7 @@ void RendererEngine::Term()
 void RendererEngine::Swap()
 {
     HRESULT hr;
-    hr = m_pSwapChain->Present(0, 0);    // 引数１:垂直同期　２：特殊フラグ(0でいい)
+    hr = m_pSwapChain->Present(1, 0);    // 引数１:垂直同期　２：特殊フラグ(0でいい)
 
     if (FAILED(hr))return;
 }

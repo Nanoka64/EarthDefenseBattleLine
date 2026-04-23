@@ -147,7 +147,7 @@ void MiniMapRader::UpdateRadarIcons(
         auto& target = targetObjs[i];
         VEC3 targetPos = target->get_Transform().lock()->get_VEC3ToPos();
 
-        // 相対座標の計算
+        // 相対座標の計算（中心位置を原点（0,0）にする）
         float relativeX = targetPos.x - centerPos.x;
         float relativeZ = targetPos.z - centerPos.z;
 
@@ -155,8 +155,9 @@ void MiniMapRader::UpdateRadarIcons(
         float rotX = (relativeX * cameraH_c - relativeZ * cameraH_s);
         float rotY = (relativeX * cameraH_s + relativeZ * cameraH_c);
 
+        // ミニマップの位置にする
         int targetMapX = static_cast<int>(MINIMAP_X + rotX);
-        int targetMapY = static_cast<int>(MINIMAP_Y - rotY);
+        int targetMapY = static_cast<int>(MINIMAP_Y - rotY);    // 前方の敵をミニマップの上の方に置きたいので、Y反転
 
         // 位置をミニマップの円内に収める
         ClampToMinimap(targetMapX, targetMapY, static_cast<int>(MINIMAP_X), static_cast<int>(MINIMAP_Y), MINIMAP_RADIUS);

@@ -178,5 +178,4 @@ void c_MissionSelect_DifficultSelect::DifficultSelectButton_OnClicFunction(Scene
 {
 	m_NextState = c_GO_GAME_SCENE;	// ƒQ[ƒ€ƒV[ƒ“‚Ö
 	Master::m_pDataManager->set_SelectDifficultyLevel(static_cast<DIFFICULTY_LEVEL>(_difficultNumber));
-
 }

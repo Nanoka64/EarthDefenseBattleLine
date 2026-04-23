@@ -491,6 +491,10 @@ int DXApp::MainLoop()
                 // ‰æ–ÊXV
                 m_pRenderer->Swap();
             }
+            //else
+            //{
+            //    Sleep(1);
+            //}
         }
     }
 

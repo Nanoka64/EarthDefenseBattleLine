@@ -473,6 +473,8 @@ void PlayerController::OnCollisionEnter(const class CollisionInfo &other)
 void PlayerController::Reset()
 {
 	m_IsDead = false;
+	m_IsJump = false;
+	m_IsRolling = false;
 	if (m_pHealthComp.lock()) {
 		m_pHealthComp.lock()->Reset();
 	}

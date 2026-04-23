@@ -89,7 +89,7 @@
 #include <sstream>
 #include <iomanip>
 /* 定数 */
-constexpr int POINTLIGHT_MAX_NUM		= 50; // ポイントライトの最大数
+constexpr int POINTLIGHT_MAX_NUM		= 100; // ポイントライトの最大数
 constexpr int DIRECTIONLIGHT_MAX_NUM	= 1;   // ディレクションライトの最大数
 
 
