@@ -6,6 +6,8 @@
 //      一旦、ACES (Academy Color Encoding System)というのを使用してみる
 //      映画風のシネマティックな感じらしい（ 見てみたらEDF4みたいな感じだった ）
 //
+//      TODO:エフェクトの見た目が大幅に変わってしまうので、ACESは一旦飛ばして、ガンマ補正のみ行う。
+//
 // \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 #pragma once
 SamplerState g_sSampler : register(s0);
@@ -50,7 +52,8 @@ float4 PSMain(PS_IN input) : SV_TARGET
     //hdrColor.b *= 0.2f;
     
     // トーンマッピング処理
-    finalColor = ACESToneMapping(hdrColor);
+    // TODO : エフェクトの見た目が極端に変わってしまうので、一旦飛ばす
+    //finalColor = ACESToneMapping(hdrColor);
     
     
     // リニア空間：現実的な正しい世界

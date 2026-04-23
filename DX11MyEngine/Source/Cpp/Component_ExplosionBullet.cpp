@@ -20,7 +20,7 @@ constexpr float DECAL_LIFE_TIME = 10.0f;             // デカールの生存時間
 constexpr float SHAKE_MAX_RANGE_EXPLOSION_SCALE_FACTOR = 15.0f; // カメラシェイク時、シェイクの最大距離を求める際に掛ける補正値
 constexpr float SHAKE_LENGTH_SCALE_FACTOR = 0.007f;             // カメラシェイク時、シェイクの大きさを求める際に掛ける補正値
 constexpr float SHAKEDURATION = 1.0f;                           // カメラシェイクの持続時間
-constexpr float EFFECT_SCALE_FACTOR = 0.15f;            // そのままだと、エフェクトが大きすぎるので
+constexpr float EFFECT_SCALE_FACTOR = 0.12f;            // そのままだと、エフェクトが大きすぎるので
 
 using namespace UtilityData;
 using namespace VECTOR3;
@@ -206,7 +206,7 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     {
         auto owner = m_pOwner.lock();
         auto transform = owner->get_Transform().lock();
-        transform->set_Pos(crntPos);     // 衝突位置に合わせる
+        transform->set_Pos(crntPos + (hitInfo.get_HitNormal() * 3.0f));     // 衝突位置に合わせる
 
         // 衝突処理
         if (m_CollisionTask)
