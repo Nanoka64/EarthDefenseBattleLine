@@ -555,9 +555,6 @@
     <ClCompile Include="Source\Cpp\Component_MoveLogic.cpp">
       <Filter>ソース ファイル\BaseComponent\Move</Filter>
     </ClCompile>
-    <ClCompile Include="..\XML_Excel\XmlArrange.cpp">
-      <Filter>ソース ファイル\App</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Cpp\Component_ButtonUI.cpp">
       <Filter>ソース ファイル\BaseComponent\UI</Filter>
     </ClCompile>
@@ -1015,9 +1012,6 @@
     </ClInclude>
     <ClInclude Include="Source\Header\Component_MoveLogic.h">
       <Filter>ソース ファイル\BaseComponent\Move</Filter>
-    </ClInclude>
-    <ClInclude Include="..\XML_Excel\XmlArrange.h">
-      <Filter>ソース ファイル\App</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\Component_ButtonUI.h">
       <Filter>ソース ファイル\BaseComponent\UI</Filter>
