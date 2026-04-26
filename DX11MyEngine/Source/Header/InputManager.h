@@ -4,14 +4,6 @@
 //--------------------------------------------------------------------------------------
 #include "InputConfig.h"
 
-enum class INPUT_FLAG_TYPE
-{
-    DOWN,       // 押された瞬間
-    UP,         // 離された瞬間
-    HOLD,       // 長押し
-    HOLD_REPEAT // 長押し（入力判定になるまでのフレーム指定用）
-};
-
 // =======================================================================================
 //
 // *---        InputManager Class         ---*
@@ -42,13 +34,13 @@ private:
     {
         MOUSE_BUTTON_STATE _mouse;
         //KEY_STATE _key;
-        int _key;
+		std::vector<int> _keys; // 複数のキーを同時に管理するためにvectorに変更
         GAMEPAD_STATE _pad;
 
         //int _count = 0;
 
         ConfigInfo() :
-            _key(-1),
+            _keys(),
             _mouse(MOUSE_BUTTON_STATE::NONE),
             _pad(GAMEPAD_STATE::NONE)
         {
@@ -60,7 +52,7 @@ private:
     //std::unordered_map<enum class CONFIG_INPUT,  int> m_CrntKeyState;       // 現在押されているキーの状態
     //std::unordered_map<enum class CONFIG_INPUT,  int> m_ConfigKeyMap;       // コンフィグ管理用
 
-    std::unordered_map<enum class SYSTEM_CONFIG, ConfigInfo> m_SystemConfigKeyMap;  // システム用コンフィグ管理
+    //std::unordered_map<enum class SYSTEM_CONFIG, ConfigInfo> m_SystemConfigKeyMap;  // システム用コンフィグ管理
 
     std::unordered_map<enum class GAME_CONFIG, ConfigInfo> m_GameConfigMap;         // ゲームシーン用コンフィグ管理
     std::unordered_map<enum class GAME_CONFIG, int>m_CrntGameConfigCountersMap;
@@ -89,7 +81,7 @@ private:
     MouseState m_PrevMouseState;  // ひとつ前のマウス状態
 
 public:
-    InputManager() = default;
+    InputManager();
     ~InputManager();
 
     bool Init(HWND hWnd);
@@ -106,7 +98,7 @@ public:
     bool GetMouseClick(MOUSE_BUTTON_STATE _button)const;       // マウスボタンが押されているか
     bool GetMouseClickDown(MOUSE_BUTTON_STATE _button)const;   // 押された瞬間
     bool GetMouseClickUp(MOUSE_BUTTON_STATE _button)const;     // 離された瞬間
-    bool GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE _button, int _waitFrame, int _repeatFrame)const;     // 入力判定になるまでのフレーム指定用
+    bool GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE _button, int _waitFrame, int _repeatFrame, bool _isStartPushJudge = false)const;     // 入力判定になるまでのフレーム指定用
     
     inline POINT GetMousePos()const { return m_MousePos; };   // マウス座標の取得
     inline LONG GetMousePosSlopeX()const{return m_CrntMouseState._state.lX;};   // Xの移動量の差の取得
@@ -121,7 +113,7 @@ public:
 
     void InitDefaultKeyConfig();            // コンフィグデフォルト設定
 
-    void ClearInput();  // シーン遷移などの際には必ず呼ぶ
+	void StopInput(int stopTime);    // 入力を一定時間受け付けないようにする
 
 private:
     // コピー禁止

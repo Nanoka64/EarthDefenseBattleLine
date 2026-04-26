@@ -281,11 +281,11 @@ void PointLightEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pObj)
         Master::m_pDebugger->DG_Separator();    // 区切り線
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"強さ"));
         Master::m_pDebugger->DG_SameLine();
-        Master::m_pDebugger->DG_SliderFloat("##Insensity", 1, &intensity, 0.0f, 100.0f);
+        Master::m_pDebugger->DG_DragFloat("##Insensity", 1, &intensity, 0.5f, 0.0f, 100.0f);
 
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"範囲"));
         Master::m_pDebugger->DG_SameLine();
-        Master::m_pDebugger->DG_SliderFloat("##Range", 1, &range, 0.0f, 10000.0f);
+        Master::m_pDebugger->DG_DragFloat("##Range", 1, &range, 0.5f, 0.0f, 1000.0f);
 
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"カラー"));
         Master::m_pDebugger->DG_SameLine();
@@ -324,9 +324,10 @@ void PlayerControllerEditor::OnEditorGUI(RendererEngine &renderer, GameObject &p
 
     // beginはInspectorWindowで行っている
     float moveSpeed             = pComp->get_MoveSpeed();
-    PLAYER_ANIMATION_ID animId  = pComp->get_AnimID();
+    PlayerData::PLAYER_RANGER_ANIM_ID animId  = pComp->get_AnimID();
     VEC3 moveVelocity           = pComp->get_MoveVelocity();
     bool isJump                 = pComp->get_IsJump();
+    bool isGrounded             = pComp->get_IsGrounded();
     bool isAngle                 = pComp->get_IsContinuousAngle();
     float jumpFoce              = pComp->get_JumpFoce();
     float gravity               = pComp->get_Gravity();
@@ -346,11 +347,15 @@ void PlayerControllerEditor::OnEditorGUI(RendererEngine &renderer, GameObject &p
 
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"再生中のアニメーション"));
         Master::m_pDebugger->DG_TextValue("ID : %d",static_cast<int>(animId));
-        Master::m_pDebugger->DG_TextValue(U8ToChar(u8"名前 : %s"), g_PlayerAnimationNames[static_cast<int>(animId) + 1].c_str());
+        Master::m_pDebugger->DG_TextValue(U8ToChar(u8"名前 : %s"), PlayerData::g_PlayerAnimationNames[static_cast<int>(animId) + 1].c_str());
 
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ジャンプフラグ"));
         Master::m_pDebugger->DG_SameLine();
         Master::m_pDebugger->DG_RadioButton("##JumpFlag", isJump);
+
+        Master::m_pDebugger->DG_BulletText(U8ToChar(u8"接地"));
+        Master::m_pDebugger->DG_SameLine();
+        Master::m_pDebugger->DG_RadioButton("##Grounded", isGrounded);
 
         Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ジャンプ力"));
         Master::m_pDebugger->DG_SameLine();
@@ -597,6 +602,7 @@ void ModelMeshResourceEditor::OnEditorGUI(RendererEngine &renderer, GameObject &
 
                 VEC4 diffuseCol     = mat->m_DiffuseColor;
                 VEC4 specCol        = mat->m_SpecularColor;
+                VEC3 emissiveCol    = mat->m_EmissiveColor;
                 float specPow       = mat->m_SpecularPower;
                 float emissivePow   = mat->m_EmissivePower;
 
@@ -627,9 +633,12 @@ void ModelMeshResourceEditor::OnEditorGUI(RendererEngine &renderer, GameObject &
                 if (Master::m_pDebugger->DG_TreeNode(U8ToChar(u8"マテリアル") + std::to_string(i + 1)))
                 {
                     Master::m_pDebugger->DG_Separator();    // 区切り線
-                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ディフューズ"));
+                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ディフューズ色"));
                     Master::m_pDebugger->DG_Image(diffSRV, VEC2(100, 100));
-                    Master::m_pDebugger->DG_ColorEdit4("##Diffuse" + std::to_string(i), &diffuseCol);
+                    if (Master::m_pDebugger->DG_ColorEdit4("##Diffuse" + std::to_string(i), &diffuseCol))
+                    {
+                        mat->m_DiffuseColor = diffuseCol;
+                    }
 
 
                     Master::m_pDebugger->DG_Separator();    // 区切り線
@@ -638,19 +647,34 @@ void ModelMeshResourceEditor::OnEditorGUI(RendererEngine &renderer, GameObject &
 
 
                     Master::m_pDebugger->DG_Separator();    // 区切り線
-                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"スペキュラ"));
+                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"スペキュラ色"));
                     Master::m_pDebugger->DG_Image(specSRV, VEC2(100, 100));
-                    Master::m_pDebugger->DG_ColorEdit4("##Speular" + std::to_string(i), &specCol);
-
+                    if (Master::m_pDebugger->DG_ColorEdit4("##Speular" + std::to_string(i), &specCol))
+                    {
+                        mat->m_SpecularColor = specCol;
+                    }
 
                     Master::m_pDebugger->DG_BulletText(U8ToChar(u8"スペキュラ強度"));
                     Master::m_pDebugger->DG_SameLine();
-                    Master::m_pDebugger->DG_DragFloat("##SpecularPower" + std::to_string(i), 1, &specPow, 0.01f, 0.0f, 255.0f);
+                    if (Master::m_pDebugger->DG_DragFloat("##SpecularPower" + std::to_string(i), 1, &specPow, 1.0f, 0.0f, 255.0f))
+                    {
+                        mat->m_SpecularPower = specPow;
+                    }
 
-                    
-                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"エミッシブ"));
+                    Master::m_pDebugger->DG_Separator();    // 区切り線
+                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"エミッシブ色"));
+                    Master::m_pDebugger->DG_Image(specSRV, VEC2(100, 100));
+                    if (Master::m_pDebugger->DG_ColorEdit3("##EmissiveColor" + std::to_string(i), &emissiveCol))
+                    {
+                        mat->m_EmissiveColor = emissiveCol;
+                    }
+
+                    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"エミッシブ強度"));
                     Master::m_pDebugger->DG_SameLine();
-                    Master::m_pDebugger->DG_DragFloat("##EmissivePower" + std::to_string(i), 1, &emissivePow, 0.01f, 0.0f, 255.0f);
+                    if (Master::m_pDebugger->DG_DragFloat("##EmissivePower" + std::to_string(i), 1, &emissivePow, 0.5f, 0.0f, 255.0f))
+                    {
+                        mat->m_EmissivePower = emissivePow;
+                    }
 
                     Master::m_pDebugger->DG_TreePop();
                 }
@@ -879,6 +903,7 @@ void TrailRendererEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pObj
     float minDist = pComp->get_MinVertexDistance();
     float width = pComp->get_Width();
     float time = pComp->get_DrawTime();
+    VEC3 randPos = pComp->get_PosRandVec();
 
 
     // ノード
@@ -898,6 +923,10 @@ void TrailRendererEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pObj
         Master::m_pDebugger->DG_SameLine();
         Master::m_pDebugger->DG_DragFloat("##Time", 1, &time, 0.1f, 1.0f, 5000.0f);
 
+        Master::m_pDebugger->DG_BulletText(U8ToChar(u8"位置のずれ"));
+        Master::m_pDebugger->DG_SameLine();
+        Master::m_pDebugger->DG_DragVec3("##RandPos", &randPos, 0.1f, 1.0f, 5000.0f);
+
         Master::m_pDebugger->DG_TreePop();
     }
 
@@ -905,6 +934,7 @@ void TrailRendererEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pObj
     pComp->set_MinVertexDistance(minDist);
     pComp->set_Width(width);
     pComp->set_DrawTime(time);
+    pComp->set_PosRandVec(randPos);
 }
 
 

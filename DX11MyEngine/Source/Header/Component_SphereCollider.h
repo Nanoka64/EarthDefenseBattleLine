@@ -14,6 +14,7 @@ class SphereCollider : public Collider
 {
 private:
 	float m_Radius;	// 半径
+	std::unique_ptr<class DebugMesh> m_pSphereMesh;	// デバッグ用メッシュ
 
 public:
 	SphereCollider(std::weak_ptr<GameObject> pOwner, int updateRank = 100);

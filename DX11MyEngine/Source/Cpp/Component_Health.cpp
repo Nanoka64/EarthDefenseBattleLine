@@ -63,7 +63,7 @@ void Health::TakeDamage(const float _dmg)
     m_CrntHP -= _dmg;
     
     // ダメージ処理を行う
-    for (auto& callback : m_DamageTaskArray){
+    for (auto& callback : m_DamageTaskArray) {
         callback(_dmg);
     }
 
@@ -73,7 +73,7 @@ void Health::TakeDamage(const float _dmg)
         m_IsDead = true;
 
 
-        // ダメージ処理を行う
+        // 死亡処理を行う
         for (auto& callback : m_DeathTaskArray) {
             callback();
         }
@@ -110,3 +110,39 @@ void Health::RegisterOnDamage(std::function<void(float)> _callback)
     m_DamageTaskArray.push_back(_callback);
 }
 
+//*---------------------------------------------------------------------------------------
+//*【?】パラメータなどのリセット
+//*
+//* [引数] なし
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void Health::Reset()
+{
+    m_IsDead = false;
+    m_CrntHP = 0.0f;
+    m_MaxHP = 0.0f;
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】現在のHP設定
+//*
+//* [引数] 
+//* _hp : 設定するHP 
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void Health::set_CrntHP(const float _hp)
+{
+    m_CrntHP = std::clamp(_hp, 0.0f, m_MaxHP);
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】HP回復
+//*
+//* [引数] 
+//* _hp : 設定するHP 
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void Health::set_RecoveryHP(const float _hp)
+{
+    m_CrntHP = std::clamp(m_CrntHP + _hp, 0.0f, m_MaxHP);
+}

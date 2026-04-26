@@ -6,9 +6,11 @@
 /* --- @:AssultRifle Class --- */
 //
 //  ★継承：IComponent ★
-//
+// 
 // 【?】アサルトライフル
-//		
+// 
+// [注意] GunWeaponに移行
+// 
 // ***************************************************************************************
 class AssultRifle : public IComponent
 {
@@ -19,6 +21,7 @@ private:
 	bool m_IsExplosionBullet = true;	// 弾の切り替えフラグ（一時的なもの　後で消す）
 	int m_FireRate;					// 発射レート
 	float m_ExplosionSize = 50.0f;	// 爆発範囲
+	float m_Zoom;
 
 public:
 	AssultRifle(std::weak_ptr<GameObject> pOwner, int updateRank = 100);

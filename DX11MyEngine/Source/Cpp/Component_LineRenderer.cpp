@@ -13,7 +13,7 @@ using namespace VERTEX;
 //*----------------------------------------------------------------------------------------
 LineRenderer::LineRenderer(std::weak_ptr<GameObject> pOwner, int updateRank)
 	: IComponent(pOwner, updateRank),
-	m_DrawTime(60.0f),
+	m_DrawTime(60),
 	m_Width(1.0f),
 	m_Length(1000.0f),
 	m_Dir(VEC3()),
@@ -71,8 +71,10 @@ void LineRenderer::Start(RendererEngine& renderer)
 //* &renderer : 描画エンジンの参照
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-void LineRenderer::Update(RendererEngine& renderer)
+void LineRenderer::LateUpdate(RendererEngine& renderer)
 {
+
+
 }
 
 //*---------------------------------------------------------------------------------------
@@ -89,10 +91,10 @@ void LineRenderer::Draw(RendererEngine& renderer)
 		return;
 	}
 
-	auto pContext = renderer.get_DeviceContext();
-
 	// 頂点更新
 	VertexUpdate(renderer);
+
+	auto pContext = renderer.get_DeviceContext();
 
 	// 定数バッファ更新
 	ConstantBufferUpdate(renderer);
@@ -135,7 +137,7 @@ void LineRenderer::VertexUpdate(RendererEngine& renderer)
 	pContext->Map(m_pVertesBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
 	// カメラ座標
-	VEC3 cameraPos = renderer.get_CameraPosition();
+	VEC3 cameraPos = Master::m_pDataManager->get_CameraPos();
 
 	VERTEX_Static* pVertices = (VERTEX_Static*)mappedResource.pData;
 

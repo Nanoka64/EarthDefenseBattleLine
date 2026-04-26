@@ -69,7 +69,7 @@ namespace GIGA_Engine
 		};
 
 
-		/* 加藤君のコードだよ */
+		/* 加藤君のコード */
 		template<class bitType>
 		struct BIT_FLAG_STRUCT
 		{

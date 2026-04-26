@@ -67,10 +67,16 @@ void AssultRifle::Start(RendererEngine &renderer)
 //* &renderer : 描画エンジンの参照
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-void AssultRifle::Update(RendererEngine &renderer)
+void AssultRifle::Update(RendererEngine& renderer)
 {
-    float c_AngleH = renderer.get_CameraComponent()->get_Angle_H();
-    float c_AngleV = renderer.get_CameraComponent()->get_Angle_V();
+    std::shared_ptr<Camera3D> camera = Master::m_pDataManager->get_CameraComponent().lock();
+    if (camera == nullptr) {
+        assert(false);
+        return;
+    }
+
+    float c_AngleH = camera->get_Angle_H();
+    float c_AngleV = camera->get_Angle_V();
 
 	auto transform = m_pOwner.lock()->get_Transform().lock();
     VEC3 pos = transform->get_WorldVEC3ToPos();
@@ -86,7 +92,7 @@ void AssultRifle::Update(RendererEngine &renderer)
     forward *= -1;  // プレイヤーが-Z前になってしまっているので
 
     // 弾を発射してないときはフラッシュライトをオフ
-    m_pFlashPointLight.lock()->set_Intensity(0.0f);
+    //m_pFlashPointLight.lock()->set_Intensity(0.0f);
 
     // レーザーサイトの始点と方向
     m_pLineRendererComp.lock()->set_Dir(VEC3::FromXMVECTOR(XMVector3Normalize(forward)));
@@ -102,13 +108,13 @@ void AssultRifle::Update(RendererEngine &renderer)
     m_FireRate = m_IsExplosionBullet ? 20 : 5;
 
     // 右クリックでズーム
-    renderer.get_CameraComponent()->set_Fov(90.0f);
+    camera->set_Fov(45.0f);
     if (GetMouseClick(MOUSE_BUTTON_STATE::RIGHT))
     {
-        renderer.get_CameraComponent()->set_Fov(40.0f);
+        camera->set_Fov(35.0f);
     }
     // 左クリックで発射
-	if(GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, m_FireRate, m_FireRate))
+	if(GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, m_FireRate, m_FireRate) && !GetInput(GAME_CONFIG::MOVE_DASH))
     {
         // ****************************************************
         //				 発射音再生
@@ -122,11 +128,15 @@ void AssultRifle::Update(RendererEngine &renderer)
         rad.y = (c_AngleH - 1.57f) * -1;
         rad.z = 0.0f;
 
+        rad.x += Tool::RandRange(-0.03f, 0.03f);
+        rad.y += Tool::RandRange(-0.03f, 0.03f);
+        rad.z += Tool::RandRange(-0.03f, 0.03f);
+
         // トランスフォームパラメータ
         BulletTransformData bulletTransform;
         bulletTransform._pos = pos;
-        bulletTransform._rotRad = rad;
-        bulletTransform._scale = VEC3(0.01f, 0.01f, 0.01f);
+        //bulletTransform._rotRad = rad;
+        bulletTransform._scale = VEC3(0.005f, 0.005f, 0.025f);
 
         if (m_IsExplosionBullet)
         {
@@ -147,8 +157,9 @@ void AssultRifle::Update(RendererEngine &renderer)
         }
 
         // フラッシュ
-        m_pFlashPointLight.lock()->set_Range(30.0f);
-        m_pFlashPointLight.lock()->set_Intensity(5.5f);
+        m_pFlashPointLight.lock()->Flash(0.05f, 8.0f, 80.0f);
+        //m_pFlashPointLight.lock()->set_Range(30.0f);
+        //m_pFlashPointLight.lock()->set_Intensity(5.5f);
         m_pFlashPointLight.lock()->set_LightColor(VEC3(1.0f, 1.0f, 1.0f));
 	}
 }

@@ -27,6 +27,12 @@ bool EditorManager::Init(RendererEngine &renderer)
 
 void EditorManager::Update(RendererEngine &renderer)
 {
+    // エディタが閉じてる
+    if (Master::m_pDataManager->get_IsDebugMode() == false)
+    {
+        return;
+    }
+
     // 各ウィンドウの更新
     for (auto& window : m_EditWindowMap)
     {

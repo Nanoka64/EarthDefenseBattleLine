@@ -17,7 +17,7 @@ class IState
 {
 protected:
 	RendererEngine *m_pRenderer = nullptr;
-	std::weak_ptr<IState<Owner>> m_pParent;
+	std::weak_ptr<IState<Owner>> m_pParent;	// 親ステート
 
 public:
 	IState() = default;

@@ -14,14 +14,6 @@ struct CreateBulletInfo
 
 };
 
-/// <summary>
-/// 弾のトランスフォーム情報
-/// </summary>
-struct BulletTransformData {
-    VECTOR3::VEC3 _pos;
-    VECTOR3::VEC3 _rotRad;
-    VECTOR3::VEC3 _scale;
-};
 
 class GameObject;
 
@@ -66,6 +58,10 @@ public:
     /// <param name="renderer">描画エンジンの参照</param>
     void Draw(RendererEngine &renderer);  
 
+    /// <summary>
+    /// 現在、アクティブ状態の弾をクリアする（プールへ帰す）
+    /// </summary>
+    void clear_CrntActiveBullet();
 
     /// <summary>
     /// 弾の登録
@@ -73,9 +69,9 @@ public:
     /// <param name="pBullet"></param>
     void RegisterBullet(BulletData::BULLET_TYPE _bulletType, std::shared_ptr<GameObject> pBullet);
 
-    void Shot(RendererEngine &renderer, const BulletTransformData& _transformData, const BulletData::NormalBulletData &_param);
-    void Shot(RendererEngine &renderer, const BulletTransformData& _transformData, const BulletData::ExplosionBulletData &_param);
-    void Shot(RendererEngine &renderer, const BulletTransformData& _transformData, const BulletData::HormingExplosionBulletData &_param);
+    void Shot(RendererEngine &renderer, const BulletData::BulletTransformData& _transformData, const BulletData::NormalBulletData &_param);
+    void Shot(RendererEngine &renderer, const BulletData::BulletTransformData& _transformData, const BulletData::ExplosionBulletData &_param);
+    void Shot(RendererEngine &renderer, const BulletData::BulletTransformData& _transformData, const BulletData::HormingExplosionBulletData &_param);
 
 private:
     // コピー禁止

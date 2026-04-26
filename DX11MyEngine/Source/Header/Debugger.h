@@ -42,14 +42,14 @@ public:
 	void DG_Text(std::string tex);																			// テキスト表示
 	void DG_SameLine(float offsetStart_X = 0.0f);															// この関数の上と下のテキストを横につなげる
 	
-	void DG_ColorPicker3(const std::string &label, float col[]);													// カラーピッカー3
-	void DG_ColorPicker3(const std::string &label, VECTOR3::VEC3* col3V);											// カラーピッカー3
-	void DG_ColorPicker4(const std::string &label, float col[]);													// カラーピッカー4
-	void DG_ColorPicker4(const std::string &label, VECTOR4::VEC4* col4V);											// カラーピッカー4
-	void DG_ColorEdit3(const std::string &label, float col[]);														// カラーエディット3
-	void DG_ColorEdit3(const std::string &label, VECTOR3::VEC3* col3V);											// カラーエディット3
-	void DG_ColorEdit4(const std::string &label, float col[]);														// カラーエディット4
-	void DG_ColorEdit4(const std::string &label, VECTOR4::VEC4* col4V);											// カラーエディット4
+	bool DG_ColorPicker3(const std::string &label, float col[]);													// カラーピッカー3
+	bool DG_ColorPicker3(const std::string &label, VECTOR3::VEC3* col3V);											// カラーピッカー3
+	bool DG_ColorPicker4(const std::string &label, float col[]);													// カラーピッカー4
+	bool DG_ColorPicker4(const std::string &label, VECTOR4::VEC4* col4V);											// カラーピッカー4
+	bool DG_ColorEdit3(const std::string &label, float col[]);														// カラーエディット3
+	bool DG_ColorEdit3(const std::string &label, VECTOR3::VEC3* col3V);											// カラーエディット3
+	bool DG_ColorEdit4(const std::string &label, float col[]);														// カラーエディット4
+	bool DG_ColorEdit4(const std::string &label, VECTOR4::VEC4* col4V);											// カラーエディット4
 
 	bool DG_DragInt(const std::string &label, int valNum, int* val, float slideSpeed, int _min, int _max);			// int
 	bool DG_DragFloat(const std::string &label, int valNum, float* val, float slideSpeed, float _min, float _max);	// float

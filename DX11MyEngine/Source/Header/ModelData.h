@@ -139,9 +139,9 @@ public:
 	ModelData();
 	~ModelData();
 
-	bool Setup(RendererEngine &render, const char *filePath);	// モデルデータのセットアップ
-	bool SetupTextureMap(std::shared_ptr<Material> matData, int matIndex);	// テクスチャマップ設定 Setup後に呼ぶ
-	void set_ShaderType(SHADER_TYPE type) { m_ShaderType = type; }	// シェーダタイプ設定
+	bool Setup(RendererEngine &render, const char *filePath);					// モデルデータのセットアップ
+	bool SetupTextureMap(std::shared_ptr<Material> matData, int matIndex);		// テクスチャマップ設定 Setup後に呼ぶ
+	void set_ShaderType(SHADER_TYPE type) { m_ShaderType = type; }				// シェーダタイプ設定
 	void set_ShadowShaderType(SHADER_TYPE type) { m_ShadowShaderType = type; }	// シャドウ用シェーダタイプ設定
 
 

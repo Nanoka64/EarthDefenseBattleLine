@@ -3,13 +3,16 @@
 #include "Component_Transform.h"
 #include "Component_RectTransform.h"
 
-/// <summary>
-/// オブジェクトの状態定義
-/// </summary>
-enum class OBJECT_STATE
+
+enum class OBJECT_CATEGORY
 {
-	STATIC,		// 静的
-	DYNAMIC		// 動的
+	UNKNOWN,
+	PLAYER,         // プレイヤー
+	ALLY_NPC,       // 味方（隊員など）
+	ENEMY,          // 敵
+	VEHICLE,        // 乗り物
+	ITEM,           // 回復・武器アイテム
+	OBSTACLE        // 破壊可能な建物など
 };
 
 
@@ -17,7 +20,7 @@ enum class OBJECT_STATE
 // ---------------------------------------------------------------------------------------
 /* --- @:GameObject3D Class --- */
 //
-//  ★継承：Transform ← Object ★
+//  ★継承：Object ★
 //
 // 【?】ゲームにに存在するもの全ての基底クラス
 //
@@ -49,8 +52,8 @@ private:
     std::shared_ptr<MyTransform> m_pTransform;	// トランスフォームコンポーネントはデフォルトで持つ（2DならRectTransformを持つ）
 
 	bool m_IsCalcUpdate;	// 更新処理がすでに呼ばれたかどうか
-	bool m_IsShadow;		// シャドウをかけるかどうか
-	OBJECT_STATE m_State;	// オブジェクトの状態（静的か動的か）
+	bool m_IsStatic;		// 静的か動的か
+	bool m_IsUpdateAllowedDuringPause;	// ポーズ中でも更新可能か
 
 	/* オブジェクトマネージャをフレンドとして登録 */
 	friend class GameObjectManager;
@@ -58,23 +61,23 @@ public:
     GameObject();
     virtual ~GameObject();
 
-	virtual bool Init(RendererEngine& renderer) { return true; };
 	virtual void Update(RendererEngine& renderer) {};
 	virtual void Draw(RendererEngine& renderer) {};
-	virtual bool Term(RendererEngine& renderer) { return true; };
 
 	void OnCollisionEnter(const class CollisionInfo& _other);	// 当たった瞬間
-	void OnCollisionStay(const class CollisionInfo& _other);	// 当たっている間
-	void OnCollisionExit(const class CollisionInfo& _other);	// 離れた瞬間
+	//void OnCollisionStay(const class CollisionInfo& _other);	// 当たっている間
+	//void OnCollisionExit(const class CollisionInfo& _other);	// 離れた瞬間
 	void OnTriggerEnter(const class CollisionInfo& _other);		// トリガー 当たった瞬間
-	void OnTriggerStay(const class CollisionInfo& _other);		// トリガー 当たっている間
-	void OnTriggerExit(const class CollisionInfo& _other);		// トリガー 離れた瞬間
+	//void OnTriggerStay(const class CollisionInfo& _other);		// トリガー 当たっている間
+	//void OnTriggerExit(const class CollisionInfo& _other);		// トリガー 離れた瞬間
 
-	bool get_IsShadow()const { return m_IsShadow; }
-	void set_IsShadow(bool _flag) { m_IsShadow = _flag; }
+	/* 静的フラグ */
+	bool get_IsStatic()const { return m_IsStatic; }
+	void set_IsStatic(bool _flag) { m_IsStatic = _flag; }
 
-	OBJECT_STATE get_State()const { return m_State; }
-	void set_State(const OBJECT_STATE& _state) { m_State = _state; }
+	/* ポーズフラグ */
+	void set_IsUpdateAllowedDuringPause(bool _flag) { m_IsUpdateAllowedDuringPause = _flag; }
+	bool get_IsUpdateAllowedDuringPause()const { return m_IsUpdateAllowedDuringPause; }
 
 	// ****************************************************************************************************************************************
 	/* コンポーネント関連 */
@@ -110,9 +113,17 @@ public:
 	std::weak_ptr<RectTransform> get_RectTransform()const;
 
 
-	// 生ポで書いたほうがいいかも
-	//MyTransform *get_Transform() const;
+	/// <summary>
+	/// 読み取り専用Transform取得
+	/// </summary>
+	/// <returns></returns>
+	const MyTransform* get_TransformConst()const;
 
+	/// <summary>
+	/// 読み取り専用RectTransform取得
+	/// </summary>
+	/// <returns></returns>
+	const RectTransform* get_RectTransformConst()const;
 
 
 	/// <summary>

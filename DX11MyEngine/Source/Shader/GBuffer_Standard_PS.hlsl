@@ -42,9 +42,9 @@ struct PS_OUT
 // **************************************************************************
 PS_OUT PSMain(PS_IN input)
 {
-    float4 diffuseMap   = g_tDiffuseTex.Sample(g_sSampler, input.UV);
-    float4 normalMap    = g_tNormalTex.Sample(g_sSampler, input.UV);
-    float4 specularMap   = g_tSpecularTex.Sample(g_sSampler, input.UV);
+    float4 diffuseMap = g_tDiffuseTex.Sample(g_sSampler, input.UV);
+    float4 normalMap = g_tNormalTex.Sample(g_sSampler, input.UV);
+    float4 specularMap = g_tSpecularTex.Sample(g_sSampler, input.UV);
     float smooth        = g_tSpecularTex.Sample(g_sSampler, input.UV).a;
     
     // 最終出力用
@@ -52,14 +52,15 @@ PS_OUT PSMain(PS_IN input)
     
     // ディフューズマップとcpp側で設定したカラーを足す
     finalCol = diffuseMap * cb_DiffuseColor;
-    float3 normal = GetNorm(normalMap, input.Tan, input.BiNorm, input.Normal);
     
+    // TODO:法線マップによって上手く適用されない場合がある
+    float3 normal = GetNorm(normalMap, input.Tan, input.BiNorm, input.Normal);
     float3 emissiveColor = cb_EmissiveColor * cb_EmissivePower;
     
     // テスト出力
     PS_OUT output;
     output.Albedo   = finalCol;
-    output.Normal.rgb   = (normal * 0.5f) + 0.5f;
+    output.Normal.rgb = (normal * 0.5f) + 0.5f; // [-1,1]の値を[0,1]に変換して出力
     output.Normal.a     = 1.0f; 
     output.Specular.rgb = specularMap.rgb + cb_SpecularColor.rgb;
     output.Specular.a   = (cb_SpecularPower) / (255.0f); // wに反射強度入れる

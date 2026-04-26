@@ -57,8 +57,8 @@ public:
 	float get_Width()const { return m_Width; };			// 幅の取得
 	void set_MinVertexDistance(const float _dist) { m_MinVertexDistance = _dist; }	// 頂点同士の距離の設定
 	float get_MinVertexDistance()const { return m_MinVertexDistance; }				// 頂点同士の距離の取得
-	void set_DrawTime(const float _t) { m_DrawTime = _t; }	// 表示時間の設定
-	float get_DrawTime()const { return m_DrawTime; }		// 表示時間の取得
+	void set_DrawTime(const int _t) { m_DrawTime = _t; }	// 表示時間の設定
+	int get_DrawTime()const { return m_DrawTime; }		// 表示時間の取得
 	void set_EmissivePower(const float _power) { m_EmissivePower = _power; }		// エミッシブ設定
 	float get_EmissivePower()const { return m_EmissivePower; }						// エミッシブ取得
 

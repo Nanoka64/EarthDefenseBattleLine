@@ -36,6 +36,7 @@ enum class RENDER_PIPELINE_STATE
 {
     NONE,
     DEFAULT,
+    DEFAULT_2D,
 
     NUM,
 };
@@ -91,9 +92,7 @@ private:
 
     RENDER_PASS m_CrntRenderPass;   // 現在の描画パス
 
-    class RenderPipeline *m_pRendererPipeline; // 描画パイプラインの実体を持つ
-
-    std::shared_ptr<class Camera3D> m_pMainCamera;  // メインカメラ情報を持つ
+    class RenderPipeline *m_pRendererPipeline;      // 描画パイプラインの実体を持つ
 public:
     RendererEngine();
     ~RendererEngine();
@@ -127,9 +126,6 @@ public:
     inline UINT get_ScreenWidth()const { return m_ScreenWidth; };                       
     inline UINT get_ScreenHeight()const { return m_ScreenHeight; };
     inline Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> get_FrameBufferSRV_ComPtr() const { return m_pFrameBufferSRV; };
-    VECTOR3::VEC3 get_CameraPosition()const;                            // カメラの位置取得
-    void set_CameraComponent(std::shared_ptr<class Camera3D> pCam);     // メインカメラの設定
-    std::shared_ptr<class Camera3D> get_CameraComponent()const;     // メインカメラの設定
     D3D11_VIEWPORT get_CrntViewPort()const { return m_CrntViewPort; }   // ビューポートの取得
     
     /// <summary>
@@ -177,7 +173,7 @@ public:
     /// <summary>
     /// デフォルトのレンダリングパイプラインを実行
     /// </summary>
-    void ExecuteDefaultRendererPipeline(RENDER_PIPELINE_STATE type);
+    void ExecuteDefaultRendererPipeline(RENDER_PIPELINE_STATE type, const class Camera3D* pCam);
 
     // ************************************************************************
     // 

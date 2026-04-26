@@ -13,10 +13,15 @@
 class Camera3D : public IComponent
 {
 private:
-	VECTOR3::VEC3 m_FocusPoint;
-	VECTOR3::VEC3 m_UpVec;
-    VECTOR3::VEC3 m_CameraPos;	// カメラの座標（色んなところで使うのでトランスフォームからではなく、ここに持つ）
-    VECTOR3::VEC3 m_LookDir;
+	std::weak_ptr<class GameObject> m_pFocusObject;		// フォーカス対象
+	VECTOR3::VEC3 m_FocusPoint;			// 注視位置
+	VECTOR3::VEC3 m_UpVec;				// 上ベクトル　
+    VECTOR3::VEC3 m_CameraPos;			// カメラの座標（色んなところで使うのでトランスフォームからではなく、ここに持つ）
+    VECTOR3::VEC3 m_LookDir;			// 向いてる方向
+	VECTOR3::VEC3 m_PosOffset;			// 対象からどのくらい離れて球面移動するか
+	VECTOR3::VEC3 m_FocusOffset;		// フォーカス位置のオフセット
+	Tool::VEC3_Shaker m_Shaker;			// シェイク用
+
 
 	float m_Angle_H;	// 水平方向アングル
 	float m_Angle_V;	// 垂直方向アングル
@@ -25,11 +30,8 @@ private:
 	float m_NearClipDist;	// 手前クリップ
 	float m_FarClipDist;	// 奥クリップ
 
-	bool m_IsControl;	// 操作フラグ
 
-	std::weak_ptr<class GameObject> m_pFocusObject;		// フォーカス対象
-	VECTOR3::VEC3 m_PosOffset;							// 対象からどのくらい離れて球面移動するか
-	VECTOR3::VEC3 m_FocusOffset;						// フォーカス位置のオフセット
+	bool m_IsControl;	// 操作フラグ
 public:
 	Camera3D(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
 	~Camera3D();
@@ -38,6 +40,7 @@ public:
 
 	void LateUpdate(RendererEngine &renderer)override;
 
+	void CamraControl(RendererEngine& renderer);	// カメラ操作
 	
 	bool get_IsControl()const { return m_IsControl; }	// 操作フラグの取得
 	void set_IsControl(bool _f) { m_IsControl = _f; }	// 操作フラグの設定
@@ -72,6 +75,10 @@ public:
 
 	VECTOR3::VEC3 get_CameraPos()const;	// 座標取得
     VECTOR3::VEC3 get_LookDir()const;		// 注視方向取得
+
+	void RequestShake(float _duration, const VECTOR3::VEC3& _strength);	// カメラシェイクの設定
+	void DistanceDecay(float _duration, const VECTOR3::VEC3& _strength, const VECTOR3::VEC3& _shakePos, float _maxRange);	// カメラシェイクの設定（距離減衰ver）
+
 
 	/// <summary>
 	/// ビュー変換行列の取得

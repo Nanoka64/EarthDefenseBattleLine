@@ -243,12 +243,16 @@ bool ResourceManager::ImportCSV_AllMaterialData(const std::string& _path)
     std::ifstream file(_path);
     std::string line;           // 行を格納する変数
 
+    int i = 0;
+
     if (file.is_open())
     {
         std::getline(file, line);   // ヘッダ行飛ばす
 
         while (std::getline(file, line)) // 1行ずつ読み込む
         {
+            i++;
+
             std::stringstream ss(line); // 行をストリームに変換
             Material data;
             std::string toStr;

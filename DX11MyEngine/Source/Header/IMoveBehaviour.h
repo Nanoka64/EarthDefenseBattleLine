@@ -15,13 +15,16 @@ struct MoveParam
     float _moveSpeed;               // 移動速度
     float _acceleration;            // 加速度
 	float _turnSpeed;               // 回転速度 
+    float _gravity;                 // 重力
+    bool _isAcceleration;           // 加速度があるか
 
     MoveParam() : 
         _moveDirection(VECTOR3::VEC3()),
         _targetPos(VECTOR3::VEC3()),
         _acceleration(0.0f),
         _turnSpeed(0.0f),
-        _moveSpeed(0.0f)
+        _moveSpeed(0.0f),
+        _gravity(0.0f)
     {
     }
 };
@@ -29,10 +32,10 @@ struct MoveParam
 struct ResultMove
 {
     VECTOR3::VEC3 _moveVelocity;    // 移動ベクトル
-    VECTOR3::VEC3 _rotateVelocity;  // 回転ベクトル
+    DirectX::XMVECTOR _RotQ;        // クオータニオン
     ResultMove() :
         _moveVelocity(VECTOR3::VEC3()),
-        _rotateVelocity(VECTOR3::VEC3())
+        _RotQ(DirectX::XMQuaternionIdentity())
     {
     }
 };

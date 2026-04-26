@@ -50,6 +50,9 @@ namespace UIData
     /// </summary>
     struct UIBase 
     {
+		int _layerRank = 0;  // 描画順を決めるためのランク（低い順に描画される）
+		std::string _tag = "UI_Unknown";    // タグ
+
         virtual ~UIBase() = default;
 
         /// <summary>
@@ -66,9 +69,10 @@ namespace UIData
     /// </summary>
     struct SpriteUIData : UIBase
     {
-        std::string _imagePath;         // 使用する画像のタグ
+        std::string _imagePath;         // 使用する画像のパス（空なら、テクスチャは設定せずにカラーのみ設定する）
         VECTOR4::VEC4 _color = VECTOR4::VEC4(1.0f);	// 頂点カラー
         VECTOR2::VEC2 _UVOffset = VECTOR2::VEC2();	// uvオフセット
+		SHADER_TYPE _shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;		// シェーダーの種類
 
 
         /// <summary>
@@ -93,11 +97,14 @@ namespace UIData
     /// </summary>
     struct ButtonUIData : SpriteUIData
     {
-        std::function<void()> _onClicFunction;          // クリック時の処理
-        std::string _text;                              // 表示する文字
-        std::shared_ptr<SpriteRenderer> _pSprite;   // 使用する画像
-        VECTOR2::VEC2 _textOffsetPos = VECTOR2::VEC2(); // 文字の位置補正
-        STATE _inputValidationState = STATE::PRESSED;	// 入力判定とするステート（functionの実行タイミング）
+        std::function<void()> _onClicFunction;                            // クリック時の処理
+        std::string _text;                                                // 表示する文字
+        std::shared_ptr<SpriteRenderer> _pSprite;                         // 使用する画像
+        VECTOR2::VEC2 _textOffsetPos = VECTOR2::VEC2();                   // 文字の位置補正
+        STATE _inputValidationState = STATE::PRESSED;	                  // 入力判定とするステート（functionの実行タイミング）
+        int _inputSoundID = SOUND_ID_TO_INT(SOUND_ID::SYSTEM_DECISION01); // 入力されたときのサウンドID
+		int _repeatInputInterval = 1;                                     // 入力のリピート間隔
+		int _inputWaitFrame = 0;                                           // 入力受付開始までの待ち時間（フレーム数）
 
         /// <summary>
         /// リセット

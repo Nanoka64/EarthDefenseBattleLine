@@ -44,8 +44,18 @@ enum class SOUND_ID
     GUN_FIRE01,            
     GUN_FIRE02,
 
+    /* 武器チェンジ */
+    GUN_CHANGE01,
+
+    /* 跳弾 */
+    ROCOCHET01,
+
     /* 爆発 */
     EXPLOSION01,
+
+    /* 建物 */
+    BUILDING_DESTRUCTION,
+    BUILDING_FALL,
 
 
     /* 兵士 */
@@ -56,11 +66,16 @@ enum class SOUND_ID
     /* 敵 */
     ENEMY_ANT_HIT01,        // アリ被弾 
     ENEMY_ANT_DEAD,         // アリやられる
+    ENEMY_ANT_ACID_SHOOT,   // 酸射出
+
+    /* アイテム */
+    ITEM_GET,               // 取得
+
 
     
     /* システム */
     SYSTEM_MOVING_CURSOR01, // 項目にカーソルがホバーしている状態
-    
+	SYSTEM_DECISION01,      // 決定音
     
     TEST,
 
@@ -98,7 +113,8 @@ enum class BGM_ID
 
     // BGM
     BGM_TITLE_01,
-
+	BGM_GAME_01,
+    BGM_VICTORY01,
 
     NUM
 };
@@ -250,7 +266,8 @@ public:
     bool Stop(SOUND_TYPE _type, int _id);     // 停止（BGM以外）
     bool StopBGM(BGM_ID _id);                 // 停止（BGMのみ）
 
-    float get_Volume(SOUND_TYPE _type);        // 音量の取得
+	void set_Volume(SOUND_TYPE _type, float _volume);    // 音量の設定
+    float get_Volume(SOUND_TYPE _type)const;        // 音量の取得
 
 private:
     // コピー禁止

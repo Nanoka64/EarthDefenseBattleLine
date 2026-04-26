@@ -37,6 +37,7 @@ private:
     std::shared_ptr<class RendererEngine> m_pRenderer;// 描画管理
     
     bool m_IsClose; // 終了フラグ
+    bool m_IsEditMode;  // 編集モードにするか
 
 public:
 
@@ -66,6 +67,13 @@ public:
     /// <param name="nCmdShow"> ウインドウを表示するためのもの</param>
     void Run(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow);  // 実行
     
+
+    /// <summary>
+    /// デバッグモードかどうか
+    /// </summary>
+    /// <returns>フラグ</returns>
+    bool get_IsDebugMode()const { return m_IsEditMode; }
+
 private:
     /// <summary>
     ///【?】 初期化
@@ -89,6 +97,11 @@ private:
     /// <returns></returns>
     int MainLoop();      
 
+
+    /// <summary>
+    /// アプリケーションのImGui関連
+    /// </summary>
+    void AppEditDrawImGui();
 
 
     // ======================================================================================================

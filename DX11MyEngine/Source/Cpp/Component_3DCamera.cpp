@@ -13,8 +13,8 @@ using namespace DirectX;
 
 #define CAMERA_ANGLE_SPEED		0.05f		// カメラの方向転換スピード
 #define CAMERA_MOVE_FACTOR		0.5f		// 
-#define CAMERA_POS_OFFSET		18.0f		// 位置のオフセット
-#define CAMERA_FOCUS_Y_OFFSET	22.0f		// 中視点オブジェクトのオフセット
+#define CAMERA_POS_OFFSET		3.0f		// 位置のオフセット
+#define CAMERA_FOCUS_Y_OFFSET	2.0f		// 中視点オブジェクトのオフセット
 
 //*---------------------------------------------------------------------------------------
 //* @:Camera3D Class 
@@ -29,10 +29,11 @@ m_CameraPos({ 0.0f,0.0f,0.0f }),
 m_LookDir({ 0.0f,0.0f,0.0f }),
 m_Angle_H(1.57f),
 m_Angle_V(0.f),
-m_Fov(90.0f),
+m_Fov(45.0f),
 m_NearClipDist(1.0f),
-m_FarClipDist(6000.0f),
-m_IsControl(true)
+m_FarClipDist(2000.0f),
+m_IsControl(true),
+m_Shaker()
 {
 	this->set_Tag("Camera3D"); 
 	m_PosOffset.x = CAMERA_POS_OFFSET;
@@ -62,7 +63,8 @@ Camera3D::~Camera3D()
 //*----------------------------------------------------------------------------------------
 void Camera3D::Start(RendererEngine& renderer)
 {
-
+	// デフォルトFOVの設定
+	Master::m_pDataManager->set_DefaultFov(m_Fov);
 }
 
 
@@ -76,17 +78,70 @@ void Camera3D::Start(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void Camera3D::LateUpdate(RendererEngine &renderer)
 {
-	// 操作フラグがオフなら操作できない
-	if (m_IsControl == false)return;
+	if (Master::m_pDataManager->get_IsPause())return;	// TODO:ポーズ中なら返す
 
+
+	m_IsControl = Master::m_pDataManager->get_IsCameraControl();
+
+	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
+
+	// 操作フラグがオフなら操作できない
+	if (m_IsControl)
+	{
+		CamraControl(renderer);
+	}
+
+
+	if (m_pFocusObject.expired())
+	{
+		return;
+	}
+
+	VEC3 focusObjPos = m_pFocusObject.lock()->get_Transform().lock()->get_VEC3ToPos();
+	focusObjPos += m_FocusOffset;
+
+	// 注視点を設定
+	//m_FocusPoint = VEC3::Lerp(m_FocusPoint, focusObjPos, CAMERA_MOVE_FACTOR);	// ガタガタする
+	m_FocusPoint = focusObjPos;
+
+	// 方向ベクトルを作る
+	VEC3 lookDir;
+	lookDir.x = m_PosOffset.x * cosf(m_Angle_V) * cosf(m_Angle_H);
+	lookDir.y = m_PosOffset.y * sinf(m_Angle_V);
+	lookDir.z = m_PosOffset.z * cosf(m_Angle_V) * sinf(m_Angle_H);
+
+
+
+	m_CameraPos = lookDir + m_FocusPoint;
+
+	// シェイクの適用
+	if (Master::m_pDataManager->get_UserConfigData()._isCameraShake)
+	{
+		// シェイクの更新
+		m_Shaker.Update(deltaTime);
+		m_CameraPos = m_Shaker.Apply(m_CameraPos);
+	}
+
+    m_LookDir = lookDir;
+
+	// カメラの位置
+	m_pOwner.lock()->get_Transform().lock()->set_Pos(m_CameraPos);
+}
+
+
+void Camera3D::CamraControl(RendererEngine& renderer)
+{
 	// マウスの移動量の差を取得する
-	LONG lX = Master::m_pInputManager->GetMousePosSlopeX();	
+	LONG lX = Master::m_pInputManager->GetMousePosSlopeX();
 	LONG lY = Master::m_pInputManager->GetMousePosSlopeY();
-	float semsitivity = 0.004f;
+	const float MOUSE_SCALE = 0.0001f;	// そのままでは大きすぎるため、スケーリングする（最大1.0になるように）
+	float sensitivity = Master::m_pDataManager->get_UserConfigData()._mouseSensitivity * MOUSE_SCALE;
+
+	lY = Master::m_pDataManager->get_UserConfigData()._isInvertY ? -lY : lY;
 
 	// マウスの移動量を計算
-	m_Angle_H -= (float)lX * semsitivity;
-	m_Angle_V += (float)lY * semsitivity;
+	m_Angle_H -= (float)lX * sensitivity;
+	m_Angle_V += (float)lY * sensitivity;
 
 	if (m_Angle_V >= 1.5f)	// 下を向く
 	{
@@ -132,30 +187,6 @@ void Camera3D::LateUpdate(RendererEngine &renderer)
 			m_Angle_H += 6.28f;
 		}
 	}
-
-	if (m_pFocusObject.expired())
-	{
-		return;
-	}
-
-	VEC3 focusObjPos = m_pFocusObject.lock()->get_Transform().lock()->get_VEC3ToPos();
-	focusObjPos += m_FocusOffset;
-
-	// 注視点を設定
-	//m_FocusPoint = VEC3::Lerp(m_FocusPoint, focusObjPos, CAMERA_MOVE_FACTOR);	// ガタガタする
-	m_FocusPoint = focusObjPos;
-
-	// 方向ベクトルを作る
-	VEC3 lookDir;
-	lookDir.x = m_PosOffset.x * cosf(m_Angle_V) * cosf(m_Angle_H);
-	lookDir.y = m_PosOffset.y * sinf(m_Angle_V);
-	lookDir.z = m_PosOffset.z * cosf(m_Angle_V) * sinf(m_Angle_H);
-
-	m_CameraPos = lookDir + m_FocusPoint;
-    m_LookDir = lookDir;
-
-	// カメラの位置
-	m_pOwner.lock()->get_Transform().lock()->set_Pos(m_CameraPos);
 }
 
 
@@ -180,6 +211,48 @@ XMMATRIX Camera3D::get_ViewMatrix()const
 
 	return viewMat;
 }
+
+//*---------------------------------------------------------------------------------------
+//*【?】カメラシェイクの開始
+//*
+//* [引数]
+//* _duration : 持続時間
+//* &_strength : 強さ
+//*
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void Camera3D::RequestShake(float _duration, const VECTOR3::VEC3& _strength)
+{
+	m_Shaker.Start(_duration, _strength);
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】カメラシェイクの開始 
+//*     距離減衰ver 
+//*
+//* [引数]
+//* _duration : 持続時間
+//* &_strength : 強さ
+//* &_shakePos : シェイクを発生させる位置
+//* &maxRadius : シェイクを及ぼす最大距離
+//*
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void Camera3D::DistanceDecay(float _duration, const VECTOR3::VEC3& _strength, const VECTOR3::VEC3& _shakePos, float _maxRange)
+{
+	float dist = VEC3::DistanceSq(m_CameraPos, _shakePos); // スタートからの移動距離
+
+	if (_maxRange * _maxRange > dist)
+	{
+		float t = dist / (_maxRange * _maxRange);	// 0.0 ～ 1.0
+		float factor = 1.0f - t;    // そのままでは、最大（端）で1.0になってしまい、離れるほど大きくなってしまうので
+		VEC3 length = _strength * factor;
+
+		m_Shaker.Start(_duration, length);
+	}
+
+}
+
 
 void Camera3D::set_UpVec(const VECTOR3::VEC3& upVec)
 {

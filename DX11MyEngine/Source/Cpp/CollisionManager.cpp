@@ -7,6 +7,7 @@
 #include "Component_Transform.h"
 #include "GameObject.h"
 
+using namespace UtilityData;
 using namespace VECTOR3;
 
 CollisionManager::CollisionManager()
@@ -126,8 +127,20 @@ void CollisionManager::CollisionProcess()
                     pushVector = info.get_HitNormal() * info.get_PenetrationDepth();
 
                     // 静的オブジェクトの場合は0.0にする（押し出さない）
-                    float ratioA = isStaticA ? 0.0f : 0.5f;
-                    float ratioB = isStaticB ? 0.0f : 0.5f;
+                    // 押し出し比率
+                    float ratioA = 0.5f;
+                    float ratioB = 0.5f;
+
+                    if (isStaticA && !isStaticB) {
+                        // Aが静的、Bが動的
+                        ratioA = 0.0f;
+                        ratioB = 1.0f;
+                    }
+                    else if (!isStaticA && isStaticB) {
+                        // Aが動的、Bが静的
+                        ratioA = 1.0f;
+                        ratioB = 0.0f;
+                    }
 
 
                     // Aは法線方向に押し出す *******************************************
@@ -402,7 +415,7 @@ bool CollisionManager::HitCheck_Raycast(
     std::shared_ptr<class Collider> _collider, 
     std::shared_ptr<class MyTransform> _transform, 
     const CollInData_Ray& _ray, 
-    float* _outDist,
+    float* _outDistSq,
     class CollisionInfo* _outHitInfo)
 {
     bool isHit = false;
@@ -414,10 +427,26 @@ bool CollisionManager::HitCheck_Raycast(
         break;
     case COLLIDER_TYPE::BOX:
     {
-        CollInData_AABB box;
-        if (HitCheck_BoxVsRay(box, _ray, _outHitInfo))
-        {
+        auto boxCollider = std::static_pointer_cast<BoxCollider>(_collider);
+        
+        // コライダーの位置と、オブジェクトの位置を合わせる。
+        VEC3 center = boxCollider->get_Center() + _transform->get_VEC3ToPos();
 
+        // サイズを反映させる
+        CollInData_AABB dataAABB;
+        dataAABB._min = center - boxCollider->get_Size();
+        dataAABB._max = center + boxCollider->get_Size();
+
+        if (HitCheck_BoxVsRay(dataAABB, _ray, _outHitInfo))
+        {
+			// 衝突したコライダーとオブジェクトを保存
+			_outHitInfo->set_HitCollider(_collider);
+			_outHitInfo->set_HitObject(_collider->get_OwnerObj());
+
+			// 衝突したコライダーへの距離を保存
+			*_outDistSq = (_outHitInfo->get_HitPoint() - _ray._point).LengthSq();
+            
+            isHit = true;
         }
     }
     break;
@@ -468,17 +497,54 @@ std::vector<std::shared_ptr<Collider>> CollisionManager::CheckSphere(const VECTO
 
         // マスクチェック
         if (!(UINT_CAST(col->get_CollisionCategory()) & _mask)) continue;
+        if (!col->get_IsActiveOwnerObj())continue;
 
         // トランスフォーム取得
         auto trans = col->get_OwnerObj().lock()->get_Component<MyTransform>();
-        VEC3 pos = trans->get_VEC3ToPos();
-        CollInData_Sphere srcA = { _center,_radius };
-        CollInData_Sphere srcB = { pos,    _radius };
 
-        if (HitCheck_SphereVsSphere(srcA, srcB))
-        {
-            hitList.push_back(col);
+        // 相手が球の場合
+        if (col->get_ColliderType() == COLLIDER_TYPE::SPHERE) {
+            float colRadius = 0.0f;
+            auto sphereCol = std::static_pointer_cast<SphereCollider>(col);
+            colRadius = sphereCol->get_Radius();
+
+            VEC3 pos = trans->get_VEC3ToPos();
+            CollInData_Sphere srcA = { _center,_radius };
+            CollInData_Sphere srcB = { pos,    colRadius };
+
+            // スフィアとスフィアで判定
+            if (HitCheck_SphereVsSphere(srcA, srcB))
+            {
+                hitList.push_back(col);
+            }
+
         }
+
+        // ボックスの場合
+         else if (col->get_ColliderType() == COLLIDER_TYPE::BOX) {
+            auto boxCol = std::static_pointer_cast<BoxCollider>(col);
+            // コライダーの位置と、オブジェクトの位置を合わせる。
+            VEC3 center = boxCol->get_Center() + trans->get_VEC3ToPos();
+
+
+            // AABB
+            CollInData_AABB srcA;
+            srcA._min = center - boxCol->get_Size();
+            srcA._max = center + boxCol->get_Size();
+
+            // スフィア
+            CollInData_Sphere srcB = { _center,_radius };
+
+            // ボックスとスフィアで判定
+            if (HitCheck_BoxVsSphere(srcA, srcB))
+            {
+                hitList.push_back(col);
+            }
+        }
+         else {
+            continue; // その他のコライダータイプはスキップ
+		}
+
     }
     return hitList;
 }
@@ -497,7 +563,7 @@ std::vector<std::shared_ptr<Collider>> CollisionManager::CheckSphere(const VECTO
 bool CollisionManager::CheckRaycast(const CollInData_Ray& _ray, int _mask, class CollisionInfo* _outHitInfo)
 {
     bool isHit = false;
-    float closestDist = FLT_MAX;
+    float closestDist = FLT_MIN;
     CollisionInfo tempHitInfo;
 
     // 判定ループ処理
@@ -623,152 +689,6 @@ bool CollisionManager::HitCheck_BoxVsPoint(const CollInData_AABB& _box, const VE
     return true;
 }
 
-//*---------------------------------------------------------------------------------------
-//*【?】ボックスとレイの判定
-//*
-//* [引数]
-//* &_src : 箱 
-//* &_dst : 光線
-//* [返値]
-//* true : 当たった
-//* false : 当たってない
-//*----------------------------------------------------------------------------------------
-bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray)
-{
-    float t_Min = 0.0f;
-    float t_Max = 0.0f;
-
-    VEC3 minV = _box._min;
-    VEC3 maxV = _box._max;
-    VEC3 point = _ray._point;
-    VEC3 dir = _ray._dir;
-
-    // X軸の判定*************************************************
-    float tx_Min = 0.0f;
-    float tx_Max = 0.0f;
-    // 線分ベクトルが0.0の場合
-    if (dir.x == 0.0f) {
-        if (point.x < minV.x || point.x > maxV.x)
-        {
-            return false;
-        }
-
-        tx_Min = 0.0f;
-        tx_Max = 1.0f;
-    }
-    else {
-        // X軸での領域を決定
-        float t0 = (minV.x - point.x) / dir.x;
-        float t1 = (maxV.x - point.x) / dir.x;
-        if (t0 < t1) {
-            tx_Min = t0;
-            tx_Max = t1;
-        }
-        else {
-            tx_Min = t1;
-            tx_Max = t0;
-        }
-        // X軸領域内ですでに範囲外
-        if (tx_Max < 0.0f || tx_Min > 1.0f) {
-            return false;
-        }
-    }
-
-    t_Min = tx_Min;
-    t_Max = tx_Max;
-
-
-    // Y軸の判定*************************************************
-    float ty_Min = 0.0f;
-    float ty_Max = 0.0f;
-    // 線分ベクトルが0.0の場合
-    if (dir.y == 0.0f) {
-        if (point.y < minV.y || point.y > maxV.y)
-        {
-            return false;
-        }
-
-        ty_Min = 0.0f;
-        ty_Max = 1.0f;
-    }
-    else {
-        // X軸での領域を決定
-        float t0 = (minV.y - point.y) / dir.y;
-        float t1 = (maxV.y - point.y) / dir.y;
-        if (t0 < t1) {
-            ty_Min = t0;
-            ty_Max = t1;
-        }
-        else {
-            ty_Min = t1;
-            ty_Max = t0;
-        }
-        // Y軸領域内ですでに範囲外
-        if (ty_Max < 0.0f || ty_Min > 1.0f) {
-            return false;
-        }
-    }
-
-    if (t_Max < ty_Min || t_Min > ty_Max)
-    {
-        return false;
-    }
-
-    // X軸とY軸の領域が被っていない
-    if (t_Min < ty_Min)t_Min = ty_Min;
-    if (t_Max > ty_Max)t_Max = ty_Max;
-
-
-
-    // Z軸の判定*************************************************
-    float tz_Min = 0.0f;
-    float tz_Max = 0.0f;
-    // 線分ベクトルが0.0の場合
-    if (dir.z == 0.0f) {
-        if (point.z < minV.z || point.z > maxV.z)
-        {
-            return false;
-        }
-
-        tz_Min = 0.0f;
-        tz_Max = 1.0f;
-    }
-    else {
-        // X軸での領域を決定
-        float t0 = (minV.z - point.z) / dir.z;
-        float t1 = (maxV.z - point.z) / dir.z;
-        if (t0 < t1) {
-            tz_Min = t0;
-            tz_Max = t1;
-        }
-        else {
-            tz_Min = t1;
-            tz_Max = t0;
-        }
-        // Z軸領域内ですでに範囲外
-        if (tz_Max < 0.0f || tz_Min > 1.0f) {
-            return false;
-        }
-    }
-
-    if (t_Max < tz_Min || t_Min > tz_Max)
-    {
-        return false;
-    }
-
-    // X軸とY軸の領域が被っていない
-    if (t_Min < tz_Min)t_Min = tz_Min;
-    if (t_Max > tz_Max)t_Max = tz_Max;
-
-    // 共通領域のチェック
-    if (t_Min > 1.0f || t_Max < 0.0f) {
-        return false;
-    }
-
-    return true;
-}
-
-
 
 //*---------------------------------------------------------------------------------------
 //*【?】ボックスとスフィアの判定
@@ -795,7 +715,7 @@ bool CollisionManager::HitCheck_BoxVsSphere(const CollInData_AABB &_box, const C
                      (P.z - _sphere._pos.z) * (P.z - _sphere._pos.z);
 
     // 距離が球の半径より小さいなら衝突
-    return distance < _sphere._radius;
+    return distance < (_sphere._radius * _sphere._radius);
 }
 
 
@@ -812,12 +732,11 @@ bool CollisionManager::HitCheck_BoxVsSphere(const CollInData_AABB &_box, const C
 bool CollisionManager::HitCheck_SphereVsSphere(const CollInData_Sphere& _src, const CollInData_Sphere& _dst)
 {
     VECTOR3::VEC3 result;
-    result = _dst._pos - _src._pos;
+    float dist = VEC3::DistanceSq(_src._pos, _dst._pos);
 
-    float length = result.LengthSq();
     float r = _src._radius + _dst._radius;
 
-    if ((r * r) > length)
+    if ((r * r) > dist)
     {
         return true;
     }
@@ -885,6 +804,156 @@ bool CollisionManager::HitCheck_PlaneVsRay(const CollInData_Plane& _plane, const
 //*----------------------------------------------------------------------------------------
 bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo)
 {
+    float t_Min = 0.0f;
+    float t_Max = 0.0f;
+	VEC3 hitNnormal = VEC3();
+
+    VEC3 minV = _box._min;
+    VEC3 maxV = _box._max;
+    VEC3 point = _ray._point;
+    VEC3 dir = _ray._dir;
+
+    // X軸の判定*************************************************
+    float tx_Min = 0.0f;
+    float tx_Max = 0.0f;
+    // 線分ベクトルが0.0（平行）の場合
+    if (dir.x == 0.0f) 
+    {
+        // 線分のZ幅がボックスのZ幅に入ってなければ、衝突していない
+        if (point.x < minV.x || point.x > maxV.x)
+        {
+            return false;
+        }
+
+        tx_Min = 0.0f;
+        tx_Max = 1.0f;
+    }
+    else {
+        // X軸での領域を決定
+        float t0 = (minV.x - point.x) / dir.x;
+        float t1 = (maxV.x - point.x) / dir.x;
+        if (t0 < t1) {
+            tx_Min = t0;
+            tx_Max = t1;
+        }
+        else {
+            tx_Min = t1;
+            tx_Max = t0;
+        }
+        // X軸領域内ですでに範囲外
+        if (tx_Max < 0.0f || tx_Min > 1.0f) {
+            return false;
+        }
+    }
+
+    t_Min = tx_Min;
+    t_Max = tx_Max;
+
+	// 方向がマイナスということは、正の方向から入ってきているので、衝突した面の法線は正のX軸方向
+    hitNnormal = (dir.x < 0.0f) ? VEC3(1.0f, 0.0f, 0.0f) : VEC3(-1.0f, 0.0f, 0.0f);
+
+
+
+    // Y軸の判定*************************************************
+    float ty_Min = 0.0f;
+    float ty_Max = 0.0f;
+    // 線分ベクトルが0.0（平行）の場合
+    if (dir.y == 0.0f) {
+
+		// 線分のY幅がボックスのY幅に入ってなければ、衝突していない
+        if (point.y < minV.y || point.y > maxV.y)
+        {
+            return false;
+        }
+
+        ty_Min = 0.0f;
+        ty_Max = 1.0f;
+    }
+    else {
+        // Y軸での領域を決定
+        float t0 = (minV.y - point.y) / dir.y;
+        float t1 = (maxV.y - point.y) / dir.y;
+        if (t0 < t1) {
+            ty_Min = t0;
+            ty_Max = t1;
+        }
+        else {
+            ty_Min = t1;
+            ty_Max = t0;
+        }
+        // Y軸領域内ですでに範囲外
+        if (ty_Max < 0.0f || ty_Min > 1.0f) {
+            return false;
+        }
+    }
+
+    if (t_Max < ty_Min || t_Min > ty_Max)
+    {
+        return false;
+    }
+
+    // Y軸の方が進入が遅い（Y軸の面から箱に入った）
+    if (t_Min < ty_Min) {
+        t_Min = ty_Min;
+		hitNnormal = (dir.y < 0.0f) ? VEC3(0.0f, 1.0f, 0.0f) : VEC3(0.0f, -1.0f, 0.0f);
+    }
+
+    if (t_Max > ty_Max)t_Max = ty_Max;
+
+
+
+    // Z軸の判定*************************************************
+    float tz_Min = 0.0f;
+    float tz_Max = 0.0f;
+    // 線分ベクトルが0.0の場合
+    if (dir.z == 0.0f) {
+        if (point.z < minV.z || point.z > maxV.z)
+        {
+            return false;
+        }
+
+        tz_Min = 0.0f;
+        tz_Max = 1.0f;
+    }
+    else {
+        // Z軸での領域を決定
+        float t0 = (minV.z - point.z) / dir.z;
+        float t1 = (maxV.z - point.z) / dir.z;
+        if (t0 < t1) {
+            tz_Min = t0;
+            tz_Max = t1;
+        }
+        else {
+            tz_Min = t1;
+            tz_Max = t0;
+        }
+        // Z軸領域内ですでに範囲外
+        if (tz_Max < 0.0f || tz_Min > 1.0f) {
+            return false;
+        }
+    }
+
+    if (t_Max < tz_Min || t_Min > tz_Max)
+    {
+        return false;
+    }
+
+    // X軸とY軸の領域が被っていない
+    if (t_Min < tz_Min) {
+        t_Min = tz_Min;
+		hitNnormal = (dir.z < 0.0f) ? VEC3(0.0f, 0.0f, 1.0f) : VEC3(0.0f, 0.0f, -1.0f);
+    }
+    if (t_Max > tz_Max)t_Max = tz_Max;
+
+    // 共通領域のチェック
+    if (t_Min > 1.0f || t_Max < 0.0f) {
+        return false;
+    }
+
+
+    _hitInfo->set_HitPoint(point + dir * t_Min);
+    _hitInfo->set_HitNormal(hitNnormal);
+
     return true;
 }
 

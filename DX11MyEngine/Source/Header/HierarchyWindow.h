@@ -10,5 +10,9 @@ public:
     ~HierarchyWindow() override;
     bool Init(RendererEngine &renderer) override;
     void Update(RendererEngine &renderer)override;
+
+private:
+    void SelectObjectsDraw(std::vector<std::shared_ptr<GameObject>>& _objects)const;
+
 };
 

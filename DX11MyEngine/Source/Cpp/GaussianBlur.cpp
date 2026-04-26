@@ -10,7 +10,6 @@
 
 
 /// <summary>
-/// ※ 魔導書にあった関数
 /// ガウシアン関数を利用して重みテーブルを計算する
 /// </summary>
 /// <param name="weightsTbl">重みテーブルの記録先</param>
@@ -44,7 +43,7 @@ void CalcWeightsTableFromGaussian(float* weightsTbl, int sizeOfWeightsTbl, float
 
 
 GaussianBlur::GaussianBlur():
-    m_weights(),
+    m_BlurInfo(),
     m_pHorizontalBlur(nullptr),
     m_pVerticalBlur(nullptr),
     m_Id()
@@ -69,7 +68,7 @@ bool GaussianBlur::Setup(RendererEngine& renderer, std::shared_ptr<Texture> pTex
 	}
 
     // ガウシアンブラー用の重みテーブルを計算する
-    CalcWeightsTableFromGaussian(m_weights, NUM_WEIGHTS, 4.0f);
+    CalcWeightsTableFromGaussian(m_BlurInfo.weights, NUM_WEIGHTS, 4.0f);
 
     // スプライトの初期化
 	if (!InitSprites(renderer)){
@@ -82,7 +81,7 @@ bool GaussianBlur::Setup(RendererEngine& renderer, std::shared_ptr<Texture> pTex
 void GaussianBlur::ExcuteOnGPU(RendererEngine& renderer, float blurPow)
 {
     // ガウシアンブラー用の重みテーブルを計算する
-    CalcWeightsTableFromGaussian(m_weights, NUM_WEIGHTS, blurPow);
+    CalcWeightsTableFromGaussian(m_BlurInfo.weights, NUM_WEIGHTS, blurPow);
 
     renderer.RegisterCullMode(CULL_MODE::BACK);
 
@@ -91,18 +90,18 @@ void GaussianBlur::ExcuteOnGPU(RendererEngine& renderer, float blurPow)
     // 水平ブラー
     // 
     // ************************************************************************
-    UINT vpWidth = static_cast<float>(m_pTexture.lock()->get_Width()) / 2.0f;
-    UINT vpHeight = static_cast<float>(m_pTexture.lock()->get_Height());
+    UINT vpWidth = UINT_CAST(m_pTexture.lock()->get_Width()) / 2;
+    UINT vpHeight = UINT_CAST(m_pTexture.lock()->get_Height());
     
     // ビューポートの設定
-    renderer.set_ViewPort(0, 0, vpWidth, vpHeight);
+    renderer.set_ViewPort(0, 0, FLOAT_CAST(vpWidth), FLOAT_CAST(vpHeight));
 
     // 水平ブラー用レンダリングターゲットに変更
     renderer.RegisterRenderTarget(m_pHorizontalBlur->get_RTV(), nullptr);
     renderer.ClearRenderTargetView(m_pHorizontalBlur);
 
     // 水平ブラー
-    m_pHorizontalBlurSprite->setToGPU_ExtendUserPS_CBuffer(renderer, 0, &m_weights);
+    m_pHorizontalBlurSprite->setToGPU_ExtendUserPS_CBuffer(renderer, 0, &m_BlurInfo.weights);
     m_pHorizontalBlurSprite->Draw(renderer);
 
     // レンダリングターゲット解除
@@ -113,17 +112,18 @@ void GaussianBlur::ExcuteOnGPU(RendererEngine& renderer, float blurPow)
     // 垂直ブラー
     // 
     // ************************************************************************
-    vpWidth = static_cast<float>(m_pTexture.lock()->get_Width()) / 2.0f;
-    vpHeight = static_cast<float>(m_pTexture.lock()->get_Height()) / 2.0f;
+    vpWidth = UINT_CAST(m_pTexture.lock()->get_Width()) / 2;
+    vpHeight = UINT_CAST(m_pTexture.lock()->get_Height()) / 2;
      
     // ビューポートの設定
-    renderer.set_ViewPort(0, 0, vpWidth, vpHeight);
+    renderer.set_ViewPort(0, 0, FLOAT_CAST(vpWidth), FLOAT_CAST(vpHeight));
+
     // 垂直ブラー用レンダリングターゲットに変更
     renderer.RegisterRenderTarget(m_pVerticalBlur->get_RTV(), nullptr);
     renderer.ClearRenderTargetView(m_pVerticalBlur);
 
     // 垂直ブラー
-    m_pVerticalBlurSprite->setToGPU_ExtendUserPS_CBuffer(renderer, 0, &m_weights);
+    m_pVerticalBlurSprite->setToGPU_ExtendUserPS_CBuffer(renderer, 0, &m_BlurInfo.weights);
     m_pVerticalBlurSprite->Draw(renderer);
 
     // レンダリングターゲット解除
@@ -132,6 +132,8 @@ void GaussianBlur::ExcuteOnGPU(RendererEngine& renderer, float blurPow)
 
 void GaussianBlur::Term()
 {
+    m_pHorizontalBlurSprite.reset();
+    m_pVerticalBlurSprite.reset();
     SAFE_DELETE(m_pHorizontalBlur);
     SAFE_DELETE(m_pVerticalBlur);
 }
@@ -187,13 +189,13 @@ bool GaussianBlur::InitSprites(RendererEngine& renderer)
     horizontalBlurSprite.pRenderer = &renderer;
     horizontalBlurSprite.pPSConstantBuffers = new ExpandConstantBufferInfo(); // VS定数バッファにブラー用の重みテーブルをセット
     horizontalBlurSprite.pPSConstantBuffers->SetSlot = 7;               // スロット7にセット
-    horizontalBlurSprite.pPSConstantBuffers->pUserExpandConstantBuffer = &m_weights;
-    horizontalBlurSprite.pPSConstantBuffers->UserExpandConstantBufferSize = sizeof(m_weights);
+    horizontalBlurSprite.pPSConstantBuffers->pUserExpandConstantBuffer = &m_BlurInfo.weights;
+    horizontalBlurSprite.pPSConstantBuffers->UserExpandConstantBufferSize = sizeof(m_BlurInfo.weights);
     horizontalBlurSprite.PSConstBufferNum = 1;
     horizontalBlurSprite.IsActive = false;
     horizontalBlurSprite.ObjTag = "HorizontalBlurSprite" + std::to_string(m_Id);
-    horizontalBlurSprite.Width = screenW;      // サイズの変更はRTだけでいい
-    horizontalBlurSprite.Height = screenH;
+    horizontalBlurSprite.Width = FLOAT_CAST(screenW);      // サイズの変更はRTだけでいい
+    horizontalBlurSprite.Height = FLOAT_CAST(screenH);
     horizontalBlurSprite.pTextureMap[0] = m_pTexture;
     horizontalBlurSprite.Type = SPRITE_USAGE_TYPE::RENDER_TARGET;
     horizontalBlurSprite.ShaderType = SHADER_TYPE::POST_GAUSSIAN_BLUR_HORIZONTAL;
@@ -207,13 +209,13 @@ bool GaussianBlur::InitSprites(RendererEngine& renderer)
     verticalBlurSprite.pRenderer = &renderer;
     verticalBlurSprite.pPSConstantBuffers = new ExpandConstantBufferInfo();   // VS定数バッファにブラー用の重みテーブルをセット
     verticalBlurSprite.pPSConstantBuffers->SetSlot = 7;                 // スロット7にセット
-    verticalBlurSprite.pPSConstantBuffers->pUserExpandConstantBuffer = &m_weights;
-    verticalBlurSprite.pPSConstantBuffers->UserExpandConstantBufferSize = sizeof(m_weights);
+    verticalBlurSprite.pPSConstantBuffers->pUserExpandConstantBuffer = &m_BlurInfo.weights;
+    verticalBlurSprite.pPSConstantBuffers->UserExpandConstantBufferSize = sizeof(m_BlurInfo.weights);
     verticalBlurSprite.PSConstBufferNum = 1;
     verticalBlurSprite.IsActive = false;
     verticalBlurSprite.ObjTag = "VerticalBlurSprite" + std::to_string(m_Id);
-    verticalBlurSprite.Width = screenW;
-    verticalBlurSprite.Height = screenH;
+    verticalBlurSprite.Width = FLOAT_CAST(screenW); 
+    verticalBlurSprite.Height = FLOAT_CAST(screenH);
     verticalBlurSprite.pTextureMap[0] = Master::m_pResourceManager->Convert_SRVToTexture("RT_HorizontalBlur" + std::to_string(m_Id), m_pHorizontalBlur->get_SRV_ComPtr());
     verticalBlurSprite.Type = SPRITE_USAGE_TYPE::RENDER_TARGET;
     verticalBlurSprite.ShaderType = SHADER_TYPE::POST_GAUSSIAN_BLUR_VERTICAL;

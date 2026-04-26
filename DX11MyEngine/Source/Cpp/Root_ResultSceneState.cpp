@@ -1,10 +1,14 @@
 #include "pch.h"
-#include "Root_ResultSceneState.h"
+#include "ResultScene_StateHeader.h"
 #include "GameObjectManager.h"
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
+#include "Component_WeaponController.h"
 #include "InputFactory.h"
 
+using namespace VECTOR2;
+using namespace VECTOR3;
+using namespace VECTOR4;
 using namespace SceneStateEnums;
 using namespace Tool::UV;
 
@@ -15,9 +19,15 @@ using namespace Tool::UV;
 //* 引数：1.SceneManager
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-void Root_ResultSceneState::OnEnter(SceneManager *pOwner)
+void Root_ResultSceneState::OnEnter(SceneManager* pOwner)
 {
-	this->SetInitChildState(pOwner, c_RESULT::c_GETITEM_CHECK);
+	// クリアか失敗か
+	if (Master::m_pDataManager->get_IsMissionCleared()) {	
+		this->SetInitChildState(pOwner, c_RESULT::c_CLEARED);
+	}
+	else{
+		this->SetInitChildState(pOwner, c_RESULT::c_FAILED);
+	}
 }
 
 
@@ -27,9 +37,10 @@ void Root_ResultSceneState::OnEnter(SceneManager *pOwner)
 //* 引数：1.SceneManager
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-void Root_ResultSceneState::OnExit(SceneManager *pOwner)
+void Root_ResultSceneState::OnExit(SceneManager* pOwner)
 {
-	Master::m_pGameObjectManager->clear_NotIsDontDestroyObject();
+	// ゲーム中に使用したリソースをクリアする
+	Master::m_pDataManager->ClearGameSceneResource(*m_pRenderer);
 }
 
 

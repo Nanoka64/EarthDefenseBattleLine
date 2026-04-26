@@ -1,15 +1,93 @@
 #pragma once
+#include "ConstantBulletData.h"
 
 /// <summary>
 /// 武器データをまとめた名前空間
 /// </summary>
 namespace WeaponData
 {
+
+    /// <summary>
+    /// UI表示用の武器データ
+    /// </summary>
+    struct WeaponUIData
+    {
+        std::wstring _name;             // 武器名
+        int _ammoMaxNum = 0;            // 弾数( 0なら弾を持たない武器 )
+        int _ammoRemaining = 0;         // 現在の弾数
+        float _reloadTime;              // リロード時間
+        float _crntReloadTime;          // 現在のリロード時間
+    };
+
+
+    /// <summary>
+    /// ベースとなる武器データ
+    /// </summary>
+    struct BaseWeaponData
+    {
+        int _level = -1;                // 武器レベル
+        std::wstring _name;             // 武器名
+
+        /// <summary>
+        /// リセット
+        /// </summary>
+        void Reset()
+        {
+            *this = BaseWeaponData();
+        }
+    };
+
+    /// <summary>
+    /// 銃系武器のデータ
+    /// </summary>
+    struct GunWeaponData : BaseWeaponData
+    {
+        int _bulletMaxNum = 0;          // 弾数
+        int _bulletSimultaneousNum = 1; // 弾の同時発射数
+        float _fireRate = 0.0f;         // 連射速度
+        float _reloadTime = 0.0f;       // リロード時間
+        float _accuracy = 0.0f;         // 精度（ラジアン）
+        float _zoomLength = 0.0f;       // ズーム倍率（0.0以外の時に作動）
+        bool _isLaserSight = true;      // レーザーサイトはあるか
+        int _soundID = -1;              // 発射音のID
+
+        BulletData::BULLET_TYPE _bulletType = BulletData::BULLET_TYPE::NORMAL;  // 弾の種類
+
+        // variantは共用体（union）を使いやすくしてくれるやつ
+        // 必ず「_bulletType」と一致したデータを入れる
+        using BulletParamVariant = std::variant<BulletData::NormalBulletData, BulletData::ExplosionBulletData>;
+        BulletParamVariant _bulletParam;    // 弾のパラメータ
+
+        /// <summary>
+        /// リセット
+        /// </summary>
+        void Reset()
+        {
+            *this = GunWeaponData();
+        }
+    };
+
+    /// <summary>
+    /// 爆発武器のデータ
+    /// </summary>
+    struct ExplosionWeaponData : GunWeaponData
+    {
+        /// <summary>
+        /// リセット
+        /// </summary>
+        void Reset()
+        {
+            *this = ExplosionWeaponData();
+        }
+    };
+
     /// <summary>
     /// レンジャーの武器データ
     /// </summary>
     namespace Ranger
     {
+        constexpr int RANGER_WEAPON_NUM = 2;    // 二つまで装備
+
         /// <summary>
         /// 装備する武器のカテゴリ
         /// </summary>
@@ -53,6 +131,5 @@ namespace WeaponData
 
             NUM,
         };
-
     };
 };

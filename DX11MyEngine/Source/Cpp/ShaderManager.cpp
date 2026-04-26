@@ -7,8 +7,6 @@
 #include "Path.h"
 #include <algorithm>
 
-#define SHADER_NUM 2    // シェーダの数
-
 using namespace Path;
 using namespace Microsoft::WRL;
 
@@ -128,6 +126,14 @@ bool ShaderManager::Init(std::shared_ptr<RendererEngine> renderer)
         {
             /* スプライト 標準 UI用  */
             SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE,
+            ARRAYSIZE(g_Static_Layout),
+            g_Static_Layout,
+        },       
+        
+        // FORWARD_STD_STATIC
+        {
+            /* スプライト 標準 UI用  テクスチャ無し  */
+            SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE,
             ARRAYSIZE(g_Static_Layout),
             g_Static_Layout,
         },       
@@ -449,6 +455,9 @@ bool ShaderManager::VertexShaderFactory(SHADER_TYPE type, ShaderInfo* out, SHADE
         case SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE:    // スプライト 標準 UI用
             hr = this->CompileShader(HLSL__Sprite_VS_PATH.c_str(), "VSMain", "vs_5_0", &pVSBlob);
             break;       
+        case SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE:    // スプライト 標準 UI用 テクスチャ無し
+            hr = this->CompileShader(HLSL__Sprite_VS_PATH.c_str(), "VSMain", "vs_5_0", &pVSBlob);
+            break;       
         case SHADER_TYPE::FORWARD_UNLIT_STATIC:       // 簡易3Dオブジェクト ライティング無し
             hr = this->CompileShader(HLSL__Static_VS_PATH.c_str(), "VSMain", "vs_5_0", &pVSBlob);
             break; 
@@ -546,6 +555,9 @@ bool ShaderManager::VertexShaderFactory(SHADER_TYPE type, ShaderInfo* out, SHADE
             this->LoadCSOFile(HLSL_CSO__Static_VS_PATH.c_str(),&csoByteCode);
             break;
         case SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE:          // スプライト 標準 UI用
+            this->LoadCSOFile(HLSL_CSO__Sprite_VS_PATH.c_str(), &csoByteCode);
+            break;
+		case SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE: // スプライト 標準 UI用 テクスチャ無し
             this->LoadCSOFile(HLSL_CSO__Sprite_VS_PATH.c_str(), &csoByteCode);
             break;
         case SHADER_TYPE::FORWARD_UNLIT_STATIC:             // 簡易3Dオブジェクト ライティング無し
@@ -672,6 +684,9 @@ bool ShaderManager::PixelShaderFactory(SHADER_TYPE type, ShaderInfo* out, SHADER
         case SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE:    // スプライト 標準 UI用
             hr = this->CompileShader(HLSL__Sprite_PS_PATH.c_str(), "PSMain", "ps_5_0", &pPSBlob);
             break;      
+		case SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE:  // スプライト 標準 UI用 テクスチャ無し
+            hr = this->CompileShader(HLSL__Sprite_NoTexture_PS_PATH.c_str(), "PSMain", "ps_5_0", &pPSBlob);
+            break;      
         case SHADER_TYPE::FORWARD_UNLIT_STATIC:    // 簡易3Dオブジェクト ライティング無し
             hr = this->CompileShader(HLSL__Simple_PS_PATH.c_str(), "PSMain", "ps_5_0", &pPSBlob);
             break;        
@@ -761,13 +776,16 @@ bool ShaderManager::PixelShaderFactory(SHADER_TYPE type, ShaderInfo* out, SHADER
             this->LoadCSOFile(HLSL_CSO__GBuffer_Standard_PS_PATH.c_str(), &csoByteCode);
             break;
         case SHADER_TYPE::DEFERRED_STD_TRAIL:       
-            hr = LoadCSOFile(HLSL_CSO__GBuffer_Simple_PS_PATH.c_str(), &csoByteCode);
+            this->LoadCSOFile(HLSL_CSO__GBuffer_Simple_PS_PATH.c_str(), &csoByteCode);
             break;
         case SHADER_TYPE::DEFERRED_STD_DECAL:       
-            hr = LoadCSOFile(HLSL_CSO__Decal_PS_PATH.c_str(), &csoByteCode);
+            this->LoadCSOFile(HLSL_CSO__Decal_PS_PATH.c_str(), &csoByteCode);
             break;
         case SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE:
             this->LoadCSOFile(HLSL_CSO__Sprite_PS_PATH.c_str(), &csoByteCode);
+            break;   
+        case SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE:
+            this->LoadCSOFile(HLSL_CSO__Sprite_NoTexture_PS_PATH.c_str(), &csoByteCode);
             break;   
         case SHADER_TYPE::FORWARD_UNLIT_STATIC:
             this->LoadCSOFile(HLSL_CSO__Simple_PS_PATH.c_str(), &csoByteCode);

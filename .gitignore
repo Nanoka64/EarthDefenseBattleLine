@@ -396,3 +396,7 @@ Resource/Texture/Weak_1024.png
 !DX11MyEngine/packages/**/*.dll
 !DX11MyEngine/packages/**/*.targets
 !DX11MyEngine/packages/**/*.props
+/DX11MyEngine/Resource/Texture/Materials/coast_sand_rocks_02_diff_8k.png
+/DX11MyEngine/Resource/Texture/Materials/coast_sand_rocks_02_nor_dx_8k.png
+/DX11MyEngine/Resource/Texture/Materials/pebble_cemented_floor_diff_2k.png
+/DX11MyEngine/Resource/Texture/Materials/pebble_cemented_floor_nor_dx_2k.png

@@ -16,14 +16,14 @@ using namespace GIGA_Engine;
 //*----------------------------------------------------------------------------------------
 BillboardResource::BillboardResource(std::weak_ptr<GameObject> pOwner, int updateRank) :IComponent(pOwner, updateRank),
 m_pCBTransformSet(nullptr),
-m_pCBMaterialDataSet(nullptr)
+m_pCBMaterialDataSet(nullptr),
+m_FixedAxisBitFlag()
 {
 	this->set_Tag("BillboardResource");
 
-	// TODO:ビットフラグ、関数内で演算が効かない問題を直す
-	BitFlag::SetFlag((unsigned)FIXED_AXIS_BITFLAG_X, (unsigned&)m_FixedAxisBitFlag);
-	BitFlag::SetFlag((unsigned)FIXED_AXIS_BITFLAG_Y, (unsigned&)m_FixedAxisBitFlag);
-	BitFlag::SetFlag((unsigned)FIXED_AXIS_BITFLAG_Z, (unsigned&)m_FixedAxisBitFlag);
+	//BitFlag::SetFlag((unsigned)FIXED_AXIS_BITFLAG_X, (unsigned&)m_FixedAxisBitFlag);
+	//BitFlag::SetFlag((unsigned)FIXED_AXIS_BITFLAG_Y, (unsigned&)m_FixedAxisBitFlag);
+	//BitFlag::SetFlag((unsigned)FIXED_AXIS_BITFLAG_Z, (unsigned&)m_FixedAxisBitFlag);
 
 }
 
@@ -51,41 +51,13 @@ BillboardResource::~BillboardResource()
 	}
 }
 
+
 // ----------------------------------------------------------------------------------------------------------------------
-//       * IPolyResource Class - テクスチャマップ設定 Setup後に呼ぶ *
+//       * IPolyResource Class - マテリアルを設定 *
 // ----------------------------------------------------------------------------------------------------------------------
-bool BillboardResource::set_TextureMap(TEXTURE_MAP mapType, UINT matIndex, const std::wstring& path)
+void BillboardResource::set_Material(std::shared_ptr<Material> pMaterial)
 {
-	// テクスチャ読み込み
-	auto texture = Master::m_pResourceManager->LoadWIC_Texture(path);
-	if (texture == nullptr) {
-		return false;
-	}
-
-	// 範囲外アクセスチェック
-	if (m_pMeshData->NumMaterial <= matIndex) {
-		return false;
-	}
-
-	// 対応したマップにテクスチャを入れる
-	switch (mapType)
-	{
-	case TEXTURE_MAP_NONE:
-		break;
-	case TEXTURE_MAP_DIFFUSE:
-		m_pMeshData->pMaterials.lock()->m_DiffuseMap.Texture = texture;
-		break;				   
-	case TEXTURE_MAP_NORMAL:   
-		m_pMeshData->pMaterials.lock()->m_NormalMap.Texture = texture;
-		break;				   
-	case TEXTURE_MAP_SPECULAR: 
-		m_pMeshData->pMaterials.lock()->m_SpecularMap.Texture = texture;
-		break;
-	default:
-		break;
-	}
-
-	return true;
+	m_pMeshData->pMaterials = pMaterial;
 }
 
 
@@ -160,7 +132,7 @@ bool BillboardResource::Setup(RendererEngine& renderer, BILLBOARD_USAGE_TYPE typ
 	{
 	case BILLBOARD_USAGE_TYPE::SIMPLE:
 		// 板ポリでメッシュ作成
-		m_pMeshData = MeshInfoFactory::CreateQuadInfo(renderer, pMaterial, materialNum, false);
+		m_pMeshData = MeshInfoFactory::CreateQuadInfo(renderer, pMaterial, materialNum, false, 1.0f);
 		break;
 	default:
 		break;

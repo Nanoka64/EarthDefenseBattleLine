@@ -16,6 +16,8 @@
 #include "Texture.h"
 
 using namespace GIGA_Engine;
+using namespace VECTOR3;
+using namespace VECTOR2;
 
 //*---------------------------------------------------------------------------------------
 //* @:MeshFactory Class 
@@ -33,11 +35,12 @@ std::shared_ptr<class GameObject> MeshFactory::CreateModel(const CreateModelInfo
         return{};
     }
 
+    auto obj = std::make_shared<GameObject>();
+    obj->set_LayerRank(info.ObjLayer);  // 更新レイヤーの設定
+
     // オブジェクトの生成
-    std::shared_ptr<GameObject> pModelObj = Instantiate3D(std::move(std::make_shared<GameObject>()), info.IsTransparent);
-    pModelObj->Init(*info.pRenderer);
+    std::shared_ptr<GameObject> pModelObj = Instantiate3D(std::move(obj), info.IsTransparent);
     pModelObj->set_Tag(info.ObjTag.c_str());
-    pModelObj->set_IsShadow(true);  // シャドウをする
 
     // オブジェクトの状態をアクティブにする
     if (info.IsActive) {
@@ -96,9 +99,8 @@ std::shared_ptr<class GameObject> MeshFactory::CreateUtilityMesh(const CreateUti
 {
     // オブジェクトの生成
     std::shared_ptr<GameObject> pObj = Instantiate3D(std::move(std::make_shared<GameObject>()), info.IsTransparent);
-    pObj->Init(*info.pRenderer);
     pObj->set_Tag(info.ObjTag.c_str());
-    pObj->set_IsShadow(true);   // シャドウをする
+    pObj->set_LayerRank(info.ObjLayer);  // 更新レイヤーの設定
 
 
     // オブジェクトの状態をアクティブにする
@@ -114,7 +116,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateUtilityMesh(const CreateUti
     auto meshRenderer = pObj->add_Component<MeshRenderer>();
 
     // リソースのセットアップ
-    if (!meshResource->Setup(*info.pRenderer,info.ShaderType, info.Type, info.MaterialData->pMaterialData, info.MatNum, info.IsNormalMap))return {};
+    if (!meshResource->Setup(*info.pRenderer,info.ShaderType, info.Type, info.MaterialData->pMaterialData, info.MatNum, info.IsNormalMap, info.TilingScale))return {};
     
     // Rendererにリソースを設定
     meshRenderer->set_MeshResource(meshResource);
@@ -133,7 +135,6 @@ std::shared_ptr<class GameObject> MeshFactory::CreateSprite(const CreateSpriteIn
 {
     // オブジェクトの生成
     std::shared_ptr<GameObject> pObj = Instantiate2D(std::move(std::make_shared<GameObject>()), info.IsTransparent);
-    pObj->Init(*info.pRenderer);
     pObj->set_Tag(info.ObjTag.c_str());
 
     // オブジェクトの状態をアクティブにする
@@ -141,7 +142,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateSprite(const CreateSpriteIn
         pObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
     }
 
-    // TODO:無条件DontDestroy
+    // TODO:無条件DontDestroy（RTが消されてしまうため）
     pObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
 
 
@@ -165,7 +166,6 @@ std::shared_ptr<class GameObject> MeshFactory::CreateBillboard(const CreateBillb
 {
     // オブジェクトの生成
     std::shared_ptr<GameObject> pObj = Instantiate3D(std::move(std::make_shared<GameObject>()), info.IsTransparent);
-    pObj->Init(*info.pRenderer);
     pObj->set_Tag(info.ObjTag.c_str());
 
     // オブジェクトの状態をアクティブにする
@@ -197,7 +197,6 @@ std::shared_ptr<class GameObject> MeshFactory::CreateSkybox(const CreateSkyboxIn
 {
     // オブジェクトの生成
     std::shared_ptr<GameObject> pObj = Instantiate3D(std::move(std::make_shared<GameObject>()), info.IsTransparent);
-    pObj->Init(*info.pRenderer);
     pObj->set_Tag(info.ObjTag.c_str());
 
     // オブジェクトの状態をアクティブにする
@@ -210,7 +209,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateSkybox(const CreateSkyboxIn
     auto skyRenderer = pObj->add_Component<SkyRenderer>();
 
     // リソースのセットアップ                                  ↓キューブにする
-    if (!meshResource->Setup(*info.pRenderer, info.ShaderType, UTILITY_MESH_TYPE::CUBE, info.MaterialData->pMaterialData, info.MatNum, false))return {};
+    if (!meshResource->Setup(*info.pRenderer, info.ShaderType, UTILITY_MESH_TYPE::CUBE, info.MaterialData->pMaterialData, info.MatNum, false, VEC2(1.0f,1.0f)))return {};
 
     // Rendererにリソースを設定
     skyRenderer->set_MeshResource(meshResource);
@@ -228,7 +227,6 @@ std::shared_ptr<class GameObject> MeshFactory::CreateDecal(const CreateDecalInfo
 {
     // オブジェクトの生成
     std::shared_ptr<GameObject> pObj = Instantiate3D(std::move(std::make_shared<GameObject>()), info.IsTransparent);
-    pObj->Init(*info.pRenderer);
     pObj->set_Tag(info.ObjTag.c_str());
 
     // オブジェクトの状態をアクティブにする
@@ -241,7 +239,7 @@ std::shared_ptr<class GameObject> MeshFactory::CreateDecal(const CreateDecalInfo
     auto decalRenderer = pObj->add_Component<DecalRenderer>();
 
     // リソースのセットアップ                                  ↓キューブにする
-    if (!meshResource->Setup(*info.pRenderer, info.ShaderType, UTILITY_MESH_TYPE::CUBE, info.MaterialData->pMaterialData, info.MatNum, false))return {};
+    if (!meshResource->Setup(*info.pRenderer, info.ShaderType, UTILITY_MESH_TYPE::CUBE, info.MaterialData->pMaterialData, info.MatNum, false, VEC2(1.0f,1.0f)))return {};
 
     // Rendererにリソースを設定
     decalRenderer->set_MeshResource(meshResource);

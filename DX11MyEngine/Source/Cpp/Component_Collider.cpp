@@ -7,6 +7,7 @@
 
 using namespace GIGA_Engine;
 using namespace VECTOR3;
+using namespace UtilityData;
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ

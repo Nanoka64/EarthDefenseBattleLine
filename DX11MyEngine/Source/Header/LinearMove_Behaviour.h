@@ -15,8 +15,6 @@ class LinearMove_Behaviour : public IMoveBehaviour
 {
 private:
 
-
-
 public:
 	LinearMove_Behaviour();
 	~LinearMove_Behaviour();

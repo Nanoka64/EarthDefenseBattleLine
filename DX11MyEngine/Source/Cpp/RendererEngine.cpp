@@ -3,7 +3,6 @@
 //--------------------------------------------------------------------------------------
 #include "pch.h"
 #include "RendererEngine.h"
-#include "MyStruct.h"
 #include "Path.h"
 #include "DX_RenderTarget.h"
 #include "BlendManager.h"
@@ -184,7 +183,6 @@ void RendererEngine::EndRender()
 void RendererEngine::Term()
 {
     CleanupDX11();  // リソース解放
-    m_pMainCamera.reset();
 }
 
 
@@ -197,7 +195,7 @@ void RendererEngine::Term()
 void RendererEngine::Swap()
 {
     HRESULT hr;
-    hr = m_pSwapChain->Present(0, 0);    // 引数１:垂直同期　２：特殊フラグ(0でいい)
+    hr = m_pSwapChain->Present(1, 0);    // 引数１:垂直同期　２：特殊フラグ(0でいい)
 
     if (FAILED(hr))return;
 }
@@ -656,30 +654,6 @@ bool RendererEngine::WorldToScreen(const VECTOR3::VEC3 &_world, VECTOR2::VEC2 &_
 }
 
 //*---------------------------------------------------------------------------------------
-//*【?】カメラ座標取得
-//* 戻値：座標
-//*----------------------------------------------------------------------------------------
-VECTOR3::VEC3 RendererEngine::get_CameraPosition()const
-{
-    return m_pMainCamera->get_CameraPos();
-}
-
-//*---------------------------------------------------------------------------------------
-//*【?】カメラコンポーネントの設定
-//*----------------------------------------------------------------------------------------
-void RendererEngine::set_CameraComponent(std::shared_ptr<class Camera3D> pCam)
-{
-    m_pMainCamera = pCam;
-}
-//*---------------------------------------------------------------------------------------
-//*【?】カメラコンポーネントの取得
-//*----------------------------------------------------------------------------------------
-std::shared_ptr<class Camera3D> RendererEngine::get_CameraComponent()const
-{
-    return m_pMainCamera;
-}
-
-//*---------------------------------------------------------------------------------------
 //* @:RendererEngine Class 
 //*【?】ビューポートの設定
 //* 引数：1.描画範囲の左上Ｘ座標、
@@ -769,9 +743,6 @@ bool RendererEngine::CreateRendererPipeline(RENDER_PIPELINE_STATE type)
 {
     switch (type)
     {
-    case RENDER_PIPELINE_STATE::NONE:
-        return false;
-        break;
     case RENDER_PIPELINE_STATE::DEFAULT:
         // レンダーパイプラインの作成
         m_pRendererPipeline = new RenderPipeline();
@@ -791,16 +762,21 @@ bool RendererEngine::CreateRendererPipeline(RENDER_PIPELINE_STATE type)
 }
 
 //*---------------------------------------------------------------------------------------
-//* @:RendererEngine Class 
 //*【?】デフォルトレンダリングパイプラインの実行
-//* 引数：なし
-//* 戻値：なし
+//*
+//* [引数]
+//* type : パイプラインの種類
+//* *pCam : カメラコンポーネント
+//*
+//* [返値]
+//* true : 成功
+//* false : 失敗
 //*----------------------------------------------------------------------------------------
-void RendererEngine::ExecuteDefaultRendererPipeline(RENDER_PIPELINE_STATE type)
+void RendererEngine::ExecuteDefaultRendererPipeline(RENDER_PIPELINE_STATE type, const Camera3D* pCam)
 {
-    float farClip = m_pMainCamera->get_Far();
-    float nearClip = m_pMainCamera->get_Near();
-    float fov = m_pMainCamera->get_Fov();
+    float farClip = pCam->get_Far();
+    float nearClip = pCam->get_Near();
+    float fov = pCam->get_Fov();
 
     float screen_width = static_cast<float>(get_ScreenWidth());
     float screen_height = static_cast<float>(get_ScreenHeight());
@@ -809,7 +785,7 @@ void RendererEngine::ExecuteDefaultRendererPipeline(RENDER_PIPELINE_STATE type)
     SetupProjectionTransform(screen_width, screen_height, fov, nearClip, farClip);
 
     // ビュー行列の更新
-    auto viewMatrix = m_pMainCamera->get_ViewMatrix();
+    auto viewMatrix = pCam->get_ViewMatrix();
 
     // ビュー変換し定数バッファへ送る
     if (!SetupViewTransform(viewMatrix)) {
@@ -1091,7 +1067,7 @@ void RendererEngine::RegisterRenderTarget(ID3D11RenderTargetView* pRtv, ID3D11De
 void RendererEngine::RegisterRenderTargetAndViewPort(class DX_RenderTarget* pRT)
 {
     // ビューポートの設定
-    this->set_ViewPort(0, 0, pRT->get_Width(), pRT->get_Height());
+    this->set_ViewPort(0.0f, 0.0f, FLOAT_CAST(pRT->get_Width()), FLOAT_CAST(pRT->get_Height()));
 
     // 深度ビューあり
     if (pRT->HasDepthStencilBuffer()) {

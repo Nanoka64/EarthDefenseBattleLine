@@ -40,16 +40,16 @@ RectTransform::~RectTransform()
 //*---------------------------------------------------------------------------------------
 //*【?】幅と高さの設定
 //* 
-//* [引数] なし
+//* [引数] 
+//*_size : サイズ
 //*
-//* [返値]
-//* ワールド変換行列 
+//* [返値] なし
 //*----------------------------------------------------------------------------------------
 void RectTransform::set_Size(float width, float height)
 {
     // 親のサイズを取得（親がない場合はキャンバスのサイズ）
-    float parentWidth = Master::m_pDataManager->get_ScreenWidth();
-    float parentHeight = Master::m_pDataManager->get_ScreenHeight();
+    float parentWidth = FLOAT_CAST(Master::m_pDataManager->get_ScreenWidth());
+    float parentHeight = FLOAT_CAST(Master::m_pDataManager->get_ScreenHeight());
     if (auto parent = m_pParentRect.lock())
     {
         parentWidth = parent->get_Width();
@@ -67,6 +67,35 @@ void RectTransform::set_Size(float width, float height)
 
 
 //*---------------------------------------------------------------------------------------
+//*【?】幅と高さの設定
+//* 
+//* [引数] 
+//*_size : サイズ
+//* 
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void RectTransform::set_Size(const VECTOR2::VEC2& _size)
+{
+    // 親のサイズを取得（親がない場合はキャンバスのサイズ）
+    float parentWidth = FLOAT_CAST(Master::m_pDataManager->get_ScreenWidth());
+    float parentHeight = FLOAT_CAST(Master::m_pDataManager->get_ScreenHeight());
+    if (auto parent = m_pParentRect.lock())
+    {
+        parentWidth = parent->get_Width();
+        parentHeight = parent->get_Height();
+    }
+
+    // 現在のアンカーによって確保されている幅と高さを計算
+    float anchorWidth = parentWidth * (m_AnchorMax.x - m_AnchorMin.x);
+    float anchorHeight = parentHeight * (m_AnchorMax.y - m_AnchorMin.y);
+
+    // 指定された幅・高さになるように、SizeDelta（余白または絶対サイズ）を逆算してセット
+    m_SizeDelta.x = _size.x - anchorWidth;
+    m_SizeDelta.y = _size.y - anchorHeight;
+}
+
+
+//*---------------------------------------------------------------------------------------
 //*【?】ワールド変換行列の計算
 //* TODO:計算ロジック部分をほとんどAIに頼んでしまったので、復習して理解できるようにする！
 //* 
@@ -78,8 +107,8 @@ void RectTransform::set_Size(float width, float height)
 void RectTransform::UpdateUILocalMatrix()
 {
     // スクリーンの大きさをまずは親とする
-	float parentWidth =  Master::m_pDataManager->get_ScreenWidth();
-	float parentHeight = Master::m_pDataManager->get_ScreenHeight();
+	float parentWidth = FLOAT_CAST(Master::m_pDataManager->get_ScreenWidth());
+	float parentHeight = FLOAT_CAST(Master::m_pDataManager->get_ScreenHeight());
 	VEC2 parentPivot = { 0.0f, 0.0f };  // 左上基準
 
     // 親が設定されていればそっちに入れ替え
@@ -132,7 +161,7 @@ void RectTransform::UpdateUILocalMatrix()
     // 移動（親のピボットからの相対位置）
     XMMATRIX transMtx = XMMatrixTranslation(localPosX, localPosY, 0.0f);
 
-    // ローカル行列の合成（Offset -> Scale -> Rotation -> Translation）
+    // ローカル行列の合成（Offset * Scale * Rotation * Translation）
     XMMATRIX localMatrix = offsetMtx * scaleMtx * rotMtx * transMtx;
 
     //ワールド行列の計算（親のワールド行列と掛け合わせる）

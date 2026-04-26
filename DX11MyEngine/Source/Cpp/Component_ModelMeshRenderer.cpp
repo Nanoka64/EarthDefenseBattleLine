@@ -79,7 +79,7 @@ void ModelMeshRenderer::Draw(RendererEngine &renderer)
     CB_MATERIAL_SET *CB_MatSet      = modelData->GetConstantBufferMaterialDataSet();
     CB_TRANSFORM_SET *CB_TransSet   = modelData->GetConstantBufferTransformSet();
     UINT vertexNum                  = pMeshes->get_VertexNum();
-    VERTEX_Skneed* vertices         = pMeshes->get_Vertices();
+    //VERTEX_Skneed* vertices         = pMeshes->get_Vertices();
     SHADER_TYPE shaderType          = modelData->get_ShaderType();
     SHADER_TYPE shadowShaderType    = modelData->get_ShadowShaderType();
 
@@ -111,28 +111,9 @@ void ModelMeshRenderer::Draw(RendererEngine &renderer)
     if (renderer.get_CrntRenderPass() == RENDER_PASS::MAIN) {
         Master::m_pShaderManager->DeviceToSetShader(shaderType);
 
-        // マテリアル情報セット ==========================
-        CB_MATERIAL mat{};
-        mat.Diffuse         = matList[0].lock()->m_DiffuseColor;
-        mat.Specular        = matList[0].lock()->m_SpecularColor;
-        mat.SpecularPower   = matList[0].lock()->m_SpecularPower;
-        mat.EmissivePower   = matList[0].lock()->m_EmissivePower;
-        mat.EmissiveColor   = matList[0].lock()->m_EmissiveColor;
-        CB_MatSet->Data     = mat;
-
-        // 定数バッファに転送
-        pDeviceContext->UpdateSubresource(
-            CB_MatSet->pBuff,
-            0,
-            nullptr,
-            &CB_MatSet->Data,
-            0,
-            0
-        );
 
         // トランスフォーム用定数バッファのセット
         pDeviceContext->VSSetConstantBuffers(0, 1, &CB_TransSet->pBuff);    // ワールド行列
-        pDeviceContext->PSSetConstantBuffers(4, 1, &CB_MatSet->pBuff);      // マテリアル
 
         // メッシュの描画
         for (u_int meshIdx = 0; meshIdx < meshNum; meshIdx++)
@@ -140,32 +121,52 @@ void ModelMeshRenderer::Draw(RendererEngine &renderer)
             aiMesh *mesh = pScene->mMeshes[meshIdx];
             auto mat = matList[mesh->mMaterialIndex].lock();
 
-            /* SRVの設定 */
+            if (mat != nullptr)
             {
-                if (mat != nullptr)
-                {
-                    //ブレンドステート設定 ==========================
-                    Master::m_pBlendManager->DeviceToSetBlendState(mat->m_BlendMode);
+                // 定数バッファにマテリアル情報セット ==========================
+                CB_MATERIAL cb_matData{};
+                cb_matData.Diffuse = mat->m_DiffuseColor;
+                cb_matData.Specular = mat->m_SpecularColor;
+                cb_matData.SpecularPower = mat->m_SpecularPower;
+                cb_matData.EmissivePower = mat->m_EmissivePower;
+                cb_matData.EmissiveColor = mat->m_EmissiveColor;
+                CB_MatSet->Data = cb_matData;
 
-                    // ディフューズ
-                    if (mat->m_DiffuseMap.Texture.lock() != nullptr) {
-                        auto diff = mat->m_DiffuseMap.Texture.lock()->get_SRV();
-                        if (diff != nullptr)
-                            pDeviceContext->PSSetShaderResources(0, 1, &diff);
-                    }
+                // 定数バッファに転送
+                pDeviceContext->UpdateSubresource(
+                    CB_MatSet->pBuff,
+                    0,
+                    nullptr,
+                    &CB_MatSet->Data,
+                    0,
+                    0
+                );
 
-                    // ノーマル
-                    if (mat->m_NormalMap.Texture.lock() != nullptr) {
-                        auto norm = mat->m_NormalMap.Texture.lock()->get_SRV();
-                        if (norm != nullptr)
-                            pDeviceContext->PSSetShaderResources(1, 1, &norm);
-                    }
-                    // スペキュラ
-                    if (mat->m_SpecularMap.Texture.lock() != nullptr) {
-                        auto spec = mat->m_SpecularMap.Texture.lock()->get_SRV();
-                        if (spec != nullptr)
-                            pDeviceContext->PSSetShaderResources(2, 1, &spec);
-                    }
+                pDeviceContext->PSSetConstantBuffers(4, 1, &CB_MatSet->pBuff);      // PSにマテリアルセット
+
+                //ブレンドステート設定 ==========================
+                Master::m_pBlendManager->DeviceToSetBlendState(mat->m_BlendMode);
+
+                /* SRVの設定 */
+
+                // ディフューズ
+                if (mat->m_DiffuseMap.Texture.lock() != nullptr) {
+                    auto diff = mat->m_DiffuseMap.Texture.lock()->get_SRV();
+                    if (diff != nullptr)
+                        pDeviceContext->PSSetShaderResources(0, 1, &diff);
+                }
+
+                // ノーマル
+                if (mat->m_NormalMap.Texture.lock() != nullptr) {
+                    auto norm = mat->m_NormalMap.Texture.lock()->get_SRV();
+                    if (norm != nullptr)
+                        pDeviceContext->PSSetShaderResources(1, 1, &norm);
+                }
+                // スペキュラ
+                if (mat->m_SpecularMap.Texture.lock() != nullptr) {
+                    auto spec = mat->m_SpecularMap.Texture.lock()->get_SRV();
+                    if (spec != nullptr)
+                        pDeviceContext->PSSetShaderResources(2, 1, &spec);
                 }
             }
 
@@ -178,7 +179,9 @@ void ModelMeshRenderer::Draw(RendererEngine &renderer)
     }
     // シャドウパス **********************************************************
     else if (renderer.get_CrntRenderPass() == RENDER_PASS::SHADOW) {
-        if (pScene->HasAnimations()){
+
+        // スキニングメッシュかどうか
+		if (pScene->mMeshes[0]->HasBones()) {  
             Master::m_pShaderManager->DeviceToSetShader(SHADER_TYPE::POST_SHADOWMAP_SKINNED);
         }
         else{

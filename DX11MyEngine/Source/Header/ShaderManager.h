@@ -46,6 +46,7 @@ enum class SHADER_TYPE
     // UIやαブレンドがあるオブジェクト用
     _FORWARD_STD_STATIC,                // ◆ 簡易3Dオブジェクト
     FORWARD_UNLIT_UI_SPRITE,            // スプライト 標準 UI用  ライティングなし
+    FORWARD_UNLIT_UI_NOTEXTURE_SPRITE,  // スプライト 標準 UI用  ライティングなし テクスチャ無し
     _FORWARD_STD_BILLBOARD,             // ◆ ビルボード
     FORWARD_UNLIT_STATIC,               // 簡易3Dオブジェクト ライティングなし
 

@@ -4,6 +4,8 @@
 #include "Component_3DCamera.h"
 #include <windows.h>
 
+using namespace VECTOR3;
+
 constexpr int NUM_SE_CHANNELS    = 1;	    // SEのチャンネル数（モノラル）
 constexpr int NUM_VOICE_CHANNELS = 1;	    // ボイスのチャンネル数（モノラル）
 constexpr int NUM_BGM_CHANNELS   = 2;	    // BGMのチャンネル数（ステレオ）
@@ -262,11 +264,18 @@ bool SoundManager::InitXA2Sound(void)
 
 	// システム
 	Load_Wav("Resource/Sound/SE/System/moving-cursor-2.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SYSTEM_MOVING_CURSOR01));
+	Load_Wav("Resource/Sound/SE/System/Decision_01.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SYSTEM_DECISION01));
 
 	// 武器
 	Load_Wav("Resource/Sound/SE/Weapon/GunFire_01.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::GUN_FIRE01));
 	Load_Wav("Resource/Sound/SE/Weapon/GunFire_02.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::GUN_FIRE02));
+	Load_Wav("Resource/Sound/SE/Weapon/Ricochet_01.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ROCOCHET01));
 	Load_Wav("Resource/Sound/SE/Weapon/Explosion01.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::EXPLOSION01));
+	Load_Wav("Resource/Sound/SE/Weapon/GunChange_01.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::GUN_CHANGE01));
+
+	// 建物
+	Load_Wav("Resource/Sound/SE/Building/Destruction.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::BUILDING_DESTRUCTION));
+	Load_Wav("Resource/Sound/SE/Building/Fall.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::BUILDING_FALL));
 
 	// 兵士
 	Load_Wav("Resource/Sound/SE/Ranger/パンチの衣擦れ1.wav",SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SOLDIER_R_JUMP_IN));
@@ -275,13 +284,16 @@ bool SoundManager::InitXA2Sound(void)
 	// 敵
 	Load_Wav("Resource/Sound/SE/Enemy/DSGNImpt_Impact Smear Short 04_RSCPC_HV.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_HIT01));
 	Load_Wav("Resource/Sound/SE/Enemy/DSGNImpt_Impact High Spark 04_RSCPC_HV.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_DEAD));
+	Load_Wav("Resource/Sound/SE/Enemy/DSGNImpt_Impact Smear Short 06_RSCPC_HV.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ENEMY_ANT_ACID_SHOOT));
 	
+	// アイテム
+	Load_Wav("Resource/Sound/SE/Game/ItemGet.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::ITEM_GET));
+
 	
-	Load_Wav("Resource/Sound/BGM/Taboo Marionette.wav", SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::TEST));
-
-
 	// BGM
 	Load_Wav("Resource/Sound/BGM/Flash_Shadow.wav", SOUND_TYPE::BGM, SOUND_ID_TO_INT(BGM_ID::BGM_TITLE_01));
+	Load_Wav("Resource/Sound/BGM/MusMus-BGM-170.wav", SOUND_TYPE::BGM, SOUND_ID_TO_INT(BGM_ID::BGM_GAME_01));
+	Load_Wav("Resource/Sound/BGM/Victory.wav", SOUND_TYPE::BGM, SOUND_ID_TO_INT(BGM_ID::BGM_VICTORY01));
 
 	// ボイス
 	Load_Wav("Resource/Sound/Voice/Ranger/an000_01.wav",SOUND_TYPE::VOICE, SOUND_ID_TO_INT(VOICE_ID::SOLDIER_R_SHOUT_01));
@@ -336,16 +348,21 @@ void SoundManager::UninitXA2Sound(void)
 //* true : 成功
 //* false : 失敗
 //*----------------------------------------------------------------------------------------
-bool SoundManager::Update(RendererEngine &renderer)
+bool SoundManager::Update(RendererEngine& renderer)
 {
 	// ############################################################################
 	//							リスナーの更新
 	// ############################################################################
-	auto cameraComp = renderer.get_CameraComponent();
-	VECTOR3::VEC3 cameraPos = cameraComp->get_CameraPos();
-	VECTOR3::VEC3 cameraUp = cameraComp->get_UpVec();
-    VECTOR3::VEC3 cameraLook = cameraComp->get_LookDir();
-
+	// カメラ情報
+	VECTOR3::VEC3 cameraPos;
+	VECTOR3::VEC3 cameraUp;
+	VECTOR3::VEC3 cameraLook;
+	if (auto cameraComp = Master::m_pDataManager->get_CameraComponent().lock())
+	{
+		cameraPos = cameraComp->get_CameraPos();
+		cameraUp = cameraComp->get_UpVec();
+		cameraLook = cameraComp->get_LookDir();
+	}
 
 	// 何故かパンが反転してしまうため
 	cameraLook = -cameraLook;
@@ -371,6 +388,10 @@ bool SoundManager::Update(RendererEngine &renderer)
     m_Listener.Velocity.y = 0.0f;
     m_Listener.Velocity.z = 0.0f;
 
+	// BGMの音量を更新
+	if (m_BGM_SoundSlot._pSourceVoice) {
+		m_BGM_SoundSlot._pSourceVoice->SetVolume(m_BGMVolume);
+	}
 
 	// ############################################################################
     //							3Dサウンドの更新
@@ -1310,6 +1331,36 @@ bool SoundManager::SerchResource(SOUND_TYPE _type, int _id, WaveResource *&_outR
 }
 
 //*---------------------------------------------------------------------------------------
+//*【?】指定サウンドタイプの音量を設定
+//*
+//* [引数]
+//* _type：サウンドの種類 (SE、BGM、ボイスなど)
+//* _vol : 音量（0.0f～1.0f）
+//* 
+//* [返値] 
+//* float : 音量 
+//*---------------------------------------------------------------------------------------
+void SoundManager::set_Volume(SOUND_TYPE _type, float _vol)
+{
+	switch (_type)
+	{
+	case SOUND_TYPE::SE:
+		m_SEVolume = _vol;
+		break;
+	case SOUND_TYPE::BGM:
+		m_BGMVolume = _vol;
+		break;
+	case SOUND_TYPE::VOICE:
+		m_VoiceVolume = _vol;
+		break;
+	default:
+		break;
+	}
+}
+
+
+
+//*---------------------------------------------------------------------------------------
 //*【?】指定サウンドタイプの音量を取得
 //*
 //* [引数]
@@ -1318,7 +1369,7 @@ bool SoundManager::SerchResource(SOUND_TYPE _type, int _id, WaveResource *&_outR
 //* [返値] 
 //* float : 音量 
 //*---------------------------------------------------------------------------------------
-float SoundManager::get_Volume(SOUND_TYPE _type)
+float SoundManager::get_Volume(SOUND_TYPE _type)const
 {
 	switch (_type)
 	{

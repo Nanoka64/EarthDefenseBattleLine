@@ -29,17 +29,20 @@ struct CreateMesh_Base
 {
     RendererEngine* pRenderer;      // 描画
     std::string ObjTag;             // オブジェクトのタグ
+    int ObjLayer;                   // オブジェクトの更新レイヤー
     bool IsActive;                  // 生成時にオブジェクトをアクティブにするか
+    bool IsTransparent;             // 透明度があるか（ある場合はフォワード用のシェーダにしてね）
     SHADER_TYPE ShaderType;         // 使用するシェーダの種類
     SHADER_TYPE Shadow_ShaderType;  // シャドウマップ生成に使用するシェーダの種類
-    bool IsTransparent;             // 透明度があるか（ある場合はフォワード用のシェーダにしてね）
 
     CreateMesh_Base() :
         pRenderer(nullptr),
         IsActive(true),
         ShaderType(SHADER_TYPE::DEFERRED_STD_STATIC),
         Shadow_ShaderType(SHADER_TYPE::POST_SHADOWMAP),
-        IsTransparent(false)
+        IsTransparent(false),
+        ObjLayer(100),
+        ObjTag("Unknown")
     {};
 };
 
@@ -74,13 +77,15 @@ struct CreateUtilityMeshInfo : public CreateMesh_Base
     bool IsNormalMap;            // 法線マップ使用するかどうか
     SetupMaterialInfo* MaterialData; // マテリアル情報
     UINT MatNum;                     // マテリアル数
+	VECTOR2::VEC2 TilingScale;       // タイリングスケール（UVの繰り返し数） 
 
     // コンストラクタ
     CreateUtilityMeshInfo():
         MaterialData(nullptr),
         MatNum(0),
         Type(UTILITY_MESH_TYPE::NONE),
-        IsNormalMap(false)
+        IsNormalMap(false),
+        TilingScale(VECTOR2::VEC2(1.0f,1.0f))
     {};
 };
 

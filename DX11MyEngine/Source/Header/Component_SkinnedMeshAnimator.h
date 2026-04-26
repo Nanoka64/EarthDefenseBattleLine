@@ -41,14 +41,18 @@ private:
 	bool m_IsAnimationFlag;								 // アニメーションさせるかどうか（とりまデバッグ用）
 	float m_AnimProcTime;								 // 更新用カウンタ
 	float m_ShadowAnimProcTime;							 // シャドウ用更新カウンタ
+	float m_AimPitchAngle;
+	float m_AimYawAngle;
 
 public:
 	SkinnedMeshAnimator(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
 	~SkinnedMeshAnimator();
 
 	void Start(RendererEngine& renderer)override;
-	//void Update(RendererEngine& renderer)override;
+	void Update(RendererEngine& renderer)override;
 	void Draw(RendererEngine& renderer)override;
+
+	void PlayAnim(float _time);	// アニメーションの再生
 
 	void BoneTransformsUpdate(RendererEngine &renderer, float timeInSeconds, int animIdx);	// ボーンの更新
 	void set_MeshResource(std::weak_ptr<class ModelMeshResource> meshResource);	// リソースの設定
@@ -65,6 +69,8 @@ public:
 	int getAnimIndex()const { return m_CurrentAnimIndex; }
 	int get_PrevAnimIndex()const { return m_PrevAnimIndex; }
 	bool get_IsAnim()const { return m_IsAnimationFlag; };
+
+	DirectX::XMMATRIX& get_BoneLocalWorldMatrix(const std::string& _nodeName);	// ノード名からボーンのワールド変換行列を取得する
 
 	std::vector<AnimationData *> get_AnimationDataList()const { return m_Animations; }
 

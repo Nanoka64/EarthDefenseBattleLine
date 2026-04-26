@@ -16,15 +16,19 @@ namespace SceneStateEnums
     // タイトルの子シーン
     enum c_TITLE
     {
-        c_TITLE_LOAD_PROCESS,   // ロード処理（一番最初に呼ばれる）
-        c_TITLE_MAIN_MENU,      // どの項目へ行くか選ぶ状態
-        
-        c_TITLE_MISSION_SELECT, // ミッション選択
-        c_TITLE_SOLDIER_SELECT, // 兵科選択
-        c_TITLE_CONFIG,         // 設定
+        c_TITLE_NONE = -1,
 
-        c_GO_GAME_SCENE,        // 特殊フラグ ゲームシーンへ行くように親へ伝える
-        c_GO_EXIT,              // ゲームの終了
+        c_TITLE_LOAD_PROCESS,       // ロード処理（一番最初に呼ばれる）
+        c_TITLE_MAIN_MENU,          // どの項目へ行くか選ぶ状態
+        
+        c_TITLE_MISSION_SELECT,     // ミッション選択
+        c_TITLE_SOLDIER_SELECT,     // 兵科選択
+        c_TITLE_CONFIG,             // 設定
+
+        c_TITLE_DIFFICULT_SELECT,   // 難易度選択
+
+        c_GO_GAME_SCENE,            // 特殊フラグ ゲームシーンへ行くように親へ伝える
+        c_GO_EXIT,                  // ゲームの終了
 
         c_TITLE_NUM, 
     };
@@ -34,8 +38,14 @@ namespace SceneStateEnums
     /// </summary>
     enum c_GAME
     {
+        c_GAME_NONE = -1,
+
         c_GAME_LOAD,            // ロード
         c_GAME_PLAY,            // プレイ
+
+        c_GAME_PAUSE,           // ポーズ画面
+        c_GAME_CONFIG,          // 設定画面
+        c_GAME_MANUAL,          // 操作説明画面
 
         c_GO_RESULT_SCENE,      // 特殊フラグ リザルトシーンへ行く
 
@@ -47,10 +57,14 @@ namespace SceneStateEnums
     /// </summary>
     enum c_RESULT
     {
+        c_RESULT_NONE = -1,
+
+        c_CLEARED,              // ミッションクリア
+        c_FAILED,               // ミッション失敗
         c_GETITEM_CHECK,        // 取得したアイテムの確認
-
+        
         c_GO_TITLE_SCENE,       // 特殊フラグ タイトルシーンへ
-
+        
         c_RESULT_NUM,           
     };
 };

@@ -14,7 +14,7 @@ using namespace VERTEX;
 TrailRenderer::TrailRenderer(std::weak_ptr<GameObject> pOwner, int updateRank) 
 	: IComponent(pOwner, updateRank),
 	m_MinVertexDistance(10.0f),
-	m_DrawTime(60.0f),
+	m_DrawTime(60),
 	m_Width(10.0f),
 	m_CrntTrailPos(VEC3()),
 	m_pCBMaterialDataSet(nullptr),
@@ -60,7 +60,7 @@ void TrailRenderer::Start(RendererEngine &renderer)
 		return;
 	}
 	//m_pTex = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/rust_coarse_01_arm_1k.jpg");
-	m_pTex = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Particle/Flame1.png");
+	m_pTex = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Particle/Acid.png");
 }
 
 
@@ -84,6 +84,7 @@ void TrailRenderer::Update(RendererEngine &renderer)
 	else {	// 初回用
 		dist = m_MinVertexDistance;
 	}
+
 	if (dist >= m_MinVertexDistance)
 	{
 		TrailInfo trail;
@@ -177,7 +178,7 @@ void TrailRenderer::VertexUpdate(RendererEngine& renderer)
 	pContext->Map(m_pVertesBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
 	// カメラ座標
-	VEC3 cameraPos = renderer.get_CameraPosition();
+	VEC3 cameraPos = Master::m_pDataManager->get_CameraPos();
 
 	VERTEX_Static *pVertices = (VERTEX_Static *)mappedResource.pData;
 	for (int i = 0; i < m_TrailInfoList.size(); i++)
@@ -278,7 +279,7 @@ void TrailRenderer::ConstantBufferUpdate(RendererEngine& renderer)
 	m_pCBMaterialDataSet->Data.EmissivePower = m_EmissivePower;
 	m_pCBMaterialDataSet->Data.EmissiveColor = VEC3(m_Color.x, m_Color.y, m_Color.z);
 	m_pCBMaterialDataSet->Data.Specular		 = VEC4(1.0f, 1.0f, 1.0f, 0.1f);
-	m_pCBMaterialDataSet->Data.SpecularPower = 150.0f;
+	m_pCBMaterialDataSet->Data.SpecularPower = 100.0f;
 
 	// データのコピー 
 	memcpy(mappedResource.pData, &m_pCBMaterialDataSet->Data, sizeof(CB_MATERIAL));

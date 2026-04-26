@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "LinearMove_Behaviour.h"
 
+using namespace VECTOR3;
+using namespace VECTOR2;
+using namespace DirectX;
+
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
 //*----------------------------------------------------------------------------------------
@@ -32,10 +36,18 @@ ResultMove LinearMove_Behaviour::MoveCalculate(float _deltaTime, const MoveParam
 {
 	ResultMove res;
 
-	// 直線移動の計算
-	VECTOR3::VEC3 forward = _param._moveDirection;		// 前方向のベクトルを取得
+	VEC3 forward = _param._moveDirection;;		// 前方向のベクトルを取得
+	float targetAngleY = atan2f(forward.x, forward.z);
+
+	// 目標とするクォータニオン
+	XMVECTOR targetRotQ = XMQuaternionRotationRollPitchYaw(0.0f, targetAngleY, 0.0f);
+	XMVECTOR crntRotQ = _transform.get_RotationQuaternion();
+	// クォータニオンの球面線形補間
+	// 普通の線形補間だと、値が飛んでしまうためクォータニオンの場合は球面線形補間を使う
+	XMVECTOR newRotQ = XMQuaternionSlerp(crntRotQ, targetRotQ, _param._turnSpeed);
+
 	float speed = _param._moveSpeed;
 	res._moveVelocity = forward * speed;	// 移動量を計算
-
+	res._RotQ = newRotQ;
 	return res;
 }

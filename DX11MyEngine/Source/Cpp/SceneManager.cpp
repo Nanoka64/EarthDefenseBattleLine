@@ -538,8 +538,6 @@ void SceneManager::Update(RendererEngine& renderer)
     // 遅延更新
     Master::m_pGameObjectManager->ObjectLateUpdate(renderer);
 
-    // エディタの更新
-    Master::m_pEditorManager->Update(renderer);
 }
 
 
@@ -552,7 +550,9 @@ void SceneManager::Update(RendererEngine& renderer)
 void SceneManager::Draw(RendererEngine& renderer)
 {
     // レンダリングパイプラインの実行
-    renderer.ExecuteDefaultRendererPipeline(RENDER_PIPELINE_STATE::DEFAULT);
+    if (auto camera = Master::m_pDataManager->get_CameraComponent().lock()) {
+        renderer.ExecuteDefaultRendererPipeline(RENDER_PIPELINE_STATE::DEFAULT, camera.get());
+    }
 
     // シーンステートの描画
     m_StateMachine.Draw();

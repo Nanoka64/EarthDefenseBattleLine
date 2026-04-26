@@ -2,10 +2,12 @@
 #include "Component_MoveLogic.h"
 #include "IMoveBehaviour.h"
 #include "LinearMove_Behaviour.h"
+#include "HormingMove_Behaviour.h"
 #include "GameObject.h"
 
 using namespace GIGA_Engine;
 using namespace VECTOR3;
+using namespace UtilityData;
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
@@ -15,7 +17,9 @@ using namespace VECTOR3;
 //*----------------------------------------------------------------------------------------
 MoveLogic::MoveLogic(std::weak_ptr<GameObject> pOwner, int updateRank)
     :IComponent(pOwner, updateRank),
-    m_pMoveBehaviour(nullptr)
+    m_pMoveBehaviour(nullptr),
+    m_GravityVelocity(0.0f),
+    m_CrntMoveVelocity(VEC3())
 {
     this->set_Tag("MoveLogic");
 }
@@ -61,18 +65,52 @@ void MoveLogic::Calculate(const MoveParam& _param)
         {
             ResultMove res;
 
+
             // 移動計算を呼び出す
             res = m_pMoveBehaviour->MoveCalculate(deltaTime, _param, *pTransform);
+
+            // 加速度
+            //float accelerationSpeed = _param._acceleration * deltaTime;
+
+            // 目標速度に近づける
+            //m_CrntMoveVelocity = VEC3::Lerp(m_CrntMoveVelocity, res._moveVelocity, accelerationSpeed);
 
             // 移動ベクトルと回転ベクトルをもとに、新しい位置と回転を計算する
             VEC3 crntPos = pTransform->get_VEC3ToPos();
             VEC3 newPos = crntPos + (res._moveVelocity * deltaTime);
 
+            // 重力があるなら、重力処理を行う
+            if (_param._gravity > 0.0f)
+            {
+                m_GravityVelocity -= _param._gravity * deltaTime;
+
+                newPos.y += m_GravityVelocity * deltaTime;
+                if (newPos.y < 0.0f)
+                {
+                    newPos.y = 0.0f;
+                    m_GravityVelocity = 0.0f;
+                }
+            }
+
             // 反映
             pTransform->set_Pos(newPos);
+            pTransform->set_RotationQuaternion(res._RotQ);
         }
     }
 }
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】パラメータのリセット
+//*
+//* [引数] なし
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void MoveLogic::ParamReset()
+{
+    m_GravityVelocity = 0.0f;
+}
+
 
 //*---------------------------------------------------------------------------------------
 //*【?】移動挙動の登録
@@ -90,6 +128,7 @@ void MoveLogic::Register(MOVE_BEHAVIOUR_TYPE _type)
         m_pMoveBehaviourMap[_type] = std::make_unique<LinearMove_Behaviour>();
         break;
     case MOVE_BEHAVIOUR_TYPE::HOMING:
+        m_pMoveBehaviourMap[_type] = std::make_unique<HormingMove_Behaviour>();
         break;
     default:
         break;

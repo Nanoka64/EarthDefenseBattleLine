@@ -2,6 +2,7 @@
 #include "Component_PlayerController.h"
 #include "Component_3DCamera.h"
 #include "Component_SkinnedMeshAnimator.h"
+#include "Component_WeaponController.h"
 #include "Component_Health.h"
 #include "GameObject.h"
 #include "InputFactory.h"
@@ -13,12 +14,17 @@ using namespace Input;
 using namespace VECTOR3;
 using namespace VECTOR2;
 
+using namespace PlayerData;
+
 using namespace DirectX;
 using namespace Tool;
 
-constexpr float MOVE_SPEED = 150.0f;		// プレイヤーの移動速度
-constexpr float ROLLING_SPEED = 10.0f;	// ローリング時のスピード
-constexpr int ROLLING_DURATION = 60;	// ローリング時間
+constexpr float MOVE_SPEED = 10.0f;		// プレイヤーの移動速度
+constexpr float ROLLING_SPEED = 32.0f;	// ローリング時初速
+constexpr float ROLLING_DURATION = 1.0f;// ローリング時間
+constexpr float JUMP_HEIGHT = 2.5f;		// ジャンプの高さ
+constexpr float GRAVITY = 18.0f;		// 重力
+constexpr float ANIM_SPEED = 1.25f;		// アニメーション速度
 
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
@@ -32,12 +38,15 @@ m_IsAnim(false),
 m_IsJump(false),
 m_IsDead(false),
 m_IsRolling(false),
+m_IsGrounded (true),
 m_IsContinuousAngle(true),
 m_MoveVelocity(VEC3()),
 m_MoveSpeed(MOVE_SPEED),
-m_CrntAnimID(PLAYER_ANIMATION_ID::T_POSE),
+m_CrntAnimID(PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE),
 m_JumpVelocity(0.0f),
-m_RollingCounter(0),
+m_Gravity(GRAVITY),
+m_JumpForce(0.0f),
+m_RollingElapsedTime(0.0f),
 m_RollingDuration(ROLLING_DURATION)
 {
 	this->set_Tag("PlayerController");
@@ -76,18 +85,25 @@ void PlayerController::Start(RendererEngine& renderer)
 	// アニメーションコンポーネントの取得
 	m_pAnimatorComp = m_pOwner.lock()->get_Component<SkinnedMeshAnimator>();
 
-	m_CrntAnimID = PLAYER_ANIMATION_ID::CROUCH_FWD_LOOP;
+	//武器制御用コンポーネントの取得
+	m_pWeaponController = m_pOwner.lock()->get_Component<WeaponController>();
+
+	m_CrntAnimID = PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE;
 
 	// HP管理コンポーネントの取得
 	m_pHealthComp = m_pOwner.lock()->get_Component<Health>();
-	m_pHealthComp.lock()->set_MaxHP(200.0f);
-	m_pHealthComp.lock()->set_CrntHP(200.0f);
+	//m_pHealthComp.lock()->set_MaxHP(200.0f);
+	//m_pHealthComp.lock()->set_CrntHP(200.0f);
+
+	// ジャンプ力の計算
+	// https://heron-no-suugaku.sakura.ne.jp/jump-implementation-math/#toc1
+	m_JumpForce = sqrtf(2.0f * m_Gravity * JUMP_HEIGHT);
 
 	// 被弾時のコールバック
 	m_pHealthComp.lock()->RegisterOnDamage(
 		[this] (float _damage)
 		{
-			ChangeAnimation(PLAYER_ANIMATION_ID::HIT_HEAD); 
+			//ChangeAnimation(PLAYER_ANIMATION_ID::HIT_HEAD); 
 		}
 	);	
 	// 死亡時のコールバック
@@ -95,7 +111,7 @@ void PlayerController::Start(RendererEngine& renderer)
 		[this] 
 		{
 			m_IsDead = true;
-			ChangeAnimation(PLAYER_ANIMATION_ID::DEATH01); 
+			//ChangeAnimation(PLAYER_ANIMATION_ID::DEATH01); 
 		}
 	);
 }
@@ -111,14 +127,37 @@ void PlayerController::Start(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void PlayerController::Update(RendererEngine &renderer)
 {
-	if (m_IsDead)return;
-	
+	m_IsGrounded = false;
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】遅延更新
+//*
+//* [引数]
+//* RendererEngine& : 描画エンジンの参照
+//*
+//* [返値]
+//* void
+//*----------------------------------------------------------------------------------------
+void PlayerController::LateUpdate(RendererEngine& renderer)
+{
+	// プレイヤー死亡
+	if (m_IsDead) {
+		Master::m_pDataManager->set_IsPlayerDead(true);
+		return;
+	}
+
+	m_pAnimatorComp.lock()->PlayAnim(Master::m_pTimeManager->get_DeltaTime() * ANIM_SPEED);
+
 	// ローリングの処理のみ行って返す
 	if (m_IsRolling)
 	{
 		RollingUpdate();
 		return;
 	}
+
+	// 武器制御の更新
+	//m_pWeaponController.lock()->Update(renderer);
 
 	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 
@@ -132,7 +171,7 @@ void PlayerController::Update(RendererEngine &renderer)
 	VEC3 crntRot = m_pMyTransformComp.lock()->get_VEC3ToRotateToRad();	// 現在の回転
 
 	// 待機アニメーション
-	ChangeAnimation(PLAYER_ANIMATION_ID::IDLE_LOOP);
+	ChangeAnimation(PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE);
 
 	// 前方向と右方向ベクトルを作る 
 	// 右方向ベクトルは上方向と前方向ベクトルの外積を取ることでできる
@@ -146,35 +185,40 @@ void PlayerController::Update(RendererEngine &renderer)
 
 	// 右方向ベクトル
 	VEC3 right = VEC3::Cross(upVec, forward);
-	
+
 	// 正規化
 	forward = forward.Normalize();
 	right = right.Normalize();
 
 	/*VEC3 velocity{ 0.0f,0.0f,0.0f };*/
-
+	VEC3 inputDir = VEC3(0.0f, 0.0f, 0.0f);
 	m_MoveVelocity.x = 0.0f;
 	m_MoveVelocity.z = 0.0f;
+
 
 	//-----------------------------------------------------------------------------
 	// ■ 移動入力 / ジャンプ時はローリングさせない
 	//-----------------------------------------------------------------------------
 	if (GetInput(GAME_CONFIG::MOVE_FORWARD))	// 前進
 	{
-		m_MoveVelocity += forward;
+		inputDir += forward;
 	}
 	if (GetInput(GAME_CONFIG::MOVE_BACK))		// 後退
 	{
-		m_MoveVelocity -= forward;
+		inputDir -= forward;
 	}
 	if (GetInput(GAME_CONFIG::MOVE_RIGHT))		// 右へ
-	{ 
-		m_MoveVelocity += right;
+	{
+		inputDir += right;
 
 		// 右ローリング
-		if (GetInputDown(GAME_CONFIG::MOVE_JUMP) && m_IsJump == false)	
+		if (GetInputDown(GAME_CONFIG::MOVE_JUMP) && m_IsJump == false)
 		{
-			m_MoveVelocity = m_MoveVelocity.Normalize();
+			inputDir = inputDir.Normalize();
+			m_MoveVelocity.x = inputDir.x;
+			m_MoveVelocity.z = inputDir.z;
+
+
 			m_IsRolling = true;
 			// ****************************************************
 			//				 ローリング開始音/声 再生
@@ -186,12 +230,16 @@ void PlayerController::Update(RendererEngine &renderer)
 	}
 	if (GetInput(GAME_CONFIG::MOVE_LEFT))		// 左へ
 	{
-		m_MoveVelocity -= right;
+		inputDir -= right;
 
 		// 左ローリング
 		if (GetInputDown(GAME_CONFIG::MOVE_JUMP) && m_IsJump == false)
 		{
-			m_MoveVelocity = m_MoveVelocity.Normalize();
+			inputDir = inputDir.Normalize();
+			m_MoveVelocity.x = inputDir.x;
+			m_MoveVelocity.z = inputDir.z;
+
+
 			m_IsRolling = true;
 			// ****************************************************
 			//				 ローリング開始音/声 再生
@@ -202,17 +250,33 @@ void PlayerController::Update(RendererEngine &renderer)
 			return;
 		}
 	}
-	
+
 	// 正規化
-	m_MoveVelocity = m_MoveVelocity.Normalize();
+	inputDir = inputDir.Normalize();
+	m_MoveVelocity.x = inputDir.x;
+	m_MoveVelocity.z = inputDir.z;
 
 	//-----------------------------------------------------------------------------
 	// ■ ジャンプ入力受付 / ジャンプ中処理
 	//-----------------------------------------------------------------------------
-	// ジャンプ状態ではない、かつ、ローリング中でもない
-	if (m_IsJump == false && m_IsRolling == false)
+	// 接地しているならジャンプ可能
+	if (m_IsGrounded)
 	{
-		if (GetInputDown(GAME_CONFIG::MOVE_JUMP))
+		// ジャンプ中に接地した場合、リセット
+		if (m_IsJump)
+		{
+			// ****************************************************
+			//				 ジャンプ - 着地音 再生
+			// ****************************************************
+			Master::m_pSoundManager->Play(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SOLDIER_R_JUMP_LAND));
+			ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_DOWN);
+
+			m_JumpVelocity = 0.0f;
+			m_IsJump = false;
+		}
+
+		// ジャンプ状態ではない、かつ、ローリング中でもない
+		if (GetInputDown(GAME_CONFIG::MOVE_JUMP) && m_IsRolling == false)
 		{
 			m_IsJump = true;
 			m_JumpVelocity = m_JumpForce;
@@ -224,16 +288,24 @@ void PlayerController::Update(RendererEngine &renderer)
 			Master::m_pSoundManager->Play_Rand(SOUND_TYPE::VOICE, SOUND_ID_TO_INT(VOICE_ID::SOLDIER_R_SHOUT_01), 3);
 
 			// ジャンプ開始アニメーション
-			ChangeAnimation(PLAYER_ANIMATION_ID::JUMP_START);
+			ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_UP);
 		}
 	}
 	else
 	{
-		// ジャンプ中アニメーション
-		ChangeAnimation(PLAYER_ANIMATION_ID::JUMP_LOOP);
-		m_JumpVelocity -= m_Gravity;	// 重力
-	}
+		// 空中にいる場合は重力をかけ続ける
+		ChangeAnimation(PLAYER_RANGER_ANIM_ID::JUMP_LOOP);
+		m_JumpVelocity -= m_Gravity * deltaTime;
 
+		// 世界の裏側に落下した場合
+		if (crntPos.y < -100.0f)
+		{
+			m_IsJump = false;
+			m_JumpVelocity = 0.0f;
+			m_pMyTransformComp.lock()->set_Pos(VEC3(0.0f, 100.0f, 0.0f));
+			return;
+		}
+	}
 	// 正規化後に入れる
 	m_MoveVelocity.y = m_JumpVelocity;
 
@@ -246,40 +318,22 @@ void PlayerController::Update(RendererEngine &renderer)
 	//-----------------------------------------------------------------------------
 	if (m_MoveVelocity.Length() > 0.001f)
 	{
-		//m_MoveVelocity = m_MoveVelocity.Normalize();
+		// 水平方向の移動ベクトル
+		VEC3 horizontalMove = m_MoveVelocity;
+		horizontalMove.y = 0;
 
 		// 移動計算
-		newPos = (crntPos + (m_MoveVelocity * (m_MoveSpeed * deltaTime)));
+		newPos = (crntPos + (horizontalMove * m_MoveSpeed * deltaTime) + (VEC3(0, m_JumpVelocity, 0) * deltaTime));
 
-		if (m_IsJump)
-		{
-			// 地面判定
-			if (newPos.y < 0.0f)
-			{
-				// ****************************************************
-				//				 ジャンプ - 着地音再生
-				// ****************************************************
-				Master::m_pSoundManager->Play(SOUND_TYPE::SE, SOUND_ID_TO_INT(SOUND_ID::SOLDIER_R_JUMP_LAND));
-
-				newPos.y = 0.0f;
-				m_JumpVelocity = 0.0f;
-				m_IsJump = false;
-				ChangeAnimation(PLAYER_ANIMATION_ID::JUMP_LAND);
-			}
-		}
-
-		// 移動ベクトルを加算
-		m_pMyTransformComp.lock()->set_Pos(newPos);
 
 		// 動いているならアニメーション
 		m_IsAnim = true;
-		
+
 		/*
 		// 移動ベクトルに合わせてY軸のみ回転させる
 		// ジャンプ時に回転しないよう、X/Zのみ考慮
 		*/
-		VEC2 velocityXZ = VEC2(m_MoveVelocity.x, m_MoveVelocity.z);
-		if (velocityXZ.Length() > 0.001f)
+		if (horizontalMove.Length() > 0.001f)
 		{
 			//!***********************************
 			// 方向の処理を外に出すとガタガタする
@@ -290,35 +344,36 @@ void PlayerController::Update(RendererEngine &renderer)
 			if (m_IsJump == false)
 			{
 				// 走りアニメーション
-				ChangeAnimation(PLAYER_ANIMATION_ID::JOG_FWD_LOOP);
+				ChangeAnimation(PLAYER_RANGER_ANIM_ID::RUNING);
 			}
 
 			if (!m_IsContinuousAngle)
 			{
-				MovedAngle(crntRot,m_MoveVelocity);
+				MovedAngle(crntRot, m_MoveVelocity);
 			}
 		}
+
+		m_pMyTransformComp.lock()->set_Pos(newPos);
 	}
+
+
+	if (m_pWeaponController.lock()->get_IsCrntWeaponReloading())
+	{
+
+		if (m_MoveVelocity.Length() > 0.001f) {
+			ChangeAnimation(PLAYER_RANGER_ANIM_ID::RUNNNING_RELOAD);
+		}
+		else {
+			ChangeAnimation(PLAYER_RANGER_ANIM_ID::RELOADING_IDLE);
+		}
+	}
+
 
 	// 継続的に視点を変える
 	if (m_IsContinuousAngle)
 	{
 		ContinuousAngle(crntRot);
 	}
-}
-
-//*---------------------------------------------------------------------------------------
-//*【?】描画
-//*
-//* [引数]
-//* RendererEngine& : 描画エンジンの参照
-//*
-//* [返値]
-//* void
-//*----------------------------------------------------------------------------------------
-void PlayerController::Draw(RendererEngine& renderer)
-{
-	return;
 }
 
 //*---------------------------------------------------------------------------------------
@@ -334,7 +389,10 @@ void PlayerController::Draw(RendererEngine& renderer)
 void PlayerController::RollingUpdate()
 {
 	// ローリングアニメーションに
-	ChangeAnimation(PLAYER_ANIMATION_ID::ROLL);
+	ChangeAnimation(PLAYER_RANGER_ANIM_ID::RUNING_DIVE_ROLL);
+
+	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
+	
 
 	auto pOwner = m_pOwner.lock();
 	m_pMyTransformComp = pOwner->get_Transform().lock();
@@ -345,19 +403,23 @@ void PlayerController::RollingUpdate()
 
 	// 0.0 ～ 1.0 に正規化
 	float t = std::min(
-		static_cast<float>( m_RollingCounter) / static_cast<float>(m_RollingDuration), 
+		m_RollingElapsedTime / m_RollingDuration,
 		1.0f); 
 
+	// ※ イージングより、経過時間の割合の方が、本家の挙動に似ている感じがするので、変更
 	// イージング関数でカウンタに合わせて速度を落としていく
-	float easeOut = 1.0f - Tool::Easing::EaseOutQuad(t);
-	newPos = crntPos + (m_MoveVelocity * (ROLLING_SPEED * easeOut));
+	//float easeOut = 1.0f - Tool::Easing::EaseOutSin(t);
+	newPos = crntPos + (m_MoveVelocity * (ROLLING_SPEED * (1.0f - t))) * deltaTime;
+
+	
+	m_RollingElapsedTime += deltaTime;
 
 	// 時間で止める
-	if (m_RollingCounter >= m_RollingDuration)
+	if (t >= 1.0f)
 	{
 		/* 移動ベクトルとかを元に戻す */
 		m_IsRolling = false;
-		m_RollingCounter = 0;
+		m_RollingElapsedTime = 0.0f;
 
 		// ****************************************************
 		//				 ローリング終了音再生
@@ -369,8 +431,6 @@ void PlayerController::RollingUpdate()
 
 	// ローリング方向に合わせて回転させる
 	MovedAngle(crntRot,m_MoveVelocity);
-
-	m_RollingCounter++;
 }
 
 
@@ -389,6 +449,38 @@ void PlayerController::OnCollisionEnter(const class CollisionInfo &other)
 	{
 		//m_pHealthComp.lock()->TakeDamage(1.0f);
 	}
+
+	VEC3 normal = other.get_HitNormal();
+
+	// 法線のY成分が一定以上（例：0.7f以上で約45度以下の坂）なら床とみなす
+	if (normal.y < -0.7f)
+	{
+		m_IsGrounded = true;
+
+		// めり込み防止のため、下方向への速度（重力による落下速度）をリセット
+		if (m_JumpVelocity < 0.0f) {
+			m_JumpVelocity = 0.0f;
+		}
+	}
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】パラメータ等をリセットする
+//*
+//* [引数] なし
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
+void PlayerController::Reset()
+{
+	m_IsDead = false;
+	m_IsJump = false;
+	m_IsRolling = false;
+	if (m_pHealthComp.lock()) {
+		m_pHealthComp.lock()->Reset();
+	}
+	if (m_pAnimatorComp.lock())	{
+		ChangeAnimation(PlayerData::PLAYER_RANGER_ANIM_ID::RIFLE_AMING_IDLE);
+	}
 }
 
 //*---------------------------------------------------------------------------------------
@@ -398,7 +490,7 @@ void PlayerController::OnCollisionEnter(const class CollisionInfo &other)
 //* id : アニメーション番号
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-void PlayerController::ChangeAnimation(PLAYER_ANIMATION_ID id)
+void PlayerController::ChangeAnimation(PlayerData::PLAYER_RANGER_ANIM_ID id)
 {
 	// 同じ又はアニメーションが止まっているなら返す
 	if (id == m_CrntAnimID)
@@ -406,18 +498,20 @@ void PlayerController::ChangeAnimation(PLAYER_ANIMATION_ID id)
 		return;
 	}
 
+	auto animComp = m_pAnimatorComp.lock();
+
 	// ひとつ前のアニメーションIDセット
-	m_pAnimatorComp.lock()->set_PrevAnimIndex(static_cast<int>(m_CrntAnimID));
+	animComp->set_PrevAnimIndex(static_cast<int>(m_CrntAnimID));
 
 	m_CrntAnimID = id;
 
 	// 現在のアニメーションIDセット
-	m_pAnimatorComp.lock()->set_AnimIndex(static_cast<int>(m_CrntAnimID));
+	animComp->set_AnimIndex(static_cast<int>(m_CrntAnimID));
 
-	if (m_CrntAnimID == PLAYER_ANIMATION_ID::ROLL)
+	if (m_CrntAnimID == PLAYER_RANGER_ANIM_ID::RUNING_DIVE_ROLL)
 	{
-		m_pAnimatorComp.lock()->set_AnimProcTime(0.0f);
-		m_pAnimatorComp.lock()->set_ShadowAnimProcTime(0.0f);
+		animComp->set_AnimProcTime(0.0f);
+		animComp->set_ShadowAnimProcTime(0.0f);
 	}
 }
 
@@ -433,7 +527,7 @@ void PlayerController::ContinuousAngle(const VECTOR3::VEC3 &_crntRot)
 	float angle_V = m_pCameraComp.lock()->get_Angle_V();	// 垂直アングル取得
 
 	POINT mousePos = Master::m_pInputManager->GetMousePos();
-	float targetAngleY = (angle_H - 1.57) * -1;
+	float targetAngleY = (angle_H + 1.57f) * -1.0f;
 
 	// 目標とするクォータニオン
 	XMVECTOR targetRotQ = XMQuaternionRotationRollPitchYaw(0.0f, targetAngleY, 0.0f);
@@ -457,7 +551,7 @@ void PlayerController::MovedAngle(const VECTOR3::VEC3 &_crntRot, const VECTOR3::
 {
 	//目標の方向ベクトルから角度値を算出c
 	float targetAngleY = atan2(_velocity.x, _velocity.z);
-	targetAngleY -= 3.14f;	// ※ プレイヤーモデルが前後反転してしまっているため
+	//targetAngleY -= 3.14f;	// ※ プレイヤーモデルが前後反転してしまっているため  追記：直した
 
 	// 目標とするクォータニオン
 	XMVECTOR targetRotQ = XMQuaternionRotationRollPitchYaw(0.0f, targetAngleY, 0.0f);

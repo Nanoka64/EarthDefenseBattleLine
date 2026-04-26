@@ -24,11 +24,16 @@ private:
     class DX_RenderTarget *m_pLuminance_RT;		// 輝度抽出用
     class DX_RenderTarget *m_pShadowMap_RT;		// シャドウマップ（ライトから見た深度を書き込む）
 
+    // シャドウマップの解像度
+    const float SHADOW_SIZE_X = 4096.0f;    
+    const float SHADOW_SIZE_Y = 4096.0f;
+
     static const int NUM_WEIGHTS = 8;
     float m_GaussWeights[NUM_WEIGHTS];  // ガウス重み係数
 
     static const int BLUR_COUNT = 4;         // ブラー回数（ブルーム用）
     class GaussianBlur *m_pBloomGaussianBlur;// ブルーム用ガウスブラー
+    float m_Bloom_BlurIncensity;             // ブルームぼかしの強さ
 
     class GaussianBlur *m_pDoF_GaussianBlur; // 被写界深度用ガウスブラー
     float m_DoF_BlurIncensity;               // DOFブラーの強さ
@@ -48,23 +53,10 @@ private:
     std::shared_ptr<class SpriteRenderer> m_pFinalSceneToneMappingFilter_Sprite;
 
 
-    // 被写界深度情報
-    struct DoFInfo {
-        float dof_MaxRange; // ぼかしの最大距離
-        float dof_MinRange; // ぼかしの開始距離
-
-        float pad[2];
-    }m_DofData;
+    DoFInfo m_DofData;
 
     // シャドウバイアス情報
-    struct ShadowInfo
-    {
-        float baseShadowBias;
-        float slopeScaledBias;
-        float depthBiasClamp;
-
-        float pad1;
-    }m_ShadowData;
+    ShadowInfo m_ShadowData;
 
 
     // ビューポートの設定時にスムーズに渡す用
@@ -99,9 +91,14 @@ private:
     void Geometry_PathRender(RendererEngine &renderer);          // G-Buffer
     void Decal_PathRender(RendererEngine &renderer);             // デカール
     void Lighting_PathRender(RendererEngine &renderer);          // ディファードライティング
-    void Forward_PathRender(RendererEngine &renderer);           // フォワード
+    void Forward_PathRender(RendererEngine &renderer);            // スカイボックス
     void PostEffect_PathRender(RendererEngine &renderer);        // ポストエフェクト
     void CopyToFrameBuffer_PathRender(RendererEngine &renderer); // フレームバッファへ描画＆トーンマッピング
+
+    /// <summary>
+    /// ImGuiを使用したレンダーターゲットのデバッグ表示
+    /// </summary>
+    void DebugRenderTargetImGui();
 
     /// <summary>
     /// レンダーターゲットの作成

@@ -213,7 +213,7 @@ OUT_DiffAndSpec PointLightCalc(PointLight _ligData, float3 _eyePos, float3 _spcC
     float3 diffPoint = LambertDiffuseLightCalc(ligDir, _ligData.DiffuseColor, _norm);
     
     // フォン反射
-    float3 spcPoint = PhongSpecularLightCalc(ligDir, _eyePos, _spcCol, _spcPow, _worldPos, _norm);
+    float3 spcPoint = Blinn_PhongSpecularLightCalc(ligDir, _eyePos, _spcCol, _spcPow, _worldPos, _norm);
     
     // そのままだと薄すぎる場合があるので少し補正
     //diffPoint += 0.3f;
@@ -284,7 +284,7 @@ float3 HemisphereLightCalc(float3 _norm)
 float3 GetNorm(float4 _normMap, float3 _tan, float3 _biNorm, float3 _localNorm)
 {
     // 今のままだと0～1の値になっているので、-1～1に変換
-    _normMap = (_normMap - 0.5f) * 2.0f;
+    _normMap = _normMap * 2.0f - 1.0f;
     
     // タンジェントスペースの法線をワールドスペースに変換
     return normalize(

@@ -2,7 +2,6 @@
 #include "DXApp.h"
 #include "Window.h"
 #include "Path.h"
-#include "MyStruct.h"
 #include "InputManager.h"
 #include "DirectWriteManager.h"
 #include "FontConfig.h"
@@ -16,6 +15,7 @@
 
 using namespace Input;
 using namespace VERTEX;
+using namespace Tool;
 
 
 Debugger                *Master::m_pDebugger            = nullptr;  // ImGui機能ラップ
@@ -34,7 +34,9 @@ TimeManager             *Master::m_pTimeManager         = nullptr;   // 時間管理
 DataManager             *Master::m_pDataManager         = nullptr;   // データ管理
 BulletManager           *Master::m_pBulletManager       = nullptr;   // 弾管理
 UIManager               *Master::m_pUIManager           = nullptr;   // UI管理
-
+RandomManager           *Master::m_pRandomManager       = nullptr;   // 乱数管理
+WeaponDataManager       *Master::m_pWeaponDataManager   = nullptr;   // 武器データ管理
+ItemManager             *Master::m_pItemManager         = nullptr;   // アイテム管理
 
 //*---------------------------------------------------------------------------------------
 //* @:DXApp Class 
@@ -49,7 +51,8 @@ DXApp::DXApp(uint32_t width, uint32_t height) :
     m_Height(height),
     m_pRenderer(),
     m_pGameManager(),
-    m_IsClose(false)
+    m_IsClose(false),
+    m_IsEditMode(true)
 {
 
 }
@@ -100,6 +103,9 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
     Master::m_pDataManager          = new DataManager();            // データ管理
     Master::m_pBulletManager        = new BulletManager();          // 弾管理 
     Master::m_pUIManager            = new UIManager();              // UI管理
+    Master::m_pRandomManager        = new RandomManager();          // 乱数管理
+    Master::m_pWeaponDataManager    = new WeaponDataManager();      // 武器管理
+    Master::m_pItemManager          = new ItemManager();            // アイテム管理
 
     // *************************************************************************************************
     /**  ウインドウの初期化 **/
@@ -111,9 +117,18 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
     }
 
     // *************************************************************************************************
+    /**  ランダムマネージャー初期化 **/
+    // *************************************************************************************************
+    if (!Master::m_pRandomManager->Init())
+    {
+        assert(false);
+        return false;
+    }
+
+    // *************************************************************************************************
     /**  データマネージャの初期化 **/
     // *************************************************************************************************
-    if (!Master::m_pDataManager->Init())
+    if (!Master::m_pDataManager->Init(m_pRenderer.get()))
     {
         assert(false);
         return false;
@@ -150,23 +165,24 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
     ///////////////////////////////////////////
     // シェーダ作成
     ///////////////////////////////////////////
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::DEFERRED_STD_STATIC,           SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::DEFERRED_STD_STATIC_N,         SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::DEFERRED_STD_SKINNED_N,        SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE,       SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::DEFERRED_STD_RT_SPRITE,        SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::FORWARD_UNLIT_STATIC,          SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_GAUSSIAN_BLUR_HORIZONTAL, SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_GAUSSIAN_BLUR_VERTICAL,   SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_SKYBOX,                   SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_LUMINANCE_FILTER,         SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_KAWASE_FILTER,            SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_SHADOWMAP,                SHADER_CREATE_TYPE::RUNTIME))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_SHADOWMAP_SKINNED,        SHADER_CREATE_TYPE::RUNTIME))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_DEPTH_OF_FILED,           SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_TONEMAPPING,              SHADER_CREATE_TYPE::CSO))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::DEFERRED_STD_TRAIL,            SHADER_CREATE_TYPE::RUNTIME))return false;
-    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::DEFERRED_STD_DECAL,            SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::DEFERRED_STD_STATIC,               SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::DEFERRED_STD_STATIC_N,             SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::DEFERRED_STD_SKINNED_N,            SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE,           SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::DEFERRED_STD_RT_SPRITE,            SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::FORWARD_UNLIT_STATIC,              SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE, SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_GAUSSIAN_BLUR_HORIZONTAL,     SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_GAUSSIAN_BLUR_VERTICAL,       SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_SKYBOX,                       SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_LUMINANCE_FILTER,             SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_KAWASE_FILTER,                SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_SHADOWMAP,                    SHADER_CREATE_TYPE::RUNTIME))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_SHADOWMAP_SKINNED,            SHADER_CREATE_TYPE::RUNTIME))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_DEPTH_OF_FILED,               SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::POST_TONEMAPPING,                  SHADER_CREATE_TYPE::CSO))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::DEFERRED_STD_TRAIL,                SHADER_CREATE_TYPE::RUNTIME))return false;
+    if (!Master::m_pShaderManager->CreateShader(SHADER_TYPE::DEFERRED_STD_DECAL,                SHADER_CREATE_TYPE::CSO))return false;
 
     // *************************************************************************************************
     //** リソース管理の初期化 **/
@@ -205,6 +221,14 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
         return false;
     }
 
+    // *************************************************************************************************
+    /**  武器データマネージャー初期化 **/
+    // *************************************************************************************************
+    if (!Master::m_pWeaponDataManager->Init())
+    {
+        assert(false);
+        return false;
+    }
 
     // *************************************************************************************************
     /**  ライトマネージャー初期化 **/
@@ -250,6 +274,7 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
         assert(false);
         return false;
     }
+
     // *************************************************************************************************
     /**  タイムマネージャの初期化 **/
     // *************************************************************************************************
@@ -295,6 +320,26 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
     // 白 20サイズ 標準 ----------------------------------------------
     pFontData = new FONT_DATA("White_20_STD");  
     pFontData->fontSize = 20.0f;
+    pFontData->fontWeight = DWRITE_FONT_WEIGHT_BOLD;
+    pFontData->color = D2D1::ColorF(D2D1::ColorF::White);
+
+    // 登録
+    Master::m_pDirectWriteManager->SetFontData(pFontData);
+    SAFE_DELETE(pFontData);
+
+    // 白 15サイズ 標準 ----------------------------------------------
+    pFontData = new FONT_DATA("White_15_STD");  
+    pFontData->fontSize = 15.0f;
+    pFontData->fontWeight = DWRITE_FONT_WEIGHT_BOLD;
+    pFontData->color = D2D1::ColorF(D2D1::ColorF::White);
+
+    // 登録
+    Master::m_pDirectWriteManager->SetFontData(pFontData);
+    SAFE_DELETE(pFontData);
+
+    // 白 10サイズ 標準 ----------------------------------------------
+    pFontData = new FONT_DATA("White_10_STD");  
+    pFontData->fontSize = 10.0f;
     pFontData->fontWeight = DWRITE_FONT_WEIGHT_BOLD;
     pFontData->color = D2D1::ColorF(D2D1::ColorF::White);
 
@@ -360,7 +405,7 @@ int DXApp::MainLoop()
             if (difference > 1000.0f / g_Fps)
             {
                 // 終了ボタンが押されるか、ゲームの終了フラグが立っているか
-                if (GetInput(GAME_CONFIG::PAUSE) || m_pGameManager->get_IsGameClose()) break;   
+                if (GetInput(GAME_CONFIG::EXIT) || m_pGameManager->get_IsGameClose()) break;   
 
                 // 前回時刻を更新
                 lastTime = crntTime;
@@ -376,65 +421,34 @@ int DXApp::MainLoop()
 
 
                 // アプリケーション情報
-                Master::m_pDebugger->BeginDebugWindow("Application");
-                Master::m_pDebugger->DG_TextValue("CrntTime : %d", crntTime);
-                Master::m_pDebugger->DG_TextValue("LastTime : %d", lastTime);
-                Master::m_pDebugger->DG_TextValue("Difference : %f.3", difference);
-                Master::m_pDebugger->DG_TextValue("DeltaTime : %f.3", deltatime);
-                Master::m_pDebugger->EndDebugWindow(); 
-                
-                using namespace Tool;
+                //Master::m_pDebugger->BeginDebugWindow("Application");
+                //Master::m_pDebugger->DG_TextValue("CrntTime : %d", crntTime);
+                //Master::m_pDebugger->DG_TextValue("LastTime : %d", lastTime);
+                //Master::m_pDebugger->DG_TextValue("Difference : %f.3", difference);
+                //Master::m_pDebugger->DG_TextValue("DeltaTime : %f.3", deltatime);
+                //Master::m_pDebugger->EndDebugWindow(); 
+                //
 
+				// デバッグキー：F1でカメラコントロールモードのオンオフ切り替え
+                if (GetInputDown(GAME_CONFIG::F1))
+                {
+					bool isCameraControlMode = Master::m_pDataManager->get_IsCameraControl();
 
-                // 操作ガイド
-                Master::m_pDebugger->BeginDebugWindow(U8ToChar(u8"説明"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"DirectX11を使用した自作3Dグラフィックフレームワークです。"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"レンダリングパイプラインから自作し、ディファードシェーディングによる\n基本的なライティング、ポストエフェクト、シャドウ等を実装しました。"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"プログラム側はコンポーネント指向で設計し、\n柔軟にオブジェクトを作成できるようにしています。"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"※ 現在は技術デモ的なものとなってしまっているため、\n敵を一定数倒すだけのシンプルなものになっています。"));
-                Master::m_pDebugger->DG_Separator();    // 区切り
-                Master::m_pDebugger->DG_BulletText(U8ToChar(u8"☆操作方法"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"WASD：移動"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"マウスまたは矢印キー：視点操作"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"Space：ジャンプ"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"AまたはDを押しながらSpace：緊急回避"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"左クリック：射撃"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"右クリック：ズーム"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"ESC：終了"));
-                Master::m_pDebugger->DG_Separator();    // 区切り
-                Master::m_pDebugger->DG_BulletText(
-                    U8ToChar(
-                        u8"オブジェクトリストからオブジェクトを選択し、インスペクタでコンポーネントの\n一部パラメータ等が見れたりいじれるようになっています。"));
+                    isCameraControlMode ? Master::m_pDataManager->set_IsCameraControl(false) :
+						Master::m_pDataManager->set_IsCameraControl(true);
+                }
 
+				// デバッグキー：F2で武器使用のオンオフ切り替え
+                if (GetInputDown(GAME_CONFIG::F2))
+                {
+					bool isUseWeapon = Master::m_pDataManager->get_IsUseWeapon();
 
-                Master::m_pDebugger->DG_Separator();    // 区切り
-                Master::m_pDebugger->DG_BulletText(U8ToChar(u8"☆実装コンポーネント"));
+                    isUseWeapon ? Master::m_pDataManager->set_IsUseWeapon(false) :
+						Master::m_pDataManager->set_IsUseWeapon(true);
+                }
 
-                Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ユーティリティ"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"・Transform\n・Camera3D\n"));
-                Master::m_pDebugger->DG_Separator();    // 区切り
-
-
-                Master::m_pDebugger->DG_BulletText(U8ToChar(u8"メッシュ"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"・ModelMeshResource\n・ModelMeshRenderer\n・SkinnedMeshAnimator\n・SkyRenderer\n・SpriteRenderer\n・MeshResource\n・MeshRenderer\n・LineRenderer\n・TrailRenderer\n・BillboardResource\n・BillboardRenderer\n"));
-                Master::m_pDebugger->DG_Separator();    // 区切り
-
-
-                Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ライト"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"・DirectionLight\n・PointLight\n"));
-                Master::m_pDebugger->DG_Separator();    // 区切り
-
-                
-                Master::m_pDebugger->DG_BulletText(U8ToChar(u8"コライダー"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"・BoxCollider\n・SphereCollider\n"));
-                Master::m_pDebugger->DG_Separator();    // 区切り
-
-                
-                Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ゲームプレイ用"));
-                Master::m_pDebugger->DG_Text(U8ToChar(u8"・PlayerController\n・EnemyController\n・Health\n"));
-                Master::m_pDebugger->DG_Separator();    // 区切り
-
-                Master::m_pDebugger->EndDebugWindow();
+                // ImGui関連
+                AppEditDrawImGui();
 
                 // DirectWrite描画開始
                 Master::m_pDirectWriteManager->BeginDraw();
@@ -448,8 +462,16 @@ int DXApp::MainLoop()
                 // ゲーム更新
                 m_pGameManager->Update(*m_pRenderer);
 
-                // エフェクト更新（描画はパイプラインクラスのフォワードと同じ位置で行っている）
-                Master::m_pEffectManager->UpdateEffect(*m_pRenderer);
+                // エディタの更新
+                Master::m_pEditorManager->Update(*m_pRenderer);
+
+                // ポーズ中はエフェクト停止
+                if (Master::m_pDataManager->get_IsPause() == false)
+                {
+                    // エフェクト更新（描画はパイプラインクラスのフォワードと同じ位置で行っている）
+                    Master::m_pEffectManager->UpdateEffect(*m_pRenderer);
+                }
+
 
                 // ゲーム描画
                 m_pGameManager->Draw(*m_pRenderer);
@@ -457,12 +479,11 @@ int DXApp::MainLoop()
                 // サウンドの更新
                 Master::m_pSoundManager->Update(*m_pRenderer);
 
+                // DirectWrite描画終了
+                Master::m_pDirectWriteManager->EndDraw();
 
                 // ImGUI描画終了
                 Master::m_pDebugger->EndFrame();
-
-                // DirectWrite描画終了
-                Master::m_pDirectWriteManager->EndDraw();
 
                 // 描画の終了
                 m_pRenderer->EndRender();
@@ -470,6 +491,10 @@ int DXApp::MainLoop()
                 // 画面更新
                 m_pRenderer->Swap();
             }
+            //else
+            //{
+            //    Sleep(1);
+            //}
         }
     }
 
@@ -478,6 +503,100 @@ int DXApp::MainLoop()
     timeEndPeriod(1); // タイマーの分解機能設定をデフォルトに戻す
 
     return (int)msg.wParam;
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:DXApp Class 
+//*【?】ImGui関連の記述
+//* 引数：なし
+//* 返値：void
+//*----------------------------------------------------------------------------------------
+void DXApp::AppEditDrawImGui()
+{
+    //=========================================================================================
+    //
+    //						操作ガイド
+    //
+    //=========================================================================================
+    Master::m_pDebugger->BeginDebugWindow(U8ToChar(u8"説明"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"DirectX11を使用した自作3Dグラフィックフレームワークです。"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"レンダリングパイプラインから自作し、ディファードシェーディングによる\n基本的なライティング、ポストエフェクト、シャドウ等を実装しました。"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"プログラム側はコンポーネント指向で設計し、\n柔軟にオブジェクトを作成できるようにしています。"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"※ 現在は敵を一定数倒すだけのシンプルなものになっていますが、\n今後ゲーム部分の拡張を続けていきます。"));
+    Master::m_pDebugger->DG_Separator();    // 区切り
+    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"☆操作方法"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"[キーボード]"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"WASD：移動"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"マウスまたは矢印キー：視点操作"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"Space：ジャンプ"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"AまたはDを押しながらSpace：緊急回避"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"左Shift：押している間、弾が発射されなくなります。"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"1または2：武器切り替え"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"ESC：終了"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"[マウス]"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"マウスホイール：武器切り替え"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"左クリック：射撃"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"右クリック：ズーム"));
+    Master::m_pDebugger->DG_Separator();    // 区切り
+    Master::m_pDebugger->DG_BulletText(
+        U8ToChar(
+            u8"オブジェクトリストからオブジェクトを選択し、インスペクタでコンポーネントの\n一部パラメータ等が見れたりいじれるようになっています。"));
+
+
+    Master::m_pDebugger->DG_Separator();    // 区切り
+    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"☆実装コンポーネント"));
+
+    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ユーティリティ"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"・Transform\n・Camera3D\n"));
+    Master::m_pDebugger->DG_Separator();    // 区切り
+
+
+    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"メッシュ"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"・ModelMeshResource\n・ModelMeshRenderer\n・SkinnedMeshAnimator\n・SkyRenderer\n・SpriteRenderer\n・MeshResource\n・MeshRenderer\n・LineRenderer\n・TrailRenderer\n・BillboardResource\n・BillboardRenderer\n"));
+    Master::m_pDebugger->DG_Separator();    // 区切り
+
+
+    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ライト"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"・DirectionLight\n・PointLight\n"));
+    Master::m_pDebugger->DG_Separator();    // 区切り
+
+
+    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"コライダー"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"・BoxCollider\n・SphereCollider\n"));
+    Master::m_pDebugger->DG_Separator();    // 区切り
+
+
+    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ゲームプレイ用"));
+    Master::m_pDebugger->DG_Text(U8ToChar(u8"・PlayerController\n・EnemyController\n・Health...など\n"));
+    Master::m_pDebugger->DG_Separator();    // 区切り
+
+    Master::m_pDebugger->EndDebugWindow();
+
+
+    //=========================================================================================
+    //
+    //					    アプリケーション情報
+    //
+    //=========================================================================================
+    Master::m_pDebugger->BeginDebugWindow(U8ToChar(u8"アプリケーション設定"), 0);
+    if (Master::m_pDebugger->DG_CheckBox(U8ToChar(u8"デバッグ用エディタの表示"), &m_IsEditMode))
+    {
+        Master::m_pDataManager->set_IdDebugMode(m_IsEditMode);
+    }
+
+	bool isCameraControl = Master::m_pDataManager->get_IsCameraControl();
+    if (Master::m_pDebugger->DG_CheckBox(U8ToChar(u8"視点操作の有効/無効（F1キーで切り替え）"), &isCameraControl))
+    {
+        Master::m_pDataManager->set_IsCameraControl(isCameraControl);
+    }
+
+	bool isUseWeapon = Master::m_pDataManager->get_IsUseWeapon();
+    if (Master::m_pDebugger->DG_CheckBox(U8ToChar(u8"武器使用の有効/無効（F2キーで切り替え）"), &isUseWeapon))
+    {
+        Master::m_pDataManager->set_IsUseWeapon(isUseWeapon);
+    }
+    Master::m_pDebugger->EndDebugWindow();
+
 }
 
 
@@ -543,7 +662,7 @@ HRESULT DXApp::InitWindow(HINSTANCE hInstance, int nCmdShow)
     // windowの作成
     // Create window
     m_hInst = hInstance;
-    RECT rc = { WND_RECT_LEFT, WND_RECT_TOP,  m_Width, m_Height };      // 矩形を設定する
+    RECT rc = { WND_RECT_LEFT, WND_RECT_TOP,  static_cast<LONG>(m_Width), static_cast<LONG>(m_Height) };      // 矩形を設定する
     int res = AdjustWindowRect(&rc, dwStyle, FALSE);   // ウインドウの形を整える
 
     m_hWnd = CreateWindowW(

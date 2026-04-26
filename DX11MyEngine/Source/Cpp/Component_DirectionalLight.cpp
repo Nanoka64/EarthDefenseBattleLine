@@ -17,10 +17,10 @@ using namespace VECTOR3;
 //* 引数：2.更新レイヤー
 //*----------------------------------------------------------------------------------------
 DirectionalLight::DirectionalLight(std::weak_ptr<GameObject> pOwner, int updateRank) : Light(pOwner, updateRank),
-m_FocusOffsetDistance(2000.0f),
-m_OrthographicWidth(650.0f),
-m_OrthographicHeigh(650.0f),
-m_ShadowDistance(4000.0f)
+m_FocusOffsetDistance(100.0f),
+m_OrthographicWidth(100.0f),
+m_OrthographicHeigh(100.0f),
+m_ShadowDistance(200.0f)
 {
 	this->set_Tag("DirectionalLight");
 }

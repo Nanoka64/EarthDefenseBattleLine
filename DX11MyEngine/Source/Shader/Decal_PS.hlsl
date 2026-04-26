@@ -40,7 +40,7 @@ struct PS_OUT
 // **************************************************************************
 /* - @:エントリーポイント - */
 // **************************************************************************
-PS_OUT PSMain(PS_IN input) : SV_TARGET
+PS_OUT PSMain(PS_IN input) 
 {
     PS_OUT output;
     
@@ -82,7 +82,6 @@ PS_OUT PSMain(PS_IN input) : SV_TARGET
     // ワールド空間の法線を求める
     float3 decalWorldNormal = normalize(mul(normTex.xyz, (float3x3) cb_Transform));
     decalWorldNormal = decalWorldNormal * 0.5f + 0.5f; // 0～1戻す
-    
     
     albedColor.rgb = albedTex.rgb;
     albedColor.a = albedTex.a;

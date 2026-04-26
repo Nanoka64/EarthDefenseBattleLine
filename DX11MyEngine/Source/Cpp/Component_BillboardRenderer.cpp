@@ -69,10 +69,16 @@ void BillboardRenderer::Update(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void BillboardRenderer::Draw(RendererEngine& renderer)
 {
+    // シャドウパス時には返す
+    if (renderer.get_CrntRenderPass() == RENDER_PASS::SHADOW) {
+        return;
+    }
+
     auto pContext = renderer.get_DeviceContext();
-    std::shared_ptr<MeshResourceData> meshData = m_pResource.lock()->m_pMeshData;
-    CB_TRANSFORM_SET* cbTransSet = m_pResource.lock()->m_pCBTransformSet;
-    CB_MATERIAL_SET* cbMatSet = m_pResource.lock()->m_pCBMaterialDataSet;
+	auto resourcePtr = m_pResource.lock();
+    std::shared_ptr<MeshResourceData> meshData = resourcePtr->m_pMeshData;
+    CB_TRANSFORM_SET* cbTransSet = resourcePtr->m_pCBTransformSet;
+    CB_MATERIAL_SET* cbMatSet = resourcePtr->m_pCBMaterialDataSet;
     ID3D11Buffer* vtxBuff = meshData->pVertexBuffer;
     ID3D11Buffer* idxBuff = meshData->pIndexBuffer;
 
@@ -86,7 +92,17 @@ void BillboardRenderer::Draw(RendererEngine& renderer)
 
     const XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
     XMVECTOR forward = viewInvMtx.r[2];     // [2]に前方向が入ってる（0:rg1:up2:fw）
-    forward = XMVectorSetY(forward, 0.0f);  // Y成分を0にする
+ 
+    if (resourcePtr->m_FixedAxisBitFlag & FIXED_AXIS_BITFLAG_X) {
+        forward = XMVectorSetX(forward, 0.0f);  // X成分を0にする
+    }
+    if (resourcePtr->m_FixedAxisBitFlag & FIXED_AXIS_BITFLAG_Y) {
+        forward = XMVectorSetY(forward, 0.0f);  // Y成分を0にする
+    }
+    if (resourcePtr->m_FixedAxisBitFlag & FIXED_AXIS_BITFLAG_Z) {
+        forward = XMVectorSetZ(forward, 0.0f);  // Z成分を0にする
+    }
+
     forward = XMVector3Normalize(forward);  // 正規化
 
     XMVECTOR right = XMVector3Cross(up, forward);   // 外積を使って右方向ベクトルを求める

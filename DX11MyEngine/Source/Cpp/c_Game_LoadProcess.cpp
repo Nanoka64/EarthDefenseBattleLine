@@ -1,31 +1,41 @@
 #include "pch.h"
-#include "c_Game_LoadProcess.h"
+#include "GameScene_StateHeader.h"
 #include "GameManager.h"
 #include "ResourceManager.h"
 #include "RendererEngine.h"
 #include "SceneStateEnums.h"
 #include "GameObject.h"
 #include "InputFactory.h"
+#include "MeshFactory.h"
 #include "Component_3DCamera.h"
 #include "Component_PlayerController.h"
 #include "Component_SkinnedMeshAnimator.h"
 #include "Component_ModelMeshResource.h"
 #include "Component_ModelMeshRenderer.h"
 #include "Component_MeshRenderer.h"
-#include "MeshFactory.h"
 #include "Component_DirectionalLight.h"
 #include "Component_PointLight.h"
 #include "Component_SpriteRenderer.h"
 #include "Component_BillboardRenderer.h"
 #include "Component_SkyRenderer.h"
 #include "Component_AssultRifle.h"
+#include "Component_GunWeapon.h"
 #include "Component_BoxCollider.h"
 #include "Component_SphereCollider.h"
 #include "Component_TrailRenderer.h"
 #include "Component_EnemyController.h"
 #include "Component_Health.h"
 #include "Component_LineRenderer.h"
+#include "Component_WeaponController.h"
+#include "Component_BuildingController.h"
+#include "Component_MiniMapRader.h"
+#include "Component_Player_HPBar.h"
+#include "Component_MoveLogic.h"
+#include "Component_Faction.h"
+#include "Component_Item.h"
 
+using namespace UtilityData;
+using namespace EnemyData;
 using namespace SceneStateEnums;
 using namespace VECTOR4;
 using namespace VECTOR3;
@@ -44,6 +54,17 @@ void c_Game_LoadProcess::OnEnter(SceneManager *pOwner)
 	{
 		obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 	}
+
+    // ロード画面用用スプライトを作る **********************************************
+    float width = static_cast<float>(m_pRenderer->get_ScreenWidth());
+    float height = static_cast<float>(m_pRenderer->get_ScreenHeight());
+    UIData::RectTransformData rectData;
+    rectData._size = VEC2(width, height);
+    UIData::SpriteUIData spriteData;
+    spriteData._tag = "LoadSprite";
+    spriteData._imagePath = "Resource/Texture/Title/Load.png";
+    spriteData._layerRank = 101;
+    m_pLoadBackObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
 }
 
 
@@ -64,62 +85,13 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         assert(false);
     }
 
-
-    /* 兵士 */
+    // *************************************************************************************************
+    // アイテム管理クラスの初期化
+    // *************************************************************************************************
+    if (!Master::m_pItemManager->Init(*m_pRenderer))
     {
-        // マテリアル取得
-        auto matPtr1 = Master::m_pResourceManager->FindMaterial("Soldier_body");
-        auto matPtr2 = Master::m_pResourceManager->FindMaterial("Soldier_head");
-
-        SetupMaterialInfo matInfo[3];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr1; // 体
-
-        matInfo[1].Index = 1;
-        matInfo[1].pMaterialData = matPtr1; // ヘルメット（体）
-
-        matInfo[2].Index = 2;
-        matInfo[2].pMaterialData = matPtr2; // 頭
-
-        CreateModelInfo model;
-        model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Player/chara.fbx";
-        model.ObjTag = "Soldier";
-        model.IsAnim = true;
-        model.MatNum = 3;
-        model.SetupMaterial = matInfo;
-        model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
-        auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(-1);
-    }
-
-    std::shared_ptr<GameObject> sphireObj;
-
-    /* スフィア */
-    {
-        // マテリアル取得
-        auto matPtr = Master::m_pResourceManager->FindMaterial("Canonn");
-
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr;
-
-        CreateUtilityMeshInfo mesh;
-        mesh.pRenderer = m_pRenderer;
-        mesh.Type = UTILITY_MESH_TYPE::SPHERE;
-        mesh.MatNum = 1;
-        mesh.MaterialData = matInfo;
-        mesh.IsActive = true;
-        mesh.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
-        mesh.IsNormalMap = false;
-        mesh.ObjTag = "Canonn";
-
-        sphireObj = MeshFactory::CreateUtilityMesh(mesh);
-        sphireObj->get_Transform().lock()->set_Scale(10.0f, 10.0f, 10.0f);
-        sphireObj->get_Transform().lock()->set_Pos(0.0f, 1000.0f, 0.0f);
-        sphireObj->get_Transform().lock()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
-
-        auto light = sphireObj->add_Component<PointLight>();
+        MessageBox(NULL, "アイテム管理クラスの初期化に失敗しました", "GameLoad", MB_OK);
+        assert(false);
     }
 
     /* アリ モデルの生成 */
@@ -133,7 +105,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
         CreateModelInfo model;
         model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Enemy/ant_lowpoly.fbx";
+        model.Path = "Resource/Model/Enemy/GiantAnt01.fbx";
         model.ObjTag = "Ant1";
         model.IsAnim = true;
         model.MatNum = 1;
@@ -144,44 +116,61 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         {
             model.ObjTag = "Ant"/* + std::to_string(i + 1)*/;   // タグ
 
-            auto obj  = MeshFactory::CreateModel(model);
+            auto obj = MeshFactory::CreateModel(model);
             auto transform = obj->get_Component<MyTransform>();
 
             // 動的オブジェクト
-            obj->set_State(OBJECT_STATE::DYNAMIC);
+            obj->set_IsStatic(false);
+
+            // ポーズ中は停止
+            obj->set_IsUpdateAllowedDuringPause(false);
 
             obj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
             obj->get_Component<SkinnedMeshAnimator>()->set_AnimIndex(0);
-            
-            // エネミーコントローラーと体力管理を追加
+
+            //
+            // エネミーコントローラー追加
+            //
             obj->add_Component<EnemyController>();
-            obj->add_Component<Health>();
-            auto trail = obj->add_Component<TrailRenderer>();
-            trail->set_Color(VEC4(1.0f, 0.0f, 0.0f, 1.0f));
-            trail->set_Width(15.0f);
-            trail->set_DrawTime(120.0f);
-            trail->set_EmissivePower(2.0f);
+            obj->add_Component<MoveLogic>();
+            
+            //
+            // 派閥コンポーネント追加
+            //
+            auto faction = obj->add_Component<Faction>();
+            faction->set_Faction(FACTION::ENEMY);
+            
+            //
+            // 体力コンポーネント追加
+            //
+            auto health = obj->add_Component<Health>();
+            float hp = ENEMY_ANT01_BASE_HP * Master::m_pDataManager->get_EnemyDifficultyFactor()._hpRate;
+            health->set_MaxHP(hp);
+            health->set_CrntHP(hp);
 
             VEC3 pos = VEC3();
-            pos.x = Tool::RandRange(-600.0, 600.0);
-            pos.y = 15.0f;
-            pos.z = Tool::RandRange(-600.0, 600.0);
-            
+            pos.x = Tool::RandRange(-50.0, 50.0);
+            pos.y = 0.0f;
+            pos.z = Tool::RandRange(-50.0, 50.0);
+
             VEC3 rot = VEC3();
             rot.y = Tool::RandRange(-360.0f, 360.0f);
 
             transform->set_Pos(pos);
             transform->set_RotateToDeg(rot);
-            transform->set_Scale(0.1f, 0.1f, 0.1f);
+            transform->set_Scale(1);
 
-
+            //
             // コライダーの追加
+            //
             auto collider = obj->add_Component<BoxCollider>();
-            collider->set_Size(VEC3(20, 15, 20));
-            collider->set_Center(VEC3(0, 10, 0));
+            collider->set_Size(VEC3(2.0f, 2.0f, 2.0f));
+            collider->set_Center(VEC3(0.0f, 2.0f, 0.0f));
             // 衝突カテゴリ
             collider->set_CollisionCategory(COLLISION_CATEGORY::ENEMY);
 
+            unsigned hitMask = UINT_CAST(COLLISION_CATEGORY::BUILDING) | UINT_CAST(COLLISION_CATEGORY::DESTRUCTION_BUILDING);
+            collider->set_CollisionBitMask(hitMask);
 
             // コライダーの登録
             Master::m_pCollisionManager->RegisterCollider(collider);
@@ -190,84 +179,113 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
     /* B-2 モデルの生成 */
     {
-        // マテリアル取得
-        auto matPtr = Master::m_pResourceManager->FindMaterial("B_2");
+        //// マテリアル取得
+        //auto matPtr = Master::m_pResourceManager->FindMaterial("B_2");
 
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr;
+        //SetupMaterialInfo matInfo[1];
+        //matInfo[0].Index = 0;
+        //matInfo[0].pMaterialData = matPtr;
 
-        CreateModelInfo model;
-        model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/b-2/B-2_NonBone.fbx";
-        model.ObjTag = "B-2";
-        model.IsAnim = false;
-        model.MatNum = 1;
-        model.SetupMaterial = matInfo;
-        model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
-        for (int i = 0; i < 3; i++)
-        {
-            model.ObjTag = "B-2_" + std::to_string(i + 1);
-            auto obj = MeshFactory::CreateModel(model);
-            obj->get_Component<MyTransform>()->set_Scale(0.05f, 0.05f, 0.05f);
-        }
+        //CreateModelInfo model;
+        //model.pRenderer = m_pRenderer;
+        //model.Path = "Resource/Model/b-2/B-2_NonBone.fbx";
+        //model.ObjTag = "B-2";
+        //model.IsAnim = false;
+        //model.MatNum = 1;
+        //model.SetupMaterial = matInfo;
+        //model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
+        //for (int i = 0; i < 3; i++)
+        //{
+        //    model.ObjTag = "B-2_" + std::to_string(i + 1);
+        //    auto obj = MeshFactory::CreateModel(model);
+        //    obj->get_Component<MyTransform>()->set_Scale(0.05f, 0.05f, 0.05f);           
+        //    // ポーズ中は停止
+        //    obj->set_IsUpdateAllowedDuringPause(false);
+        //}
     }
 
     /* クレイモア モデルの生成 */
     {
-        // マテリアル取得
-        auto matPtr = Master::m_pResourceManager->FindMaterial("Claymore");
+        //// マテリアル取得
+        //auto matPtr = Master::m_pResourceManager->FindMaterial("Claymore");
 
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr;
+        //SetupMaterialInfo matInfo[1];
+        //matInfo[0].Index = 0;
+        //matInfo[0].pMaterialData = matPtr;
 
-        CreateModelInfo model;
-        model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Claymore/Claymore.fbx";
-        model.ObjTag = "Claymore";
-        model.IsAnim = false;
-        model.MatNum = 1;
-        model.SetupMaterial = matInfo;
-        model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
-        auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<MyTransform>()->set_Scale(2.0f, 2.0f, 2.0f);
-        obj->get_Component<MyTransform>()->set_Pos(0.0f, 100.0f, 400.0f);
+        //CreateModelInfo model;
+        //model.pRenderer = m_pRenderer;
+        //model.Path = "Resource/Model/Claymore/Claymore.fbx";
+        //model.ObjTag = "Claymore";
+        //model.IsAnim = false;
+        //model.MatNum = 1;
+        //model.SetupMaterial = matInfo;
+        //model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
+        //auto obj = MeshFactory::CreateModel(model);
+        //obj->get_Component<MyTransform>()->set_Scale(2.0f, 2.0f, 2.0f);
+        //obj->get_Component<MyTransform>()->set_Pos(0.0f, 100.0f, 400.0f);
     }
 
     /* 建物 モデルの生成 */
     {
         // マテリアル取得
-        auto matPtr = Master::m_pResourceManager->FindMaterial("Building");
+        auto matPtr1 = Master::m_pResourceManager->FindMaterial("Building01_Top");
+        auto matPtr2 = Master::m_pResourceManager->FindMaterial("Building01_Base1");
+        auto matPtr3 = Master::m_pResourceManager->FindMaterial("Building01_Base2");
+        auto matPtr4 = Master::m_pResourceManager->FindMaterial("Building01_Base3");
 
-        SetupMaterialInfo matInfo[1];
+        SetupMaterialInfo matInfo[4];
         matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr;
+        matInfo[0].pMaterialData = matPtr1;
+        matInfo[1].Index = 1;
+        matInfo[1].pMaterialData = matPtr2;
+        matInfo[2].Index = 2;
+        matInfo[2].pMaterialData = matPtr3;
+        matInfo[3].Index = 3;
+        matInfo[3].pMaterialData = matPtr4;
 
         CreateModelInfo model;
         model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Building/01/building01.fbx";
+        model.Path = "Resource/Model/Building/02/Building_01.fbx";
         model.ObjTag = "Building";
         model.IsAnim = false;
-        model.MatNum = 1;
+        model.MatNum = 4;
         model.SetupMaterial = matInfo;
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
-        auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<MyTransform>()->set_Scale(0.5f, 0.5f, 0.5f);
-        obj->get_Component<MyTransform>()->set_Pos(300.0f, 0.0f, 0.0f);
-        obj->get_Component<MyTransform>()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
 
-        // コライダーの追加
-        auto collider = obj->add_Component<BoxCollider>();
-        collider->set_Size(VEC3(170.0f, 300.0f, 170.0f));
-        collider->set_Center(VEC3(0.0f, 300.0f, 0.0f));
-        collider->set_IsStatic(true);
-        // 衝突カテゴリ
-        collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);   
+        for (int x = -2; x < 3; x++)
+        {
+            for (int y = -2; y < 3; y++)
+            {
+                VEC3 scale = VEC3(0.8f);
+                auto obj = MeshFactory::CreateModel(model);
+                obj->get_Component<MyTransform>()->set_Scale(scale);
+                obj->get_Component<MyTransform>()->set_Pos(50.0f * x,  0.0f,  70.0f * y);
+                obj->get_Component<MyTransform>()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
 
+                // ポーズ中は停止
+                obj->set_IsUpdateAllowedDuringPause(false);
 
-        // コライダーの登録
-        Master::m_pCollisionManager->RegisterCollider(obj->get_Component<BoxCollider>());
+                // 建物制御コンポーネント追加
+                obj->add_Component<BuildingController>();
+
+                // 体力コンポーネントの追加
+                auto health = obj->add_Component<Health>();
+				health->set_MaxHP(600.0f);
+				health->set_CrntHP(600.0f);
+
+                // コライダーの追加
+                auto collider = obj->add_Component<BoxCollider>();
+                collider->set_Size(VEC3(20.0f * scale.x, 30.0f * scale.y, 10.0f * scale.z));
+                collider->set_Center(VEC3(0.0f, 30.0f * scale.y, 0.0f));
+                collider->set_IsStatic(true);
+                // 衝突カテゴリ
+                collider->set_CollisionCategory(COLLISION_CATEGORY::DESTRUCTION_BUILDING);
+
+                // コライダーの登録
+                Master::m_pCollisionManager->RegisterCollider(obj->get_Component<BoxCollider>());
+            }
+        }
     }
 
     /* マザーシップの生成 */
@@ -291,8 +309,8 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
         auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<MyTransform>()->set_Scale(0.5f, 0.5f, 0.5f);
-        obj->get_Component<MyTransform>()->set_Pos(0.0f, 2000.0f, 0.0f);
+        obj->get_Component<MyTransform>()->set_Scale(0.1f, 0.1f, 0.1f);
+        obj->get_Component<MyTransform>()->set_Pos(0.0f, 500.0f, 0.0f);
         obj->get_Component<MyTransform>()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
     }
 
@@ -336,6 +354,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
     {
         // マテリアル取得
         auto matPtr = Master::m_pResourceManager->FindMaterial("Ground");
+        //auto matPtr = Master::m_pResourceManager->FindMaterial("PointLight");
 
         SetupMaterialInfo matInfo[1];
         matInfo[0].Index = 0;
@@ -349,16 +368,18 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         mesh.MaterialData = matInfo;
         mesh.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
         mesh.IsNormalMap = true;
+		mesh.TilingScale = VEC2(30.0f, 30.0f);
+        mesh.ObjLayer = 90;
 
         auto obj = MeshFactory::CreateUtilityMesh(mesh);
-        obj->get_Transform().lock()->set_Scale(1000.0f, 500.0f, 1000.0f);
+        obj->get_Transform().lock()->set_Scale(200.0f, 1.0f, 200.0f);
         obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
         obj->get_Transform().lock()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
 
         // コライダーの追加
         auto collider = obj->add_Component<BoxCollider>();
-        collider->set_Size(VEC3(1000, 1, 1000));
-        collider->set_Center(VEC3(0, 0, 0));
+        collider->set_Size(VEC3(200.0f, 1.0f, 200.0f));
+        collider->set_Center(VEC3(0, -1.0f, 0)); // コライダーの中心を地面の厚み分だけ下げる
         collider->set_IsStatic(true);
         // 衝突カテゴリ
         collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
@@ -389,34 +410,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         obj->get_Transform().lock()->set_Pos(0.0f, 0.0f, 0.0f);
     }
 
-    /* ビルボードの生成 */
-    {
-        // マテリアル取得
-        auto matPtr = Master::m_pResourceManager->FindMaterial("Billboard");
-
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr;
-
-
-        CreateBillboradInfo billboard;
-        billboard.pRenderer = m_pRenderer;
-        billboard.Type = BILLBOARD_USAGE_TYPE::SIMPLE;
-        billboard.ShaderType = SHADER_TYPE::FORWARD_UNLIT_STATIC;
-        billboard.IsActive = true;
-        billboard.MatNum = 1;
-        billboard.MaterialData = matInfo;
-        billboard.IsTransparent = true; // 透明度があり
-
-        VEC3 pos = VEC3(-600.0f, 50.0f, 800.0f);
-
-        //mat->m_DiffuseColor = VEC4(0.5, 0.5, 0.5, 1.0f);
-        auto obj = MeshFactory::CreateBillboard(billboard);
-        obj->get_Transform().lock()->set_Pos(pos);
-        obj->get_Transform().lock()->set_Scale(50, 50, 50);
-        obj->set_Tag("Billboard");
-    }
-
     /* ポイントライトの生成 (Cubuで分かりやすく)*/
     {
         // マテリアル取得
@@ -434,12 +427,13 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         mesh.IsActive = true;
         mesh.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
         mesh.IsNormalMap = true;
+        mesh.ObjLayer = 90;
 
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 0; i++)
         {
             VEC3 pt;
             pt.x = static_cast<float>(rand() % 1000) - 500.0f;
-            pt.y = 50.0f;
+            pt.y = 40.0f;
             pt.z = static_cast<float>(rand() % 1000) - 500.0f;
             VEC3 col;
             col.x = static_cast<float>(rand() % 255) / 255.0f;
@@ -447,72 +441,310 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
             col.z = static_cast<float>(rand() % 255) / 255.0f;
 
             auto obj = MeshFactory::CreateUtilityMesh(mesh);
-            obj->get_Transform().lock()->set_Pos(pt);
-            obj->get_Transform().lock()->set_Scale(VEC3(10, 10, 10));
+            obj->get_Transform().lock()->set_Pos(VEC3(-100.0f, 0.0f, 100.0f));
+            obj->get_Transform().lock()->set_Scale(VEC3(1.0f, 1.0f, 1.0f));
             obj->set_Tag("PointLight" + std::to_string(i));
             auto light = obj->add_Component<PointLight>();
             light->set_LightColor(col);
             light->set_Range(100.0f);
             light->set_Intensity(25.0f);
+
+            // コライダーの追加
+            auto collider = obj->add_Component<BoxCollider>();
+            collider->set_Size(VEC3(1.0f, 1.0f, 1.0f));
+            collider->set_Center(VEC3(0, 0, 0));
+            collider->set_IsStatic(true);
+            // 衝突カテゴリ
+            collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
+
+            // コライダーの登録
+            Master::m_pCollisionManager->RegisterCollider(collider);
+        }
+    }
+
+    /* 足場 */
+    {
+        // マテリアル取得
+        auto matPtr = Master::m_pResourceManager->FindMaterial("PointLight");
+
+        SetupMaterialInfo matInfo[1];
+        matInfo[0].Index = 0;
+        matInfo[0].pMaterialData = matPtr;
+
+        CreateUtilityMeshInfo mesh;
+        mesh.pRenderer = m_pRenderer;
+        mesh.Type = UTILITY_MESH_TYPE::CUBE;
+        mesh.MatNum = 1;
+        mesh.MaterialData = matInfo;
+        mesh.IsActive = true;
+        mesh.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
+        mesh.IsNormalMap = true;
+
+        auto obj = MeshFactory::CreateUtilityMesh(mesh);
+        obj->get_Transform().lock()->set_Pos(VEC3(0.0f, 10.0f, 0.0f));
+        obj->get_Transform().lock()->set_Scale(VEC3(5.0f, 1.0f, 5.0f));
+        obj->set_Tag("Scaffolding");
+
+        // コライダーの追加
+        auto collider = obj->add_Component<BoxCollider>();
+        collider->set_Size(VEC3(5.0f, 1.0f, 5.0f));
+        collider->set_Center(VEC3(0, 0, 0));
+        collider->set_IsStatic(true);
+
+        // 衝突カテゴリ
+        collider->set_CollisionCategory(COLLISION_CATEGORY::BUILDING);
+
+        // コライダーの登録
+        Master::m_pCollisionManager->RegisterCollider(collider);
+    }
+
+    /* 武器のサイト用スプライト*/
+    {
+        CreateSpriteInfo sprite;
+        sprite.pTextureMap[0] = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/crosshair094.png");
+        sprite.IsActive = true;
+        sprite.ObjTag = "GunSight01";
+        sprite.pRenderer = m_pRenderer;
+        sprite.ShaderType = SHADER_TYPE::FORWARD_UNLIT_UI_SPRITE;
+        sprite.Type = SPRITE_USAGE_TYPE::NORMAL;
+        sprite.Width = 50.0f;
+        sprite.Height = 50.0f;
+        sprite.IsActive = true;
+        sprite.IsTransparent = true;
+        auto obj = MeshFactory::CreateSprite(sprite);
+        if (obj)
+        {
+            obj->get_RectTransform().lock()->set_AnchorMax(VEC2(0.5f, 0.5f));
+            obj->get_RectTransform().lock()->set_AnchorMin(VEC2(0.5f, 0.5f));
+            obj->get_RectTransform().lock()->set_RectPosition(VEC2(-30.0f, 0.0f));
+            obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+        }
+    }
+
+    /* 画面上のUIの生成 */
+    {
+		// ミニマップレーダー
+        {
+            auto obj = GIGA_Engine::Instantiate2D(std::make_shared<GameObject>(), true);
+            auto rader = obj->add_Component<MiniMapRader>();
+            obj->set_Tag("MiniMapRader");
+            obj->set_LayerRank(100);
+            obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+        }
+
+		// プレイヤーHPバー
+        {
+            auto obj = GIGA_Engine::Instantiate2D(std::make_shared<GameObject>(), true);
+            auto rader = obj->add_Component<Player_HPBar>();
+            obj->set_Tag("Player_HPBar");
+            obj->set_LayerRank(100);
+            obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
         }
     }
 
 
+    // プレイヤーオブジェクトの取得
+    auto playerObj = Master::m_pGameObjectManager->get_ObjectByTag("Player");
+    playerObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //						武器
+    // 
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // プレイヤーの武器制御コンポーネントへの登録用のキャッシュ
+    std::shared_ptr<GunWeapon>weapon_1;
+    std::shared_ptr<GunWeapon>weapon_2;
+    {
+        /* アサルトライフル */
+        {
+            // マテリアル取得
+            auto matPtr1 = Master::m_pResourceManager->FindMaterial("AssultRifle");
+
+            SetupMaterialInfo matInfo[1];
+            matInfo[0].Index = 0;
+            matInfo[0].pMaterialData = matPtr1; // 体
+
+            CreateModelInfo model;
+            model.pRenderer = m_pRenderer;
+            model.Path = "Resource/Model/Weapon/M4A1.fbx";
+            model.ObjTag = "AssultRifle";
+            model.IsAnim = false;
+            model.MatNum = 1;
+            model.SetupMaterial = matInfo;
+            model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
+            model.ObjLayer = 91;
+            auto obj = MeshFactory::CreateModel(model);
+
+            // 破棄しない
+            //obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+            // 動的オブジェクトに設定
+            obj->set_IsStatic(false);
+
+            // ポーズ中は停止
+            obj->set_IsUpdateAllowedDuringPause(false);
+
+            // アサルトライフル
+            //obj->add_Component<AssultRifle>(1);
+            weapon_1 = obj->add_Component<GunWeapon>(1);
+            weapon_1->Setup(Master::m_pWeaponDataManager->FindWeaponData(Master::m_pDataManager->get_SelectWeaponID(0)));
+
+
+            // フラッシュ用ポイントライト
+            auto flash = obj->add_Component<PointLight>();
+            flash->set_Intensity(0.0f);
+            flash->set_Range(0.0f);
+
+            // レーザーサイト
+            auto line = obj->add_Component<LineRenderer>();
+            line->set_Color(VEC4(1.0f, 0.0f, 0.0f, 1.0f));
+            line->set_Emissive(3.0f);
+            line->set_Width(0.01f);
+            line->set_Length(20.0f);
+
+            // プレイヤーを親に設定
+            obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
+        }
+
+        /* ロケットランチャー */
+        {
+            // マテリアル取得
+            auto matPtr1 = Master::m_pResourceManager->FindMaterial("RocketLauncher");
+
+            SetupMaterialInfo matInfo[1];
+            matInfo[0].Index = 0;
+            matInfo[0].pMaterialData = matPtr1; // 体
+
+            CreateModelInfo model;
+            model.pRenderer = m_pRenderer;
+            model.Path = "Resource/Model/Weapon/RocketLauncher/RocketLauncher_01.fbx";
+            model.ObjTag = "RocketLauncher";
+            model.IsAnim = false;
+            model.MatNum = 1;
+            model.SetupMaterial = matInfo;
+            model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
+            model.ObjLayer = 91;
+            auto obj = MeshFactory::CreateModel(model);
+
+            // 破棄しない
+            //obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+            // 動的オブジェクトに設定
+            obj->set_IsStatic(false);
+
+            // ポーズ中は停止
+            obj->set_IsUpdateAllowedDuringPause(false);
+
+            // コンポーネントの追加
+            weapon_2 = obj->add_Component<GunWeapon>(1);
+            weapon_2->Setup(Master::m_pWeaponDataManager->FindWeaponData(Master::m_pDataManager->get_SelectWeaponID(1)));
+
+            // フラッシュ用ポイントライト
+            auto flash = obj->add_Component<PointLight>();
+            flash->set_Intensity(0.0f);
+            flash->set_Range(0.0f);
+
+            // レーザーサイト
+            auto line = obj->add_Component<LineRenderer>();
+            line->set_Color(VEC4(1.0f, 0.0f, 0.0f, 1.0f));
+            line->set_Emissive(3.0f);
+            line->set_Width(0.01f);
+            line->set_Length(20.0f);
+
+            // プレイヤーを親に設定
+            obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
+            obj->get_Transform().lock()->set_Scale(VEC3(1.5f, 1.5f, 1.5f));
+        }
+
+        /* レーザーポインタ ビルボードの生成 */
+        {
+            // マテリアル取得
+            auto matPtr = Master::m_pResourceManager->FindMaterial("LaserPointBillboard");
+
+            SetupMaterialInfo matInfo[1];
+            matInfo[0].Index = 0;
+            matInfo[0].pMaterialData = matPtr;
+
+            CreateBillboradInfo billboard;
+            billboard.pRenderer = m_pRenderer;
+            billboard.Type = BILLBOARD_USAGE_TYPE::SIMPLE;
+            billboard.ShaderType = SHADER_TYPE::FORWARD_UNLIT_STATIC;
+            billboard.IsActive = false;
+            billboard.MatNum = 1;
+            billboard.MaterialData = matInfo;
+            billboard.IsTransparent = true; // 透明度があり
+
+            VEC3 pos = VEC3(-600.0f, 50.0f, 800.0f);
+
+            //mat->m_DiffuseColor = VEC4(0.5, 0.5, 0.5, 1.0f);
+            auto obj = MeshFactory::CreateBillboard(billboard);
+            obj->get_Transform().lock()->set_Pos(pos);
+            obj->get_Transform().lock()->set_Scale(0.1f, 0.1f, 0.1f);
+            obj->set_Tag("LaserPointBillboard");
+            //obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
+        }
+    }
+
+    auto camera = Master::m_pDataManager->get_CameraComponent().lock();
+    
     // カメラ操作をオンに
-    m_pRenderer->get_CameraComponent()->set_IsControl(true);
+    camera->set_IsControl(true);
 
 
     // プレイヤーに操作コンポーネントつける
-    auto playerObj = Master::m_pGameObjectManager->get_ObjectByTag("Player");
-    playerObj->get_Transform().lock()->set_Pos(-900.0f, 0.0f, 900.0f); // プレイヤーの初期位置を設定
+    playerObj->get_Transform().lock()->set_Pos(-90.0f, 0.0f, 90.0f);  // プレイヤーの初期位置を設定
     playerObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+    auto playerControl = playerObj->add_Component<PlayerController>(1); // コンポーネントの追加
+    playerControl->Reset(); // パラメータ等リセットする
 
-    auto comp = playerObj->add_Component<PlayerController>(1);
-    comp->Start(*m_pRenderer);
+    // 体力コンポーネントの追加
+    float hp = Master::m_pDataManager->get_PlayerHP();
+    auto health = playerObj->get_Component<Health>();
+    health->Reset();    // 前回までの値が残っているのでリセット
+    health->set_MaxHP(hp);
+    health->set_CrntHP(hp);
 
-    /* アサルトライフル */
+
+    //*****************************************************************************************
+    //						プレイヤーに武器制御コンポーネントの追加し、
+    //                                  GunWeaponを登録
+    //*****************************************************************************************
+    constexpr int WEAPON_MAX_SLOT = 2;  // プレイヤーの装備する最大武器スロット
+    auto weaponControl = playerObj->add_Component<WeaponController>();
+    weaponControl->Setup(*m_pRenderer, WEAPON_MAX_SLOT);
+    weaponControl->RegisterWeapon(weapon_1, 0);
+    weaponControl->RegisterWeapon(weapon_2, 1);
+    weaponControl->StartingWeapon(0); // 0の武器を初期装備に
+    playerControl->Start(*m_pRenderer);
+
+
+    //*****************************************************************************************
+    //						難易度によって空の色を変える
+    //                        ちょっとした雰囲気作り  
+    //*****************************************************************************************
+    DIFFICULTY_LEVEL crntDiffLevel = Master::m_pDataManager->get_DifficultyLevel();
+    auto dirLightObj = Master::m_pGameObjectManager->get_ObjectByTag("DirectionLight");
+    auto dirLight = dirLightObj->get_Component<DirectionalLight>();
+    VEC3 color = VEC3(1.0f);
+    switch (crntDiffLevel)
     {
-        // マテリアル取得
-        auto matPtr1 = Master::m_pResourceManager->FindMaterial("AssultRifle");
-
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr1; // 体
-
-        CreateModelInfo model;
-        model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Weapon/M4A1.fbx";
-        model.ObjTag = "AssultRifle";
-        model.IsAnim = false;
-        model.MatNum = 1;
-        model.SetupMaterial = matInfo;
-        model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
-        auto obj = MeshFactory::CreateModel(model);
-
-        // 破棄しない
-        obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);
-
-        // アサルトライフル
-        obj->add_Component<AssultRifle>();
-
-        // フラッシュ用ポイントライト
-        auto flash = obj->add_Component<PointLight>();
-        flash->set_Intensity(0.0f);
-        flash->set_Range(0.0f);
-
-        // レーザーサイト
-        auto line = obj->add_Component<LineRenderer>();
-        line->set_Color(VEC4(1.0f, 0.0f, 0.0f, 1.0f));
-        line->set_Emissive(3.0f);
-        line->set_Width(0.5f);
-        line->set_Length(1000.0f);
-
-        // プレイヤーを親に設定
-        obj->get_Transform().lock()->set_Parent(playerObj->get_Transform());
-        obj->get_Transform().lock()->set_VEC3ToLocal_Scale(VEC3(-0.985f, -0.985f, -0.985f));
-        obj->get_Transform().lock()->set_VEC3ToLocal_RotateToDeg(VEC3(0.0f, 0.0f, 90.0f));
-        obj->get_Transform().lock()->set_VEC3ToLocal_Pos(VEC3(-40.0f, 150.0f, 0.0f));
+    case UtilityData::DIFFICULTY_LEVEL::EASY:
+        break;
+    case UtilityData::DIFFICULTY_LEVEL::NORMAL:
+        break;
+    case UtilityData::DIFFICULTY_LEVEL::HARD:
+        color = VEC3(1.0f, 0.7f, 0.7f);
+        break;
+    case UtilityData::DIFFICULTY_LEVEL::DISASTER:
+        color = VEC3(0.8f, 0.3f, 0.8f);
+        break;
+    case UtilityData::DIFFICULTY_LEVEL::IMPOSSIBLE:
+        color = VEC3(1.0f, 0.0f, 0.0f);
+        break;
+    default:
+        break;
     }
+    dirLight->set_LightColor(color);
 
 
 
@@ -522,6 +754,9 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
     {
         obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
     }
+
+    // ロード画面スプライトをオフに（プールへ返す）
+	m_pLoadBackObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 }
 
 
@@ -535,6 +770,8 @@ int c_Game_LoadProcess::Update(SceneManager *pOwner)
 {
 	if (m_IsLoad)
 	{
+        Master::m_pInputManager->StopInput(5);	// 入力を少しの間受け付けないようにする（シーン遷移の瞬間に入力されるのを防止）
+
 		return c_GAME::c_GAME_PLAY;
 	}
 

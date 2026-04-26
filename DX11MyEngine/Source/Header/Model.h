@@ -69,10 +69,8 @@ public:
 	Model();
 	~Model();
 
-	bool Init(RendererEngine&renderer) override;	// 初期化
 	void Update(RendererEngine&renderer) override;	// 更新
 	void Draw(RendererEngine&renderer) override;	// 描画
-	bool Term(RendererEngine&renderer) override;	// 終了
 
 	bool Setup(RendererEngine&render, const char *filePath);	// モデルデータのセットアップ
 	bool set_TextureMap(TEXTURE_MAP mapType, int matIndex, const std::wstring &path);	// テクスチャマップ設定 Setup後に呼ぶ

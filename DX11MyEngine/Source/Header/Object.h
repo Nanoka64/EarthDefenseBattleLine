@@ -22,20 +22,13 @@ enum class OBJECT_STATUS_BITFLAG : unsigned
 //  ★★★抽象クラス★★★
 //
 // 【?】全てのオブジェクトの基底クラス
-
+// 
 // ***************************************************************************************
 class Object
 {
 private:
-	std::string m_Tag;	// タグ
-	
-	// ↓ビットフラグに置き換える↓
-	//bool m_IsActive;     // アクティブ状態フラグ(動いてるかどうか)
-	//bool m_IsDeath;      // 死亡フラグ(まだ削除対象ではない)
-	//bool m_IsDelete;     // Mngからの削除フラグ
-	//bool m_IsDontDestroy;// 削除しないでーっていうやつ（Unityのシーンを跨いで存在するようなやつ）
-
-	int m_LayerRank;       // 描画順を決めるために使うランク
+	std::string m_Tag;		// タグ
+	int m_LayerRank;		// 描画順を決めるために使うランク
 	unsigned int m_ObjectStatusBitFlag;	// 状態をビット管理
 
 public:
@@ -49,17 +42,6 @@ public:
 	// ****************************************************************************************************************************************
 	/* フラグ関連 */
 	// ****************************************************************************************************************************************
-	/*
-	void set_IsDelete(const bool &flag)		 { m_IsDelete = flag; }                 // Deleteフラグをtrueにする
-	void set_IsDeath(const bool &flag)		 { m_IsDeath = flag; }                  // 死亡フラグオンにする
-	void set_IsActive(const bool &flag)		 { m_IsActive = flag; }					// アクティブフラグを設定
-	void set_IsDontDestroy(const bool &flag) { m_IsDontDestroy = flag; }			// 削除しないでフラグを設定
-	bool get_IsDelete()const	  { return m_IsDelete; }							// 削除フラグ取得
-	bool get_IsDeath()const		  { return m_IsDeath; }								// 死亡フラグ取得
-	bool get_IsActive()const	  { return m_IsActive; }							// アクティブフラグ取得
-	bool get_IsDontDestroy()const { return m_IsDontDestroy; }						// 削除しないでフラグ取得
-	*/
-
 	void set_StatusFlag(OBJECT_STATUS_BITFLAG flag);	// 指定の状態フラグを立てる
 	void clear_StatusFlag(OBJECT_STATUS_BITFLAG flag);	// 指定の状態フラグを降ろす
 	bool get_IsStatusFlag(OBJECT_STATUS_BITFLAG flag);	// 指定の状態フラグが立っているかどうか

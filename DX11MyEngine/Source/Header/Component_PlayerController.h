@@ -2,11 +2,17 @@
 #include "IComponent.h"
 #include "RootSceneState.h"
 #include "StateMachine.h"
+#include "ConstantPlayerData.h"
 
-/// <summary>
+
+
+
+
 /// プレイヤーのアニメーション
 /// 末尾にRMとついているものはアニメーション自体に移動成分が入っているもの
-/// </summary>
+/// 
+/// [注意] モデルを変えたのでもう使わない ***********************************
+/*
 enum class PLAYER_ANIMATION_ID
 {
 	NONE = -1,
@@ -109,6 +115,7 @@ const std::string g_PlayerAnimationNames[] =
 	"WALK_FORMAL_LOOP",
 	"WALK_LOOP",
 };
+*/
 
 // ***************************************************************************************
 // ---------------------------------------------------------------------------------------
@@ -124,25 +131,28 @@ class PlayerController : public IComponent
 private:
 	std::weak_ptr<class Camera3D> m_pCameraComp;
 	std::weak_ptr<class MyTransform> m_pMyTransformComp;
-	std::weak_ptr<class SkinnedMeshAnimator> m_pAnimatorComp;	// アニメータコンポーネント
-	std::weak_ptr<class Health> m_pHealthComp;					// 体力管理コンポーネント
+	std::weak_ptr<class SkinnedMeshAnimator> m_pAnimatorComp;		// アニメータコンポーネント
+	std::weak_ptr<class Health> m_pHealthComp;						// 体力管理コンポーネント
+	std::weak_ptr<class WeaponController> m_pWeaponController;		// 武器制御用
+
     bool m_IsAnim;					// アニメーション中かどうか
     float m_MoveSpeed;				// 移動速度
 	bool m_IsJump;					// ジャンプしたか
 	VECTOR3::VEC3 m_MoveVelocity;	// 移動
 	float m_JumpVelocity;			// ジャンプベクトル
-	PLAYER_ANIMATION_ID m_CrntAnimID;	// 現在のアニメーションID
+	bool m_IsGrounded;				// 地面にいるか
+	PlayerData::PLAYER_RANGER_ANIM_ID m_CrntAnimID;	// 現在のアニメーションID
 	bool m_IsRolling;
 
 	// リジッドボディコンポーネントを作って移す
-	float m_JumpForce = 3.0f;	// ジャンプ力
-	float m_Gravity = 0.18f;	// 重力
+	float m_JumpForce;	// ジャンプ力
+	float m_Gravity;	// 重力
 
 	bool m_IsDead;
 	bool m_IsContinuousAngle ;	// マウスに合わせて継続的に回転させるか
 
-	int m_RollingDuration;				// ローリングの持続時間	
-	int m_RollingCounter;				// ローリング用のカウンタ
+	float m_RollingDuration;			// ローリングの持続時間	
+	float m_RollingElapsedTime;			// ローリング経過時間
 
 public:
 	PlayerController(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
@@ -150,20 +160,21 @@ public:
 
 	void Start(RendererEngine& renderer) override;		// 初期化
 	void Update(RendererEngine& renderer) override;	// 更新処理
-	void Draw(RendererEngine& renderer)override;		// 描画処理
+	void LateUpdate(RendererEngine& renderer) override;	// 更新処理
 
-	void RollingUpdate();
+	void RollingUpdate();	// ローリング更新
 
 	void OnCollisionEnter(const class CollisionInfo &other)override;
 
+	void Reset();	// パラメータ等をリセットする（ゲームの終了時などに呼ぶ）
 
 	/* 移動速度 */
     float get_MoveSpeed() const { return m_MoveSpeed; }
     void set_MoveSpeed(float speed) { m_MoveSpeed = speed; }
 
 	/* アニメーションID */
-	void set_AnimID(PLAYER_ANIMATION_ID id) { m_CrntAnimID = id; };
-	PLAYER_ANIMATION_ID get_AnimID()const { return m_CrntAnimID; };
+	void set_AnimID(PlayerData::PLAYER_RANGER_ANIM_ID id) { m_CrntAnimID = id; };
+	PlayerData::PLAYER_RANGER_ANIM_ID get_AnimID()const { return m_CrntAnimID; };
 
 	/* 移動速度ベクトル */
 	void set_MoveVelocity(const VECTOR3::VEC3 &vec) { m_MoveVelocity = vec; }
@@ -184,12 +195,15 @@ public:
 	void set_IsContinuousAngle(bool _flag) { m_IsContinuousAngle = _flag; };
 	bool get_IsContinuousAngle()const { return m_IsContinuousAngle; };
 
+	/* 接地中か */
+	bool get_IsGrounded()const { return m_IsGrounded; };
+
 private:
 	/// <summary>
 	/// アニメーションの変更
 	/// </summary>
 	/// <param name="id"></param>
-	void ChangeAnimation(PLAYER_ANIMATION_ID id);
+	void ChangeAnimation(PlayerData::PLAYER_RANGER_ANIM_ID id);
 
 
 	/// <summary>

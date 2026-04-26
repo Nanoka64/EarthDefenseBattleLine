@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "Component_SphereCollider.h"
 #include "GameObject.h"
-
+#include "RendererEngine.h"
+#include "DebugMesh.h"
+using namespace UtilityData;
 using namespace GIGA_Engine;
 using namespace VECTOR3;
 
@@ -38,6 +40,9 @@ SphereCollider::~SphereCollider()
 //*----------------------------------------------------------------------------------------
 void SphereCollider::Start(RendererEngine &renderer)
 {
+    m_pSphereMesh = std::make_unique<DebugMesh>();
+    bool res = m_pSphereMesh->Setup(renderer, DEBUG_MESHS_TYPE::CUBE);
+
     m_pTransform = m_pOwner.lock()->get_Transform();
 
     if (m_pTransform.expired())
@@ -71,4 +76,21 @@ void SphereCollider::Draw(RendererEngine &renderer)
 {
     if (m_IsDrawDebugMesh == false)return;
 
+
+    auto pContext = renderer.get_DeviceContext();
+    XMMATRIX localMat = XMMatrixIdentity();
+
+    auto transform = m_pOwner.lock()->get_Transform().lock();
+    VEC3 ownerPos = transform->get_VEC3ToPos();
+
+    XMVECTOR scl = VEC3(m_Radius);
+    XMVECTOR pos = ownerPos + m_Center; // 中心位置のオフセットを足す
+
+    XMMATRIX mtxS = XMMatrixScalingFromVector(scl);
+    XMMATRIX mtxT = XMMatrixTranslationFromVector(pos);
+
+    localMat = transform->get_ExcludingRotWorldMtx(mtxS, mtxT);
+
+    // メッシュ表示
+    m_pSphereMesh->Draw(renderer, localMat);
 }

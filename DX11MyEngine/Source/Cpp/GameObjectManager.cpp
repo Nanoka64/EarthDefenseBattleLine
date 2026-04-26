@@ -5,6 +5,8 @@
 #include "Master.h"
 #include "RendererEngine.h"
 #include "Component_RectTransform.h"
+#include "Component_Health.h"
+#include "Component_Faction.h"
 #include  <algorithm>
 
 using namespace VECTOR3;
@@ -50,19 +52,41 @@ bool GameObjectManager::Init(RendererEngine &renderer)
 //* 引数：1.RendererEngine
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-void GameObjectManager::ObjectUpdate(RendererEngine &renderer)
+void GameObjectManager::ObjectUpdate(RendererEngine& renderer)
 {
+
+    // 保留していた追加をまとめて処理
+    for (auto& pair : m_PendingAddList)
+    {
+        auto& pendingList = pair.second;
+        if (!pendingList.empty())
+        {
+            this->add_Objects(pair.first, pendingList);
+        }
+    }
+
+    // 保留していた追加を処理した後は、保留リストをクリア
+    m_PendingAddList.clear();
+
+    bool isPause = Master::m_pDataManager->get_IsPause();   // ポーズフラグ
+
     // ******************************************************************
     //
     // 不透明オブジェクト
     // 
     // ******************************************************************
+    int count = 0;
     for (auto it = m_3DOpaqueList.begin(); it != m_3DOpaqueList.end(); it++)
     {
-        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
+        count++;
+        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
-            (*it).get()->Update(renderer);
-            (*it).get()->ComponentUpdate(renderer);
+            // ポーズ中でない、またはポーズ中も動く設定なら更新
+            if (isPause == false || (*it)->get_IsUpdateAllowedDuringPause())
+            {
+                (*it).get()->Update(renderer);
+                (*it).get()->ComponentUpdate(renderer);
+            }
         }
     }
     // ******************************************************************
@@ -72,10 +96,14 @@ void GameObjectManager::ObjectUpdate(RendererEngine &renderer)
     // ******************************************************************
     for (auto it = m_3DTranslucentList.begin(); it != m_3DTranslucentList.end(); it++)
     {
-        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
+        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
-            (*it).get()->Update(renderer);
-            (*it).get()->ComponentUpdate(renderer);
+            // ポーズ中でない、またはポーズ中も動く設定なら更新
+            if (isPause == false || (*it)->get_IsUpdateAllowedDuringPause())
+            {
+                (*it).get()->Update(renderer);
+                (*it).get()->ComponentUpdate(renderer);
+            }
         }
     }
     // ******************************************************************
@@ -85,14 +113,16 @@ void GameObjectManager::ObjectUpdate(RendererEngine &renderer)
     // ******************************************************************
     for (auto it = m_2DTranslucentList.begin(); it != m_2DTranslucentList.end(); it++)
     {
-        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
+        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
-            (*it).get()->Update(renderer);
-            (*it).get()->ComponentUpdate(renderer);
+            // ポーズ中でない、またはポーズ中も動く設定なら更新
+            if (isPause == false || (*it)->get_IsUpdateAllowedDuringPause())
+            {
+                (*it).get()->Update(renderer);
+                (*it).get()->ComponentUpdate(renderer);
+            }
         }
     }
-
-
 }
 
 //*---------------------------------------------------------------------------------------
@@ -104,7 +134,7 @@ void GameObjectManager::ObjectUpdate(RendererEngine &renderer)
 void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
 {
     std::vector<std::shared_ptr<GameObject>> deleteList;       // 削除用
-
+    bool isPause = Master::m_pDataManager->get_IsPause();   // ポーズフラグ
     
     // ******************************************************************
     //
@@ -113,10 +143,13 @@ void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
     // ******************************************************************
     for (auto it = m_3DOpaqueList.begin(); it != m_3DOpaqueList.end(); it++)
     {
-        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
-        {
-            (*it).get()->Update(renderer);
-            (*it).get()->ComponentLateUpdate(renderer);
+        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
+        {           
+            // ポーズ中でない、またはポーズ中も動く設定なら更新
+            if (isPause == false || (*it)->get_IsUpdateAllowedDuringPause())
+            {
+                (*it).get()->ComponentLateUpdate(renderer);
+            }
         }
         // 削除フラグが立っていれば削除リストに追加
         if ((*it).get()->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_DELETE) == true)
@@ -132,10 +165,13 @@ void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
     // ******************************************************************
     for (auto it = m_3DTranslucentList.begin(); it != m_3DTranslucentList.end(); it++)
     {
-        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
+        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
-            (*it).get()->Update(renderer);
-            (*it).get()->ComponentLateUpdate(renderer);
+            // ポーズ中でない、またはポーズ中も動く設定なら更新
+            if (isPause == false || (*it)->get_IsUpdateAllowedDuringPause())
+            {
+                (*it).get()->ComponentLateUpdate(renderer);
+            }
         }
         // 削除フラグが立っていれば削除リストに追加
         if ((*it).get()->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_DELETE) == true)
@@ -151,10 +187,13 @@ void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
     // ******************************************************************
     for (auto it = m_2DTranslucentList.begin(); it != m_2DTranslucentList.end(); it++)
     {
-        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true) 
+        if ((*it)->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == true)
         {
-            (*it).get()->Update(renderer);
-            (*it).get()->ComponentLateUpdate(renderer);
+            // ポーズ中でない、またはポーズ中も動く設定なら更新
+            if (isPause == false || (*it)->get_IsUpdateAllowedDuringPause())
+            {
+                (*it).get()->ComponentLateUpdate(renderer);
+            }
         }
         // 削除フラグが立っていれば削除リストに追加
         if ((*it).get()->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_DELETE) == true)
@@ -177,24 +216,29 @@ void GameObjectManager::ObjectLateUpdate(RendererEngine &renderer)
 //* 引数：1.RendererEngine
 //* 返値：void
 //*----------------------------------------------------------------------------------------
-void GameObjectManager::ObjectMainRenderPass(RendererEngine &renderer)
+void GameObjectManager::ObjectMainRenderPass(RendererEngine& renderer)
 {
     int id = 0;
-    Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"コンポーネント確認"));
-    Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"こちらでは追加されている\nすべてのコンポーネントを確認できます。"));
-    Master::m_pDebugger->DG_Separator();
-    Master::m_pDebugger->DG_BulletText("Count : %d", m_3DOpaqueList.size());
+    bool isDrawComponent = Master::m_pDataManager->get_IsDebugMode();
+
+    if (isDrawComponent)
+    {
+        Master::m_pDebugger->BeginDebugWindow(Tool::U8ToChar(u8"コンポーネント確認"));
+        Master::m_pDebugger->DG_BulletText(Tool::U8ToChar(u8"こちらでは追加されている\nすべてのコンポーネントを確認できます。"));
+        Master::m_pDebugger->DG_Separator();
+        Master::m_pDebugger->DG_BulletText("Count : %d", m_3DOpaqueList.size());
+    }
 
     // 描画
     for (auto& obj : m_3DOpaqueList)
     {
         // *** 静的 ***
-        if (obj->get_State() == OBJECT_STATE::STATIC)
+        if (obj->get_IsStatic())
         {
             renderer.RegisterDefaultDepthStencilState(1);
         }
         // *** 動的 ***
-        else if (obj->get_State() == OBJECT_STATE::DYNAMIC)
+        else if (!obj->get_IsStatic())
         {
             renderer.RegisterDefaultDepthStencilState(0);
         }
@@ -207,6 +251,8 @@ void GameObjectManager::ObjectMainRenderPass(RendererEngine &renderer)
         //******************************************************
         // 各オブジェクトのコンポーネントをツリー上に表示
         //******************************************************
+        if (isDrawComponent == false)continue;
+
         id++;
         // IDを名前に入れて一意にする（##ID は表示されず、内部的な識別子になる）
         std::string label = obj->get_Tag() + "##" + std::to_string(id);
@@ -221,7 +267,9 @@ void GameObjectManager::ObjectMainRenderPass(RendererEngine &renderer)
             Master::m_pDebugger->DG_TreePop();
         }
     }
-    Master::m_pDebugger->EndDebugWindow();
+    if (isDrawComponent) {
+        Master::m_pDebugger->EndDebugWindow();
+    }
 }
 
 
@@ -237,8 +285,7 @@ void GameObjectManager::ObjectShadowRenderPass(RendererEngine &renderer)
     // 描画
     for (auto &obj : m_3DOpaqueList)
     {
-        if (!obj->get_IsShadow() ||
-            !obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE))
+        if ( !obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE))
         {
             continue;
         }
@@ -256,7 +303,7 @@ void GameObjectManager::ObjectShadowRenderPass(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void GameObjectManager::Alpha_ObjectRenderPass(RendererEngine &renderer)
 {
-    VEC3 camPos = renderer.get_CameraPosition();    // カメラ座標
+    VEC3 camPos = Master::m_pDataManager->get_CameraPos();    // カメラ座標
     auto begin = m_3DTranslucentList.begin();
     auto end = m_3DTranslucentList.end();
 
@@ -289,9 +336,16 @@ void GameObjectManager::Alpha_ObjectRenderPass(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void GameObjectManager::Alpha_2DObjectRenderPass(RendererEngine &renderer)
 {
-    VEC3 camPos = renderer.get_CameraPosition();    // カメラ座標
+    VEC3 camPos = Master::m_pDataManager->get_CameraPos();    // カメラ座標
     auto begin = m_2DTranslucentList.begin();
     auto end = m_2DTranslucentList.end();
+
+	// レイヤーの順番にソートする
+    std::sort(begin, end, 
+        [](const std::shared_ptr<GameObject>& a, const std::shared_ptr<GameObject>& b)
+        {
+			return a->get_LayerRank() < b->get_LayerRank();
+        });
 
     // 描画
     for (auto &obj : m_2DTranslucentList)
@@ -343,14 +397,20 @@ std::shared_ptr<GameObject> GameObjectManager::Internal_Instantiate3D(std::share
     }
 
 
+    // 遅延追加リストに追加
+
+
     // 透明度があるならフラグ立てる
     if (isTransparent) {
         pObj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_TRANSPARENT);
-        this->add_Object(OBJECT_TYPE::TRANSLICENT_3D, pObj);
+
+        m_PendingAddList[OBJECT_TYPE::TRANSLICENT_3D].push_back(pObj);
+        //this->add_Object(OBJECT_TYPE::TRANSLICENT_3D, pObj);
     }
     else
     {
-        this->add_Object(OBJECT_TYPE::OPAQUE_3D, pObj);
+        m_PendingAddList[OBJECT_TYPE::OPAQUE_3D].push_back(pObj);
+        //this->add_Object(OBJECT_TYPE::OPAQUE_3D, pObj);
     }
 
 
@@ -383,8 +443,11 @@ std::shared_ptr<GameObject> GameObjectManager::Internal_Instantiate2D(std::share
         pObj->m_pTransform->set_Parent(parent);
     }
 
-    // リストに追加
-    this->add_Object(OBJECT_TYPE::TRANSLICENT_2D, pObj);   
+    // 遅延追加リストに追加
+    m_PendingAddList[OBJECT_TYPE::TRANSLICENT_2D].push_back(pObj);
+
+    //// リストに追加
+    //this->add_Object(OBJECT_TYPE::TRANSLICENT_2D, pObj);   
 
     return pObj;
 }
@@ -415,6 +478,42 @@ void GameObjectManager::add_Object(OBJECT_TYPE _type, std::shared_ptr<GameObject
 
     auto begin = m_3DOpaqueList.begin();
     auto end = m_3DOpaqueList.end();
+
+
+    // 不透明オブジェクトのみ更新順にソート
+    std::sort(begin, end,
+        [](const std::shared_ptr<GameObject> &a, const std::shared_ptr<GameObject> &b) {
+            return a->get_LayerRank() < b->get_LayerRank();
+        });
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:GameObjectManager Class 
+//*【?】オブジェクトを追加
+//* 引数：1.オブジェクトの種類
+//* 引数：2.追加するオブジェクトの共有ポインタvector
+//* 返値：void
+//*----------------------------------------------------------------------------------------
+void GameObjectManager::add_Objects(OBJECT_TYPE _type, std::vector<std::shared_ptr<GameObject>>& _objects)
+{
+    switch (_type)
+    {
+        // 不透明オブジェクト
+    case OBJECT_TYPE::OPAQUE_3D:
+        m_3DOpaqueList.insert(m_3DOpaqueList.end(), _objects.begin(), _objects.end());
+        break;
+        // 透明度のあるオブジェクト
+    case OBJECT_TYPE::TRANSLICENT_3D:
+        m_3DTranslucentList.insert(m_3DTranslucentList.end(), _objects.begin(), _objects.end());
+        break;
+    case OBJECT_TYPE::TRANSLICENT_2D:
+        m_2DTranslucentList.insert(m_2DTranslucentList.end(), _objects.begin(), _objects.end());
+        break;
+    }
+
+    auto begin = m_3DOpaqueList.begin();
+    auto end = m_3DOpaqueList.end();
+
 
     // 不透明オブジェクトのみ更新順にソート
     std::sort(begin, end,
@@ -536,7 +635,7 @@ std::shared_ptr<GameObject> GameObjectManager::get_ObjectByTag(const std::string
 //* 引数：1.タグ
 //* 返値：オブジェクトの参照ポインタリスト
 //*----------------------------------------------------------------------------------------
-std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectListByTag(const std::string &tag)
+std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectsByTag(const std::string &tag)
 {
     std::vector<std::shared_ptr<GameObject>> resList;
 
@@ -567,6 +666,190 @@ std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectListByTag(
         }
     }
 
+    return resList;
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:GameObjectManager Class 
+//*【?】指定タグのオブジェクトを読み取り専用で取得する
+//*     shared_ptrから生ポインタを取得
+//*     ※ 透明/不透明両方
+//* 
+//* 引数：1.タグ
+//* 返値：オブジェクト読み取り専用ポインタ
+//*----------------------------------------------------------------------------------------
+const GameObject* GameObjectManager::get_ObjectByTagConst(const std::string& _tag)
+{
+    // 不透明3Dオブジェクト**********************
+    for (auto& obj : m_3DOpaqueList) {
+        if (obj->get_Tag() == _tag) return obj.get(); // 
+    }
+
+    // 透明度のある3Dオブジェクト**********************
+    for (auto& obj : m_3DTranslucentList) {
+        if (obj->get_Tag() == _tag) return obj.get();
+    }
+
+    // 透明度のある2Dオブジェクト**********************
+    for (auto& obj : m_2DTranslucentList) {
+        if (obj->get_Tag() == _tag) return obj.get();
+    }
+
+    return nullptr; // 見つからない場合
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:GameObjectManager Class 
+//*【?】指定タグのオブジェクトvectorを読み取り専用で取得する
+//*     shared_ptrから生ポインタを取得
+//*     ※ 透明/不透明両方
+//* 
+//* 引数：1.タグ
+//* 返値：オブジェクト読み取り専用ポインタ
+//*----------------------------------------------------------------------------------------
+const std::vector<const GameObject*>  GameObjectManager::get_ObjectsByTagConst(const std::string& _tag)
+{
+    std::vector<const GameObject*>objects;
+
+    // 不透明3Dオブジェクト**********************
+    for (auto& obj : m_3DOpaqueList)
+    {
+        if (obj->get_Tag() == _tag)
+        {
+            objects.push_back(obj.get());
+        }
+    }
+
+    // 透明度のある3Dオブジェクト**********************
+    for (auto& obj : m_3DTranslucentList)
+    {
+        if (obj->get_Tag() == _tag)
+        {
+            objects.push_back(obj.get());
+        }
+    }
+
+    // 透明度のある2Dオブジェクト**********************
+    for (auto& obj : m_2DTranslucentList)
+    {
+        if (obj->get_Tag() == _tag)
+        {
+            objects.push_back(obj.get());
+        }
+    }
+
+    return objects;
+}
+
+
+//*---------------------------------------------------------------------------------------
+//* @:GameObjectManager Class 
+//*【?】指定派閥のオブジェクトをすべてリストにして取得
+///     ※ 透明/不透明両方
+//* 引数：1.派閥
+//* 返値：オブジェクトの参照ポインタリスト
+//*----------------------------------------------------------------------------------------
+std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectListByFaction(const UtilityData::FACTION& _faction)
+{
+    std::vector<std::shared_ptr<GameObject>> resList;
+    // 不透明3Dオブジェクト**********************
+    for (auto& obj : m_3DOpaqueList)
+    {
+        if (obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == false) {
+            continue;
+        }
+        if (auto factionComp = obj->get_Component<Faction>())
+        {
+            if (factionComp->get_Faction() == _faction) {
+                resList.push_back(obj);
+            }
+        }
+    }
+
+    // 透明度のある3Dオブジェクト**********************
+    for (auto& obj : m_3DTranslucentList)
+    {
+        if (obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == false) {
+            continue;
+        }
+        if (auto factionComp = obj->get_Component<Faction>())
+        {
+            if (factionComp->get_Faction() == _faction) {
+                resList.push_back(obj);
+            }
+        }
+    }
+    // 透明度のある2Dオブジェクト**********************
+    for (auto& obj : m_2DTranslucentList)
+    {
+        if (obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == false) {
+            continue;
+        }
+        if (auto factionComp = obj->get_Component<Faction>())
+        {
+            if (factionComp->get_Faction() == _faction) {
+                resList.push_back(obj);
+            }
+        }
+    }
+    return resList;
+}
+
+//*---------------------------------------------------------------------------------------
+//* @:GameObjectManager Class 
+//*【?】指定派閥のオブジェクトをすべてリストにして取得（生存状態）
+///     ※ 透明/不透明両方
+//* 引数：1.派閥
+//* 返値：オブジェクトの参照ポインタリスト
+//*----------------------------------------------------------------------------------------
+std::vector<std::shared_ptr<GameObject>> GameObjectManager::get_ObjectListByFactionAlive(const UtilityData::FACTION& _faction)
+{
+    std::vector<std::shared_ptr<GameObject>> resList;
+    // 不透明3Dオブジェクト**********************
+    for (auto& obj : m_3DOpaqueList)
+    {
+        if (obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == false) {
+            continue;
+        }
+        auto factionComp = obj->get_Component<Faction>();
+        auto healthComp = obj->get_Component<Health>();
+        if (factionComp && healthComp )
+        {
+            if (factionComp->get_Faction() == _faction && healthComp->get_IsDead() == false) {
+                resList.push_back(obj);
+            }
+        }
+    }
+    // 透明度のある3Dオブジェクト**********************
+    for (auto& obj : m_3DTranslucentList)
+    {
+        if (obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == false){
+            continue;
+        }
+        auto factionComp = obj->get_Component<Faction>();
+        auto healthComp = obj->get_Component<Health>();
+        if (factionComp && healthComp)
+        {
+            if (factionComp->get_Faction() == _faction && healthComp->get_IsDead() == false) {
+                resList.push_back(obj);
+            }
+        }
+    }
+    // 透明度のある2Dオブジェクト**********************
+    for (auto& obj : m_2DTranslucentList)
+    {
+        if (obj->get_IsStatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE) == false)  {
+            continue;
+        }
+        auto factionComp = obj->get_Component<Faction>();
+        auto healthComp = obj->get_Component<Health>();
+        if (factionComp && healthComp)
+        {
+            if (factionComp->get_Faction() == _faction && healthComp->get_IsDead() == false) {
+                resList.push_back(obj);
+            }
+        }
+    }
     return resList;
 }
 
