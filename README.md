@@ -1,12 +1,13 @@
 # [DX11_GraphicFramework]
 ## 1. 概要
-地球防衛軍（EDF）スタイルの3Dアクションゲームです。
+私が好きなゲーム風に制作した3Dアクションシューティングゲームです。
 大量に押し寄せる敵をなぎ倒す爽快感と、DirectX11を用いた独自の描画エンジンが特徴です。
-現在はエンジン部分の制作が終わり、ゲーム部分の制作に注力しています。
 
 ## 2. 実行画面
-<img src="docs/images/ScreenShot_01.jpg" width="50%">
-<img src="docs/images/ScreenShot_02.jpg" width="50%">
+<img src="docs/images/ScreenShot_03.jpg" width="50%">
+<img src="docs/images/ScreenShot_05.jpg" width="50%">
+<img src="docs/images/ScreenShot_06.jpg" width="50%">
+<img src="docs/images/ScreenShot_08.jpg" width="50%">
  
 ## 3. 技術スタック
 - **言語**: C++
@@ -28,6 +29,9 @@
 - **リソース共有:** 同一データの重複ロードを回避（モデルやテクスチャなど）
 - **オブジェクトプール:** 頻繁な動的確保（new/delete）を抑止し、処理落ちを防止
 
+### 外部ファイルでパラメータ管理
+武器やマテリアルなどのパラメータをcsvやjsonで管理しています。今後はステージやオブジェクトの情報なども外部ファイルから指定できるようにしようと考えています。
+
 ### HLSL 5.0 を用いた描画パイプライン
 シェーダを活用し、[影の描画 / ポストエフェクト / ライティング] などを自前で実装しました。
 
@@ -42,10 +46,4 @@
    - ※ `packages` フォルダに必要なライブラリ（Assimp等）を含めているため、追加の環境構築は不要です。
 
 ## 6. 操作方法
-- **WASD**: 移動
-- **マウスまたは矢印キー**：視点操作
-- **左クリック**: 射撃
-- **右クリック**：ズーム
-- **スペース**: ジャンプ
-- **AまたはDを押しながらSpac**：緊急回避
-- **ESC**: 終了
+<img src="docs/images/Manual.png" width="50%">
