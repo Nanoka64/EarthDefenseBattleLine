@@ -120,9 +120,13 @@ namespace UtilityData
 	/// </summary>
 	enum class PAUSE_ITEM
 	{
+		NONE = -1,
+
 		RETURN_GAME,	// ゲームに戻る
 		RESTART,		// 再出撃
 		RETURN_TITLE,	// 退却
+		CONFIG,			// 設定
+		MANUAL,			// 操作説明表示
 		//CONFIG,		// 設定
 
 		NUM
@@ -313,7 +317,22 @@ namespace UtilityData
 		"ゲームに戻る",
 		"再出撃",
 		"退却",
+		"設定",
+		"操作マニュアル",
 		//"設定",
+	};
+
+	/// <summary>
+	/// 設定の項目名
+	/// </summary>
+	static const char* g_ConfigItemNames[static_cast<int>(CONFIG_ITEM::NUM)] =
+	{
+		"BGM音量",
+		"SE音量",
+		"マウス感度",
+		"カメラの上下反転",
+		"画面振動",
+		"シャドウの有無",
 	};
 
 	/// <summary>
@@ -363,8 +382,8 @@ namespace UtilityData
 	{
 		"初心者におすすめの難易度です。\n敵も接待してくれます。",
 		"標準的な難易度です。\nまずはこの難易度でプレイされることを推奨します。",
-		"かなり難しくなっています。\n一匹ずつ確実に倒しましょう。",
-		"敵が全力で襲い掛かってきます。",
-		"クリア不可",
+		"かなり難しくなっています。\n一体ずつ確実に倒しましょう。",
+		"敵が全力で襲い掛かってきます。\n一切の容赦はありません。",
+		"...SystemError\nプレイは推奨されません。",
 	};
 };

@@ -4,6 +4,8 @@
 #include "Component_3DCamera.h"
 #include <windows.h>
 
+using namespace VECTOR3;
+
 constexpr int NUM_SE_CHANNELS    = 1;	    // SEのチャンネル数（モノラル）
 constexpr int NUM_VOICE_CHANNELS = 1;	    // ボイスのチャンネル数（モノラル）
 constexpr int NUM_BGM_CHANNELS   = 2;	    // BGMのチャンネル数（ステレオ）
@@ -346,16 +348,21 @@ void SoundManager::UninitXA2Sound(void)
 //* true : 成功
 //* false : 失敗
 //*----------------------------------------------------------------------------------------
-bool SoundManager::Update(RendererEngine &renderer)
+bool SoundManager::Update(RendererEngine& renderer)
 {
 	// ############################################################################
 	//							リスナーの更新
 	// ############################################################################
-	auto cameraComp = renderer.get_CameraComponent();
-	VECTOR3::VEC3 cameraPos = cameraComp->get_CameraPos();
-	VECTOR3::VEC3 cameraUp = cameraComp->get_UpVec();
-    VECTOR3::VEC3 cameraLook = cameraComp->get_LookDir();
-
+	// カメラ情報
+	VECTOR3::VEC3 cameraPos;
+	VECTOR3::VEC3 cameraUp;
+	VECTOR3::VEC3 cameraLook;
+	if (auto cameraComp = Master::m_pDataManager->get_CameraComponent().lock())
+	{
+		cameraPos = cameraComp->get_CameraPos();
+		cameraUp = cameraComp->get_UpVec();
+		cameraLook = cameraComp->get_LookDir();
+	}
 
 	// 何故かパンが反転してしまうため
 	cameraLook = -cameraLook;

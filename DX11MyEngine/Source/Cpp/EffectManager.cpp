@@ -4,6 +4,7 @@
 #include "RendererEngine.h"
 #include <Effekseer.h>
 
+using namespace VECTOR3;
 
 EffectManager::EffectManager():
     m_Timer(0)
@@ -68,7 +69,7 @@ bool EffectManager::Setup(RendererEngine &renderer)
 
     // Specify a position of view
     // 視点位置を確定
-    VECTOR3::VEC3 viewPos = renderer.get_CameraPosition();
+    VECTOR3::VEC3 viewPos = Master::m_pDataManager->get_CameraPos();
     ::Effekseer::Vector3D viewerPosition = ::Effekseer::Vector3D(viewPos.x, viewPos.y, viewPos.z);
 
     // Specify a projection matrix
@@ -88,7 +89,8 @@ bool EffectManager::Setup(RendererEngine &renderer)
     LoadEffect(u"Resource/Effect/EnemyDead_01.efkefc", "EnemyDead_01");
     LoadEffect(u"Resource/Effect/Simple_Sprite_BillBoard.efkefc", "DeadExplosion");
     LoadEffect(u"Resource/Effect/Simple_SpawnMethod1.efkefc", "Hit");
-    LoadEffect(u"Resource/Effect/Explosion_01.efkefc", "Explosion_01");
+    //LoadEffect(u"Resource/Effect/Explosion_01.efkefc", "Explosion_01");
+    LoadEffect(u"Resource/Effect/Explosion_04.efkefc", "Explosion_01");
     LoadEffect(u"Resource/Effect/Explosion_02.efkefc", "Explosion_02");
     LoadEffect(u"Resource/Effect/Explosion_03.efkefc", "Explosion_03");
     LoadEffect(u"Resource/Effect/Explosion_Smoke_01.efkefc", "Explosion_Smoke_01");
@@ -117,11 +119,20 @@ void EffectManager::UpdateEffect(RendererEngine& renderer)
     UINT screenW = renderer.get_ScreenWidth();
     UINT screenH = renderer.get_ScreenHeight();
 
+    if (Master::m_pDataManager->get_CameraComponent().expired())
+    {
+        assert(false);
+        return;
+    }
+
+    auto camera = Master::m_pDataManager->get_CameraComponent().lock();
+    VEC3 cameraPos = Master::m_pDataManager->get_CameraPos();
+
     // 視点位置を確定
-    VECTOR3::VEC3 viewPos = renderer.get_CameraPosition();
-    float fov = renderer.get_CameraComponent()->get_Fov();
-    float camera_near = renderer.get_CameraComponent()->get_Near();
-    float camera_far = renderer.get_CameraComponent()->get_Far();
+    VECTOR3::VEC3 viewPos = cameraPos;
+    float fov = camera->get_Fov();
+    float camera_near = camera->get_Near();
+    float camera_far = camera->get_Far();
 
     ::Effekseer::Vector3D viewerPosition = ::Effekseer::Vector3D(viewPos.x, viewPos.y, viewPos.z);
 
@@ -130,7 +141,7 @@ void EffectManager::UpdateEffect(RendererEngine& renderer)
     ::Effekseer::Matrix44 projectionMatrix;
     projectionMatrix.PerspectiveFovLH(XMConvertToRadians(fov),(float)screenW / (float)screenH, camera_near, camera_far);
 
-    VECTOR3::VEC3 forcus = renderer.get_CameraComponent()->get_FocusPoint();
+    VECTOR3::VEC3 forcus = camera->get_FocusPoint();
 
     // Specify a camera matrix
     // カメラ行列を設定
@@ -268,4 +279,10 @@ bool EffectManager::IsPlayingEffect(int handle)
 void EffectManager::StopAllEffects()
 {
     m_EfkManager->StopAllEffects();
+}
+
+// 動的パラメータの設定
+void EffectManager::SetDynamicParameter(int handle, int32_t _index, float _param)
+{
+    m_EfkManager->SetDynamicInput(handle, _index, _param);
 }

@@ -1,6 +1,5 @@
 #include "pch.h"
-#include "c_Title_SoldierSelect.h"
-#include "Root_TitleSceneState.h"
+#include "TitleScene_StateHeader.h"
 #include "GameObjectManager.h"
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
@@ -15,29 +14,6 @@ using namespace VECTOR4;
 using namespace SceneStateEnums;
 using namespace UtilityData;
 
-// 項目の衝突判定用サイズ
-static const VECTOR2::VEC2 g_ItemSize = VECTOR2::VEC2(500.0f, 140.0f);
-
-// 項目の位置
-static const VECTOR2::VEC2 g_ItemPosArray[UINT_CAST(SOLDIER_TYPE::NUM)] =
-{
-	//VEC2( 400.0f,600.0f),
-	//VEC2(1000.0f,600.0f),
-	//VEC2( 400.0f,800.0f),
-	//VEC2(1000.0f,800.0f),
-	VEC2(400.0f,500.0f),
-	VEC2(400.0f,640.0f),
-	VEC2(400.0f,780.0f),
-	VEC2(400.0f,920.0f),
-};
-
-
-/// <summary>
-/// マウスカーソルが項目の上に乗った際に、項目をどれくらいずらすか
-/// </summary>
-static const float g_MouseHoveredItemSlideOffset = 60.0f;
-
-
 //*---------------------------------------------------------------------------------------
 //* @:c_Title_SoldierSelect Class 
 //*【?】開始
@@ -51,6 +27,9 @@ void c_Title_SoldierSelect::OnEnter(SceneManager *pOwner)
 	// メニュー項目のボタンオブジェクトとコンポーネントの取得と設定
 	for (int i = 0; i < INT_CAST(SOLDIER_TYPE::NUM); i++)
 	{
+		VEC2 pos = SOLDIER_ITEM_START_POS;
+		pos.y += i * ITEM_POS_Y_BETWEEN_DIST;	// 項目ごとにY座標をずらす
+
 		UIData::RectTransformData rectTrans;
 		UIData::ButtonUIData buttonData;
 		buttonData._imagePath = "Resource/Texture/Title/Frame03.png";
@@ -62,18 +41,20 @@ void c_Title_SoldierSelect::OnEnter(SceneManager *pOwner)
 			[this, i]() {
 				Master::m_pDataManager->set_SelectWeaponID(m_CrntSelectItem * 2, 0);
 				Master::m_pDataManager->set_SelectWeaponID(m_CrntSelectItem * 2 + 1, 1);
-				m_DecisionTextDrawCounter = 120;	// 装備決定のテキストを表示するためのカウンターをセット
-				m_DecisionSoldierTypeIndex = m_CrntSelectItem;	// 決定した兵科のインデックスをセット
+				m_DecisionTextDrawTimer = DECISON_TEXT_DRAW_DURATION;	// 装備決定のテキストを表示するためのカウンターをセット
+				m_DecisionSoldierTypeIndex = m_CrntSelectItem;			// 決定した兵科のインデックスをセット
 			};
-		rectTrans._size = g_ItemSize;
-		rectTrans._pos = g_ItemPosArray[i];
-		m_pButtonsObjArray[i] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);	// ボタンオブジェクトをプールから取得
-		m_pButtonArray[i] = m_pButtonsObjArray[i]->get_Component<ButtonUI>();							// ボタンコンポーネント取得
+		rectTrans._size = SOLDIER_ITEM_SIZE;
+		rectTrans._pos = pos;
+
+		// ボタン
+		m_pButtonsObjArray[i] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);		// ボタンオブジェクトをプールから取得
+		m_pButtonArray[i] = m_pButtonsObjArray[i]->get_Component<ButtonUI>();								// ボタンコンポーネント取得
 		m_pButtonArray[i].lock()->set_Color(VEC4(10.0f, 10.0f, 0.0f, 1.0f), UIData::STATE::HIGH_LIGHTED);	// 選択されている状態で「黄色」に
 		m_pButtonArray[i].lock()->set_Color(VEC4(5.0f, 5.0f, 0.0f, 1.0f), UIData::STATE::PRESSED);
-		m_pMenuItemRectTransformArray[i] = m_pButtonsObjArray[i]->get_RectTransform();	// ボタンのレクトトランスフォーム取得
+		m_pMenuItemRectTransformArray[i] = m_pButtonsObjArray[i]->get_RectTransform();						// ボタンのレクトトランスフォーム取得
 
-		m_ItemInfoArray[i]._pos = g_ItemPosArray[i];
+		m_ItemInfoArray[i]._pos = pos;
 		m_ItemInfoArray[i]._name = g_SoldierNames[i];
 	}
 
@@ -115,7 +96,7 @@ void c_Title_SoldierSelect::OnExit(SceneManager *pOwner)
 
 	m_pWeaponDescriptionBackSpriteObj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
 
-	m_DecisionTextDrawCounter = 0;
+	m_DecisionTextDrawTimer = 0.0f;
 }
 
 
@@ -192,6 +173,8 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 {
 	int i = 0;
 
+	float deltaTime = Master::m_pTimeManager->get_DeltaTime();
+
 	for (auto& item : m_ItemInfoArray)
 	{
 		// 項目の位置
@@ -207,8 +190,8 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 		if (m_CrntSelectItem == i)
 		{
 			// ずらす
-			menuItemPos.x += g_MouseHoveredItemSlideOffset;
-			spritePos.x += g_MouseHoveredItemSlideOffset;
+			menuItemPos.x += MOUSE_HOVERTED_ITEM_SLIDEOFFSET;
+			spritePos.x += MOUSE_HOVERTED_ITEM_SLIDEOFFSET;
 		}
 
 		m_pMenuItemRectTransformArray[i].lock()->set_RectPosition(VEC2(spritePos.x, spritePos.y));
@@ -234,7 +217,7 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 
 	Master::m_pDirectWriteManager->SetOutLine(2.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
 	// 装備を決定したときのテキスト表示 ************************************************************************
-	if (m_DecisionTextDrawCounter > 0) {
+	if (m_DecisionTextDrawTimer > 0.0f) {
 		std::string decisionText = g_SoldierNames[m_DecisionSoldierTypeIndex];
 		float textY = m_ItemInfoArray[m_DecisionSoldierTypeIndex]._pos.y;
 		float textX = m_ItemInfoArray[m_DecisionSoldierTypeIndex]._pos.x - 150.0f;
@@ -243,7 +226,7 @@ void c_Title_SoldierSelect::Draw(SceneManager *pOwner)
 		Master::m_pDirectWriteManager->DrawString("[" + decisionText + "]" + "を装備しました", VEC2(textX, textY), "White_30_STD");
 		Master::m_pDirectWriteManager->SetColor(D2D1::ColorF(D2D1::ColorF::White));
 
-		m_DecisionTextDrawCounter--;
+		m_DecisionTextDrawTimer -= deltaTime;
 	}
 	Master::m_pDirectWriteManager->DrawString("☆兵装選択", VECTOR2::VEC2(40.0f, 500.0f), "White_40_STD");
 	Master::m_pDirectWriteManager->SetOutLine(0.0f);

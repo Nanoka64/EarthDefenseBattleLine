@@ -903,6 +903,7 @@ void TrailRendererEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pObj
     float minDist = pComp->get_MinVertexDistance();
     float width = pComp->get_Width();
     float time = pComp->get_DrawTime();
+    VEC3 randPos = pComp->get_PosRandVec();
 
 
     // ƒm[ƒh
@@ -922,6 +923,10 @@ void TrailRendererEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pObj
         Master::m_pDebugger->DG_SameLine();
         Master::m_pDebugger->DG_DragFloat("##Time", 1, &time, 0.1f, 1.0f, 5000.0f);
 
+        Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ˆÊ’u‚Ì‚¸‚ê"));
+        Master::m_pDebugger->DG_SameLine();
+        Master::m_pDebugger->DG_DragVec3("##RandPos", &randPos, 0.1f, 1.0f, 5000.0f);
+
         Master::m_pDebugger->DG_TreePop();
     }
 
@@ -929,6 +934,7 @@ void TrailRendererEditor::OnEditorGUI(RendererEngine &renderer, GameObject &pObj
     pComp->set_MinVertexDistance(minDist);
     pComp->set_Width(width);
     pComp->set_DrawTime(time);
+    pComp->set_PosRandVec(randPos);
 }
 
 

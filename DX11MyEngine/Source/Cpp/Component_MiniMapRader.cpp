@@ -88,7 +88,7 @@ void MiniMapRader::Update(RendererEngine& renderer)
     //auto antList = Master::m_pGameObjectManager->get_ObjectsByTag("Ant");
     auto enemys = Master::m_pGameObjectManager->get_ObjectListByFactionAlive(FACTION::ENEMY);    // 生存状態の敵取得
     auto items = Master::m_pGameObjectManager->get_ObjectListByFaction(FACTION::ITEM);         // アイテム取得
-    
+
     size_t enemySpriteSize = m_pRaderEnemySpriteObjArray.size();
     size_t itemSpriteSize = m_pRaderItemSpriteObjArray.size();
 
@@ -97,7 +97,7 @@ void MiniMapRader::Update(RendererEngine& renderer)
         SecuringMiniMapIconSprite(renderer, INT_CAST(enemys.size()), m_pRaderEnemySpriteObjArray, VEC2(MINIMAP_ENEMY_ICON_SIZE), VEC4(1.0f, 0.0f, 0.0f, 1.0f), ENEMY_ICON_LAYER);
     }
     // 少なくなっていたら、プールへ返す
-    else if(enemySpriteSize > enemys.size()) {
+    else if (enemySpriteSize > enemys.size()) {
         m_pRaderEnemySpriteObjArray.back()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
         m_pRaderEnemySpriteObjArray.pop_back(); // 除外
     }
@@ -107,17 +107,22 @@ void MiniMapRader::Update(RendererEngine& renderer)
         SecuringMiniMapIconSprite(renderer, INT_CAST(items.size()), m_pRaderItemSpriteObjArray, VEC2(MINIMAP_ENEMY_ICON_SIZE), VEC4(0.0f, 1.0f, 0.0f, 1.0f), ITEM_ICON_LAYER);
     }
     // 少なくなっていたら、プールへ返す
-    else if(itemSpriteSize > items.size()) {
+    else if (itemSpriteSize > items.size()) {
         m_pRaderItemSpriteObjArray.back()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
         m_pRaderItemSpriteObjArray.pop_back(); // 除外
     }
 
-    VEC3 playerPos = m_pPlayerObj.lock()->get_Transform().lock()->get_VEC3ToPos();
-    float cameraAngleH = renderer.get_CameraComponent()->get_Angle_H();
+    std::shared_ptr<Camera3D> camera;
+    if (camera = Master::m_pDataManager->get_CameraComponent().lock())
+    {
+        VEC3 playerPos = m_pPlayerObj.lock()->get_Transform().lock()->get_VEC3ToPos();
+        float cameraAngleH = camera->get_Angle_H();
 
-    UpdateRadarIcons(items, m_pRaderItemSpriteObjArray, playerPos, cameraAngleH);   // アイテム
-    UpdateRadarIcons(enemys, m_pRaderEnemySpriteObjArray, playerPos, cameraAngleH); // 敵
+        UpdateRadarIcons(items, m_pRaderItemSpriteObjArray, playerPos, cameraAngleH);   // アイテム
+        UpdateRadarIcons(enemys, m_pRaderEnemySpriteObjArray, playerPos, cameraAngleH); // 敵
+    }
 }
+
 
 
 

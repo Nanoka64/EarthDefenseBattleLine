@@ -2,6 +2,9 @@
 #include "LightManager.h"
 #include "RendererEngine.h"
 #include "Component_Transform.h"
+
+using namespace VECTOR3;
+
 //*---------------------------------------------------------------------------------------
 //*【?】コンストラクタ
 //* [引数]
@@ -91,6 +94,9 @@ void LightManager::Term()
 //*----------------------------------------------------------------------------------------
 void LightManager::DirectionLight_SetCBuffer()
 {
+	VEC3 cameraPos = Master::m_pDataManager->get_CameraPos();
+
+
 	// バッファの更新
 	memcpy(
 		m_pCBDirectionLightSet->Data,
@@ -103,7 +109,7 @@ void LightManager::DirectionLight_SetCBuffer()
 	// 一旦直接セット
 	// TODO: ライトをまとめた構造体を作り、ポイント、ディレクション問わず一気に送ってしまい、その時に一緒にカメラも送るか、
 	//		 カメラを完全に分離するか…
-	m_pCBDirectionLightSet->Data[0].EyePos = m_pRenderer.lock()->get_CameraPosition();
+	m_pCBDirectionLightSet->Data[0].EyePos = cameraPos;
 
 	// GPUメモリにアクセス
 	m_pContext->Map(m_pCBDirectionLightSet->pBuff, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);

@@ -20,6 +20,9 @@
 #include "MeshFactory.h"
 #include "InputFactory.h"
 
+using namespace VECTOR3;
+using namespace VECTOR2;
+using namespace VECTOR4;
 using namespace UtilityData;
 using namespace EnemyData;
 constexpr float VOLUME_SCALE = 0.01f;  // 音量のスケール（0.0f～1.0f）
@@ -60,7 +63,7 @@ DataManager::~DataManager()
 //* true  : 成功 
 //* false : 失敗 
 //*----------------------------------------------------------------------------------------
-bool DataManager::Init(std::shared_ptr<RendererEngine>pRenderer)
+bool DataManager::Init(class RendererEngine* pRenderer)
 {
 	m_pRenderer = pRenderer;
 
@@ -148,6 +151,7 @@ bool DataManager::SettingsData_MissionTermination(RendererEngine& renderer, UINT
 {
 	return true;
 }
+
 //*---------------------------------------------------------------------------------------
 //*【?】ゲーム中に使用したリソースをクリアする
 //*		リザルトや、再出撃時に呼ぶ 
@@ -194,8 +198,8 @@ void DataManager::ClearGameSceneResource(RendererEngine& renderer)
 void DataManager::set_Fov(float _fov)
 {
 	// 描画エンジンにFOVをセット
-	if (m_pRenderer) {
-		m_pRenderer->get_CameraComponent()->set_Fov(_fov);
+	if (auto camera = m_pCameraComponent.lock()) {
+		camera->set_Fov(_fov);
 	}
 }
 
@@ -210,13 +214,25 @@ void DataManager::set_Fov(float _fov)
 //*----------------------------------------------------------------------------------------
 float DataManager::get_Fov()
 {
-	// 描画エンジンにFOVをセット
-	if (m_pRenderer) {
-		return m_pRenderer->get_CameraComponent()->get_Fov();
+	if (auto camera = m_pCameraComponent.lock()) {
+		return camera->get_Fov();
 	}
-
 	return 0.0f;
 }
+
+
+//*----------------------------------------------------------------------------------------
+//*【?】カメラ座標の取得
+//*----------------------------------------------------------------------------------------
+VECTOR3::VEC3 DataManager::get_CameraPos()const
+{
+	if (auto camera = m_pCameraComponent.lock()) {
+		return camera->get_CameraPos();
+	}
+
+	return VEC3();
+}
+
 
 //*----------------------------------------------------------------------------------------
 //*【?】BGM音量の設定

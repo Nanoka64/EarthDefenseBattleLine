@@ -131,7 +131,11 @@ void Building_CllapseNowState::OnExit(BuildingController* pOwner)
 	// ****************************************************
 	//				 カメラシェイク
 	// ****************************************************
-	m_pRenderer->get_CameraComponent()->DistanceDecay(SHAKE_DURATION, VEC3(SHAKE_LENGTH), pos, SHAKE_MAX_RANGE);
+	std::shared_ptr<Camera3D> camera;
+	if (camera = Master::m_pDataManager->get_CameraComponent().lock())
+	{
+		camera->DistanceDecay(SHAKE_DURATION, VEC3(SHAKE_LENGTH), pos, SHAKE_MAX_RANGE);
+	}
 
 
 

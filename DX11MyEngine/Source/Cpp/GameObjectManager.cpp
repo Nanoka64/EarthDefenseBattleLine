@@ -303,7 +303,7 @@ void GameObjectManager::ObjectShadowRenderPass(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void GameObjectManager::Alpha_ObjectRenderPass(RendererEngine &renderer)
 {
-    VEC3 camPos = renderer.get_CameraPosition();    // カメラ座標
+    VEC3 camPos = Master::m_pDataManager->get_CameraPos();    // カメラ座標
     auto begin = m_3DTranslucentList.begin();
     auto end = m_3DTranslucentList.end();
 
@@ -336,7 +336,7 @@ void GameObjectManager::Alpha_ObjectRenderPass(RendererEngine &renderer)
 //*----------------------------------------------------------------------------------------
 void GameObjectManager::Alpha_2DObjectRenderPass(RendererEngine &renderer)
 {
-    VEC3 camPos = renderer.get_CameraPosition();    // カメラ座標
+    VEC3 camPos = Master::m_pDataManager->get_CameraPos();    // カメラ座標
     auto begin = m_2DTranslucentList.begin();
     auto end = m_2DTranslucentList.end();
 

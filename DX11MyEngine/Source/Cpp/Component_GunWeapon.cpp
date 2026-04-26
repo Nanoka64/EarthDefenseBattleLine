@@ -93,8 +93,16 @@ void GunWeapon::Start(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void GunWeapon::LateUpdate(RendererEngine& renderer)
 {
-    float c_AngleH = renderer.get_CameraComponent()->get_Angle_H();
-    float c_AngleV = renderer.get_CameraComponent()->get_Angle_V();
+    if (Master::m_pDataManager->get_CameraComponent().expired())
+    {
+        assert(false);
+        return;
+    }
+
+    auto camera = Master::m_pDataManager->get_CameraComponent().lock();
+
+    float c_AngleH = camera->get_Angle_H();
+    float c_AngleV = camera->get_Angle_V();
     float deltaTime = Master::m_pTimeManager->get_DeltaTime();
 
     auto transform = m_pOwner.lock()->get_Transform().lock();
@@ -179,7 +187,7 @@ void GunWeapon::LateUpdate(RendererEngine& renderer)
         }
 
         // Fovの設定
-        renderer.get_CameraComponent()->set_Fov(zoomFov);
+        camera->set_Fov(zoomFov);
     }
 
     m_FireTimer += deltaTime;
@@ -308,8 +316,17 @@ void GunWeapon::Fire(RendererEngine& renderer)
         return;
     }
 
-    float c_AngleH = renderer.get_CameraComponent()->get_Angle_H();
-    float c_AngleV = renderer.get_CameraComponent()->get_Angle_V();
+    // カメラの取得
+    if (Master::m_pDataManager->get_CameraComponent().expired())
+    {
+        assert(false);
+        return;
+    }
+    auto camera = Master::m_pDataManager->get_CameraComponent().lock();
+
+    float c_AngleH =camera->get_Angle_H();
+    float c_AngleV =camera->get_Angle_V();
+    VEC3 cameraPos = camera->get_CameraPos();
 
     auto transform = m_pOwner.lock()->get_Transform().lock();
     VEC3 pos = transform->get_WorldVEC3ToPos();
@@ -329,6 +346,8 @@ void GunWeapon::Fire(RendererEngine& renderer)
         //rad.x = (c_AngleV);
         //rad.y = (c_AngleH - 1.57f);
         //rad.z = 0.0f;
+
+        XMMATRIX mat;
 
         // ワールド変換行列から方向をとる
         XMMATRIX worldMtx = transform->get_WorldMtx();

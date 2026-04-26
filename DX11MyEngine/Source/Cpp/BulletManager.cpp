@@ -108,6 +108,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_DONT_DESTROY);    // ノンデストロイ
             obj->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);        // ノンアクティブ
             obj->set_IsUpdateAllowedDuringPause(false);                     // ポーズ中は停止
+            obj->set_Tag("ExplosionLight");
 
             //*****************************************************************************************
             //						コンポーネントの追加
@@ -152,7 +153,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             //auto collider = obj->get_Component<BoxCollider>();
             //collider->set_IsEnable(false); 
 
-            // 軌跡データをクリア
+            //// 軌跡データをクリア
             //auto trail = obj->get_Component<TrailRenderer>();
             //trail->clear_TrailInfoList();
         },
@@ -193,6 +194,7 @@ bool BulletManager::Init(RendererEngine &renderer)
             billboard.MatNum = 1;
             billboard.MaterialData = matInfo;
             billboard.IsTransparent = true; // 透明度があり
+            billboard.ObjTag = "Bullet_Normal";
             auto obj = MeshFactory::CreateBillboard(billboard);
 
             
@@ -211,10 +213,10 @@ bool BulletManager::Init(RendererEngine &renderer)
             moveComp->Register(MOVE_BEHAVIOUR_TYPE::LINEAR);
             moveComp->ChangeBehaviour(MOVE_BEHAVIOUR_TYPE::LINEAR);
 
-            // 軌跡
+            //// 軌跡
             //auto trail = obj->add_Component<TrailRenderer>();
-            //trail->set_Width(1.0f);
-            //trail->set_MinVertexDistance(0.5f);
+            //trail->set_Width(0.5f);
+            //trail->set_MinVertexDistance(10.0f);
             //trail->set_DrawTime(5.0f);
             //trail->set_EmissivePower(5.0f);
             //trail->set_Color(VECTOR4::VEC4(1.0f, 1.0f, 0.0f, 1.0f));

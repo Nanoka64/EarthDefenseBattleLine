@@ -67,10 +67,16 @@ void AssultRifle::Start(RendererEngine &renderer)
 //* &renderer : 描画エンジンの参照
 //* [返値]なし
 //*----------------------------------------------------------------------------------------
-void AssultRifle::Update(RendererEngine &renderer)
+void AssultRifle::Update(RendererEngine& renderer)
 {
-    float c_AngleH = renderer.get_CameraComponent()->get_Angle_H();
-    float c_AngleV = renderer.get_CameraComponent()->get_Angle_V();
+    std::shared_ptr<Camera3D> camera = Master::m_pDataManager->get_CameraComponent().lock();
+    if (camera == nullptr) {
+        assert(false);
+        return;
+    }
+
+    float c_AngleH = camera->get_Angle_H();
+    float c_AngleV = camera->get_Angle_V();
 
 	auto transform = m_pOwner.lock()->get_Transform().lock();
     VEC3 pos = transform->get_WorldVEC3ToPos();
@@ -102,10 +108,10 @@ void AssultRifle::Update(RendererEngine &renderer)
     m_FireRate = m_IsExplosionBullet ? 20 : 5;
 
     // 右クリックでズーム
-    renderer.get_CameraComponent()->set_Fov(45.0f);
+    camera->set_Fov(45.0f);
     if (GetMouseClick(MOUSE_BUTTON_STATE::RIGHT))
     {
-        renderer.get_CameraComponent()->set_Fov(35.0f);
+        camera->set_Fov(35.0f);
     }
     // 左クリックで発射
 	if(GetMouseClickHoldRepeat(MOUSE_BUTTON_STATE::LEFT, m_FireRate, m_FireRate) && !GetInput(GAME_CONFIG::MOVE_DASH))

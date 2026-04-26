@@ -283,6 +283,9 @@
     <Filter Include="ソース ファイル\Singleton\Graphic">
       <UniqueIdentifier>{2d2f4f6a-3f73-40e4-b9e4-b250a2984f3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Game\Scene\Head">
+      <UniqueIdentifier>{6b7b7f36-9bb9-44aa-9da9-e255c8167cae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Cpp\SHADER.cpp">
@@ -585,9 +588,6 @@
     <ClCompile Include="Source\Cpp\Component_NormalBullet.cpp">
       <Filter>ソース ファイル\Game\Component\Weapon\Bullet</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Cpp\Component_AssultRifle.cpp">
-      <Filter>ソース ファイル\Game\Component\Weapon\Gun</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Cpp\Component_GunWeapon.cpp">
       <Filter>ソース ファイル\Game\Component\Weapon\Gun</Filter>
     </ClCompile>
@@ -737,6 +737,15 @@
     </ClCompile>
     <ClCompile Include="Source\Cpp\GameObjectManager.cpp">
       <Filter>ソース ファイル\Singleton\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\c_Game_Manual.cpp">
+      <Filter>ソース ファイル\Game\Scene\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_ConfigSetting.cpp">
+      <Filter>ソース ファイル\Game\Component\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\c_Game_Config.cpp">
+      <Filter>ソース ファイル\Game\Scene\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -974,39 +983,6 @@
     <ClInclude Include="Source\Header\RenderPipeline.h">
       <Filter>ソース ファイル\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\Root_TitleSceneState.h">
-      <Filter>ソース ファイル\Game\Scene\Title</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\c_Title_Config.h">
-      <Filter>ソース ファイル\Game\Scene\Title</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\c_Title_SoldierSelect.h">
-      <Filter>ソース ファイル\Game\Scene\Title</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\c_Title_MissionSelect.h">
-      <Filter>ソース ファイル\Game\Scene\Title</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\Root_GameSceneState.h">
-      <Filter>ソース ファイル\Game\Scene\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\c_Game_LoadProcess.h">
-      <Filter>ソース ファイル\Game\Scene\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\Root_ResultSceneState.h">
-      <Filter>ソース ファイル\Game\Scene\Result</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\c_Result_GetItemCheck.h">
-      <Filter>ソース ファイル\Game\Scene\Result</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\c_Title_LoadProcess.h">
-      <Filter>ソース ファイル\Game\Scene\Title</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\c_Game_Play.h">
-      <Filter>ソース ファイル\Game\Scene\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\c_Title_MainMenu.h">
-      <Filter>ソース ファイル\Game\Scene\Title</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Header\Component_PlayerController.h">
       <Filter>ソース ファイル\Game\Component\Player</Filter>
     </ClInclude>
@@ -1072,9 +1048,6 @@
     </ClInclude>
     <ClInclude Include="Source\Header\Component_NormalBullet.h">
       <Filter>ソース ファイル\Game\Component\Weapon\Bullet</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\Component_AssultRifle.h">
-      <Filter>ソース ファイル\Game\Component\Weapon\Gun</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\Component_GunWeapon.h">
       <Filter>ソース ファイル\Game\Component\Weapon\Gun</Filter>
@@ -1142,18 +1115,6 @@
     <ClInclude Include="Source\Header\HormingMove_Behaviour.h">
       <Filter>ソース ファイル\BaseComponent\Move\Behaviour</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\c_Result_Cleared.h">
-      <Filter>ソース ファイル\Game\Scene\Result</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\c_Result_Failed.h">
-      <Filter>ソース ファイル\Game\Scene\Result</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\c_Game_Pause.h">
-      <Filter>ソース ファイル\Game\Scene\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\c_MissionSelect_DifficultSelect.h">
-      <Filter>ソース ファイル\Game\Scene\Title</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Header\Component_Item.h">
       <Filter>ソース ファイル\Game\Component\Item</Filter>
     </ClInclude>
@@ -1219,6 +1180,18 @@
     </ClInclude>
     <ClInclude Include="Source\Header\GameObjectManager.h">
       <Filter>ソース ファイル\Singleton\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ResultScene_StateHeader.h">
+      <Filter>ソース ファイル\Game\Scene\Head</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\TitleScene_StateHeader.h">
+      <Filter>ソース ファイル\Game\Scene\Head</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\GameScene_StateHeader.h">
+      <Filter>ソース ファイル\Game\Scene\Head</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_ConfigSetting.h">
+      <Filter>ソース ファイル\Game\Component\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

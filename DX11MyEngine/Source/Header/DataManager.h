@@ -24,8 +24,8 @@ private:
 	UINT m_ScreenHeight;
 	float m_DefaultFov;	// デフォルトのFOV
 	bool m_IsDebugMode;
-	std::shared_ptr<class RendererEngine> m_pRenderer;// 描画エンジンのポインタ
-	//std::weak_ptr<class Camera3D> m_pCameraComponent;
+	class RendererEngine* m_pRenderer;// 描画エンジンのポインタ（読み取り）
+	std::weak_ptr<class Camera3D> m_pCameraComponent;		// カメラコンポーネント
 	
 	int m_SelectWeaponID[2];	// 武器選択で選択した武器のID 一時的にここに置く
 	UtilityData::UserConfigData m_UserConfigData;		// ユーザ設定データ
@@ -45,7 +45,10 @@ public:
 	DataManager();
 	~DataManager();
 
-	bool Init(std::shared_ptr<RendererEngine>pRenderer);
+	bool Init(class RendererEngine* pRenderer);
+	void set_CameraComponent(std::shared_ptr<class Camera3D> _pCamera) { m_pCameraComponent = _pCamera; }	// カメラコンポーネント設定
+	std::weak_ptr<class Camera3D> get_CameraComponent() { return m_pCameraComponent; }						// カメラコンポーネント取得
+	VECTOR3::VEC3 get_CameraPos()const;			// カメラ座標の取得
 
 	bool SettingsData_TitleLoadOnEnter(RendererEngine& renderer);			// タイトルロード時
 	bool SettingsData_TitleLoadOnExit(RendererEngine& renderer);			// タイトルロード時

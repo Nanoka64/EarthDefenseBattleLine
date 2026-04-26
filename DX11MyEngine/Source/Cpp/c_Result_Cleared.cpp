@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "c_Result_Cleared.h"
+#include "ResultScene_StateHeader.h"
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
 #include "InputFactory.h"

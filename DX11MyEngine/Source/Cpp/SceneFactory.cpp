@@ -4,27 +4,13 @@
 #include "RendererEngine.h"
 
 /* タイトル */
-#include "Root_TitleSceneState.h"
-#include "c_Title_LoadProcess.h"
-#include "c_Title_MainMenu.h"
-#include "c_Title_MissionSelect.h"
-#include "c_MissionSelect_DifficultSelect.h"
-#include "c_Title_SoldierSelect.h"
-#include "c_Title_Config.h"
+#include "TitleScene_StateHeader.h"
 
 /* ゲーム */
-#include "Root_GameSceneState.h"
-#include "c_Game_LoadProcess.h"
-#include "c_Game_Pause.h"
-#include "c_Game_Play.h"
-
+#include "GameScene_StateHeader.h"
 
 /* リザルト */
-#include "Root_ResultSceneState.h"
-#include "c_Result_Cleared.h"
-#include "c_Result_Failed.h"
-#include "c_Result_GetItemCheck.h"
-
+#include "ResultScene_StateHeader.h"
 
 
 using namespace SceneStateEnums;
@@ -135,17 +121,23 @@ void SceneFactory::CreateGameScene(StateMachine<SceneManager> &_out, RendererEng
 	// ********************************************************************************
 	std::shared_ptr<c_Game_LoadProcess> c_LoadProcess = std::make_shared<c_Game_LoadProcess>();	// ゲームロード
 	std::shared_ptr<c_Game_Play> c_GamePlay = std::make_shared<c_Game_Play>();					// ゲームプレイ
-	std::shared_ptr<c_Game_Pause> c_GamePause = std::make_shared<c_Game_Pause>();			// 設定画面
+	std::shared_ptr<c_Game_Pause> c_GamePause = std::make_shared<c_Game_Pause>();				// 設定画面
+	std::shared_ptr<c_Game_Config> c_GameConfig = std::make_shared<c_Game_Config>();			// 操作マニュアル画面
+	std::shared_ptr<c_Game_Manual> c_GameManual = std::make_shared<c_Game_Manual>();			// 操作マニュアル画面
 
 	// 親を設定
 	c_LoadProcess->set_Parent(pGameScene);
 	c_GamePlay->set_Parent(pGameScene);
 	c_GamePause->set_Parent(c_GamePlay);	// ポーズはプレイシーンを親に
+	c_GameConfig->set_Parent(c_GamePause);	// 設定ポーズを親に
+	c_GameManual->set_Parent(c_GamePause);	// マニュアルはポーズを親に
 
 	// 子を登録
 	pGameScene->add_Child(c_GAME::c_GAME_LOAD, (c_LoadProcess));
 	pGameScene->add_Child(c_GAME::c_GAME_PLAY, (c_GamePlay));
-	c_GamePlay->add_Child(c_GAME::c_GAME_PAUSE, (c_GamePause));	// プレイシーンはポーズを持つ
+	c_GamePlay->add_Child(c_GAME::c_GAME_PAUSE, (c_GamePause));		// プレイシーンはポーズを持つ
+	c_GamePause->add_Child(c_GAME::c_GAME_CONFIG, (c_GameConfig));	// ポーズは設定を持つ
+	c_GamePause->add_Child(c_GAME::c_GAME_MANUAL, (c_GameManual));	// ポーズはマニュアルを持つ
 
 	// タイトルをステートマシンに登録
 	_out.RegisterState(SCENE_STATE::SCENE_STATE_GAME, std::move(pGameScene));

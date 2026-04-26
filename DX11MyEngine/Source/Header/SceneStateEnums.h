@@ -44,6 +44,8 @@ namespace SceneStateEnums
         c_GAME_PLAY,            // プレイ
 
         c_GAME_PAUSE,           // ポーズ画面
+        c_GAME_CONFIG,          // 設定画面
+        c_GAME_MANUAL,          // 操作説明画面
 
         c_GO_RESULT_SCENE,      // 特殊フラグ リザルトシーンへ行く
 

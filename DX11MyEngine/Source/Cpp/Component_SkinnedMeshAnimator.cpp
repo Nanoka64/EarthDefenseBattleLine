@@ -168,9 +168,12 @@ void SkinnedMeshAnimator::BoneTransformsUpdate(RendererEngine &renderer, float t
     float timeInTicks = 0.0f;
     float animTimeTicks = 0.0f;
 
-    m_AimPitchAngle = renderer.get_CameraComponent()->get_Angle_V();
-    m_AimYawAngle = renderer.get_CameraComponent()->get_Angle_H();
-
+    std::shared_ptr<Camera3D> camera;
+    if (camera = Master::m_pDataManager->get_CameraComponent().lock())
+    {
+        m_AimPitchAngle = camera->get_Angle_V();
+        m_AimYawAngle = camera->get_Angle_H();
+    }
 
     //// 範囲外チェック
     //if (animIdx > m_Animations.size()) {

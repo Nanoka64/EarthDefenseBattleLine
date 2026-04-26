@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "c_Title_MainMenu.h"
+#include "TitleScene_StateHeader.h"
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
 #include "Component_SpriteRenderer.h"
@@ -13,26 +13,6 @@ using namespace VECTOR2;
 using namespace VECTOR3;
 using namespace VECTOR4;
 using namespace UtilityData;
-
-
-// メニュー項目の衝突判定用サイズ
-static const VECTOR2::VEC2 g_MenuItemSize = VECTOR2::VEC2(450.0f, 100.0f);
-
-// メニュー項目の位置
-static const VECTOR2::VEC2 g_MenuItemPosArray[static_cast<int>(TITLEMENU_ITEM::NUM)] =
-{
-	VEC2(400.0f,600.0f),
-	VEC2(400.0f,700.0f),
-	VEC2(400.0f,800.0f),
-	VEC2(400.0f,900.0f),
-};
-
-
-
-/// <summary>
-/// マウスカーソルが項目の上に乗った際に、項目をどれくらいずらすか
-/// </summary>
-static const float g_MouseHoveredItemSlideOffset = 50.0f;
 
 
 //*---------------------------------------------------------------------------------------
@@ -53,6 +33,9 @@ void c_Title_MainMenu::OnEnter(SceneManager* pOwner)
 	// メニュー項目のオブジェクトとコンポーネントの取得と設定
 	for (int i = 0; i < static_cast<int>(TITLEMENU_ITEM::NUM); i++)
 	{
+		VEC2 pos = MENU_ITEM_START_POS;
+		pos.y += i * ITEM_POS_Y_BETWEEN_DIST;	// Y座標を項目ごとにずらす
+
 		UIData::RectTransformData rectTrans;
 		UIData::ButtonUIData buttonData;
 		buttonData._imagePath = "Resource/Texture/Title/Line.png";
@@ -61,15 +44,15 @@ void c_Title_MainMenu::OnEnter(SceneManager* pOwner)
 		buttonData._inputValidationState = UIData::STATE::PRESSED;
 		buttonData._onClicFunction = [this, i]() {m_NextState = m_MenuItemInfoArray[i]._nextState; };
 		buttonData._textOffsetPos = VEC2(100.0f, 0.0f);
-		rectTrans._size = g_MenuItemSize;
-		rectTrans._pos = g_MenuItemPosArray[i];
+		rectTrans._size = MENU_ITEM_SIZE;
+		rectTrans._pos = pos;
 		m_pButtonsObjArray[i] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
 		m_pButtonArray[i] = m_pButtonsObjArray[i]->get_Component<ButtonUI>();
 		m_pButtonArray[i].lock()->set_Color(VEC4(10.0f, 10.0f, 0.0f, 1.0f), UIData::STATE::HIGH_LIGHTED);	// 選択されている状態で「黄色」に
 		m_pButtonArray[i].lock()->set_Color(VEC4(5.0f, 5.0f, 0.0f, 1.0f), UIData::STATE::PRESSED);	
 		m_pMenuItemRectTransformArray[i] = m_pButtonsObjArray[i]->get_RectTransform();
 
-		m_MenuItemInfoArray[i]._pos = g_MenuItemPosArray[i];
+		m_MenuItemInfoArray[i]._pos = pos;
 		m_MenuItemInfoArray[i]._name = g_TitleMenuItemNames[i];
 		m_MenuItemInfoArray[i]._type = static_cast<TITLEMENU_ITEM>(i);
 	}
@@ -174,11 +157,11 @@ void c_Title_MainMenu::Draw(SceneManager* pOwner)
 		// マウスが乗ってるならずらす
 		if (m_CrntSelectItem == item._type)
 		{
-			spritePos.x += g_MouseHoveredItemSlideOffset;
+			spritePos.x += MOUSE_HOVERTED_ITEM_SLIDEOFFSET;
 		}
 
 		m_pMenuItemRectTransformArray[static_cast<int>(item._type)].lock()->set_RectPosition(VEC2(spritePos.x, spritePos.y));
-		m_pMenuItemRectTransformArray[static_cast<int>(item._type)].lock()->set_Size(g_MenuItemSize.x, g_MenuItemSize.y);
+		m_pMenuItemRectTransformArray[static_cast<int>(item._type)].lock()->set_Size(MENU_ITEM_SIZE.x, MENU_ITEM_SIZE.y);
 	}
 
 	Master::m_pDirectWriteManager->SetOutLine(3.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));

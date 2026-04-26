@@ -550,7 +550,9 @@ void SceneManager::Update(RendererEngine& renderer)
 void SceneManager::Draw(RendererEngine& renderer)
 {
     // レンダリングパイプラインの実行
-    renderer.ExecuteDefaultRendererPipeline(RENDER_PIPELINE_STATE::DEFAULT);
+    if (auto camera = Master::m_pDataManager->get_CameraComponent().lock()) {
+        renderer.ExecuteDefaultRendererPipeline(RENDER_PIPELINE_STATE::DEFAULT, camera.get());
+    }
 
     // シーンステートの描画
     m_StateMachine.Draw();

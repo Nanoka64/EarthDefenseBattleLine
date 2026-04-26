@@ -72,10 +72,13 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             // ****************************************************
             //				 カメラシェイク
             // ****************************************************
-            float maxRange = bulletParam->_explosionRadius * SHAKE_MAX_RANGE_EXPLOSION_SCALE_FACTOR;
-            float shaleLength = bulletParam->_explosionRadius * SHAKE_LENGTH_SCALE_FACTOR;
-            renderer.get_CameraComponent()->DistanceDecay(SHAKEDURATION, VEC3(shaleLength), pos, maxRange);
-
+            std::shared_ptr<Camera3D> camera;
+            if (camera = Master::m_pDataManager->get_CameraComponent().lock())
+            {
+                float maxRange = bulletParam->_explosionRadius * SHAKE_MAX_RANGE_EXPLOSION_SCALE_FACTOR;
+                float shaleLength = bulletParam->_explosionRadius * SHAKE_LENGTH_SCALE_FACTOR;
+                camera->DistanceDecay(SHAKEDURATION, VEC3(shaleLength), pos, maxRange);
+            }
 
 
             // ****************************************************
@@ -142,6 +145,8 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             Master::m_pEffectManager->SetScaleEffect(exp_handle, effectExpSize, effectExpSize, effectExpSize);
             Master::m_pEffectManager->SetPositionEffect(exp_handle, pos.x, pos.y, pos.z);
             Master::m_pEffectManager->SetRotationEffect(exp_handle, expRot.x, expRot.y, expRot.z);
+            // 動的パラメータの設定
+            Master::m_pEffectManager->SetDynamicParameter(exp_handle, 1, bulletParam->_explosionEffectAliveTime); // 生存時間を変更
 
             if (bulletParam->_isSmoke)
             {
@@ -151,6 +156,8 @@ void ExplosionBullet::Start(RendererEngine& renderer)
                 Master::m_pEffectManager->SetScaleEffect(exp_smoke_handle, effectExpSize, effectExpSize, effectExpSize);
                 Master::m_pEffectManager->SetPositionEffect(exp_smoke_handle, pos.x, pos.y, pos.z);
                 Master::m_pEffectManager->SetRotationEffect(exp_smoke_handle, expRot.x, expRot.y, expRot.z);
+
+                Master::m_pEffectManager->SetDynamicParameter(exp_smoke_handle, 1, bulletParam->_explosionEffectAliveTime); // 生存時間を変更
             }
         };
 }
@@ -206,7 +213,7 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     {
         auto owner = m_pOwner.lock();
         auto transform = owner->get_Transform().lock();
-        transform->set_Pos(crntPos + (hitInfo.get_HitNormal() * 3.0f));     // 衝突位置に合わせる
+        transform->set_Pos(crntPos + (hitInfo.get_HitNormal() * 1.0f));     // 衝突位置に合わせる
 
         // 衝突処理
         if (m_CollisionTask)

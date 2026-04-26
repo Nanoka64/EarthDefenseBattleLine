@@ -1,6 +1,5 @@
 #include "pch.h"
-#include "c_Title_MissionSelect.h"
-#include "Root_TitleSceneState.h"
+#include "TitleScene_StateHeader.h"
 #include "GameObjectManager.h"
 #include "ResourceManager.h"
 #include "Component_ButtonUI.h"
@@ -11,20 +10,6 @@
 using namespace VECTOR2;
 using namespace VECTOR3;
 using namespace VECTOR4;
-
-// メニュー項目の衝突判定用サイズ
-static const VECTOR2::VEC2 g_MissionItemSize = VECTOR2::VEC2(400.0f, 70.0f);
-
-// メニュー項目の位置
-static const VECTOR2::VEC2 g_MissionItemPosArray[MISSION_NUM] =
-{
-	VEC2(400.0f,600.0f),
-};
-
-/// <summary>
-/// マウスカーソルが項目の上に乗った際に、項目をどれくらいずらすか
-/// </summary>
-static const float g_MouseHoveredItemSlideOffset = 50.0f;
 
 /// <summary>
 /// ミッション名
@@ -51,6 +36,9 @@ void c_Title_MissionSelect::OnEnter(SceneManager *pOwner)
 	// メニュー項目のオブジェクトとコンポーネントの取得と設定
 	for (int i = 0; i < static_cast<int>(MISSION_NUM); i++)
 	{
+		VEC2 pos = MISSION_ITEM_START_POS;	
+		pos.y += i * ITEM_POS_Y_BETWEEN_DIST;	// 項目ごとにY座標ずらす
+
 		UIData::RectTransformData rectTrans;
 		UIData::ButtonUIData buttonData;
 		buttonData._imagePath = "Resource/Texture/Title/Line.png";
@@ -59,15 +47,15 @@ void c_Title_MissionSelect::OnEnter(SceneManager *pOwner)
 		buttonData._inputValidationState = UIData::STATE::PRESSED;
 		buttonData._onClicFunction = [this, i, pOwner]() { 	this->MissionSelectButton_OnClicFunction(pOwner); };	// 難易度選択へ
 		buttonData._textOffsetPos = VEC2(100.0f, 0.0f);
-		rectTrans._size = g_MissionItemSize;
-		rectTrans._pos = g_MissionItemPosArray[i];
-		m_pButtonsObjArray[i]		 = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
-		m_pButtonArray[i]				 = m_pButtonsObjArray[i]->get_Component<ButtonUI>();
+		rectTrans._size = MISSION_ITEM_SIZE;	// サイズ
+		rectTrans._pos = pos;					// 位置
+		m_pButtonsObjArray[i] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
+		m_pButtonArray[i] = m_pButtonsObjArray[i]->get_Component<ButtonUI>();
 		m_pButtonArray[i].lock()->set_Color(VEC4(10.0f, 10.0f, 0.0f, 1.0f), UIData::STATE::HIGH_LIGHTED);	// 選択されている状態で「黄色」に
 		m_pButtonArray[i].lock()->set_Color(VEC4(5.0f, 5.0f, 0.0f, 1.0f), UIData::STATE::PRESSED);
 		m_pMenuItemRectTransformArray[i] = m_pButtonsObjArray[i]->get_RectTransform();
 
-		m_ItemInfoArray[i]._pos = g_MissionItemPosArray[i];
+		m_ItemInfoArray[i]._pos = pos;
 		m_ItemInfoArray[i]._name = g_MissionNames[i];
 	}
 
@@ -216,7 +204,7 @@ void c_Title_MissionSelect::Draw(SceneManager* pOwner)
 		// マウスが乗ってるならずらす
 		if (m_CrntSelectItem == i)
 		{
-			spritePos.x += g_MouseHoveredItemSlideOffset;
+			spritePos.x += MOUSE_HOVERTED_ITEM_SLIDEOFFSET;
 		}
 
 		m_pMenuItemRectTransformArray[0].lock()->set_RectPosition(VEC2(spritePos.x, spritePos.y));

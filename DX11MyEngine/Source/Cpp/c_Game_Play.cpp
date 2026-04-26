@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "SceneManager.h"
-#include "c_Game_Play.h"
+#include "GameScene_StateHeader.h"
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
 #include "InputFactory.h"
@@ -9,6 +9,7 @@
 #include "GameObject.h"
 #include "Component_3DCamera.h"
 #include "Component_WeaponController.h"
+#include "Component_TrailRenderer.h"
 
 using namespace UtilityData;
 using namespace SceneStateEnums;
@@ -51,8 +52,8 @@ void c_Game_Play::OnEnter(SceneManager* pOwner)
     spriteData._color = VEC4(1.0f, 0.0f, 0.0f, 0.5f);
     spriteData._shaderType = SHADER_TYPE::FORWARD_UNLIT_UI_NOTEXTURE_SPRITE;
     spriteData._layerRank = 110;
-    rectTrans._size = VEC2(300.0f, 60.0f);
-    rectTrans._pos = VEC2(0, 540);
+    rectTrans._size = ENEMY_NUM_BACK_SPRITE_SIZE;
+    rectTrans._pos = ENEMY_NUM_BACK_SPRITE_POS;
     m_pEnemyNumBackSpriteObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectTrans, spriteData);
 }
 
@@ -161,7 +162,8 @@ int c_Game_Play::Update(SceneManager *pOwner)
         return c_GAME::c_GO_RESULT_SCENE;
     }
 
-    BomberMove();
+    // B-2の移動
+    //BomberMove();
 
     return c_GAME::c_GAME_PLAY;
 }
@@ -175,6 +177,11 @@ int c_Game_Play::Update(SceneManager *pOwner)
 //*----------------------------------------------------------------------------------------
 void c_Game_Play::Draw(SceneManager* pOwner)
 {
+
+    Master::m_pDirectWriteManager->SetOutLine(3.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
+    Master::m_pDirectWriteManager->DrawFormatString("残りの敵数：{:d}", VECTOR2::VEC2(0, 540), "White_40_STD", m_EnemyNum);
+    Master::m_pDirectWriteManager->SetOutLine(0.0f);
+
     //////////////////////////////////////////////////////////////////////////////////////////
     //
     //						子ステートの描画処理
@@ -185,9 +192,6 @@ void c_Game_Play::Draw(SceneManager* pOwner)
         m_pChildStateMap[m_CrntChildStateID]->Draw(pOwner);
     }
 
-    Master::m_pDirectWriteManager->SetOutLine(3.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
-    Master::m_pDirectWriteManager->DrawFormatString("残りの敵数：{:d}", VECTOR2::VEC2(0, 540), "White_40_STD",m_EnemyNum);
-    Master::m_pDirectWriteManager->SetOutLine(0.0f);
 }
 
 

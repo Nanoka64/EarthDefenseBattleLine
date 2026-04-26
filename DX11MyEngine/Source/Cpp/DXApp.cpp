@@ -128,7 +128,7 @@ bool DXApp::Init(HINSTANCE hInstance,LPSTR lpCmdLine, int nCmdShow)
     // *************************************************************************************************
     /**  データマネージャの初期化 **/
     // *************************************************************************************************
-    if (!Master::m_pDataManager->Init(m_pRenderer))
+    if (!Master::m_pDataManager->Init(m_pRenderer.get()))
     {
         assert(false);
         return false;
@@ -465,7 +465,7 @@ int DXApp::MainLoop()
                 // エディタの更新
                 Master::m_pEditorManager->Update(*m_pRenderer);
 
-                // ポーズ中は停止
+                // ポーズ中はエフェクト停止
                 if (Master::m_pDataManager->get_IsPause() == false)
                 {
                     // エフェクト更新（描画はパイプラインクラスのフォワードと同じ位置で行っている）
@@ -479,11 +479,11 @@ int DXApp::MainLoop()
                 // サウンドの更新
                 Master::m_pSoundManager->Update(*m_pRenderer);
 
-                // ImGUI描画終了
-                Master::m_pDebugger->EndFrame();
-
                 // DirectWrite描画終了
                 Master::m_pDirectWriteManager->EndDraw();
+
+                // ImGUI描画終了
+                Master::m_pDebugger->EndFrame();
 
                 // 描画の終了
                 m_pRenderer->EndRender();

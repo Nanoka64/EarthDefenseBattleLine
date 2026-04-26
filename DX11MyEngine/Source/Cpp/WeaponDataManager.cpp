@@ -193,7 +193,12 @@ bool WeaponDataManager::LoadGunWeaponData(const std::string& _filepath, WeaponDa
     // 弾の種類を文字列から判定
     std::string typeStr = j.value("bulletType", "NORMAL");
     const json& paramJson = j["bulletParam"];
-
+    
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //						通常弾
+    // 
+    //////////////////////////////////////////////////////////////////////////////////////////
     if (typeStr == "NORMAL")
     {
         _outData._bulletType = BULLET_TYPE::NORMAL;
@@ -227,6 +232,11 @@ bool WeaponDataManager::LoadGunWeaponData(const std::string& _filepath, WeaponDa
         // variantに代入
         _outData._bulletParam = normalData;
     }
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //						爆発弾
+    // 
+    //////////////////////////////////////////////////////////////////////////////////////////
     else if (typeStr == "EXPLOSION")
     {
         _outData._bulletType = BULLET_TYPE::EXPLOSION;
@@ -261,6 +271,7 @@ bool WeaponDataManager::LoadGunWeaponData(const std::string& _filepath, WeaponDa
         // 派生クラス独自のパラメータを読み込み
         expData._explosionRadius = paramJson.value("explosionRadius", 0.0f);                        // 爆発半径
         expData._explosionEffectHandleTag = paramJson.value("explosionEffectHandleTag", "");        // 爆発エフェクトタグ
+        expData._explosionEffectAliveTime = paramJson.value("explosionEffectAliveTime", 1.0f);      // 爆発エフェクトの生存時間（1.0でそのまま）
         expData._isSmoke = paramJson.value("isSmoke", false);                                       // 煙が出るか
 
         // variantに代入

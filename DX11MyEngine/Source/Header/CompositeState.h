@@ -67,7 +67,7 @@ public:
 	}
 
 	/// <summary>
-	/// 最初の子ステートを設定
+	/// 最初の子ステートを設定（-1の場合、何もしない）
 	/// </summary>
 	/// <param name="id"></param>
 	void SetInitChildState(Owner *pOwner, const int id)

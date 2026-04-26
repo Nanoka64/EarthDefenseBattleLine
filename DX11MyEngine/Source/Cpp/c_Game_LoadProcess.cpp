@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "c_Game_LoadProcess.h"
+#include "GameScene_StateHeader.h"
 #include "GameManager.h"
 #include "ResourceManager.h"
 #include "RendererEngine.h"
@@ -179,29 +179,29 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
     /* B-2 モデルの生成 */
     {
-        // マテリアル取得
-        auto matPtr = Master::m_pResourceManager->FindMaterial("B_2");
+        //// マテリアル取得
+        //auto matPtr = Master::m_pResourceManager->FindMaterial("B_2");
 
-        SetupMaterialInfo matInfo[1];
-        matInfo[0].Index = 0;
-        matInfo[0].pMaterialData = matPtr;
+        //SetupMaterialInfo matInfo[1];
+        //matInfo[0].Index = 0;
+        //matInfo[0].pMaterialData = matPtr;
 
-        CreateModelInfo model;
-        model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/b-2/B-2_NonBone.fbx";
-        model.ObjTag = "B-2";
-        model.IsAnim = false;
-        model.MatNum = 1;
-        model.SetupMaterial = matInfo;
-        model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
-        for (int i = 0; i < 3; i++)
-        {
-            model.ObjTag = "B-2_" + std::to_string(i + 1);
-            auto obj = MeshFactory::CreateModel(model);
-            obj->get_Component<MyTransform>()->set_Scale(0.05f, 0.05f, 0.05f);           
-            // ポーズ中は停止
-            obj->set_IsUpdateAllowedDuringPause(false);
-        }
+        //CreateModelInfo model;
+        //model.pRenderer = m_pRenderer;
+        //model.Path = "Resource/Model/b-2/B-2_NonBone.fbx";
+        //model.ObjTag = "B-2";
+        //model.IsAnim = false;
+        //model.MatNum = 1;
+        //model.SetupMaterial = matInfo;
+        //model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
+        //for (int i = 0; i < 3; i++)
+        //{
+        //    model.ObjTag = "B-2_" + std::to_string(i + 1);
+        //    auto obj = MeshFactory::CreateModel(model);
+        //    obj->get_Component<MyTransform>()->set_Scale(0.05f, 0.05f, 0.05f);           
+        //    // ポーズ中は停止
+        //    obj->set_IsUpdateAllowedDuringPause(false);
+        //}
     }
 
     /* クレイモア モデルの生成 */
@@ -368,7 +368,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         mesh.MaterialData = matInfo;
         mesh.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
         mesh.IsNormalMap = true;
-		mesh.TilingScale = VEC2(20.0f, 20.0f);
+		mesh.TilingScale = VEC2(30.0f, 30.0f);
         mesh.ObjLayer = 90;
 
         auto obj = MeshFactory::CreateUtilityMesh(mesh);
@@ -685,8 +685,10 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         }
     }
 
+    auto camera = Master::m_pDataManager->get_CameraComponent().lock();
+    
     // カメラ操作をオンに
-    m_pRenderer->get_CameraComponent()->set_IsControl(true);
+    camera->set_IsControl(true);
 
 
     // プレイヤーに操作コンポーネントつける

@@ -41,7 +41,8 @@ struct CreateMesh_Base
         ShaderType(SHADER_TYPE::DEFERRED_STD_STATIC),
         Shadow_ShaderType(SHADER_TYPE::POST_SHADOWMAP),
         IsTransparent(false),
-        ObjLayer(100)
+        ObjLayer(100),
+        ObjTag("Unknown")
     {};
 };
 

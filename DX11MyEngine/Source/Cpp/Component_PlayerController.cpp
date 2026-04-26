@@ -20,7 +20,7 @@ using namespace DirectX;
 using namespace Tool;
 
 constexpr float MOVE_SPEED = 10.0f;		// プレイヤーの移動速度
-constexpr float ROLLING_SPEED = 25.0f;	// ローリング時初速
+constexpr float ROLLING_SPEED = 32.0f;	// ローリング時初速
 constexpr float ROLLING_DURATION = 1.0f;// ローリング時間
 constexpr float JUMP_HEIGHT = 2.5f;		// ジャンプの高さ
 constexpr float GRAVITY = 18.0f;		// 重力

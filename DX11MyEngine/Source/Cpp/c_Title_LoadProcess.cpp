@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "c_Title_LoadProcess.h"
+#include "TitleScene_StateHeader.h"
 #include "RendererEngine.h"
 #include "ResourceManager.h"
 #include "SceneStateEnums.h"
@@ -68,8 +68,8 @@ void c_Title_LoadProcess::OnEnter(SceneManager *pOwner)
         // ポーズ中は停止
         obj->set_IsUpdateAllowedDuringPause(false);
         
-        // 描画エンジン側にカメラコンポーネントを渡す
-        m_pRenderer->set_CameraComponent(m_pCameraComp);
+        // データ管理にカメラコンポーネントを渡す
+        Master::m_pDataManager->set_CameraComponent(m_pCameraComp);
     }
 
     // ライトにカメラのTransformを持たせる

@@ -137,7 +137,7 @@ void LineRenderer::VertexUpdate(RendererEngine& renderer)
 	pContext->Map(m_pVertesBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
 	// ƒJƒƒ‰À•W
-	VEC3 cameraPos = renderer.get_CameraPosition();
+	VEC3 cameraPos = Master::m_pDataManager->get_CameraPos();
 
 	VERTEX_Static* pVertices = (VERTEX_Static*)mappedResource.pData;
 

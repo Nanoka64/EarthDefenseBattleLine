@@ -1,6 +1,5 @@
 #include "pch.h"
-#include "c_MissionSelect_DifficultSelect.h"
-#include "Root_TitleSceneState.h"
+#include "TitleScene_StateHeader.h"
 #include "GameObjectManager.h"
 #include "ResourceManager.h"
 #include "Component_ButtonUI.h"
@@ -15,20 +14,6 @@ using namespace UtilityData;
 using namespace SceneStateEnums;
 
 
-// メニュー項目の衝突判定用サイズ
-static const VECTOR2::VEC2 g_ItemSize = VECTOR2::VEC2(450.0f, 100.0f);
-
-// メニュー項目の位置
-static const VECTOR2::VEC2 g_ItemPosArray[UINT_CAST(DIFFICULTY_LEVEL::NUM)] =
-{
-	VEC2(900.0f,500.0f),
-	VEC2(900.0f,600.0f),
-	VEC2(900.0f,700.0f),
-	VEC2(900.0f,800.0f),
-	VEC2(900.0f,900.0f),
-};
-
-
 
 //*---------------------------------------------------------------------------------------
 //* @:c_MissionSelect_DifficultSelect Class 
@@ -41,6 +26,9 @@ void c_MissionSelect_DifficultSelect::OnEnter(SceneManager* pOwner)
 	// メニュー項目のオブジェクトとコンポーネントの取得と設定
 	for (int i = 0; i < UINT_CAST(DIFFICULTY_LEVEL::NUM); i++)
 	{
+		VEC2 pos = ITEM_START_POS;
+		pos.y += i * ITEM_POS_Y_BETWEEN_DIST;	// Yを項目ごとにずらす
+
 		UIData::RectTransformData rectTrans;
 		UIData::ButtonUIData buttonData;
 		buttonData._imagePath = "Resource/Texture/Title/Line.png";
@@ -49,8 +37,9 @@ void c_MissionSelect_DifficultSelect::OnEnter(SceneManager* pOwner)
 		buttonData._inputValidationState = UIData::STATE::PRESSED;
 		buttonData._onClicFunction = [this, i, pOwner]() {this->DifficultSelectButton_OnClicFunction(pOwner, i); };
 		buttonData._textOffsetPos = VEC2(100.0f, 0.0f);
-		rectTrans._size = g_ItemSize;
-		rectTrans._pos = g_ItemPosArray[i];
+		rectTrans._size = ITEM_SIZE;
+		rectTrans._pos = pos;
+		// ボタン
 		m_pButtonsObjArray[i] = Master::m_pUIManager->GetButton(*m_pRenderer, rectTrans, buttonData);
 		m_pButtonArray[i] = m_pButtonsObjArray[i]->get_Component<ButtonUI>();
 		m_pButtonArray[i].lock()->set_Color(VEC4(10.0f, 10.0f, 0.0f, 1.0f), UIData::STATE::HIGH_LIGHTED);	// 選択されている状態で「黄色」に
@@ -161,7 +150,7 @@ void c_MissionSelect_DifficultSelect::Draw(SceneManager* pOwner)
 
 	// 難易度説明
 	VEC2 textPos = VEC2(1350.0f, 550.0f);
-	textPos.y = g_ItemPosArray[UINT_CAST(m_CrntSelectItem)].y;
+	textPos.y = ITEM_START_POS.y + ITEM_POS_Y_BETWEEN_DIST * UINT_CAST(m_CrntSelectItem);	// 項目のY座標に合わせる
 	Master::m_pDirectWriteManager->SetOutLine(2.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
 	Master::m_pDirectWriteManager->DrawString(g_DifficultyDescriptions[UINT_CAST(m_CrntSelectItem)], textPos, "White_20_STD");
 	Master::m_pDirectWriteManager->SetOutLine(0.0f);
