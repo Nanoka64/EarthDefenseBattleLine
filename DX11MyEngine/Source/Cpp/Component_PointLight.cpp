@@ -87,7 +87,7 @@ void PointLight::Update(RendererEngine &renderer)
     pointData.Pos               = pos;
 	pointData.Range	            = m_Range;
     pointData.SpecularColor     = VECTOR3::VEC3(1.0f);
-    pointData.SpecularIntensity = 1.0f;
+    pointData.SpecularIntensity = 150.0f;
     pointData.DiffuseColor      = m_LightColor;
 	pointData.DiffuseIntensity  = m_Intensity;
 

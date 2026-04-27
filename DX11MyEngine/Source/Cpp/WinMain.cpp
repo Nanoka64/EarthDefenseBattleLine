@@ -11,7 +11,7 @@
 #include <time.h>
 #include "DxApp.h"
 #if _DEBUG
-#include "../../../XML_Excel/XmlArrange.h"
+//#include "../../../XML_Excel/XmlArrange.h"
 #endif
 
 //------------------------------------------------------------------------------------------

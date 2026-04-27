@@ -34,7 +34,7 @@ DataManager::DataManager():
 m_ScreenWidth(0),
 m_ScreenHeight(0),
 m_DefaultFov(0.0f),
-m_IsDebugMode(true),
+m_IsDebugMode(false),
 m_IsUseWeapon(true),
 m_IsCameraControl(true),
 m_pRenderer(nullptr),

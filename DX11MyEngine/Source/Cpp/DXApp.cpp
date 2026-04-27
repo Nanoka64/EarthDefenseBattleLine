@@ -52,7 +52,7 @@ DXApp::DXApp(uint32_t width, uint32_t height) :
     m_pRenderer(),
     m_pGameManager(),
     m_IsClose(false),
-    m_IsEditMode(true)
+    m_IsEditMode(false)
 {
 
 }
@@ -419,16 +419,6 @@ int DXApp::MainLoop()
 
                 float deltatime = Master::m_pTimeManager->get_DeltaTime();
 
-
-                // アプリケーション情報
-                //Master::m_pDebugger->BeginDebugWindow("Application");
-                //Master::m_pDebugger->DG_TextValue("CrntTime : %d", crntTime);
-                //Master::m_pDebugger->DG_TextValue("LastTime : %d", lastTime);
-                //Master::m_pDebugger->DG_TextValue("Difference : %f.3", difference);
-                //Master::m_pDebugger->DG_TextValue("DeltaTime : %f.3", deltatime);
-                //Master::m_pDebugger->EndDebugWindow(); 
-                //
-
 				// デバッグキー：F1でカメラコントロールモードのオンオフ切り替え
                 if (GetInputDown(GAME_CONFIG::F1))
                 {
@@ -437,7 +427,6 @@ int DXApp::MainLoop()
                     isCameraControlMode ? Master::m_pDataManager->set_IsCameraControl(false) :
 						Master::m_pDataManager->set_IsCameraControl(true);
                 }
-
 				// デバッグキー：F2で武器使用のオンオフ切り替え
                 if (GetInputDown(GAME_CONFIG::F2))
                 {
@@ -518,59 +507,59 @@ void DXApp::AppEditDrawImGui()
     //						操作ガイド
     //
     //=========================================================================================
-    Master::m_pDebugger->BeginDebugWindow(U8ToChar(u8"説明"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"DirectX11を使用した自作3Dグラフィックフレームワークです。"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"レンダリングパイプラインから自作し、ディファードシェーディングによる\n基本的なライティング、ポストエフェクト、シャドウ等を実装しました。"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"プログラム側はコンポーネント指向で設計し、\n柔軟にオブジェクトを作成できるようにしています。"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"※ 現在は敵を一定数倒すだけのシンプルなものになっていますが、\n今後ゲーム部分の拡張を続けていきます。"));
-    Master::m_pDebugger->DG_Separator();    // 区切り
-    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"☆操作方法"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"[キーボード]"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"WASD：移動"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"マウスまたは矢印キー：視点操作"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"Space：ジャンプ"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"AまたはDを押しながらSpace：緊急回避"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"左Shift：押している間、弾が発射されなくなります。"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"1または2：武器切り替え"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"ESC：終了"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"[マウス]"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"マウスホイール：武器切り替え"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"左クリック：射撃"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"右クリック：ズーム"));
-    Master::m_pDebugger->DG_Separator();    // 区切り
-    Master::m_pDebugger->DG_BulletText(
-        U8ToChar(
-            u8"オブジェクトリストからオブジェクトを選択し、インスペクタでコンポーネントの\n一部パラメータ等が見れたりいじれるようになっています。"));
+    //Master::m_pDebugger->BeginDebugWindow(U8ToChar(u8"説明"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"DirectX11を使用した自作3Dグラフィックフレームワークです。"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"レンダリングパイプラインから自作し、ディファードシェーディングによる\n基本的なライティング、ポストエフェクト、シャドウ等を実装しました。"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"プログラム側はコンポーネント指向で設計し、\n柔軟にオブジェクトを作成できるようにしています。"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"※ 現在は敵を一定数倒すだけのシンプルなものになっていますが、\n今後ゲーム部分の拡張を続けていきます。"));
+    //Master::m_pDebugger->DG_Separator();    // 区切り
+    //Master::m_pDebugger->DG_BulletText(U8ToChar(u8"☆操作方法"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"[キーボード]"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"WASD：移動"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"マウスまたは矢印キー：視点操作"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"Space：ジャンプ"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"AまたはDを押しながらSpace：緊急回避"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"左Shift：押している間、弾が発射されなくなります。"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"1または2：武器切り替え"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"ESC：終了"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"[マウス]"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"マウスホイール：武器切り替え"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"左クリック：射撃"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"右クリック：ズーム"));
+    //Master::m_pDebugger->DG_Separator();    // 区切り
+    //Master::m_pDebugger->DG_BulletText(
+    //    U8ToChar(
+    //        u8"オブジェクトリストからオブジェクトを選択し、インスペクタでコンポーネントの\n一部パラメータ等が見れたりいじれるようになっています。"));
 
 
-    Master::m_pDebugger->DG_Separator();    // 区切り
-    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"☆実装コンポーネント"));
+    //Master::m_pDebugger->DG_Separator();    // 区切り
+    //Master::m_pDebugger->DG_BulletText(U8ToChar(u8"☆実装コンポーネント"));
 
-    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ユーティリティ"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"・Transform\n・Camera3D\n"));
-    Master::m_pDebugger->DG_Separator();    // 区切り
-
-
-    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"メッシュ"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"・ModelMeshResource\n・ModelMeshRenderer\n・SkinnedMeshAnimator\n・SkyRenderer\n・SpriteRenderer\n・MeshResource\n・MeshRenderer\n・LineRenderer\n・TrailRenderer\n・BillboardResource\n・BillboardRenderer\n"));
-    Master::m_pDebugger->DG_Separator();    // 区切り
+    //Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ユーティリティ"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"・Transform\n・Camera3D\n"));
+    //Master::m_pDebugger->DG_Separator();    // 区切り
 
 
-    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ライト"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"・DirectionLight\n・PointLight\n"));
-    Master::m_pDebugger->DG_Separator();    // 区切り
+    //Master::m_pDebugger->DG_BulletText(U8ToChar(u8"メッシュ"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"・ModelMeshResource\n・ModelMeshRenderer\n・SkinnedMeshAnimator\n・SkyRenderer\n・SpriteRenderer\n・MeshResource\n・MeshRenderer\n・LineRenderer\n・TrailRenderer\n・BillboardResource\n・BillboardRenderer\n"));
+    //Master::m_pDebugger->DG_Separator();    // 区切り
 
 
-    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"コライダー"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"・BoxCollider\n・SphereCollider\n"));
-    Master::m_pDebugger->DG_Separator();    // 区切り
+    //Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ライト"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"・DirectionLight\n・PointLight\n"));
+    //Master::m_pDebugger->DG_Separator();    // 区切り
 
 
-    Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ゲームプレイ用"));
-    Master::m_pDebugger->DG_Text(U8ToChar(u8"・PlayerController\n・EnemyController\n・Health...など\n"));
-    Master::m_pDebugger->DG_Separator();    // 区切り
+    //Master::m_pDebugger->DG_BulletText(U8ToChar(u8"コライダー"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"・BoxCollider\n・SphereCollider\n"));
+    //Master::m_pDebugger->DG_Separator();    // 区切り
 
-    Master::m_pDebugger->EndDebugWindow();
+
+    //Master::m_pDebugger->DG_BulletText(U8ToChar(u8"ゲームプレイ用"));
+    //Master::m_pDebugger->DG_Text(U8ToChar(u8"・PlayerController\n・EnemyController\n・Health...など\n"));
+    //Master::m_pDebugger->DG_Separator();    // 区切り
+
+    //Master::m_pDebugger->EndDebugWindow();
 
 
     //=========================================================================================
@@ -578,7 +567,7 @@ void DXApp::AppEditDrawImGui()
     //					    アプリケーション情報
     //
     //=========================================================================================
-    Master::m_pDebugger->BeginDebugWindow(U8ToChar(u8"アプリケーション設定"), 0);
+    Master::m_pDebugger->BeginDebugWindow(U8ToChar(u8"アプリケーション設定"));
     if (Master::m_pDebugger->DG_CheckBox(U8ToChar(u8"デバッグ用エディタの表示"), &m_IsEditMode))
     {
         Master::m_pDataManager->set_IdDebugMode(m_IsEditMode);
@@ -596,7 +585,6 @@ void DXApp::AppEditDrawImGui()
         Master::m_pDataManager->set_IsUseWeapon(isUseWeapon);
     }
     Master::m_pDebugger->EndDebugWindow();
-
 }
 
 

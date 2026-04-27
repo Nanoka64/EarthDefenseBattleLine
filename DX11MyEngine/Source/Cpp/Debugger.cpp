@@ -38,7 +38,7 @@ bool Debugger::Init(HWND hWnd, std::shared_ptr<class RendererEngine> renderer)
     ImGui::StyleColorsLight();   // 明るい色調
     //ImGui::StyleColorsClassic(); // 昔ながらのImGuiスタイル
 
-    // 日本語フォント設定 AIに頼んだ
+    // 日本語フォント設定
     {
         // 日本語フォントのパスを指定（例：Windows標準のメイリオ）
         // C:/Windows/Fonts/msjh.ttc (微軟正黑體) や msgothic.ttc など
