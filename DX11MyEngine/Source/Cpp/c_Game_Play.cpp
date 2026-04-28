@@ -180,6 +180,7 @@ void c_Game_Play::Draw(SceneManager* pOwner)
 
     Master::m_pDirectWriteManager->SetOutLine(3.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
     Master::m_pDirectWriteManager->DrawFormatString("残りの敵数：{:d}", VECTOR2::VEC2(0, 540), "White_40_STD", m_EnemyNum);
+    Master::m_pDirectWriteManager->DrawFormatString("TABでポーズを開く", VECTOR2::VEC2(0, 620), "White_30_STD");
     Master::m_pDirectWriteManager->SetOutLine(0.0f);
 
     //////////////////////////////////////////////////////////////////////////////////////////
