@@ -4,6 +4,9 @@
 大量に押し寄せる敵をなぎ倒す爽快感と、DirectX11を用いた独自の描画エンジンが特徴です。
 
 ## 2. 実行画面
+### Youtubeの方に紹介動画を公開しています。
+[Youtube URL](https://youtu.be/jpEfTbvPlUU)
+
 <img src="docs/images/ScreenShot_03.jpg">
 <img src="docs/images/ScreenShot_05.jpg">
 <img src="docs/images/ScreenShot_06.jpg">
