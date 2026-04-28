@@ -1,11 +1,14 @@
 # [地球防衛戦線]
+
+### 実行ファイルはreleases(以下のURL)からダウンロード出来ます。
+https://github.com/Nanoka64/EarthDefenseBattleLine/releases
+
 ## 1. 概要
 私が好きなゲームを参考に制作した3Dアクションシューティングゲームです。
 大量に押し寄せる敵をなぎ倒す爽快感と、DirectX11を用いた独自の描画エンジンが特徴です。
-
 ## 2. 実行画面
 ### Youtubeの方に紹介動画を公開しています。
-[Youtube URL](https://youtu.be/jpEfTbvPlUU)
+https://youtu.be/jpEfTbvPlUU
 
 <img src="docs/images/ScreenShot_03.jpg">
 <img src="docs/images/ScreenShot_05.jpg">
