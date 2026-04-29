@@ -1,6 +1,21 @@
-# [地球防衛戦線]
+# 【地球防衛戦線】
 
-### 実行ファイルはreleases(以下のURL)からダウンロード出来ます。
+### [対応プラットフォーム]：PC(Windows)
+### [操作]：キーボード&マウス操作
+### [作成期間]：2025年9月～26年4月（約8ヶ月）
+### [開発人数]：１人
+### [ツール・ライブラリ]：
+・VisualStudio2022
+・DirectX11
+・ImGui
+・Assimp
+・DirectWrite
+・DirectXTex
+・XAudio2
+・Effekseer
+・nlohmann-json
+
+## ・実行ファイルはreleases(以下のURL)からダウンロード出来ます。
 https://github.com/Nanoka64/EarthDefenseBattleLine/releases
 
 ## 1. 概要
