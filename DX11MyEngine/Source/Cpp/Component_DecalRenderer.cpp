@@ -117,6 +117,7 @@ void DecalRenderer::Draw(RendererEngine &renderer)
         // ワールド逆行列
         XMMATRIX invWorld = XMMatrixInverse(NULL, worldMtx);
         XMStoreFloat4x4(&m_pCBDecalSet->Data.DecalWorldInvMtx, invWorld);
+        m_pCBDecalSet->Data.DecalColor = VEC3(1.0f, 1.0f, 1.0f);
 
         // データのコピー 
         memcpy(mappedResource.pData, &m_pCBDecalSet->Data, sizeof(CB_DECAL));

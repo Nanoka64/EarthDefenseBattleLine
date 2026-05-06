@@ -543,9 +543,6 @@
     <ClCompile Include="Source\Cpp\EnemyStateFactory.cpp">
       <Filter>ソース ファイル\State\Factory</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Cpp\Component_DecalRenderer.cpp">
-      <Filter>ソース ファイル\BaseComponent\Mesh\UtilityMesh</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Cpp\Component_TimerDestruction.cpp">
       <Filter>ソース ファイル\BaseComponent\Utility</Filter>
     </ClCompile>
@@ -743,6 +740,9 @@
     </ClCompile>
     <ClCompile Include="Source\Cpp\c_Game_Config.cpp">
       <Filter>ソース ファイル\Game\Scene\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_DecalRenderer.cpp">
+      <Filter>ソース ファイル\BaseComponent\Mesh\Effect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -998,9 +998,6 @@
     <ClInclude Include="Source\Header\Ant_StateHeader.h">
       <Filter>ソース ファイル\Game\Component\Enemy\State_Ant</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\Component_DecalRenderer.h">
-      <Filter>ソース ファイル\BaseComponent\Mesh\UtilityMesh</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Header\Component_TimerDestruction.h">
       <Filter>ソース ファイル\BaseComponent\Utility</Filter>
     </ClInclude>
@@ -1186,6 +1183,9 @@
     </ClInclude>
     <ClInclude Include="Source\Header\Component_ConfigSetting.h">
       <Filter>ソース ファイル\Game\Component\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Component_DecalRenderer.h">
+      <Filter>ソース ファイル\BaseComponent\Mesh\Effect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

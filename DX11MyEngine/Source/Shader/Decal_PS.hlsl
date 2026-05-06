@@ -36,7 +36,6 @@ struct PS_OUT
     float4 Normal : SV_Target1;
 };
 
-
 // **************************************************************************
 /* - @:エントリーポイント - */
 // **************************************************************************
@@ -83,7 +82,7 @@ PS_OUT PSMain(PS_IN input)
     float3 decalWorldNormal = normalize(mul(normTex.xyz, (float3x3) cb_Transform));
     decalWorldNormal = decalWorldNormal * 0.5f + 0.5f; // 0～1戻す
     
-    albedColor.rgb = albedTex.rgb;
+    albedColor.rgb = albedTex.rgb * cb_DecalColor;
     albedColor.a = albedTex.a;
     normalColor.rgb = decalWorldNormal.rgb;
     normalColor.a = normTex.a;

@@ -190,6 +190,8 @@ cbuffer CB_SPRITE : register(b10)
 cbuffer CB_DECAL : register(b11)
 {
     float4x4 cb_InvDecalTransform;  // デカールボックスのワールド逆行列
+    float3 cb_DecalColor;   // カラー（float4にしてaにディザリングのしきい値入れてもいいかも）
+    float pad6;
 };
 
 #endif

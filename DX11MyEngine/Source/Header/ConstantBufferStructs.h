@@ -253,6 +253,8 @@ struct CB_SPRITE_SET {
 //=========================================================================================
 struct CB_DECAL {
     DirectX::XMFLOAT4X4 DecalWorldInvMtx;  // デカールボックスのワールド変換行列
+    DirectX::XMFLOAT3 DecalColor;           // カラー
+    float pad;
 };
 
 struct CB_DECAL_SET {
