@@ -105,7 +105,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
         CreateModelInfo model;
         model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Enemy/GiantAnt01.fbx";
+        model.Path = "Resource/Model/Enemy/GiantAnt01/GiantAnt01.fbx";
         model.ObjTag = "Ant1";
         model.IsAnim = true;
         model.MatNum = 1;
@@ -204,27 +204,6 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         //}
     }
 
-    /* クレイモア モデルの生成 */
-    {
-        //// マテリアル取得
-        //auto matPtr = Master::m_pResourceManager->FindMaterial("Claymore");
-
-        //SetupMaterialInfo matInfo[1];
-        //matInfo[0].Index = 0;
-        //matInfo[0].pMaterialData = matPtr;
-
-        //CreateModelInfo model;
-        //model.pRenderer = m_pRenderer;
-        //model.Path = "Resource/Model/Claymore/Claymore.fbx";
-        //model.ObjTag = "Claymore";
-        //model.IsAnim = false;
-        //model.MatNum = 1;
-        //model.SetupMaterial = matInfo;
-        //model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC_N;
-        //auto obj = MeshFactory::CreateModel(model);
-        //obj->get_Component<MyTransform>()->set_Scale(2.0f, 2.0f, 2.0f);
-        //obj->get_Component<MyTransform>()->set_Pos(0.0f, 100.0f, 400.0f);
-    }
 
     /* 建物 モデルの生成 */
     {
@@ -299,7 +278,7 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
         CreateModelInfo model;
         model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/Enemy/MotherShip.fbx";
+        model.Path = "Resource/Model/Enemy/MotherShip/MotherShip.fbx";
         model.ObjTag = "MotherShip";
         model.IsAnim = false;
         model.MatNum = 1;
@@ -309,44 +288,37 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
 
         model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
         auto obj = MeshFactory::CreateModel(model);
+		obj->set_IsStatic(false);
         obj->get_Component<MyTransform>()->set_Scale(0.1f, 0.1f, 0.1f);
         obj->get_Component<MyTransform>()->set_Pos(0.0f, 500.0f, 0.0f);
         obj->get_Component<MyTransform>()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
     }
 
-    /* クモ モデルの生成 */
+    /* 八面体生成 */
     {
         // マテリアル取得
-        auto matPtr1 = Master::m_pResourceManager->FindMaterial("Spider_1");
-        auto matPtr2 = Master::m_pResourceManager->FindMaterial("Spider_2");
-        auto matPtr3 = Master::m_pResourceManager->FindMaterial("Spider_3");
-        auto matPtr4 = Master::m_pResourceManager->FindMaterial("Spider_4");
+        auto matPtr1 = Master::m_pResourceManager->FindMaterial("Objector_body");
+        auto matPtr2 = Master::m_pResourceManager->FindMaterial("Objector_shield");
 
-        SetupMaterialInfo matInfo[4];
+        SetupMaterialInfo matInfo[2];
         matInfo[0].Index = 0;
         matInfo[0].pMaterialData = matPtr1;
         matInfo[1].Index = 1;
         matInfo[1].pMaterialData = matPtr2;
-        matInfo[2].Index = 2;
-        matInfo[2].pMaterialData = matPtr3;
-        matInfo[3].Index = 3;
-        matInfo[3].pMaterialData = matPtr4;
 
         CreateModelInfo model;
         model.pRenderer = m_pRenderer;
-        model.Path = "Resource/Model/fbx/Spider_3.fbx";
-        model.ObjTag = "Spider";
-        model.IsAnim = true;
-        model.MatNum = 4;
-        model.IsActive = false;
-
+        model.Path = "Resource/Model/Enemy/Octahedron/Octahedron.fbx";
+        model.ObjTag = "Octahedron";
+        model.IsAnim = false;
+        model.MatNum = 2;
+        model.IsActive = true;
         model.SetupMaterial = matInfo;
-
-        model.ShaderType = SHADER_TYPE::DEFERRED_STD_SKINNED_N;
+        model.ShaderType = SHADER_TYPE::DEFERRED_STD_STATIC;
         auto obj = MeshFactory::CreateModel(model);
-        obj->get_Component<SkinnedMeshAnimator>()->set_IsAnim(true);
-        obj->get_Component<MyTransform>()->set_Scale(0.5f, 0.5f, 0.5f);
-        obj->get_Component<MyTransform>()->set_Pos(0.0f, 0.0f, 0.0f);
+        obj->set_IsStatic(false);
+        obj->get_Component<MyTransform>()->set_Scale(1.0f, 1.0f, 1.0f);
+        obj->get_Component<MyTransform>()->set_Pos(-100.0f, 0.0f, 100);
         obj->get_Component<MyTransform>()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
     }
 

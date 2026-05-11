@@ -286,6 +286,15 @@
     <Filter Include="ソース ファイル\Game\Scene\Head">
       <UniqueIdentifier>{6b7b7f36-9bb9-44aa-9da9-e255c8167cae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Game\Component\Enemy\State_Octahedron">
+      <UniqueIdentifier>{658c3605-c934-40cf-bb95-dc162d12f607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Component\Enemy\State_Octahedron\Active">
+      <UniqueIdentifier>{c761bab5-39c9-41d6-b3aa-6b1082f5f60c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Component\Enemy\State_Octahedron\Patrol">
+      <UniqueIdentifier>{af5aab4e-de94-433f-8d16-db2081328e8f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Cpp\SHADER.cpp">
@@ -1186,6 +1195,9 @@
     </ClInclude>
     <ClInclude Include="Source\Header\Component_DecalRenderer.h">
       <Filter>ソース ファイル\BaseComponent\Mesh\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Octahedron_StateHeader.h">
+      <Filter>ソース ファイル\Game\Component\Enemy\State_Octahedron</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

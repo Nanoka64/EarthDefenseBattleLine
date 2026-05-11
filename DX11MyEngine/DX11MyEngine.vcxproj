@@ -287,6 +287,7 @@
     <ClInclude Include="Source\Header\ObjectFactory.h" />
     <ClInclude Include="Source\Header\ObjectPool.h" />
     <ClInclude Include="Source\Header\ObjectSelect.h" />
+    <ClInclude Include="Source\Header\Octahedron_StateHeader.h" />
     <ClInclude Include="Source\Header\RandomManager.h" />
     <ClInclude Include="Source\Header\RenderPipeline.h" />
     <ClInclude Include="Source\Header\IState.h" />
