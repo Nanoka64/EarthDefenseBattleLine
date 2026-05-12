@@ -957,6 +957,28 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
     return true;
 }
 
+
+//*---------------------------------------------------------------------------------------
+//*【?】三角形とレイの判定
+//*
+//* [引数]
+//* &_triangle : 三角形
+//* &_ray : レイ
+//* &_hitInfo : 衝突情報格納用
+//* [返値]
+//* true : 当たった
+//* false : 当たってない
+//*----------------------------------------------------------------------------------------
+bool CollisionManager::HitCheck_TraiangleVsRay(
+    const CollInData_Triangle& _triangle,
+    const CollInData_Ray& _ray,
+    class CollisionInfo* _hitInfo
+)
+{
+
+}
+
+
 //*---------------------------------------------------------------------------------------
 //*【?】スフィアとレイの判定
 //*

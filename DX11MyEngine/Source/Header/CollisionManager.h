@@ -34,6 +34,16 @@ struct CollInData_Segment
 };
 
 /// <summary>
+/// 三角形判定用
+/// </summary>
+struct CollInData_Triangle
+{
+	VECTOR3::VEC3 _v0;
+	VECTOR3::VEC3 _v1;
+	VECTOR3::VEC3 _v2;
+};
+
+/// <summary>
 /// 3D球判定
 /// </summary>
 struct CollInData_Sphere
@@ -168,14 +178,16 @@ public:
     //*****************************************************************************************
     //						 レイキャスト 
     //*****************************************************************************************
-    // 平面と線
+    // 平面とレイ
     bool HitCheck_PlaneVsRay(const CollInData_Plane& _plane, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo );
     
-    // 箱と線
+    // 箱とレイ
     bool HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo);
+    
+	// 三角形とレイ
+	bool HitCheck_TraiangleVsRay(const CollInData_Triangle& _triangle, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo);
 
-
-    // 球と線
+    // 球とレイ
     bool HitCheck_SphereVsRay(const CollInData_Sphere& _sphere, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo );
 
     // 平面と線分
