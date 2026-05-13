@@ -185,7 +185,7 @@ public:
     bool HitCheck_BoxVsRay(const CollInData_AABB& _box, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo);
     
 	// 三角形とレイ
-	bool HitCheck_TraiangleVsRay(const CollInData_Triangle& _triangle, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo);
+	bool HitCheck_TraiangleVsRay(const CollInData_Triangle& _triangle, const CollInData_Ray& _ray, float& u, float& v, float& t);
 
     // 球とレイ
     bool HitCheck_SphereVsRay(const CollInData_Sphere& _sphere, const CollInData_Ray& _ray, class CollisionInfo* _hitInfo );

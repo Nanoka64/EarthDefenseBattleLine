@@ -960,11 +960,13 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
 
 //*---------------------------------------------------------------------------------------
 //*【?】三角形とレイの判定
+//* 参考サイト：https://github.com/mitsuba-renderer/mitsuba/blob/450a2b8a258f09ec7e0824861e2306340ccbb3f4/include/mitsuba/core/triangle.h#L109
 //*
 //* [引数]
 //* &_triangle : 三角形
 //* &_ray : レイ
-//* &_hitInfo : 衝突情報格納用
+//* &_u , &_v : 三角形の面内座標（重心座標）
+//* &_t : レイの始点から衝突点までの距離
 //* [返値]
 //* true : 当たった
 //* false : 当たってない
@@ -972,10 +974,45 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
 bool CollisionManager::HitCheck_TraiangleVsRay(
     const CollInData_Triangle& _triangle,
     const CollInData_Ray& _ray,
-    class CollisionInfo* _hitInfo
+	float& _u, float& _v, float& _t
 )
 {
+    /* Find vectors for two edges sharing */
+    VEC3 edge1 = _triangle._v1 - _triangle._v0, edge2 = _triangle._v2 - _triangle._v0;
 
+    /* Begin calculating determinant - also used to calculate U parameter */
+    VEC3 pvec = VEC3::Cross(_ray._dir, edge2);
+
+    float det = VEC3::Dot(edge1, pvec);
+    if (det == 0) {
+        return false;
+    }
+    float inv_det = 1.0f / det;
+
+    /* Calculate distance from v[0] to ray origin */
+    VEC3 tvec = _ray._point - _triangle._v0;
+
+    /* Calculate U parameter and test bounds */
+    _u = VEC3::Dot(tvec, pvec) * inv_det;
+    if (_u < 0.0 || _u > 1.0) {
+        return false;
+    }
+
+    /* Prepare to test V parameter */
+    VEC3 qvec = VEC3::Cross(tvec, edge1);
+
+    /* Calculate V parameter and test bounds */
+    _v = VEC3::Dot(_ray._dir, qvec) * inv_det;
+
+    /* Inverted comparison (to catch NaNs) */
+    if (_v >= 0.0 && _u + _v <= 1.0) {
+        /* ray intersects triangle -> compute t */
+        _t = VEC3::Dot(edge2, qvec) * inv_det;
+
+        return true;
+    }
+
+    return false;
 }
 
 
