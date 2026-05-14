@@ -93,6 +93,7 @@ private:
     RENDER_PASS m_CrntRenderPass;   // 現在の描画パス
 
     class RenderPipeline *m_pRendererPipeline;      // 描画パイプラインの実体を持つ
+	CB_WINDOW_SET *m_pCBWindowSet;                  // ウインドウ情報の定数バッファセット
 public:
     RendererEngine();
     ~RendererEngine();

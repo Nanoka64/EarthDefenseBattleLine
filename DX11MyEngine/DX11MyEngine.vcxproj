@@ -195,6 +195,7 @@
     <ClInclude Include="Source\Header\Building_State.h" />
     <ClInclude Include="Source\Header\BulletManager.h" />
     <ClInclude Include="Source\Header\Component_ConfigSetting.h" />
+    <ClInclude Include="Source\Header\Component_DistortionEffect.h" />
     <ClInclude Include="Source\Header\Component_Item.h" />
     <ClInclude Include="Source\Header\CollisionManager.h" />
     <ClInclude Include="Source\Header\Component_BoxCollider.h" />
@@ -249,6 +250,7 @@
     <ClInclude Include="Source\Header\Component_WeaponBase.h" />
     <ClInclude Include="Source\Header\CompositeState.h" />
     <ClInclude Include="Source\Header\Component_GunWeapon.h" />
+    <ClInclude Include="Source\Header\ConstantBuffer.h" />
     <ClInclude Include="Source\Header\ConstantBuildingData.h" />
     <ClInclude Include="Source\Header\ConstantBulletData.h" />
     <ClInclude Include="Source\Header\ConstantEnemyData.h" />
@@ -378,6 +380,7 @@
     <ClCompile Include="Source\Cpp\Building_State.cpp" />
     <ClCompile Include="Source\Cpp\BulletManager.cpp" />
     <ClCompile Include="Source\Cpp\Component_ConfigSetting.cpp" />
+    <ClCompile Include="Source\Cpp\Component_DistortionEffect.cpp" />
     <ClCompile Include="Source\Cpp\Component_Item.cpp" />
     <ClCompile Include="Source\Cpp\c_Game_Config.cpp" />
     <ClCompile Include="Source\Cpp\c_Game_Manual.cpp" />
@@ -697,6 +700,16 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PSMain</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PSMain</EntryPointName>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Resource\CSO\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Resource\CSO\%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\Distortion_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PSMain</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PSMain</EntryPointName>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Resource\CSO\%(Filename).cso</ObjectFileOutput>

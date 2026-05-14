@@ -23,6 +23,7 @@ constexpr int CB_SLOT_POSTEFFECT = 8;	        // ポストエフェクト用
 constexpr int CB_SLOT_SHADOW = 9;	            // シャドウマップ用
 constexpr int CB_SLOT_SPRITE = 10;	            // スプライト用
 constexpr int CB_SLOT_DECAL = 11;	            // デカール用
+constexpr int CB_SLOT_WINDOW = 12;	            // ウインドウ情報用
 
 
 //=========================================================================================
@@ -260,6 +261,23 @@ struct CB_DECAL {
 struct CB_DECAL_SET {
     CB_DECAL Data = {};
     ID3D11Buffer *pBuff = nullptr;
+};
+
+
+//=========================================================================================
+//
+//						ウインドウ情報 - slot 12
+// 
+//=========================================================================================
+struct CB_WINDOW {
+	float WindowWidth;          // ウインドウ幅
+	float WindowHeight;         // ウインドウ高さ
+    float pad[2];
+};
+
+struct CB_WINDOW_SET {
+    CB_WINDOW Data = {};
+    ID3D11Buffer* pBuff = nullptr;
 };
 
 

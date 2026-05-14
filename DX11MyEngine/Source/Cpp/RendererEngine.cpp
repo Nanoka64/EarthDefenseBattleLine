@@ -9,6 +9,7 @@
 #include "RenderPipeline.h"
 #include "Component_3DCamera.h"
 #include "GameObject.h"
+#include "ConstantBuffer.h"
 #include <string>
 
 using namespace VECTOR2;

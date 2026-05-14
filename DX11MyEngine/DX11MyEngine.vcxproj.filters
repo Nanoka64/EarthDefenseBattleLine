@@ -295,6 +295,9 @@
     <Filter Include="ソース ファイル\Game\Component\Enemy\State_Octahedron\Patrol">
       <UniqueIdentifier>{af5aab4e-de94-433f-8d16-db2081328e8f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\BaseComponent\Effect">
+      <UniqueIdentifier>{7d07187a-6b47-4bc0-b449-0855f0bf640a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Cpp\SHADER.cpp">
@@ -753,6 +756,9 @@
     <ClCompile Include="Source\Cpp\Component_DecalRenderer.cpp">
       <Filter>ソース ファイル\BaseComponent\Mesh\Effect</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Cpp\Component_DistortionEffect.cpp">
+      <Filter>ソース ファイル\BaseComponent\Effect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Header\SHADER.h">
@@ -1199,6 +1205,12 @@
     <ClInclude Include="Source\Header\Octahedron_StateHeader.h">
       <Filter>ソース ファイル\Game\Component\Enemy\State_Octahedron</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Header\Component_DistortionEffect.h">
+      <Filter>ソース ファイル\BaseComponent\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ConstantBuffer.h">
+      <Filter>ソース ファイル\Tool\CBuff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Shader\ConstantBuffers_H.hlsli">
@@ -1301,6 +1313,9 @@
       <Filter>HLSL\PS\Foward</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\Sprite_NoTexture_PS.hlsl">
+      <Filter>HLSL\PS\Foward</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\Distortion_PS.hlsl">
       <Filter>HLSL\PS\Foward</Filter>
     </FxCompile>
   </ItemGroup>
