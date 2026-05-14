@@ -121,8 +121,8 @@ void c_Game_Pause::Draw(SceneManager* pOwner)
 	// âΩÇ‡ëIëÇ≥ÇÍÇƒñ≥Ç¢Ç∆Ç´Ç…ï\é¶
 	if (m_CrntSelectPauseState == PAUSE_ITEM::NONE)
 	{
-		float width = Master::m_pDataManager->get_ScreenWidth();
-		float height = Master::m_pDataManager->get_ScreenHeight();
+		float width = FLOAT_CAST(Master::m_pDataManager->get_ScreenWidth());
+		float height = FLOAT_CAST(Master::m_pDataManager->get_ScreenHeight());
 
 		Master::m_pDirectWriteManager->SetOutLine(3.0f, D2D1::ColorF(0.0f, 0.0f, 0.0f));
 		Master::m_pDirectWriteManager->DrawStringToAligment("ÇoÇÅÇïÇìÇÖ", VECTOR2::VEC2(0.0f, -250.0f), "White_40_STD", H_ALIGNMENT::CENTER, V_ALIGNMENT::CENTER, VEC2(width, height));

@@ -213,6 +213,29 @@ bool ShaderManager::Init(std::shared_ptr<RendererEngine> renderer)
         m_InputLayoutSetupDataList.push_back(layout[i]);
     }
 
+
+    /* 定数バッファの作成 */
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::TRANSFORM)]           = std::make_unique<ConstantBuffer<CB_TRANSFORM>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::VIEW)]                = std::make_unique<ConstantBuffer<CB_VIEW>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::PROJECTION)]          = std::make_unique<ConstantBuffer<CB_PROJECTION>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::BONE)]                = std::make_unique<ConstantBuffer<CB_BONES_DATA>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::MATERIAL)]            = std::make_unique<ConstantBuffer<CB_MATERIAL>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::DIRECTIONAL_LIGHT)]   = std::make_unique<ConstantBuffer<CB_DIRECTION_LIGHT>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::POINT_LIGHT)]         = std::make_unique<ConstantBuffer<CB_POINT_LIGHT>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::BLUR_WEIGHTS)]        = std::make_unique<ConstantBuffer<BlurInfo>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::POSTEFFECT)]          = std::make_unique<ConstantBuffer<DoFInfo>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::SHADOW)]              = std::make_unique<ConstantBuffer<ShadowInfo>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::SPRITE)]              = std::make_unique<ConstantBuffer<CB_SPRITE>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::DECAL)]               = std::make_unique<ConstantBuffer<CB_DECAL>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::WINDOW)]              = std::make_unique<ConstantBuffer<CB_WINDOW>>();
+    
+	auto device = m_pRenderer.lock()->get_Device();
+
+    for (auto &cb : m_ConstantBuffers)
+    {
+        cb->Setup(device);
+    }
+
     return true;
 }
 
@@ -280,14 +303,41 @@ void ShaderManager::NullSetAllShader()
     pContext->PSSetShader(nullptr, nullptr, 0);
 }
 
+//*---------------------------------------------------------------------------------------
+//*【?】定数バッファの更新＆セット
+//* 
+//* [引数]
+//* _type : 種類
+//* *_data : 定数バッファの内容
+//* _size : サイズ
+//* [返値] 
+//* なし
+//*----------------------------------------------------------------------------------------
+void ShaderManager::BindConstantBuffer(CONSTANT_BUFFER_TYPE _type, const void* _data, UINT _size)
+{
+    size_t index = static_cast<size_t>(_type);
+
+    auto pContext = m_pRenderer.lock().get()->get_DeviceContext();
+	m_ConstantBuffers[index]->UpdateRaw(pContext, _data, _size);
+    m_ConstantBuffers[index]->Bind(pContext, UINT_CAST(_type));
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】終了
+//*
+//* [引数] なし
+//* [返値] なし
+//*----------------------------------------------------------------------------------------
 void ShaderManager::Term()
 {
     m_ShaderList.clear();
     m_InputLayoutSetupDataList.clear();
+
+    for (int i = 0; i < m_ConstantBuffers.size(); i++)
+    {
+        m_ConstantBuffers[i]->Release();
+    }
 }
-
-
-
 
 /* ---------------------------------------------------------------------------------------
 /* - @:ShaderManager Class - 入力レイアウトの作成 - * - */

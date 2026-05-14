@@ -1211,6 +1211,9 @@
     <ClInclude Include="Source\Header\ConstantBuffer.h">
       <Filter>ソース ファイル\Tool\CBuff</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Header\IConstantBuffer.h">
+      <Filter>ソース ファイル\Tool\CBuff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Shader\ConstantBuffers_H.hlsli">

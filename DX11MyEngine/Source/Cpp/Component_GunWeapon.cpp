@@ -347,8 +347,6 @@ void GunWeapon::Fire(RendererEngine& renderer)
         //rad.y = (c_AngleH - 1.57f);
         //rad.z = 0.0f;
 
-        XMMATRIX mat;
-
         // ƒ[ƒ‹ƒh•ÏŠ·s—ñ‚©‚ç•ûŒü‚ð‚Æ‚é
         XMMATRIX worldMtx = transform->get_WorldMtx();
         DirectX::XMVECTOR scale;

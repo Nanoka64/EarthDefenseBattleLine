@@ -270,6 +270,7 @@
     <ClInclude Include="Source\Header\Gun_StateHeader.h" />
     <ClInclude Include="Source\Header\HierarchyWindow.h" />
     <ClInclude Include="Source\Header\HormingMove_Behaviour.h" />
+    <ClInclude Include="Source\Header\IConstantBuffer.h" />
     <ClInclude Include="Source\Header\IDX_BlendState.h" />
     <ClInclude Include="Source\Header\IMoveBehaviour.h" />
     <ClInclude Include="Source\Header\InspectorEditors.h" />

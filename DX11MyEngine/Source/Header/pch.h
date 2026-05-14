@@ -98,6 +98,8 @@ constexpr int DIRECTIONLIGHT_MAX_NUM	= 1;   // ディレクションライトの最大数
 #include "SHADER.h"					// シェーダ情報
 #include "Window.h"					// ウインドウ情報
 #include "Helper.h"					// ヘルパー
+#include "IDXResource.h"					// ヘルパー
+#include "ConstantBuffer.h"			// 定数バッファ用構造体
 #include "ConstantBufferStructs.h"	// 定数バッファ用構造体
 #include "Material.h"				// マテリアル
 #include "BitFlag.h"				// ビットフラグ関連
