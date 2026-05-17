@@ -38,7 +38,7 @@ void Root_TitleSceneState::OnEnter(SceneManager* pOwner)
 	UIData::SpriteUIData spriteData;
 	UIData::RectTransformData spriteRect;
 	// タイトルロゴのスプライト
-	spriteData._imagePath = "Resource/Texture/Title/Title_logo.png";
+	spriteData._imagePath = "Resource/Texture/Title/IA_TitleLogo.png";
 	spriteData._tag = "TitleLogo_Sp";
 	spriteData._layerRank = 100;
 	spriteRect._size = VEC2(width, height);

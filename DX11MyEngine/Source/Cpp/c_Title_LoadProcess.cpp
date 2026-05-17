@@ -82,7 +82,7 @@ void c_Title_LoadProcess::OnEnter(SceneManager *pOwner)
     rectData._size = VEC2(width, height);
 	UIData::SpriteUIData spriteData;
     spriteData._tag = "LoadSprite";
-    spriteData._imagePath = "Resource/Texture/Title/Load.png";
+    spriteData._imagePath = "Resource/Texture/Title/IA_Load.png";
     spriteData._layerRank = 101;
     m_pLoadBackObj = Master::m_pUIManager->GetSprite(*m_pRenderer, rectData, spriteData);
 }
