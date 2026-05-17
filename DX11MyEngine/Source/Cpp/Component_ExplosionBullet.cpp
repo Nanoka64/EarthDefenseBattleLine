@@ -16,7 +16,7 @@
 
 constexpr float DECAL_SIZE_FACTOR        = 100.0f;   // デカールの大きさの補正値
 constexpr float DECAL_Z_AXIS_SIZE_FACTOR = 0.0f;     // デカールの奥行に加算する補正値
-constexpr float DECAL_LIFE_TIME = 10.0f;             // デカールの生存時間
+constexpr float DECAL_LIFE_TIME = 1000.0f;             // デカールの生存時間
 constexpr float SHAKE_MAX_RANGE_EXPLOSION_SCALE_FACTOR = 15.0f; // カメラシェイク時、シェイクの最大距離を求める際に掛ける補正値
 constexpr float SHAKE_LENGTH_SCALE_FACTOR = 0.007f;             // カメラシェイク時、シェイクの大きさを求める際に掛ける補正値
 constexpr float SHAKEDURATION = 1.0f;                           // カメラシェイクの持続時間
@@ -121,14 +121,14 @@ void ExplosionBullet::Start(RendererEngine& renderer)
             scale.y = expSize;
             scale.z = expSize;
 
-            auto obj = MeshFactory::CreateDecal(decal);
-            obj->get_Component<DecalRenderer>()->Start(renderer);
-            obj->get_Transform().lock()->set_Pos(pos);
-            obj->get_Transform().lock()->set_Scale(scale);
-            obj->get_Transform().lock()->set_RotateToRad(angleX, angleY, angleZ);
-            obj->set_Tag("BulletHole");
-            auto timer = obj->add_Component<TimerDestruction>();
-            timer->set_LifeTime(DECAL_LIFE_TIME);  // 生存時間
+            //auto obj = MeshFactory::CreateDecal(decal);
+            //obj->get_Component<DecalRenderer>()->Start(renderer);
+            //obj->get_Transform().lock()->set_Pos(pos);
+            //obj->get_Transform().lock()->set_Scale(scale);
+            //obj->get_Transform().lock()->set_RotateToRad(angleX, angleY, angleZ);
+            //obj->set_Tag("BulletHole");
+            //auto timer = obj->add_Component<TimerDestruction>();
+            //timer->set_LifeTime(DECAL_LIFE_TIME);  // 生存時間
 
             // エフェクト
             VEC3 effectRot = VEC3(abs(angleX - 0.05f), angleY, 0.0f);
@@ -190,10 +190,25 @@ void ExplosionBullet::Update(RendererEngine &renderer)
     // 前回の位置として保持
     m_PrevPos = crntPos;  
 
-    // 移動
-    moveComp->Calculate(param); 
+    moveComp->set_MoveParam(param);	// 移動ロジックにパラメータを渡す
 
-	// 移動後の位置
+}
+
+
+//*---------------------------------------------------------------------------------------
+//*【?】遅延更新
+//*
+//* [引数]
+//* &renderer : 描画エンジンの参照
+//* [返値]なし
+//*----------------------------------------------------------------------------------------
+void ExplosionBullet::LateUpdate(RendererEngine& renderer)
+{
+    auto transform = m_pOwner.lock()->get_Transform().lock();
+    auto bulletParam = get_ExplosionParameter();
+
+
+    // 移動後の位置
     VEC3 newPos = transform->get_VEC3ToPos();
 
     // 射程距離外で削除
@@ -202,18 +217,18 @@ void ExplosionBullet::Update(RendererEngine &renderer)
         m_pOwner.lock()->clear_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);    // ノンアクティブに
     }
 
-	// レイキャストで衝突判定
+    // レイキャストで衝突判定
     CollInData_Ray ray;
-	ray._point = crntPos;
-	ray._dir = newPos - crntPos;    // 前回の位置から新しい位置へのベクトル
+	ray._point = m_PrevPos;           // 前回の位置からレイを飛ばす
+    ray._dir = newPos - m_PrevPos;    // 前回の位置から新しい位置へのベクトル
     unsigned mask = bulletParam->_collisionMask;
-	CollisionInfo hitInfo;
+    CollisionInfo hitInfo;
 
     if (Master::m_pCollisionManager->CheckRaycast(ray, mask, &hitInfo))
     {
         auto owner = m_pOwner.lock();
         auto transform = owner->get_Transform().lock();
-        transform->set_Pos(crntPos + (hitInfo.get_HitNormal() * 1.0f));     // 衝突位置に合わせる
+        transform->set_Pos(m_PrevPos + (hitInfo.get_HitNormal() * 1.0f));     // 衝突位置に合わせる
 
         // 衝突処理
         if (m_CollisionTask)
@@ -225,7 +240,7 @@ void ExplosionBullet::Update(RendererEngine &renderer)
 
         VEC3 pos = transform->get_VEC3ToPos();
 
-        unsigned mask = bulletParam->_collisionMask;;   
+        unsigned mask = bulletParam->_collisionMask;;
 
         // 範囲内チェック
         auto targets = Master::m_pCollisionManager->CheckSphere(pos, bulletParam->_explosionRadius, mask);

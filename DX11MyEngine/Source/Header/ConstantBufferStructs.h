@@ -82,9 +82,10 @@ struct CB_PROJECTION_SET
 //						スキニング用ボーン行列 - slot 3
 // 
 //=========================================================================================
+constexpr int MAX_BONES = 128; // ボーンの最大数（必要に応じて変更）
 struct CB_BONES_DATA
 {
-    DirectX::XMFLOAT4X4 BonesMatrices[128];   
+    DirectX::XMFLOAT4X4 BonesMatrices[MAX_BONES];
 };
 
 struct CB_BONES_DATA_SET
@@ -124,24 +125,38 @@ struct CB_MATERIAL_SET {
 //						ディレクションライト情報 - slot 5
 // 
 //=========================================================================================
-struct CB_DIRECTION_LIGHT
+struct CB_DirectionLightData
 {
     DirectX::XMFLOAT3 Direction;    // 方向
     float Padding;
-    
     DirectX::XMFLOAT3 DiffuseColor; // ディフューズ色
     float DiffuseIntensity;         // ディフューズ光度
-
     DirectX::XMFLOAT3 SpecularColor;// スペキュラ色
     float SpecularIntensity;        // スペキュラ強度
 
     // ライトから見た画面座標
     DirectX::XMFLOAT4X4 LightViewProj;
 
-    //DirectX::XMFLOAT3 LightPos; // ライトの位置（シャドウマップ用）
-    //float Padding3;
+};
 
-    // TODO:ここに置くと色々ずれるので場所変える
+struct CB_DIRECTION_LIGHT
+{
+    //DirectX::XMFLOAT3 Direction;    // 方向
+    //float Padding;
+    //
+    //DirectX::XMFLOAT3 DiffuseColor; // ディフューズ色
+    //float DiffuseIntensity;         // ディフューズ光度
+
+    //DirectX::XMFLOAT3 SpecularColor;// スペキュラ色
+    //float SpecularIntensity;        // スペキュラ強度
+
+    //// ライトから見た画面座標
+    //DirectX::XMFLOAT4X4 LightViewProj;
+
+    ////DirectX::XMFLOAT3 LightPos; // ライトの位置（シャドウマップ用）
+    ////float Padding3;
+
+	CB_DirectionLightData Lights[DIRECTIONLIGHT_MAX_NUM];   // 今のところは1個しか使わないけど、複数のライトに対応できるように配列にしている
     DirectX::XMFLOAT3 EyePos;       // 視点の位置
     float Padding2;
 };
@@ -176,10 +191,9 @@ struct CB_PointLightData
 
 struct CB_POINT_LIGHT
 {
-    CB_PointLightData Lights[POINTLIGHT_MAX_NUM]; // 50個
-    unsigned LightCount;                       // 使用するライトの個数
+    CB_PointLightData Lights[POINTLIGHT_MAX_NUM]; // 100個
+    unsigned LightCount;                          // 使用するライトの個数
     float Padding[3];
-
 };
 
 /// <summary>
@@ -188,7 +202,7 @@ struct CB_POINT_LIGHT
 /// </summary>
 struct CB_POINT_LIGHT_SET
 {
-    CB_POINT_LIGHT Data; // 50個
+    CB_POINT_LIGHT Data; 
     ID3D11Buffer* pBuff = nullptr;
 };
 
@@ -198,7 +212,7 @@ struct CB_POINT_LIGHT_SET
 //						ブラー情報 - slot 7 
 // 
 //=========================================================================================
-struct BlurInfo
+struct CB_BLUR
 {
 	float weights[8];  // ブラーの重み
 };
@@ -209,7 +223,7 @@ struct BlurInfo
 // 
 //=========================================================================================
 // 被写界深度情報
-struct DoFInfo {
+struct CB_DOF {
     float dof_MaxRange; // ぼかしの最大距離
     float dof_MinRange; // ぼかしの開始距離
 
@@ -221,7 +235,7 @@ struct DoFInfo {
 //						シャドウ情報 - slot 9
 // 
 //=========================================================================================
-struct ShadowInfo
+struct CB_SHADOW
 {
     float baseShadowBias;
     float slopeScaledBias;

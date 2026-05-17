@@ -93,7 +93,7 @@ int Ant_AT_TrackingState::Update(class EnemyController *pOwner)
 		movePram._turnSpeed = 0.1f;
 		movePram._targetPos = targetPos;
 		auto move = pOwner->get_MoveLogicComponent().lock();
-		move->Calculate(movePram);
+		move->set_MoveParam(movePram);	// 移動ロジックにパラメータを渡す
 
 		
 		//=========================================================================================

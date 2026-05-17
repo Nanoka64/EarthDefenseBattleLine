@@ -17,17 +17,19 @@
 class MoveLogic : public IComponent
 {
 private:
-    std::unordered_map<UtilityData::MOVE_BEHAVIOUR_TYPE, std::unique_ptr<IMoveBehaviour>> m_pMoveBehaviourMap;    // 移動挙動のマップ
+    std::array<std::unique_ptr<IMoveBehaviour>, static_cast<size_t>(UtilityData::MOVE_BEHAVIOUR_TYPE::NUM)> m_pMoveBehaviourMap;    // 移動挙動のマップ
     IMoveBehaviour *m_pMoveBehaviour = nullptr;	// 現在の移動挙動
     VECTOR3::VEC3 m_CrntMoveVelocity;           // 現在の移動ベクトル
     float m_GravityVelocity;
+	MoveParam m_MoveParam;                      // 移動パラメータ
 
 public:
     MoveLogic(std::weak_ptr<GameObject> pOwner, int updateRank = 100);
     ~MoveLogic();
 
     void Start(RendererEngine &renderer) override;		// 初期化
-    void Calculate(const struct MoveParam& _param);		    // 移動処理
+    void Update(RendererEngine &renderer) override;		// 更新
+	void set_MoveParam(const MoveParam& _param) { m_MoveParam = _param; }	// 移動パラメータの設定
 
     /// <summary>
     /// パラメータのリセット
@@ -45,5 +47,8 @@ public:
     /// </summary>
     /// <param name="_type">変更する移動挙動の種類</param>
     void ChangeBehaviour(UtilityData::MOVE_BEHAVIOUR_TYPE _type);
+
+private:
+    void Calculate(const struct MoveParam& _param);		    // 移動処理
 };
 

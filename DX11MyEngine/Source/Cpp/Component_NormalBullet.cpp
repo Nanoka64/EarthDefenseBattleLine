@@ -213,11 +213,24 @@ void NormalBullet::Update(RendererEngine &renderer)
     param._moveSpeed = m_pWeaponData->_speed;
     param._gravity = m_pWeaponData->_gravityScale;
 
-    m_PrevPos = crntPos;
+	m_PrevPos = crntPos;    // 前回の位置を更新
 
 	// 移動処理
-    moveComp->Calculate(param);
+    moveComp->set_MoveParam(param);	// 移動ロジックにパラメータを渡す
 
+}
+
+//*---------------------------------------------------------------------------------------
+//*【?】遅延更新
+//*
+//* [引数]
+//* &renderer : 描画エンジンの参照
+//* [返値]なし
+//*----------------------------------------------------------------------------------------
+void NormalBullet::LateUpdate(RendererEngine& renderer)
+{
+    auto transform = m_pOwner.lock()->get_Transform().lock();
+    
     // 移動後の位置
     VEC3 newPos = transform->get_VEC3ToPos();
 
@@ -228,8 +241,8 @@ void NormalBullet::Update(RendererEngine &renderer)
     }
     // レイキャストで衝突判定（コライダーの衝突処理をこっちに移動）
     CollInData_Ray ray;
-    ray._point = crntPos;
-	ray._dir = newPos - crntPos;    // 前回の位置から新しい位置へのベクトル
+	ray._point = m_PrevPos;           // 前回の位置からレイを飛ばす
+    ray._dir = newPos - m_PrevPos;    // 前回の位置から新しい位置へのベクトル
     unsigned mask = m_pWeaponData->_collisionMask;
     CollisionInfo hitInfo;
 
@@ -244,9 +257,9 @@ void NormalBullet::Update(RendererEngine &renderer)
         {
             m_CollisionTask(hitInfo);
         }
-
     }
 }
+
 
 //*---------------------------------------------------------------------------------------
 //*【?】衝突処理

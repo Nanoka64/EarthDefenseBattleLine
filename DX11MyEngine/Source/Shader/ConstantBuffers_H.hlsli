@@ -197,7 +197,7 @@ cbuffer CB_DECAL : register(b11)
 //* =========================================================================
 //*- @:ウインドウ用データ -            >>>>>>>【１２】
 //* =========================================================================
-cbuffer CB_DECAL : register(b11)
+cbuffer CB_WINDOW : register(b12)
 {
     float cb_WindowWidth; // ウインドウの幅
     float cb_WindowHeight; // ウインドウの高さ

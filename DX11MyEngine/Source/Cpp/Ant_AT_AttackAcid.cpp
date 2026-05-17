@@ -73,7 +73,7 @@ int Ant_AT_AttackAcidState::Update(class EnemyController* pOwner)
 		movePram._turnSpeed = 0.5f;
 		movePram._targetPos = targetPos;		
 		auto move = pOwner->get_MoveLogicComponent().lock();
-		move->Calculate(movePram);
+		move->set_MoveParam(movePram);	// 移動ロジックにパラメータを渡す
 
 		/* 硬直時間を終えたら、攻撃 */
 		if (pOwner->get_StateTimer() > m_PreAttackStunDuration)

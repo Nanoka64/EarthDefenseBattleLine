@@ -19,8 +19,8 @@ m_AnimationTime(0.0),
 m_CurrentAnimIndex(-1),
 m_IsAnimationFlag(false),
 m_AnimProcTime(0.0),
-m_ShadowAnimProcTime(0.0),
-m_ConstanrBufferBonesData(nullptr)
+m_ShadowAnimProcTime(0.0)/*,
+m_ConstanrBufferBonesData(nullptr)*/
 {
     this->set_Tag("SkinnedMeshAnimator");
 }
@@ -44,7 +44,7 @@ void SkinnedMeshAnimator::Start(RendererEngine &renderer)
     m_BoneList      = m_pMeshResource.lock()->get_ModelData().lock()->get_BoneList();
     m_BoneIndexMap  = m_pMeshResource.lock()->get_ModelData().lock()->get_BoneIndexMap();
     m_Animations    = m_pMeshResource.lock()->get_ModelData().lock()->get_Animations();
-    m_ConstanrBufferBonesData = m_pMeshResource.lock()->get_ModelData().lock()->GetConstantBufferBonesData();
+    //m_ConstanrBufferBonesData = m_pMeshResource.lock()->get_ModelData().lock()->GetConstantBufferBonesData();
 }
 
 //*---------------------------------------------------------------------------------------
@@ -102,28 +102,34 @@ void SkinnedMeshAnimator::Draw(RendererEngine &renderer)
 
     auto pContext = renderer.get_DeviceContext();
 
+    //auto bonesData = m_pMeshResource.lock()->get_ModelData().lock()->get_BonesData();
+
+    CB_BONES_DATA bonesData = {};
+
     // 定数バッファに詰め込む
-    for (size_t i = 0; i < ARRAYSIZE(m_ConstanrBufferBonesData->Data.BonesMatrices); i++)
+    for (size_t i = 0; i < MAX_BONES; i++)
     {
         if (m_BoneList.size() <= i)break;
-        m_ConstanrBufferBonesData->Data.BonesMatrices[i] = m_BoneList[i].FinalTransformation;
+        bonesData.BonesMatrices[i] = m_BoneList[i].FinalTransformation;
     }
 
     // モデルシェーダに切り替え
     Master::m_pShaderManager->DeviceToSetShader(m_pMeshResource.lock()->get_ModelData().lock()->get_ShaderType());
 
-    // 定数バッファ更新
-    pContext->UpdateSubresource(
-        m_ConstanrBufferBonesData->pBuff,
-        0,
-        nullptr,
-        &m_ConstanrBufferBonesData->Data,
-        0,
-        0
-    );
+	Master::m_pShaderManager->BindConstantBuffer(CONSTANT_BUFFER_TYPE::BONE, (void*)&bonesData, sizeof(CB_BONES_DATA));
 
-    // ボーン変換用の定数バッファの更新＆セット
-    pContext->VSSetConstantBuffers(3, 1, &m_ConstanrBufferBonesData->pBuff);
+    //// 定数バッファ更新
+    //pContext->UpdateSubresource(
+    //    m_ConstanrBufferBonesData->pBuff,
+    //    0,
+    //    nullptr,
+    //    &m_ConstanrBufferBonesData->Data,
+    //    0,
+    //    0
+    //);
+
+    //// ボーン変換用の定数バッファの更新＆セット
+    //pContext->VSSetConstantBuffers(3, 1, &m_ConstanrBufferBonesData->pBuff);
 }
 
 

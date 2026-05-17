@@ -21,6 +21,7 @@ public:
 
 	void Start(RendererEngine &renderer) override;		// 初期化
 	void Update(RendererEngine &renderer) override;		// 更新処理
+	void LateUpdate(RendererEngine &renderer) override;		// 更新処理
 
 	void OnTriggerEnter(const class CollisionInfo &other);		//　衝突時の処理
 	const BulletData::ExplosionBulletData* get_ExplosionParameter()const;					// パラメータの取得

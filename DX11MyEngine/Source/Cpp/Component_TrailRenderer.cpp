@@ -25,6 +25,9 @@ TrailRenderer::TrailRenderer(std::weak_ptr<GameObject> pOwner, int updateRank)
 	m_Color(VEC4(1.0f, 1.0f, 1.0f,1.0f))
 {
 	this->set_Tag("TrailRenderer");
+
+
+	m_pTex = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Particle/Acid.png");
 }
 
 
@@ -60,7 +63,6 @@ void TrailRenderer::Start(RendererEngine &renderer)
 		return;
 	}
 	//m_pTex = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/rust_coarse_01_arm_1k.jpg");
-	m_pTex = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/Particle/Acid.png");
 }
 
 
@@ -269,26 +271,35 @@ void TrailRenderer::ConstantBufferUpdate(RendererEngine& renderer)
 {
 	auto pContext = renderer.get_DeviceContext();
 
-	if (m_pCBMaterialDataSet == nullptr)return;
+	CB_MATERIAL cbMaterial{};
+	cbMaterial.Diffuse = m_Color;
+	cbMaterial.EmissivePower = m_EmissivePower;
+	cbMaterial.EmissiveColor = VEC3(m_Color.x, m_Color.y, m_Color.z);
+	cbMaterial.Specular = VEC4(1.0f, 1.0f, 1.0f, 0.1f);
+	cbMaterial.SpecularPower = 100.0f;
+	Master::m_pShaderManager->BindConstantBuffer(CONSTANT_BUFFER_TYPE::MATERIAL, (void*)&cbMaterial, sizeof(CB_MATERIAL));
 
-	// GPUメモリにアクセス
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	pContext->Map(m_pCBMaterialDataSet->pBuff, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
-	m_pCBMaterialDataSet->Data.Diffuse		 = m_Color;
-	m_pCBMaterialDataSet->Data.EmissivePower = m_EmissivePower;
-	m_pCBMaterialDataSet->Data.EmissiveColor = VEC3(m_Color.x, m_Color.y, m_Color.z);
-	m_pCBMaterialDataSet->Data.Specular		 = VEC4(1.0f, 1.0f, 1.0f, 0.1f);
-	m_pCBMaterialDataSet->Data.SpecularPower = 100.0f;
+	//if (m_pCBMaterialDataSet == nullptr)return;
 
-	// データのコピー 
-	memcpy(mappedResource.pData, &m_pCBMaterialDataSet->Data, sizeof(CB_MATERIAL));
+	//// GPUメモリにアクセス
+	//D3D11_MAPPED_SUBRESOURCE mappedResource;
+	//pContext->Map(m_pCBMaterialDataSet->pBuff, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
-	// アクセス終了
-	pContext->Unmap(m_pCBMaterialDataSet->pBuff, 0);
+	//m_pCBMaterialDataSet->Data.Diffuse		 = m_Color;
+	//m_pCBMaterialDataSet->Data.EmissivePower = m_EmissivePower;
+	//m_pCBMaterialDataSet->Data.EmissiveColor = VEC3(m_Color.x, m_Color.y, m_Color.z);
+	//m_pCBMaterialDataSet->Data.Specular		 = VEC4(1.0f, 1.0f, 1.0f, 0.1f);
+	//m_pCBMaterialDataSet->Data.SpecularPower = 100.0f;
 
-	// 定数バッファへ送信
-	pContext->PSSetConstantBuffers(4,1, &m_pCBMaterialDataSet->pBuff);
+	//// データのコピー 
+	//memcpy(mappedResource.pData, &m_pCBMaterialDataSet->Data, sizeof(CB_MATERIAL));
+
+	//// アクセス終了
+	//pContext->Unmap(m_pCBMaterialDataSet->pBuff, 0);
+
+	//// 定数バッファへ送信
+	//pContext->PSSetConstantBuffers(4,1, &m_pCBMaterialDataSet->pBuff);
 
 	ID3D11ShaderResourceView* tex = nullptr;
 	tex = m_pTex->get_SRV();

@@ -817,7 +817,7 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
     float tx_Min = 0.0f;
     float tx_Max = 0.0f;
     // 線分ベクトルが0.0（平行）の場合
-    if (dir.x == 0.0f) 
+    if (std::abs(dir.x) <= 1e-6f)
     {
         // 線分のZ幅がボックスのZ幅に入ってなければ、衝突していない
         if (point.x < minV.x || point.x > maxV.x)
@@ -858,7 +858,7 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
     float ty_Min = 0.0f;
     float ty_Max = 0.0f;
     // 線分ベクトルが0.0（平行）の場合
-    if (dir.y == 0.0f) {
+    if (std::abs(dir.y) <= 1e-6f) {
 
 		// 線分のY幅がボックスのY幅に入ってなければ、衝突していない
         if (point.y < minV.y || point.y > maxV.y)
@@ -906,7 +906,7 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
     float tz_Min = 0.0f;
     float tz_Max = 0.0f;
     // 線分ベクトルが0.0の場合
-    if (dir.z == 0.0f) {
+    if (std::abs(dir.z) <= 1e-6f) {
         if (point.z < minV.z || point.z > maxV.z)
         {
             return false;
@@ -949,7 +949,6 @@ bool CollisionManager::HitCheck_BoxVsRay(const CollInData_AABB& _box, const Coll
     if (t_Min > 1.0f || t_Max < 0.0f) {
         return false;
     }
-
 
     _hitInfo->set_HitPoint(point + dir * t_Min);
     _hitInfo->set_HitNormal(hitNnormal);

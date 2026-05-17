@@ -27,7 +27,7 @@ class SkinnedMeshAnimator : public IComponent
 private:
 	std::weak_ptr<class ModelMeshResource> m_pMeshResource;	// メッシュ情報を持つ
 
-	CB_BONES_DATA_SET *m_ConstanrBufferBonesData;			// ボーン変換用定数バッファ
+	//CB_BONES_DATA_SET *m_ConstanrBufferBonesData;			// ボーン変換用定数バッファ
 
 	/***********アニメーション関連***********/
 	std::vector<BoneInfo> m_BoneList;				     // ボーンリスト

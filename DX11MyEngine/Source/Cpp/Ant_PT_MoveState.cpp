@@ -131,8 +131,8 @@ int Ant_PT_MoveState::Update(class EnemyController* pOwner)
 		movePram._turnSpeed = 0.05f;	// ‹}‚ÉU‚èŒü‚­‚Æ•Ï‚È‚Ì‚ÅA­‚µ—D‚µ‚ß‚É
 		movePram._moveDirection = m_MoveDir;
 		auto move = pOwner->get_MoveLogicComponent().lock();
-		move->Calculate(movePram);
-		
+		move->set_MoveParam(movePram);	// ˆÚ“®ƒƒWƒbƒN‚Éƒpƒ‰ƒ[ƒ^‚ð“n‚·
+
 
 		// •Ç‚Ì‚Ú‚è
 		//VEC3 myForward = myTransform->get_Forward();

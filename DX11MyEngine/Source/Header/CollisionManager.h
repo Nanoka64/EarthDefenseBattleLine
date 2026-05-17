@@ -67,7 +67,7 @@ struct CollInData_AABB
 struct CollInData_Plane
 {
     VECTOR3::VEC3 _point;   // ”CˆÓ‚Ì“_
-    VECTOR3::VEC3 _norm;    // •½–Ê‚Ì–@ü
+    VECTOR3::VEC3 _norm;    // –@ü
 };
 
 /// <summary>

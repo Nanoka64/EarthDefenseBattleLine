@@ -60,7 +60,7 @@ void DirectionalLight::Update(RendererEngine &renderer)
 {
     auto pContext = renderer.get_DeviceContext();
 
-	CB_DIRECTION_LIGHT dirData{};
+	CB_DirectionLightData dirData{};
 	
 	// トランスフォームの取得
 	auto transform = m_pOwner.lock()->get_Transform().lock();

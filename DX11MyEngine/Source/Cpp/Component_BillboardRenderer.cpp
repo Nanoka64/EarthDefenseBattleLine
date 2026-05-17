@@ -77,10 +77,13 @@ void BillboardRenderer::Draw(RendererEngine& renderer)
     auto pContext = renderer.get_DeviceContext();
 	auto resourcePtr = m_pResource.lock();
     std::shared_ptr<MeshResourceData> meshData = resourcePtr->m_pMeshData;
-    CB_TRANSFORM_SET* cbTransSet = resourcePtr->m_pCBTransformSet;
-    CB_MATERIAL_SET* cbMatSet = resourcePtr->m_pCBMaterialDataSet;
+    //CB_TRANSFORM_SET* cbTransSet = resourcePtr->m_pCBTransformSet;
+    //CB_MATERIAL_SET* cbMatSet = resourcePtr->m_pCBMaterialDataSet;
     ID3D11Buffer* vtxBuff = meshData->pVertexBuffer;
     ID3D11Buffer* idxBuff = meshData->pIndexBuffer;
+    CB_MATERIAL cbMaterial{};
+	CB_TRANSFORM cbTransform{};
+
 
     std::shared_ptr<MyTransform> transform = m_pOwner.lock()->get_Transform().lock();
 
@@ -123,41 +126,19 @@ void BillboardRenderer::Draw(RendererEngine& renderer)
         );
 
     XMMATRIX mtx = XMMatrixTranspose(worldMtx);        // 行列の転置
-    XMStoreFloat4x4(&cbTransSet->Data.WorldMtx, mtx);  // XMMATRIX → XMFLOAT4X4変換
-    
-    // 定数バッファに転送
-    pContext->UpdateSubresource(
-        cbTransSet->pBuff,
-        0,
-        nullptr,
-        &cbTransSet->Data,
-        0,
-        0
-    );
+    XMStoreFloat4x4(&cbTransform.WorldMtx, mtx);  // XMMATRIX → XMFLOAT4X4変換
 
     auto pMatData = meshData->pMaterials.lock();
 
     // マテリアル情報セット ==========================
-    CB_MATERIAL mat{};
-    mat.Diffuse = pMatData->m_DiffuseColor;
-    mat.Specular = pMatData->m_SpecularColor;
-    mat.SpecularPower = pMatData->m_SpecularPower;
-    cbMatSet->Data = mat;
+    cbMaterial.Diffuse = pMatData->m_DiffuseColor;
+    cbMaterial.Specular = pMatData->m_SpecularColor;
+    cbMaterial.SpecularPower = pMatData->m_SpecularPower;
 
-    // 定数バッファに転送
-    pContext->UpdateSubresource(
-        cbMatSet->pBuff,
-        0,
-        nullptr,
-        &cbMatSet->Data,
-        0,
-        0
-    );
 
     // 定数バッファをセット ==========================
-    pContext->VSSetConstantBuffers(0, 1, &cbTransSet->pBuff);
-    pContext->PSSetConstantBuffers(4, 1, &cbMatSet->pBuff);
-    //pContext->PSSetConstantBuffers(0, 1, &m_pCB3DObjectSet->pBuff);
+    Master::m_pShaderManager->BindConstantBuffer(CONSTANT_BUFFER_TYPE::TRANSFORM, (void*)&cbTransform, sizeof(CB_TRANSFORM));
+    Master::m_pShaderManager->BindConstantBuffer(CONSTANT_BUFFER_TYPE::MATERIAL, (void*)&cbMaterial, sizeof(CB_MATERIAL));
 
 
     // テクスチャセット ==========================

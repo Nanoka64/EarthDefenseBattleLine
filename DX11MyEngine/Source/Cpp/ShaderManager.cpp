@@ -214,6 +214,24 @@ bool ShaderManager::Init(std::shared_ptr<RendererEngine> renderer)
     }
 
 
+	// 定数バッファの使用方法定義
+    D3D11_USAGE usages[UINT_CAST(CONSTANT_BUFFER_TYPE::NUM)] =
+    {
+        D3D11_USAGE_DYNAMIC,  // TRANSFORM
+        D3D11_USAGE_DYNAMIC,  // VIEW
+        D3D11_USAGE_DYNAMIC,  // PROJECTION
+        D3D11_USAGE_DYNAMIC,  // BONE
+        D3D11_USAGE_DYNAMIC,  // MATERIAL
+        D3D11_USAGE_DYNAMIC,  // DIRECTIONAL_LIGHT
+        D3D11_USAGE_DYNAMIC,  // POINT_LIGHT
+		D3D11_USAGE_DYNAMIC,  // BLUR_WEIGHTS
+		D3D11_USAGE_DYNAMIC,  // POSTEFFECT
+        D3D11_USAGE_DYNAMIC,  // SHADOW
+        D3D11_USAGE_DYNAMIC,  // SPRITE
+        D3D11_USAGE_DYNAMIC,  // DECAL
+        D3D11_USAGE_DEFAULT,  // WINDOW
+    };
+
     /* 定数バッファの作成 */
 	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::TRANSFORM)]           = std::make_unique<ConstantBuffer<CB_TRANSFORM>>();
 	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::VIEW)]                = std::make_unique<ConstantBuffer<CB_VIEW>>();
@@ -222,18 +240,20 @@ bool ShaderManager::Init(std::shared_ptr<RendererEngine> renderer)
 	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::MATERIAL)]            = std::make_unique<ConstantBuffer<CB_MATERIAL>>();
 	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::DIRECTIONAL_LIGHT)]   = std::make_unique<ConstantBuffer<CB_DIRECTION_LIGHT>>();
 	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::POINT_LIGHT)]         = std::make_unique<ConstantBuffer<CB_POINT_LIGHT>>();
-	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::BLUR_WEIGHTS)]        = std::make_unique<ConstantBuffer<BlurInfo>>();
-	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::POSTEFFECT)]          = std::make_unique<ConstantBuffer<DoFInfo>>();
-	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::SHADOW)]              = std::make_unique<ConstantBuffer<ShadowInfo>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::BLUR_WEIGHTS)]        = std::make_unique<ConstantBuffer<CB_BLUR>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::POSTEFFECT)]          = std::make_unique<ConstantBuffer<CB_DOF>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::SHADOW)]              = std::make_unique<ConstantBuffer<CB_SHADOW>>();
 	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::SPRITE)]              = std::make_unique<ConstantBuffer<CB_SPRITE>>();
 	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::DECAL)]               = std::make_unique<ConstantBuffer<CB_DECAL>>();
 	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::WINDOW)]              = std::make_unique<ConstantBuffer<CB_WINDOW>>();
     
 	auto device = m_pRenderer.lock()->get_Device();
 
+    int slot = 0;
     for (auto &cb : m_ConstantBuffers)
     {
-        cb->Setup(device);
+        cb->Setup(device, usages[slot]);
+        slot++;
     }
 
     return true;

@@ -53,10 +53,10 @@ private:
     std::shared_ptr<class SpriteRenderer> m_pFinalSceneToneMappingFilter_Sprite;
 
 
-    DoFInfo m_DofData;
+    CB_DOF m_DofData;
 
     // シャドウバイアス情報
-    ShadowInfo m_ShadowData;
+    CB_SHADOW m_ShadowData;
 
 
     // ビューポートの設定時にスムーズに渡す用
