@@ -360,6 +360,52 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         Master::m_pCollisionManager->RegisterCollider(collider);
     }
 
+    {
+        // マテリアル取得
+        auto matPtr = Master::m_pResourceManager->FindMaterial("MuzzleFlash_1");
+        auto matPtr2 = Master::m_pResourceManager->FindMaterial("MuzzleFlash_2");
+        //auto matPtr = Master::m_pResourceManager->FindMaterial("PointLight");
+
+        SetupMaterialInfo matInfo[1];
+        matInfo[0].Index = 0;
+        matInfo[0].pMaterialData = matPtr;
+
+        CreateUtilityMeshInfo mesh;
+        mesh.pRenderer = m_pRenderer;
+        mesh.Type = UTILITY_MESH_TYPE::QUAD;
+        mesh.ObjTag = "MuzzleFlash_1";
+        mesh.MatNum = 1;
+        mesh.MaterialData = matInfo;
+        mesh.ShaderType = SHADER_TYPE::FORWARD_UNLIT_STATIC;
+        mesh.IsNormalMap = false;
+		mesh.IsTransparent = true;
+        mesh.ObjLayer = 90;
+
+        auto obj = MeshFactory::CreateUtilityMesh(mesh);
+        obj->get_Transform().lock()->set_Scale(10.0f, 10.0f, 10.0f);
+        obj->get_Transform().lock()->set_Pos(-150.0f, 0.0f, 100.0f);
+        obj->get_Transform().lock()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
+
+
+        SetupMaterialInfo matInfo2[1];
+        matInfo2[0].Index = 0;
+        matInfo2[0].pMaterialData = matPtr2;
+
+        mesh.pRenderer = m_pRenderer;
+        mesh.Type = UTILITY_MESH_TYPE::QUAD;
+        mesh.ObjTag = "MuzzleFlash_2";
+        mesh.MatNum = 1;
+        mesh.MaterialData = matInfo2;
+        mesh.ShaderType = SHADER_TYPE::FORWARD_UNLIT_STATIC;
+        mesh.IsTransparent = true;
+        mesh.ObjLayer = 90;
+
+        obj = MeshFactory::CreateUtilityMesh(mesh);
+        obj->get_Transform().lock()->set_Scale(10.0f, 10.0f, 10.0f);
+        obj->get_Transform().lock()->set_Pos(-150.0f, 0.0f, 100.0f);
+        obj->get_Transform().lock()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
+    }
+
     /* スカイボックスの生成 */
     {
         // マテリアル取得

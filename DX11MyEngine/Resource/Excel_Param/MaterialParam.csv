@@ -34,3 +34,5 @@ Acid_02,5,1,1,1,1,1,1,1,100,5,0,0,1,Resource/Texture/Particle/Ant_Hit1.png,Resou
 Flame_01,10,1,1,1,1,1,1,1,100,10,0,0,10,Resource/Texture/Particle/Flame1.png,-1,-1,1
 Objector_body,0,1,0,1,1,1,1,1,100,0,1,0,3,Resource/Model/Enemy/Octahedron/textures/shieldSurface.jpg,-1,-1,1
 Objector_shield,1,1,1,1,1,1,1,1,100,0,0,0,0,Resource/Model/Enemy/Octahedron/textures/shieldSurface.jpg,-1,-1,1
+MuzzleFlash_1,1,1,1,1,1,1,1,1,100,0,0,0,0,Resource/Texture/Particle/MazzleFrash1.png,-1,-1,1
+MuzzleFlash_2,1,1,1,1,1,1,1,1,100,0,0,0,0,Resource/Texture/Particle/MazzleFrash2.png,-1,-1,1

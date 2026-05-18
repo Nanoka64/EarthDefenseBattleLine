@@ -127,6 +127,14 @@ void MeshRenderer::Draw(RendererEngine& renderer)
         Master::m_pShaderManager->BindConstantBuffer(CONSTANT_BUFFER_TYPE::TRANSFORM, (void*)&cbTransform, sizeof(CB_TRANSFORM));
     }
 
+
+    //カリング設定 ==========================
+    renderer.RegisterCullMode(meshInfo->CullMode);
+
+    //ブレンドステート設定 ==========================
+    Master::m_pBlendManager->DeviceToSetBlendState(meshInfo->pMaterials.lock()->m_BlendMode);
+
+
     // 頂点＆インデックスバッファ設定 ==========================
     UINT offset = 0;
     pContext->IASetVertexBuffers(0, 1, &vtxBuff, &vtxStride, &offset);      // 頂点バッファをセット

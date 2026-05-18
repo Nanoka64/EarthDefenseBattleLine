@@ -516,8 +516,8 @@ void RenderPipeline::Forward_PathRender(RendererEngine &renderer)
     /*
     * エフェクシアの描画もここでする！！
     */
-    Master::m_pEffectManager->DrawEffect();
     Master::m_pGameObjectManager->Alpha_ObjectRenderPass(renderer);
+    Master::m_pEffectManager->DrawEffect();
 
     // スカイボックス深度ステンシル設定解除
     renderer.RegisterDepthStencilState(NULL, 0);

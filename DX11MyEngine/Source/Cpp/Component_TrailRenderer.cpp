@@ -186,28 +186,27 @@ void TrailRenderer::VertexUpdate(RendererEngine& renderer)
 	for (int i = 0; i < m_TrailInfoList.size(); i++)
 	{
 		VEC3 tail = m_TrailInfoList[i]._pos;// 末尾（今作るのはこれ）
-		VEC3 head = VEC3();					// 先頭
 
 		m_TrailInfoList[i]._time--;
 
 		// 時間の比率を求める
 		float w_t = static_cast<float>(m_TrailInfoList[i]._time) / static_cast<float>(m_DrawTime);
 
-		// 先頭位置を取得
+		VEC3 headDir;
+
+		// 先頭位置への方向を求める
 		if (i < (m_TrailInfoList.size() - 1)){
-			head = m_TrailInfoList[i + 1]._pos;
+			headDir = (m_TrailInfoList[i + 1]._pos - tail).Normalize();
 		}
 		else{
 			// 先頭位置がない場合、前の情報から仮想の位置を作る
 			VEC3 prev = m_TrailInfoList[i - 1]._pos;
-			head = head + (tail - prev);
+			headDir = (tail - prev).Normalize();
 		}
 
 		// カメラへの方向
 		VEC3 viewDir = (tail - cameraPos).Normalize();
 		
-		// 先頭位置への方向
-		VEC3 headDir = (head - tail).Normalize();
 
 		// メッシュの広がる方向ベクトルを作る
 		VEC3 dir = VEC3::Cross(headDir, viewDir);
