@@ -53,5 +53,12 @@ void DistortionEffect::Update(RendererEngine& renderer)
 //*----------------------------------------------------------------------------------------
 void DistortionEffect::Draw(RendererEngine& renderer)
 {
+
+
+
+	// デバイスにシェーダをセット ===================================================
+	Master::m_pShaderManager->DeviceToSetShader(SHADER_TYPE::POST_DISTORTION);
+
+
 }
 

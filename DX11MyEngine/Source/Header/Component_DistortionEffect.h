@@ -16,6 +16,7 @@ private:
 	float m_DistortionPower;   // 歪みの強さ
 	float m_DistortionSpeed;   // 歪みの速度
 	float m_DistortionScale;   // 歪みのスケール
+	CB_DISTORTION m_CBDistortion;	// 定数バッファ用データ
 
 public:
 	DistortionEffect(std::weak_ptr<GameObject> pOwner, int updateRank);
