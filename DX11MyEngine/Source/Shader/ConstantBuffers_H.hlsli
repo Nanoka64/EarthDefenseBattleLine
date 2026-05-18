@@ -204,4 +204,15 @@ cbuffer CB_WINDOW : register(b12)
     float2 pad7;
 };
 
+
+//* =========================================================================
+//*- @:ディストーション用データ -        >>>>>>>【１３】
+//* =========================================================================
+cbuffer CB_DISTORTION : register(b13)
+{
+    float cb_DistortionPower;       // ディストーションの強さ
+    float cb_DistortionTime;        // ディストーションの時間（アニメーション用）
+    float2 cb_Distortion_UVScale;   // ディストーションのUVスケール
+};
+
 #endif

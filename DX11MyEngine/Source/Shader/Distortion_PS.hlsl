@@ -18,10 +18,9 @@ Texture2D g_tNoizeTexture : register(t1); // ノイズテクスチャ
 /* =========================================================================*/
 struct PS_IN
 {
-    float4 Pos : SV_Position;
-    float3 Normal : NORMAL0;
-    float4 Color : COLOR0;
-    float2 UV : TEXCOORD0;
+    float4 Pos       : SV_Position;
+    float4 PosInProj : TEXCOORD0; // 投影空間の頂点座標
+    float2 UV        : TEXCOORD1;
 };
 
 
@@ -30,5 +29,17 @@ struct PS_IN
 // **************************************************************************
 float4 PSMain(PS_IN input) : SV_TARGET
 {
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+    float4 finalColor = float4(0.0, 0.0, 0.0, 1.0);
+   
+    // ノイズテクスチャを使ってUVを歪ませる
+    float2 noiseUV = input.UV + float2(0, cb_DistortionTime * 0.5f);
+    float3 noise = g_tNoizeTexture.Sample(g_sSampler, noiseUV).rgb;
+    
+    // 0～1のノイズを -1～1 に変換して強度を調整
+    float2 offset = (noise.xy * 2.0f - 1.0f) * cb_DistortionPower;
+    
+    // シーンテクスチャを歪ませたUVでサンプリング
+    finalColor = g_tSceneTexture.Sample(g_sSampler, input.PosInProj.xy + offset);
+    
+    return finalColor;
 }

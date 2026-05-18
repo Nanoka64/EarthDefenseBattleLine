@@ -24,6 +24,7 @@ constexpr int CB_SLOT_SHADOW = 9;	            // シャドウマップ用
 constexpr int CB_SLOT_SPRITE = 10;	            // スプライト用
 constexpr int CB_SLOT_DECAL = 11;	            // デカール用
 constexpr int CB_SLOT_WINDOW = 12;	            // ウインドウ情報用
+constexpr int CB_SLOT_DISTORTION = 13;          // ディストーション用
 
 
 //=========================================================================================
@@ -292,6 +293,18 @@ struct CB_WINDOW {
 struct CB_WINDOW_SET {
     CB_WINDOW Data = {};
     ID3D11Buffer* pBuff = nullptr;
+};
+
+
+//=========================================================================================
+//
+//						ディストーション情報 - slot 13
+// 
+//=========================================================================================
+struct CB_DISTORTION {
+	float Power;                 // ディストーションの強さ
+	float Time;                  // ディストーションの時間（アニメーションさせるためのもの）
+	DirectX::XMFLOAT2 UVScale;   // ディストーションのUVスケール
 };
 
 

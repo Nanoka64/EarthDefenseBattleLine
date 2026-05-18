@@ -61,6 +61,7 @@ enum class SHADER_TYPE
     POST_SHADOWMAP_SKINNED,             // シャドウマップスキニング用
     POST_DEPTH_OF_FILED,                // 被写界深度
     POST_TONEMAPPING,                   // トーンマッピング（ACES使用）
+    POST_DISTORTION,                    // ディストーション
     
     /* 旧仕様 */
     //SIMPLE,     // 単純な3Dオブジェクト表示用

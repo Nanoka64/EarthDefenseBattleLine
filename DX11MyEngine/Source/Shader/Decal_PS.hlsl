@@ -50,7 +50,7 @@ PS_OUT PSMain(PS_IN input)
     float4 normalColor = float4(0.0, 0.0, 0.0, 1.0);
     
     // スクリーン空間のUVを求める（デカールはボックスの為そのままでは使えない）
-    float2 screenUV = input.Pos.xy * float2(1.0f / 1904.0f, 1.0f / 1041.0f);
+    float2 screenUV = input.Pos.xy / float2(cb_WindowWidth, cb_WindowHeight);
     
     // 深度値
     float depth = g_tDepthTexture.Sample(g_sSampler, screenUV).r;
