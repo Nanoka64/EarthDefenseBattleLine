@@ -33,6 +33,7 @@
 #include "Component_MoveLogic.h"
 #include "Component_Faction.h"
 #include "Component_Item.h"
+#include "Component_DistortionEffect.h"
 
 using namespace UtilityData;
 using namespace EnemyData;
@@ -404,6 +405,16 @@ void c_Game_LoadProcess::OnExit(SceneManager* pOwner)
         obj->get_Transform().lock()->set_Scale(10.0f, 10.0f, 10.0f);
         obj->get_Transform().lock()->set_Pos(-150.0f, 0.0f, 100.0f);
         obj->get_Transform().lock()->set_RotateToDeg(0.0f, 0.0f, 0.0f);
+    }
+
+    {
+        auto obj = GIGA_Engine::Instantiate3D(std::make_shared<GameObject>(), true);
+        obj->set_Tag("DistortionEffect");
+        obj->set_LayerRank(1000);
+        obj->set_StatusFlag(OBJECT_STATUS_BITFLAG::IS_ACTIVE);
+		obj->get_Transform().lock()->set_Pos(-155.0f, 5.0f, 100.0f);
+        auto distortion = obj->add_Component<DistortionEffect>();
+        distortion->Setup(*m_pRenderer);
     }
 
     /* スカイボックスの生成 */

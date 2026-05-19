@@ -52,7 +52,7 @@ VS_OUTPUT VSMain(VS_INPUT input)
     
     // 正規化スクリーン座標系の座標を求める
     output.PosInProj = output.Pos; 
-    output.PosInProj.xy /= output.PosInProj.w;
+    output.PosInProj.xyz /= output.PosInProj.w;
     
     
     return output;

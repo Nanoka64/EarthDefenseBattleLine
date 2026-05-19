@@ -24,6 +24,8 @@ private:
     class DX_RenderTarget *m_pLuminance_RT;		// 輝度抽出用
     class DX_RenderTarget *m_pShadowMap_RT;		// シャドウマップ（ライトから見た深度を書き込む）
 
+    //class DX_RenderTarget *m_pSceneCopy_RT;	
+
     // シャドウマップの解像度
     const float SHADOW_SIZE_X = 4096.0f;    
     const float SHADOW_SIZE_Y = 4096.0f;

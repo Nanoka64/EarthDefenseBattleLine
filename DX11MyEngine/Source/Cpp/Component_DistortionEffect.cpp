@@ -74,19 +74,35 @@ void DistortionEffect::Draw(RendererEngine& renderer)
     std::shared_ptr<MyTransform> transform = m_pOwner.lock()->get_Transform().lock();
 
     // シェーダセット ==========================
-    Master::m_pShaderManager->DeviceToSetShader(SHADER_TYPE::FORWARD_UNLIT_STATIC);
+    Master::m_pShaderManager->DeviceToSetShader(SHADER_TYPE::POST_DISTORTION);
 
     /* ========== 定数バッファの更新 ========== */
     XMMATRIX viewInvMtx = renderer.get_ViewInvMatrix(); // ビュー逆行列取得
 
-    const XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+    // ビルボードの回転を計算 ==========================
+     
+    // デフォルトの上方向ベクトル（ワールドのY軸）を基準にする
+    const XMVECTOR baseUP = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+    // ----------------------------------------------
+    // 前方ベクトル
+    // ----------------------------------------------
     XMVECTOR forward = viewInvMtx.r[2];     // [2]に前方向が入ってる（0:rg1:up2:fw）
-
-    //forward = XMVectorSet(forward,);
-
     forward = XMVector3Normalize(forward);  // 正規化
 
-    XMVECTOR right = XMVector3Cross(up, forward);   // 外積を使って右方向ベクトルを求める
+    // ----------------------------------------------
+    // 右方向ベクトル
+    // ----------------------------------------------
+    XMVECTOR right = XMVector3Cross(baseUP, forward);   // 外積を使って右方向ベクトルを求める
+    right = XMVector3Normalize(right);      // 正規化
+
+    // ----------------------------------------------
+    // 上方向ベクトル
+    // ----------------------------------------------
+    XMVECTOR up = XMVector3Cross(forward, right);
+    up = XMVector3Normalize(up);            // 正規化
+
 
     viewInvMtx.r[0] = right;   // X軸
     viewInvMtx.r[1] = up;      // Y軸
@@ -94,7 +110,7 @@ void DistortionEffect::Draw(RendererEngine& renderer)
     viewInvMtx.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);// 平行移動成分をゼロにする
 
     // ワールド行列セット ==========================
-
+     
     // 明示的に行列を設定
     XMMATRIX worldMtx =
         transform->get_WorldMtx(
@@ -106,6 +122,11 @@ void DistortionEffect::Draw(RendererEngine& renderer)
     XMMATRIX mtx = XMMatrixTranspose(worldMtx);        // 行列の転置
     XMStoreFloat4x4(&cbTransform.WorldMtx, mtx);  // XMMATRIX → XMFLOAT4X4変換
 
+	static float time = 0.0f;
+	time += 0.01f;
+
+	m_CBDistortion.Power = 0.3f; // ディストーションの強さ
+	m_CBDistortion.Time = time;   // 時間を更新（アニメーションさせるためのもの）
 
     // 定数バッファをセット ==========================
     Master::m_pShaderManager->BindConstantBuffer(CONSTANT_BUFFER_TYPE::TRANSFORM, (void*)&cbTransform, sizeof(CB_TRANSFORM));
@@ -116,10 +137,15 @@ void DistortionEffect::Draw(RendererEngine& renderer)
     ID3D11ShaderResourceView* noizeSRV = nullptr;
     ID3D11ShaderResourceView* sceneSRV = nullptr;
 
+    //auto sceneTexture = Master::m_pResourceManager->Convert_SRVToTexture("RT_SceneFinal");
+    //sceneSRV = sceneTexture->get_SRV();
+    auto noizeTexture = Master::m_pResourceManager->LoadWIC_Texture(L"Resource/Texture/PerlinNoise.png");
+    noizeSRV = noizeTexture->get_SRV();
+
 	// デバイスにシェーダをセット ===================================================
 	Master::m_pShaderManager->DeviceToSetShader(SHADER_TYPE::POST_DISTORTION);
 
-    pContext->PSSetShaderResources(0, 1, &sceneSRV);
+    //pContext->PSSetShaderResources(0, 1, &sceneSRV);
     pContext->PSSetShaderResources(1, 1, &noizeSRV);
 
     // 頂点＆インデックスバッファ設定 ==========================
@@ -139,3 +165,16 @@ void DistortionEffect::Draw(RendererEngine& renderer)
 
 }
 
+bool DistortionEffect::Setup(RendererEngine& renderer)
+{
+    auto pDevice = renderer.get_Device();
+    m_pMeshData = std::make_shared<MeshResourceData>();
+
+    /*
+    *  メッシュ情報の作成
+    */
+    *m_pMeshData = MeshInfoFactory::CreateMesh(pDevice, g_QuadVertices, g_QuadVertexNum, g_QuadIndices, g_QuadIndexNum);
+    m_pMeshData->CullMode = CULL_MODE::NONE;
+
+    return true;
+}

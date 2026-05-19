@@ -93,6 +93,9 @@ constexpr int POINTLIGHT_MAX_NUM		= 100; // ポイントライトの最大数
 constexpr int DIRECTIONLIGHT_MAX_NUM	= 1;   // ディレクションライトの最大数
 
 
+#define IS_WRITE_ENABLE   // DirectWriteを使用しているとRenderDocが使用できないのでそういう時にこれを消す
+
+
 /// <summary>
 /// 描画パス
 /// </summary>
