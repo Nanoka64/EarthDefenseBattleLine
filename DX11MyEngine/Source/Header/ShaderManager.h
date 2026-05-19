@@ -126,6 +126,7 @@ enum class CONSTANT_BUFFER_TYPE
 	SPRITE,                 // スプライト用
 	DECAL,  		        // デカール用  
 	WINDOW, 			    // ウインドウ情報用
+	DISTORTION,             // ディストーション用
 
     NUM,
 };

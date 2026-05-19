@@ -1,5 +1,6 @@
 #pragma once
 #include "IComponent.h"
+#include "MeshInfoFactory.h"
 
 // ***************************************************************************************
 // ---------------------------------------------------------------------------------------
@@ -18,6 +19,8 @@ private:
 	float m_DistortionScale;   // 歪みのスケール
 	CB_DISTORTION m_CBDistortion;	// 定数バッファ用データ
 
+	std::shared_ptr<MeshResourceData> m_pMeshData;	// メッシュ情報
+
 public:
 	DistortionEffect(std::weak_ptr<GameObject> pOwner, int updateRank);
 	~DistortionEffect();
@@ -25,6 +28,5 @@ public:
 	void Start(RendererEngine& renderer) override;	// 初期化
 	void Update(RendererEngine& renderer) override;	// 更新
 	void Draw(RendererEngine& renderer) override;	// 描画
-
 };
 

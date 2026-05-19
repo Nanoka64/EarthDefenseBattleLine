@@ -93,22 +93,42 @@ void BillboardRenderer::Draw(RendererEngine& renderer)
     /* ========== 定数バッファの更新 ========== */
     XMMATRIX viewInvMtx = renderer.get_ViewInvMatrix(); // ビュー逆行列取得
 
-    const XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+	// ビルボードの回転を計算 ==========================
+
+	// デフォルトの上方向ベクトル（ワールドのY軸）を基準にする
+    const XMVECTOR baseUP = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+    // ----------------------------------------------
+    // 前方ベクトル
+    // ----------------------------------------------
     XMVECTOR forward = viewInvMtx.r[2];     // [2]に前方向が入ってる（0:rg1:up2:fw）
- 
+
     if (resourcePtr->m_FixedAxisBitFlag & FIXED_AXIS_BITFLAG_X) {
-        forward = XMVectorSetX(forward, 0.0f);  // X成分を0にする
+        forward = XMVectorSetX(forward, 0.0f);  // X成分を0にする（左右向かない）
     }
     if (resourcePtr->m_FixedAxisBitFlag & FIXED_AXIS_BITFLAG_Y) {
-        forward = XMVectorSetY(forward, 0.0f);  // Y成分を0にする
+        forward = XMVectorSetY(forward, 0.0f);  // Y成分を0にする（上向かない）
     }
     if (resourcePtr->m_FixedAxisBitFlag & FIXED_AXIS_BITFLAG_Z) {
-        forward = XMVectorSetZ(forward, 0.0f);  // Z成分を0にする
+        forward = XMVectorSetZ(forward, 0.0f);  // Z成分を0にする（前後向かない）
     }
-
     forward = XMVector3Normalize(forward);  // 正規化
 
-    XMVECTOR right = XMVector3Cross(up, forward);   // 外積を使って右方向ベクトルを求める
+    
+    // ----------------------------------------------
+    // 右方向ベクトル
+    // ----------------------------------------------
+    XMVECTOR right = XMVector3Cross(baseUP, forward);   // 外積を使って右方向ベクトルを求める
+    right = XMVector3Normalize(right);      // 正規化
+
+
+    // ----------------------------------------------
+	// 上方向ベクトル
+    // ----------------------------------------------
+    XMVECTOR up = XMVector3Cross(forward, right);
+    up = XMVector3Normalize(up);            // 正規化
+
 
     viewInvMtx.r[0] = right;   // X軸
     viewInvMtx.r[1] = up;      // Y軸
@@ -116,6 +136,7 @@ void BillboardRenderer::Draw(RendererEngine& renderer)
     viewInvMtx.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);// 平行移動成分をゼロにする
 
     // ワールド行列セット ==========================
+
 
     // 明示的に行列を設定
     XMMATRIX worldMtx = 

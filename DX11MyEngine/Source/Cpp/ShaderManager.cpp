@@ -251,6 +251,7 @@ bool ShaderManager::Init(std::shared_ptr<RendererEngine> renderer)
 	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::SPRITE)]              = std::make_unique<ConstantBuffer<CB_SPRITE>>();
 	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::DECAL)]               = std::make_unique<ConstantBuffer<CB_DECAL>>();
 	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::WINDOW)]              = std::make_unique<ConstantBuffer<CB_WINDOW>>();
+	m_ConstantBuffers[UINT_CAST(CONSTANT_BUFFER_TYPE::DISTORTION)]          = std::make_unique<ConstantBuffer<CB_DISTORTION>>();
     
 	auto device = m_pRenderer.lock()->get_Device();
 
